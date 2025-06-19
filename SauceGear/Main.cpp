@@ -117,7 +117,7 @@ int main()
     int nrColumns = 7;
     float spacing = 2.5;
 
-    // pbr: setup framebuffer
+    // pbr: setup framebuffer :)
     // ----------------------
     unsigned int captureFBO;
     unsigned int captureRBO;
