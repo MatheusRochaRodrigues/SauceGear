@@ -95,6 +95,8 @@ vec2 IntegrateBRDF(float NdotV, float roughness)
         {
             float G = GeometrySmith(N, V, L, roughness);
             float G_Vis = (G * VdotH) / (NdotH * NdotV);
+
+            //Faz a aproximação de Fresnel usando Schlick, considerando V . H
             float Fc = pow(1.0 - VdotH, 5.0);
 
             A += (1.0 - Fc) * G_Vis;
