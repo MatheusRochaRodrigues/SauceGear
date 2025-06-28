@@ -17,6 +17,8 @@
 #include "Camera.h" 
 #include "Model.h" 
 #include "IBLMapGenerator.h"
+#include "SkyboxRenderer.h"
+#include "LightManager.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -146,7 +148,7 @@ int main()
     GLuint prefilterMap = iblGen.GetPrefilterMap();
     GLuint brdfLUTTexture = iblGen.GetBrdfLUT();
 
-
+    //SkyboxRenderer skybox(backgroundShader);
 
 
     // initialize static shader uniforms before rendering
@@ -166,7 +168,8 @@ int main()
 
     // load models
     // -----------
-    Model ModelDebugAssimp("Resources/Models/backpack/backpack.obj");
+    //Model ModelDebugAssimp("Resources/Models/backpack/backpack.obj");
+    Model ModelDebugAssimp("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
 
     // render loop
     // -----------
@@ -177,6 +180,9 @@ int main()
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        //glEnable(GL_CULL_FACE);
+
 
         // input
         // -----
@@ -273,7 +279,8 @@ int main()
         // render the loaded model
         glm::mat4 model1 = glm::mat4(1.0f);
         model1 = glm::translate(model1, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model1 = glm::scale(model1, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        //model1 = glm::scale(model1, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        model1 = glm::scale(model1, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
         baseColor.setMat4("model", model1);
         ModelDebugAssimp.Draw(baseColor);
 

@@ -2,6 +2,12 @@
 #define IBL_MAP_GENERATOR_H
 
 #include <stb/stb_image.h>
+//#include <stb/stb_image_write.h>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+
+namespace fs = std::filesystem;
 
 #include "Shader.h"
 #include "RenderUtils.h" // renderCube, renderQuad
@@ -37,6 +43,9 @@ private:
     void CreateIrradianceMap();
     void CreatePrefilterMap();
     void CreateBRDFLUT();
+
+    /*bool LoadFromDisk(const std::string& hdrPath);
+    void SaveToDisk(const std::string& hdrPath);*/
 };
 
 #endif // IBL_MAP_GENERATOR_H

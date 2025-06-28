@@ -1,9 +1,9 @@
 #include "IBLMapGenerator.h"
 
-IBLMapGenerator::IBLMapGenerator(const Shader& eqShader, const Shader& irrShader,
-    const Shader& preShader, const Shader& brdf)
-    : equirectShader(eqShader), irradianceShader(irrShader),
-    prefilterShader(preShader), brdfShader(brdf) {
+IBLMapGenerator::IBLMapGenerator(const Shader& equirectToCubemap, const Shader& irradianceConv,
+    const Shader& prefilter, const Shader& brdf)
+    : equirectShader(equirectToCubemap), irradianceShader(irradianceConv),
+    prefilterShader(prefilter), brdfShader(brdf) {
     SetupCapture();
 }
 
@@ -50,6 +50,14 @@ void IBLMapGenerator::LoadHDR(const std::string& hdrPath) {
 }
 
 void IBLMapGenerator::Generate(const std::string& hdrPath) {
+    /*std::string name = fs::path(hdrPath).stem().string();
+    std::string cacheDir = "cache/" + name;*/
+
+    /*if (LoadFromDisk(hdrPath)) {
+        std::cout << "Loaded IBL maps from disk cache for: " << hdrPath << std::endl;
+        return;
+    }*/
+
     LoadHDR(hdrPath);
     CreateCubemap();
 
@@ -59,7 +67,34 @@ void IBLMapGenerator::Generate(const std::string& hdrPath) {
     //----------specular      IBL
     CreatePrefilterMap();
     CreateBRDFLUT();
+
+    //SaveToDisk(hdrPath);
 }
+
+//bool IBLMapGenerator::LoadFromDisk(const std::string& hdrPath) {
+//    std::string name = fs::path(hdrPath).stem().string();
+//    std::string cacheDir = "cache/" + name;
+//
+//    if (!fs::exists(cacheDir))
+//        return false;
+//
+//    // Você pode expandir isso para carregar mapas .dds ou imagens HDR com stb_image
+//    return false; // Placeholder, real implementation needed.
+//}
+//
+//void IBLMapGenerator::SaveToDisk(const std::string& hdrPath) {
+//    std::string name = fs::path(hdrPath).stem().string();
+//    std::string cacheDir = "cache/" + name;
+//
+//    fs::create_directories(cacheDir);
+//
+//    // Placeholder: salvar os mapas em .hdr ou .dds futuramente
+//    std::ofstream meta(cacheDir + "/info.txt");
+//    meta << "Cache created for " << hdrPath << "\n";
+//    meta.close();
+//}
+
+//----------------------------------------------creating Maps IBL
 
 void IBLMapGenerator::CreateCubemap() {
     // pbr: setup cubemap to render to and attach to framebuffer
