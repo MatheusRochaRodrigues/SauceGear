@@ -18,13 +18,15 @@
 #include "Model.h" 
 #include "IBLMapGenerator.h"
 #include "SkyboxRenderer.h"
-#include "LightManager.h"
+#include "Lighting.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
-
+void RenderScene(Shader& pbrShader); 
+void renderScene(Shader& shader);
+unsigned int loadTexture(char const* path);
 
 // settings
 const unsigned int SCR_WIDTH = 1680;
@@ -39,6 +41,25 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+
+// lights
+// ------
+glm::vec3 lightPositions[] = {
+    glm::vec3(-10.0f,  10.0f, 10.0f),
+    glm::vec3(10.0f,  10.0f, 10.0f),
+    glm::vec3(-10.0f, -10.0f, 10.0f),
+    glm::vec3(10.0f, -10.0f, 10.0f),
+};
+glm::vec3 lightColors[] = {
+    glm::vec3(300.0f, 300.0f, 300.0f),
+    glm::vec3(300.0f, 300.0f, 300.0f),
+    glm::vec3(300.0f, 300.0f, 300.0f),
+    glm::vec3(300.0f, 300.0f, 300.0f)
+};
+int nrRows = 7;
+int nrColumns = 7;
+float spacing = 2.5;
 
 int main()
 {
@@ -102,7 +123,16 @@ int main()
     Shader backgroundShader("background.vs", "background.fs");
 
     //BASE COLOR TEST
-    Shader baseColor("BaseColor.vs", "BaseColor.fs");
+    //Shader baseColor("BaseColor.vs", "BaseColor.fs");
+    //Shader baseShadow("BaseShadow.vs", "BaseShadow.fs");
+    Shader baseColor("BaseShadow.vs", "BaseShadow.fs");
+
+    // build and compile shaders
+    // -------------------------
+    //Shader shader("ShadowMap.vs", "ShadowMap.fs"); 
+    //Shader debugDepthQuad("3.1.3.debug_quad.vs", "3.1.3.debug_quad_depth.fs");
+
+    Shader screenShader("FrameBufferQuad.vs", "debug_quad_depth.fs");
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 0);
@@ -111,27 +141,7 @@ int main()
     pbrShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
     pbrShader.setFloat("ao", 1.0f);
 
-    backgroundShader.use();
-    backgroundShader.setInt("environmentMap", 0);
 
-
-    // lights
-    // ------
-    glm::vec3 lightPositions[] = {
-        glm::vec3(-10.0f,  10.0f, 10.0f),
-        glm::vec3(10.0f,  10.0f, 10.0f),
-        glm::vec3(-10.0f, -10.0f, 10.0f),
-        glm::vec3(10.0f, -10.0f, 10.0f),
-    };
-    glm::vec3 lightColors[] = {
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f),
-        glm::vec3(300.0f, 300.0f, 300.0f)
-    };
-    int nrRows = 7;
-    int nrColumns = 7;
-    float spacing = 2.5;
 
     // Inicializa o gerador de mapas IBL
     IBLMapGenerator iblGen(
@@ -148,7 +158,6 @@ int main()
     GLuint prefilterMap = iblGen.GetPrefilterMap();
     GLuint brdfLUTTexture = iblGen.GetBrdfLUT();
 
-    //SkyboxRenderer skybox(backgroundShader);
 
 
     // initialize static shader uniforms before rendering
@@ -156,8 +165,8 @@ int main()
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     pbrShader.use();
     pbrShader.setMat4("projection", projection);
-    backgroundShader.use();
-    backgroundShader.setMat4("projection", projection);
+
+    SkyboxRenderer skybox(backgroundShader, projection);
 
     // then before rendering, configure the viewport to the original framebuffer's screen dimensions
     int scrWidth, scrHeight;
@@ -168,8 +177,22 @@ int main()
 
     // load models
     // -----------
-    //Model ModelDebugAssimp("Resources/Models/backpack/backpack.obj");
-    Model ModelDebugAssimp("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
+    Model ModelDebugAssimp("Resources/Models/backpack/backpack.obj");
+    //Model ModelDebugAssimp("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
+    
+    unsigned int woodTexture = loadTexture("Resources/Textures/ww.png");
+
+
+    // configure depth map FBO
+    // -----------------------
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+    Shader shader("ShadowMap.vs", "ShadowMap.fs");
+    Lighting lightManager(shader, SHADOW_WIDTH, SHADOW_HEIGHT);
+
+    lightManager.InstanceDirectionalLight(
+        glm::vec3(-2.0f, 4.0f, -1.0f), glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
 
     // render loop
     // -----------
@@ -193,97 +216,118 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
         // render scene, supplying the convoluted irradiance map to the final shader.
         // ------------------------------------------------------------------------------------------
-        pbrShader.use();
-        glm::mat4 view = camera.GetViewMatrix();
-        pbrShader.setMat4("view", view);
-        pbrShader.setVec3("camPos", camera.Position);
+                   // pbrShader.use();
+                   // glm::mat4 view = camera.GetViewMatrix();
+                   // pbrShader.setMat4("view", view);
+                   // pbrShader.setVec3("camPos", camera.Position);
 
-        // bind pre-computed IBL data
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
-
-        // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
-        glm::mat4 model = glm::mat4(1.0f);
-        for (int row = 0; row < nrRows; ++row)
-        {
-            pbrShader.setFloat("metallic", (float)row / (float)nrRows);
-            for (int col = 0; col < nrColumns; ++col)
-            {
-                // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
-                // on direct lighting.
-                pbrShader.setFloat("roughness", glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
-
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(
-                    (float)(col - (nrColumns / 2)) * spacing,
-                    (float)(row - (nrRows / 2)) * spacing,
-                    -2.0f
-                ));
-                pbrShader.setMat4("model", model);
-                pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-                renderSphere();
-            }
-        }
+                   // // bind pre-computed IBL data
+                   // glActiveTexture(GL_TEXTURE0);
+                   // glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+                   // glActiveTexture(GL_TEXTURE1);
+                   // glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+                   //glActiveTexture(GL_TEXTURE2);
+                   // glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
 
 
-        // render light source (simply re-render sphere at light positions)
-        // this looks a bit off as we use the same shader, but it'll make their positions obvious and 
-        // keeps the codeprint small.
-        for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
-        {
-            glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-            newPos = lightPositions[i];
-            pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-            pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+                   // for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+                   // {
+                   //     glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+                   //     newPos = lightPositions[i];
+                   //     pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+                   //     pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, newPos);
-            model = glm::scale(model, glm::vec3(0.5f));
-            pbrShader.setMat4("model", model);
-            pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-            renderSphere();
-        }
+                   //     glm::mat4 model = glm::mat4(1.0f);
+                   //     model = glm::translate(model, newPos);
+                   //     model = glm::scale(model, glm::vec3(0.5f));
+                   //     pbrShader.setMat4("model", model);
+                   //     pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+                   //     renderSphere();
+                   // }
 
-        // render skybox (render as last to prevent overdraw)
-        backgroundShader.use();
-        backgroundShader.setMat4("view", view);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // display irradiance map
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap); // display prefilter map
-        renderCube();
+                   // RenderScene(pbrShader);
 
+                   // //// render skybox (render as last to prevent overdraw) 
+                   // //// (irradianceMap) display irradiance map  -Debug in Skybox
+                   // //// (prefilterMap)  display prefilter map    -Debug in Skybox
+                   // skybox.Draw(view, envCubemap);  
 
-        // render BRDF map to screen
-        //brdfShader.Use();
-        //renderQuad();
+                   // //// render BRDF map to screen
+                   // ////brdfShader.Use();
+                   // ////renderQuad();
+                   // // 
 
 
+        ////light
+        lightManager.UpdateLights(camera.Position); 
+        glCullFace(GL_FRONT); 
 
+        lightManager.allLights[0].position = lightManager.allLights[0].position + glm::vec3(0.05f) * deltaTime;
+        Shader* sa = lightManager.DirectionalShader;
 
-        // don't forget to enable shader before setting uniforms
-        baseColor.use();
-
-        // view/projection transformations
+        //// don't forget to enable shader before setting uniforms
+        sa->use(); 
+        //// view/projection transformations
         glm::mat4 projection1 = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view1 = camera.GetViewMatrix();
+        sa->setMat4("projection", projection1);
+        sa->setMat4("view", view1); 
+        //// render the loaded model
+        glm::mat4 model1 = glm::mat4(1.0f);
+        model1 = glm::translate(model1, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model1 = glm::scale(model1, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        model1 = glm::scale(model1, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+        sa->setMat4("model", model1);
+        ModelDebugAssimp.Draw(*sa);
+        renderScene(*sa);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glCullFace(GL_BACK); // don't forget to reset original culling face
+        //end shadow
+
+
+
+        //render scene real
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //// don't forget to enable shader before setting uniforms
+        baseColor.use();
+        baseColor.setInt("diffuseTexture", 0);
+        baseColor.setInt("shadowMap", 1);
+
+        // view/projection transformations 
         baseColor.setMat4("projection", projection1);
+        //baseColor.setMat4("view", view1);
+        baseColor.setVec3("viewPos", camera.Position);
         baseColor.setMat4("view", view1);
 
         // render the loaded model
-        glm::mat4 model1 = glm::mat4(1.0f);
-        model1 = glm::translate(model1, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        //model1 = glm::scale(model1, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        model1 = glm::scale(model1, glm::vec3(0.01f, 0.01f, 0.01f));	// it's a bit too big for our scene, so scale it down
         baseColor.setMat4("model", model1);
+
+        baseColor.setVec3("lightPos", lightManager.allLights[0].position);
+        baseColor.setMat4("lightSpaceMatrix", lightManager.allLights[0].lightSpaceMatrices);
+
         ModelDebugAssimp.Draw(baseColor);
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, woodTexture); 
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, lightManager.allLights[0].depthMap); 
+        renderScene(baseColor);
+
+
+
+        /*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+         
+        screenShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, lightManager.allLights[0].depthMap);
+        renderQuad();*/
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -296,6 +340,86 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+
+
+// renders the 3D scene
+// --------------------
+//void renderScene(const Shader& shader)
+void renderScene(Shader& shader)
+{
+    // floor
+    glm::mat4 model = glm::mat4(1.0f);
+    shader.setMat4("model", model);
+    glBindVertexArray(planeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // cubes
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
+    model = glm::scale(model, glm::vec3(0.5f));
+    shader.setMat4("model", model);
+    renderCube();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
+    model = glm::scale(model, glm::vec3(0.5f));
+    shader.setMat4("model", model);
+    renderCube  ();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0));
+    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+    model = glm::scale(model, glm::vec3(0.25));
+    shader.setMat4("model", model);
+    renderCube();
+
+    model = glm::mat4(1.0f); 
+    shader.setMat4("model", model);
+    renderPlane();
+}
+
+
+void RenderScene(Shader& pbrShader) {
+    // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
+    glm::mat4 model = glm::mat4(1.0f);
+    for (int row = 0; row < nrRows; ++row)
+    {
+        pbrShader.setFloat("metallic", (float)row / (float)nrRows);
+        for (int col = 0; col < nrColumns; ++col)
+        {
+            // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
+            // on direct lighting.
+            pbrShader.setFloat("roughness", glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
+
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(
+                (float)(col - (nrColumns / 2)) * spacing,
+                (float)(row - (nrRows / 2)) * spacing,
+                -2.0f
+            ));
+            pbrShader.setMat4("model", model);
+            pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+            renderSphere();
+        }
+    }
+
+
+    // render light source (simply re-render sphere at light positions)
+    // this looks a bit off as we use the same shader, but it'll make their positions obvious and 
+    // keeps the codeprint small.
+    for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
+    {
+        glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+        newPos = lightPositions[i];
+        pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+        pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, newPos);
+        model = glm::scale(model, glm::vec3(0.5f));
+        pbrShader.setMat4("model", model);
+        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        renderSphere();
+    }
 }
 
 bool wireframe = false;
@@ -364,4 +488,44 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+
+// utility function for loading a 2D texture from file
+// ---------------------------------------------------
+unsigned int loadTexture(char const* path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }

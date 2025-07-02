@@ -1,10 +1,14 @@
 #include "IBLMapGenerator.h"
 
 IBLMapGenerator::IBLMapGenerator(const Shader& equirectToCubemap, const Shader& irradianceConv,
-    const Shader& prefilter, const Shader& brdf)
-    : equirectShader(equirectToCubemap), irradianceShader(irradianceConv),
-    prefilterShader(prefilter), brdfShader(brdf) {
+    const Shader& prefilter, const Shader& brdf) : 
+    equirectShader(equirectToCubemap), 
+    irradianceShader(irradianceConv),
+    prefilterShader(prefilter), 
+    brdfShader(brdf) {
+
     SetupCapture();
+
 }
 
 void IBLMapGenerator::SetupCapture() {

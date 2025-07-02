@@ -12,8 +12,12 @@ public:
     SkyboxRenderer(const Shader& shader);
     void Draw(const glm::mat4& view, const glm::mat4& projection, GLuint cubemap);
 
+    SkyboxRenderer(const Shader& shader, const glm::mat4& projection);
+    void Draw(const glm::mat4& view, GLuint cubemap);
+
 private:
     Shader shader;
+    glm::mat4 projection;
 };
 
 #endif

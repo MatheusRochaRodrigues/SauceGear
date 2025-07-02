@@ -131,7 +131,7 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="IBLMapGenerator.cpp" />
-    <ClCompile Include="LightManager.cpp" />
+    <ClCompile Include="Lighting.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainLegacyPBR.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -144,7 +144,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="IBLMapGenerator.h" />
-    <ClInclude Include="LightManager.h" />
+    <ClInclude Include="Lighting.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Shader.h" />
@@ -157,15 +157,24 @@
     <None Include="background.vs" />
     <None Include="BaseColor.fs" />
     <None Include="BaseColor.vs" />
+    <None Include="BaseShadow.fs" />
+    <None Include="BaseShadow.vs" />
     <None Include="brdf.fs" />
     <None Include="brdf.vs" />
     <None Include="cubemap.vs" />
+    <None Include="debug_quad_depth.fs" />
     <None Include="equirectangular_to_cubemap.fs" />
     <None Include="Frag.fg" />
+    <None Include="FrameBufferQuad.fs" />
+    <None Include="FrameBufferQuad.vs" />
     <None Include="irradiance_convolution.fs" />
     <None Include="pbr.fs" />
     <None Include="pbr.vs" />
     <None Include="prefilter.fs" />
+    <None Include="ShadowMap.fs" />
+    <None Include="ShadowMap.vs" />
+    <None Include="ShadowPointMap.fs" />
+    <None Include="ShadowPointMap.vs" />
     <None Include="Vertex.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -48,7 +48,7 @@
     <ClCompile Include="SkyboxRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="LightManager.cpp">
+    <ClCompile Include="Lighting.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,7 +77,7 @@
     <ClInclude Include="SkyboxRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="LightManager.h">
+    <ClInclude Include="Lighting.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -114,5 +114,14 @@
     <None Include="brdf.fs" />
     <None Include="BaseColor.vs" />
     <None Include="BaseColor.fs" />
+    <None Include="ShadowMap.vs" />
+    <None Include="ShadowMap.fs" />
+    <None Include="ShadowPointMap.vs" />
+    <None Include="ShadowPointMap.fs" />
+    <None Include="BaseShadow.fs" />
+    <None Include="BaseShadow.vs" />
+    <None Include="FrameBufferQuad.vs" />
+    <None Include="FrameBufferQuad.fs" />
+    <None Include="debug_quad_depth.fs" />
   </ItemGroup>
 </Project>
