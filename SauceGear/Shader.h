@@ -15,11 +15,15 @@
 
 std::string get_file_contents(const char* filename);
 
+
 class Shader
 {
 public:
 	// Reference ID of the Shader Program
 	GLuint ID;
+
+	std::string name;
+
 	// Constructor that build the Shader Program from 2 different shaders
 	Shader(const char* vertexFile, const char* fragmentFile);
 	// Constructor that build geometry shader too
@@ -46,6 +50,7 @@ public:
 private:
 	// Aqui estava o problema: a função precisa estar declarada dentro da classe!
 	void compileErrors(unsigned int shader, const char* type);
+	std::string ShaderPathDefault = "Resources/Shaders/";
 };
 
 

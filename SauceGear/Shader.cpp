@@ -20,6 +20,14 @@ std::string get_file_contents(const char* filename)
 // Constructor that build the Shader Program from 2 different shaders
 Shader::Shader(const char* vertexFile, const char* fragmentFile)
 {
+	name = vertexFile;
+
+	std::string vPath = ShaderPathDefault + vertexFile; 
+	std::string fPath = ShaderPathDefault + fragmentFile;
+
+	vertexFile = vPath.c_str(); 
+	fragmentFile = fPath.c_str();
+
 	// Read vertexFile and fragmentFile and store the strings
 	std::string vertexCode = get_file_contents(vertexFile);
 	std::string fragmentCode = get_file_contents(fragmentFile);
@@ -65,6 +73,16 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 // Constructor that build the Shader Program from 2 different shaders
 Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile)
 {
+	name = vertexFile;
+
+	std::string vPath = ShaderPathDefault + vertexFile;
+	std::string gPath = ShaderPathDefault + geometryFile;
+	std::string fPath = ShaderPathDefault + fragmentFile;
+
+	vertexFile = vPath.c_str();
+	geometryFile = gPath.c_str();
+	fragmentFile = fPath.c_str();
+
 	// Read vertexFile and fragmentFile and store the strings
 	std::string vertexCode = get_file_contents(vertexFile);
 	std::string geometryCode = get_file_contents(geometryFile);
@@ -196,6 +214,7 @@ void Shader::compileErrors(unsigned int shader, const char* type)
 		{
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 			std::cout << "SHADER_COMPILATION_ERROR for:" << type << "\n" << infoLog << std::endl;
+			std::cout << std::endl << "name of shader : " + name << std::endl;
 		}
 	}
 	else
@@ -205,6 +224,7 @@ void Shader::compileErrors(unsigned int shader, const char* type)
 		{
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
 			std::cout << "SHADER_LINKING_ERROR for:" << type << "\n" << infoLog << std::endl;
+			std::cout << std::endl << "name of shader : " + name << std::endl;
 		}
 	}
 }

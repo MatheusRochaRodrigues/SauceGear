@@ -77,7 +77,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "GearSauce", NULL, NULL);
     glfwMakeContextCurrent(window);
     if (window == NULL)
     {
@@ -110,29 +110,27 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    //PBR 
-    Shader pbrShader("pbr.vs", "pbr.fs");           //Shader pbrShader("pbr.vs", "pbrWithoutIBL.fs");
-    //IBL - DIFFUSE
-    Shader equirectangularToCubemapShader("cubemap.vs", "equirectangular_to_cubemap.fs");
-    Shader irradianceShader("cubemap.vs", "irradiance_convolution.fs");
-    //IBL - SPECULAR
-    Shader prefilterShader("cubemap.vs", "prefilter.fs");
-    Shader brdfShader("brdf.vs", "brdf.fs"); 
 
+    //PBR 
+    Shader pbrShader("PBR/pbr.vs", "PBR/pbr.fs");           //Shader pbrShader("pbr.vs", "pbrWithoutIBL.fs");
+    //IBL - DIFFUSE
+    Shader equirectangularToCubemapShader("cubemap.vs", "PBR/equirectangular_to_cubemap.fs");
+    Shader irradianceShader("cubemap.vs", "PBR/irradiance_convolution.fs");
+    //IBL - SPECULAR
+    Shader prefilterShader("cubemap.vs", "PBR/prefilter.fs");
+    Shader brdfShader("PBR/brdf.vs", "PBR/brdf.fs");  
     //Skybox hdr
     Shader backgroundShader("background.vs", "background.fs");
 
     //BASE COLOR TEST
-    //Shader baseColor("BaseColor.vs", "BaseColor.fs");
-    //Shader baseShadow("BaseShadow.vs", "BaseShadow.fs");
-    Shader baseColor("BaseShadow.vs", "BaseShadow.fs");
+    //Shader baseColor("BaseColor.vs", "BaseColor.fs"); 
+    Shader baseColor("BlinnPhong/BaseShadow.vs", "BlinnPhong/BaseShadow.fs");   //Shader baseShadow("BaseShadow.vs", "BaseShadow.fs");
 
-    // build and compile shaders
-    // -------------------------
-    //Shader shader("ShadowMap.vs", "ShadowMap.fs"); 
-    //Shader debugDepthQuad("3.1.3.debug_quad.vs", "3.1.3.debug_quad_depth.fs");
 
-    Shader screenShader("FrameBufferQuad.vs", "debug_quad_depth.fs");
+    //Shader shader("Debug/ShadowMap.vs", "Debug/ShadowMap.fs"); 
+    //Shader debugDepthQuad("3.1.3.debug_quad.vs", "3.1.3.debug_quad_depth.fs"); 
+    Shader screenShader("Debug/FrameBufferQuad.vs", "Debug/debug_quad_depth.fs");
+
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 0);
@@ -140,7 +138,6 @@ int main()
     pbrShader.setInt("brdfLUT", 2);
     pbrShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
     pbrShader.setFloat("ao", 1.0f);
-
 
 
     // Inicializa o gerador de mapas IBL
@@ -187,13 +184,18 @@ int main()
     // -----------------------
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
-    Shader shader("ShadowMap.vs", "ShadowMap.fs");
-    Lighting lightManager(shader, SHADOW_WIDTH, SHADOW_HEIGHT);
+    Shader shader("Shadows/ShadowMapD.vs", "Shadows/ShadowMapD.fs");
+    Shader shaderP("Shadows/ShadowMapP.vs", "Shadows/ShadowMapP.gs" , "Shadows/ShadowMapP.fs");
+    Lighting lightManager(shader, shaderP, SHADOW_WIDTH, SHADOW_HEIGHT);
 
-    lightManager.InstanceDirectionalLight(
-        glm::vec3(-2.0f, 4.0f, -1.0f), glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    /*lightManager.InstanceDirectionalLight(
+        glm::vec3(-2.0f, 4.0f, -1.0f), glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));*/
+
+    lightManager.InstancePointLight(
+        glm::vec3(0.0f, 0.0f, 0.0f), glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 
+    //Shader screenShaderCube("debug_Cube_depth.vs", "debug_Cube_depth.fs");
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -265,23 +267,26 @@ int main()
         lightManager.UpdateLights(camera.Position); 
         glCullFace(GL_FRONT); 
 
-        lightManager.allLights[0].position = lightManager.allLights[0].position + glm::vec3(0.05f) * deltaTime;
-        Shader* sa = lightManager.DirectionalShader;
+        //lightManager.allLights[0].position.z = static_cast<float>(sin(glfwGetTime() * 0.5) * 3.0);
+        // move light position over time 
+
+        //Shader* sa = lightManager.DirectionalShader;
+        Shader* sa = lightManager.PointShader;
 
         //// don't forget to enable shader before setting uniforms
         sa->use(); 
         //// view/projection transformations
         glm::mat4 projection1 = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view1 = camera.GetViewMatrix();
-        sa->setMat4("projection", projection1);
-        sa->setMat4("view", view1); 
-        //// render the loaded model
+        //sa->setMat4("projection", projection1);
+        //sa->setMat4("view", view1); 
+        ////// render the loaded model
         glm::mat4 model1 = glm::mat4(1.0f);
-        model1 = glm::translate(model1, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model1 = glm::scale(model1, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        model1 = glm::scale(model1, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
-        sa->setMat4("model", model1);
-        ModelDebugAssimp.Draw(*sa);
+        //model1 = glm::translate(model1, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        //model1 = glm::scale(model1, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        //model1 = glm::scale(model1, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+        //sa->setMat4("model", model1);
+        //ModelDebugAssimp.Draw(*sa);
         renderScene(*sa);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -298,13 +303,17 @@ int main()
         //// don't forget to enable shader before setting uniforms
         baseColor.use();
         baseColor.setInt("diffuseTexture", 0);
-        baseColor.setInt("shadowMap", 1);
+        baseColor.setInt("shadowMap", 2);
+        baseColor.setInt("depthMap", 1);
 
         // view/projection transformations 
         baseColor.setMat4("projection", projection1);
         //baseColor.setMat4("view", view1);
         baseColor.setVec3("viewPos", camera.Position);
         baseColor.setMat4("view", view1);
+            
+        /// cuidadooooooooooooooooooooooooooooooooooooooooo
+        baseColor.setFloat("far_plane", lightManager.far_plane);
 
         // render the loaded model
         baseColor.setMat4("model", model1);
@@ -312,22 +321,34 @@ int main()
         baseColor.setVec3("lightPos", lightManager.allLights[0].position);
         baseColor.setMat4("lightSpaceMatrix", lightManager.allLights[0].lightSpaceMatrices);
 
-        ModelDebugAssimp.Draw(baseColor);
+        //ModelDebugAssimp.Draw(baseColor);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, woodTexture); 
+
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, lightManager.allLights[0].depthMap); 
+        glBindTexture(GL_TEXTURE_CUBE_MAP, lightManager.allLights[0].depthMap);
+
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, lightManager.allLights[0].depthMap); 
         renderScene(baseColor);
 
 
 
-        /*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
          
-        screenShader.use();
+        /*screenShader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, lightManager.allLights[0].depthMap);
-        renderQuad();*/
+        renderQuad();
+
+        /*screenShaderCube.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, lightManager.allLights[0].depthMap);
+        screenShaderCube.setFloat("far_plane", lightManager.far_plane);
+        sa->setMat4("projection", projection1);
+        sa->setMat4("view", view1);
+        renderCube()*/;
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -343,39 +364,80 @@ int main()
 }
 
 
+// renders the 3D scene
+// --------------------
+void renderScene(Shader& shader)
+{
+    // room cube
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(5.0f));
+    shader.setMat4("model", model);
+    glDisable(GL_CULL_FACE); // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
+    shader.setInt("reverse_normals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
+    renderCube();
+    shader.setInt("reverse_normals", 0); // and of course disable it
+    glEnable(GL_CULL_FACE);
+    // cubes
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(4.0f, -3.5f, 0.0));
+    model = glm::scale(model, glm::vec3(0.5f));
+    shader.setMat4("model", model);
+    renderCube();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(2.0f, 3.0f, 1.0));
+    model = glm::scale(model, glm::vec3(0.75f));
+    shader.setMat4("model", model);
+    renderCube();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-3.0f, -1.0f, 0.0));
+    model = glm::scale(model, glm::vec3(0.5f));
+    shader.setMat4("model", model);
+    renderCube();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-1.5f, 1.0f, 1.5));
+    model = glm::scale(model, glm::vec3(0.5f));
+    shader.setMat4("model", model);
+    renderCube();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(-1.5f, 2.0f, -3.0));
+    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+    model = glm::scale(model, glm::vec3(0.75f));
+    shader.setMat4("model", model);
+    renderCube();
+}
 
 // renders the 3D scene
 // --------------------
 //void renderScene(const Shader& shader)
-void renderScene(Shader& shader)
-{
-    // floor
-    glm::mat4 model = glm::mat4(1.0f);
-    shader.setMat4("model", model);
-    glBindVertexArray(planeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    // cubes
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.setMat4("model", model);
-    renderCube  ();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0));
-    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    model = glm::scale(model, glm::vec3(0.25));
-    shader.setMat4("model", model);
-    renderCube();
-
-    model = glm::mat4(1.0f); 
-    shader.setMat4("model", model);
-    renderPlane();
-}
+//void renderScene(Shader& shader)
+//{
+//    // floor
+//    glm::mat4 model = glm::mat4(1.0f);
+//    shader.setMat4("model", model);
+//    glBindVertexArray(planeVAO);
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
+//    // cubes
+//    model = glm::mat4(1.0f);
+//    model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0));
+//    model = glm::scale(model, glm::vec3(0.5f));
+//    shader.setMat4("model", model);
+//    renderCube();
+//    model = glm::mat4(1.0f);
+//    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0));
+//    model = glm::scale(model, glm::vec3(0.5f));
+//    shader.setMat4("model", model);
+//    renderCube  ();
+//    model = glm::mat4(1.0f);
+//    model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0));
+//    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
+//    model = glm::scale(model, glm::vec3(0.25));
+//    shader.setMat4("model", model);
+//    renderCube();
+//
+//    model = glm::mat4(1.0f); 
+//    shader.setMat4("model", model);
+//    renderPlane();
+//}
 
 
 void RenderScene(Shader& pbrShader) {

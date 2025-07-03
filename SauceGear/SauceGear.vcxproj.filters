@@ -82,46 +82,50 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="background.fs">
+    <None Include="Resources\Shaders\background.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="background.vs">
+    <None Include="Resources\Shaders\background.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="cubemap.vs">
+    <None Include="Resources\Shaders\cubemap.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="equirectangular_to_cubemap.fs">
+    <None Include="Resources\Shaders\PBR\equirectangular_to_cubemap.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Frag.fg">
+    <None Include="Resources\Shaders\Basic\Frag.fg">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="irradiance_convolution.fs">
+    <None Include="Resources\Shaders\PBR\irradiance_convolution.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="pbr.fs">
+    <None Include="Resources\Shaders\PBR\pbr.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="pbr.vs">
+    <None Include="Resources\Shaders\PBR\pbr.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Vertex.vs">
+    <None Include="Resources\Shaders\Basic\Vertex.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="prefilter.fs" />
-    <None Include="brdf.vs" />
-    <None Include="brdf.fs" />
-    <None Include="BaseColor.vs" />
-    <None Include="BaseColor.fs" />
-    <None Include="ShadowMap.vs" />
-    <None Include="ShadowMap.fs" />
-    <None Include="ShadowPointMap.vs" />
-    <None Include="ShadowPointMap.fs" />
-    <None Include="BaseShadow.fs" />
-    <None Include="BaseShadow.vs" />
-    <None Include="FrameBufferQuad.vs" />
-    <None Include="FrameBufferQuad.fs" />
-    <None Include="debug_quad_depth.fs" />
+    <None Include="Resources\Shaders\PBR\prefilter.fs" />
+    <None Include="Resources\Shaders\PBR\brdf.vs" />
+    <None Include="Resources\Shaders\PBR\brdf.fs" />
+    <None Include="Resources\Shaders\CellShading\BaseColor.vs" />
+    <None Include="Resources\Shaders\CellShading\BaseColor.fs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapD.vs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapD.fs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.fs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.vs" />
+    <None Include="Resources\Shaders\Debug\FrameBufferQuad.vs" />
+    <None Include="Resources\Shaders\Debug\FrameBufferQuad.fs" />
+    <None Include="Resources\Shaders\Debug\debug_quad_depth.fs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapP.vs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapP.fs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapP.gs" />
+    <None Include="Resources\Shaders\Shadows\ShadowPointPCFold.fs" />
+    <None Include="Resources\Shaders\Debug\debug_Cube_depth.fs" />
+    <None Include="debug_Cube_depth.vs" />
   </ItemGroup>
 </Project>

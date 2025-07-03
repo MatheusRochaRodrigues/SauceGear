@@ -20,12 +20,18 @@ struct Light {
 
     //Pos Processing
     GLuint depthMap;
+    
+    //dir
     glm::mat4 lightSpaceMatrices;
+
+    //point
+    glm::mat4 shadowTransforms[6];
 };
 
 class Lighting {
 public:
-    Lighting(Shader& Directional, const unsigned int SHADOW_WIDTH = 1024, const unsigned int SHADOW_HEIGHT = 1024);
+    //Lighting(Shader& Directional, Shader& Point, const unsigned int SHADOW_WIDTH = 512, const unsigned int SHADOW_HEIGHT = 512);
+    Lighting(Shader& Directional, Shader& Point, const unsigned int SHADOW_WIDTH = 1024, const unsigned int SHADOW_HEIGHT = 1024);
 
     //LightManager(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& colors);
     void InstanceDirectionalLight   (glm::vec3 position, glm::mat4 model, glm::vec3 color);  
@@ -34,12 +40,19 @@ public:
 
     //void UpdateLights(const Shader& shader, float time);
     void UpdateLights(glm::vec3 positionPlayer);
+    void updtDirectional(Light& light);
+    void updtPoint(Light& light);
+
     std::vector<Light*> getLightsNearest(glm::vec3 positionPlayer);
 
     std::vector<Light> allLights;
     Shader* DirectionalShader;
-private:
     Shader* PointShader;
+
+    //float near_plane = 1.0f, far_plane = 7.5f;
+    float near_plane = 1.0f;
+    float far_plane = 25.0f;
+private:
 
     unsigned int SHADOW_WIDTH;
     unsigned int SHADOW_HEIGHT;
@@ -49,7 +62,6 @@ private:
     //unsigned int depthMap; 
     //std::vector<GLuint> depthMaps;
 
-    float near_plane = 1.0f, far_plane = 7.5f;
 
 
     //std::vector<glm::vec3> positions;
