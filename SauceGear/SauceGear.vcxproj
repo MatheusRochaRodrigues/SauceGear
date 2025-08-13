@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -107,6 +107,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,38 +130,155 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EditorUI.cpp" />
+    <ClCompile Include="Editor\EditorApp.cpp" />
+    <ClCompile Include="Editor\EditorMain.cpp" />
+    <ClCompile Include="Editor\ImGuiLayer.cpp" />
+    <ClCompile Include="Editor\Panels\FileExplorerPanel.h" />
+    <ClCompile Include="Editor\Panels\HierarchyPanel.h" />
+    <ClCompile Include="Editor\Panels\InspectorPanel.h" />
+    <ClCompile Include="Editor\Panels\SceneViewPanel.h" />
+    <ClCompile Include="Game\GameMain.cpp" />
+    <ClCompile Include="Graphics\Framebuffer.cpp" />
+    <ClCompile Include="ImGui\GraphEditor.cpp" />
+    <ClCompile Include="ImGui\ImCurveEdit.cpp" />
+    <ClCompile Include="ImGui\ImGradient.cpp" />
+    <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\ImGuizmo.cpp" />
+    <ClCompile Include="ImGui\imgui_demo.cpp" />
+    <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
+    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="ImGui\ImSequencer.cpp" />
+    <ClCompile Include="Editor\Panels\IPanelHelper.h" />
+    <ClCompile Include="Resources\Primitive.cpp" />
+    <ClCompile Include="Scene\Systems\RenderSystem.cpp" />
+    <ClCompile Include="Scene\Systems\LightSystem.cpp" />
+    <ClCompile Include="Scene\Systems\PostProcessSystem.cpp" />
+    <ClCompile Include="Core\Application.cpp" />
+    <ClCompile Include="Core\EngineContext.cpp" />
     <ClCompile Include="glad.c" />
-    <ClCompile Include="IBLMapGenerator.cpp" />
-    <ClCompile Include="Lighting.cpp" />
+    <ClCompile Include="Graphics\Renderer.cpp" />
+    <ClCompile Include="Graphics\IBLMapGenerator.cpp" />
+    <ClCompile Include="Core\InputSystem.cpp" />
+    <ClCompile Include="Core\Logger.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MainLegacyPBR.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="SkyboxRenderer.cpp" />
+    <ClCompile Include="Graphics\Mesh.cpp" />
+    <ClCompile Include="Resources\Model.cpp" />
+    <ClCompile Include="Scene\SceneECS.cpp" />
+    <ClCompile Include="Graphics\Shader.cpp" />
+    <ClCompile Include="Graphics\SkyboxRenderer.cpp" />
     <ClCompile Include="stb.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="IBLMapGenerator.h" />
-    <ClInclude Include="Lighting.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="SkyboxRenderer.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="RenderUtils.h" />
+    <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\Input.h" />
+    <ClInclude Include="Core\KeyCodes.h" />
+    <ClInclude Include="Editor\EditorApp.h" />
+    <ClInclude Include="Editor\ImGuiLayer.h" />
+    <ClInclude Include="Game\MoveScript.h" />
+    <ClInclude Include="Graphics\FullscreenQuad.h" />
+    <ClInclude Include="Graphics\Framebuffer.h" />
+    <ClInclude Include="Editor\Panels\IPanel.h" />
+    <ClInclude Include="Editor\Panels\Load.h" />
+    <ClInclude Include="Scene\Components\MeshFilter.h" />
+    <ClInclude Include="PostProcessEffect.h" />
+    <ClInclude Include="Resources\Primitive.h" />
+    <ClInclude Include="Scene\Components\HierarchyComponent.h" />
+    <ClInclude Include="ImGui\GraphEditor.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\ImCurveEdit.h" />
+    <ClInclude Include="ImGui\ImGradient.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\ImGuizmo.h" />
+    <ClInclude Include="ImGui\imgui_impl_glfw.h" />
+    <ClInclude Include="ImGui\imgui_impl_opengl3.h" />
+    <ClInclude Include="ImGui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\ImSequencer.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="ImGui\ImZoomSlider.h" />
+    <ClInclude Include="Scene\Components\Tags\ForwardTag.h" />
+    <ClInclude Include="Scene\GameScene.h" />
+    <ClInclude Include="Scene\PlayerCamera.h" />
+    <ClInclude Include="Scene\Components\NativeScriptComponent.h" />
+    <ClInclude Include="Scene\Components\PostEffects\BlurEffectComponent.h" />
+    <ClInclude Include="Scene\Systems\GlobalUniformSystem.h" />
+    <ClInclude Include="Scene\Systems\PostProcessSystem.h" />
+    <ClInclude Include="Scene\Components\PostProcessComponent.h" />
+    <ClInclude Include="Scene\LightingUtils.h" />
+    <ClInclude Include="Scene\Components\CameraComponent.h" />
+    <ClInclude Include="Scene\Systems\CameraSystem.h" />
+    <ClInclude Include="Scene\SceneManager.h" />
+    <ClInclude Include="Scene\Systems\LightSystem.h" />
+    <ClInclude Include="Scene\Components\LightComponent.h" />
+    <ClInclude Include="Core\InputSystem.h" />
+    <ClInclude Include="Scene\ComponentManager.h" />
+    <ClInclude Include="Scene\Components\ComponentsHelper.h" />
+    <ClInclude Include="Scene\Components\Material.h" />
+    <ClInclude Include="Scene\Components\MeshRenderer.h" />
+    <ClInclude Include="Scene\Components\Transform.h" />
+    <ClInclude Include="Scene\Components\Velocity.h" />
+    <ClInclude Include="Scene\PhysicsSystem.h" />
+    <ClInclude Include="Core\Time.h" />
+    <ClInclude Include="Core\Logger.h" />
+    <ClInclude Include="Core\EngineContext.h" />
+    <ClInclude Include="Scene\Entity.h" />
+    <ClInclude Include="Platform\Window.h" />
+    <ClInclude Include="Scene\Camera.h" />
+    <ClInclude Include="Core\Application.h" />
+    <ClInclude Include="Graphics\Renderer.h" />
+    <ClInclude Include="Graphics\IBLMapGenerator.h" />
+    <ClInclude Include="Graphics\Mesh.h" />
+    <ClInclude Include="Resources\Model.h" />
+    <ClInclude Include="Scene\SceneECS.h" />
+    <ClInclude Include="Graphics\Shader.h" />
+    <ClInclude Include="Graphics\SkyboxRenderer.h" />
+    <ClInclude Include="Scene\System.h" />
+    <ClInclude Include="Graphics\Texture.h" />
+    <ClInclude Include="Graphics\RenderUtils.h" />
+    <ClInclude Include="Scene\Systems\MoveSystem.h" />
+    <ClInclude Include="Scene\Systems\RenderSystem.h" />
+    <ClInclude Include="Scene\Systems\SystemHelper.h" />
+    <ClInclude Include="Scene\TransformComponent.h" />
+    <ClInclude Include="Scene\Systems\ScriptSystem .h" />
+    <ClInclude Include="Scene\ScriptBehaviour.h" />
+    <ClInclude Include="Scene\Components\ScriptBehaviour.h" />
+    <ClInclude Include="Scene\Components\Tags\TransparentTag.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
+    <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.vs" />
+    <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.fs" />
+    <None Include="Resources\Shaders\DeferredShading\DeferredShading.vs" />
+    <None Include="Resources\Shaders\DeferredShading\DeferredShading.fs" />
+    <None Include="Resources\Shaders\DeferredShading\gBuffer.fs" />
+    <None Include="Resources\Shaders\DeferredShading\gBuffer.vs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseLightingBAKP.fs" />
+    <None Include="Resources\Shaders\DeferredShading\gBufferLegacy.vs" />
+    <None Include="Resources\Shaders\PostProcess\BlackAndWhite.fs" />
     <None Include="debug_Cube_depth.vs" />
+    <None Include="Resources\Shaders\PostProcess\post.fs" />
+    <None Include="Resources\Shaders\PostProcess\post.vs" />
+    <None Include="Resources\Shaders\PostProcess\postprocess.fs" />
+    <None Include="Resources\Shaders\PostProcess\postprocess.vs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.fs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.vs" />
+    <None Include="Resources\Shaders\CellShading\fragment.fs" />
     <None Include="Resources\Shaders\Debug\debug_Cube_depth.fs" />
     <None Include="Resources\Shaders\background.fs" />
     <None Include="Resources\Shaders\background.vs" />
     <None Include="Resources\Shaders\CellShading\BaseColor.fs" />
     <None Include="Resources\Shaders\CellShading\BaseColor.vs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.fs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.vs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseLighting.fs" />
+    <None Include="Resources\Shaders\BlinnPhong\BaseLighting.vs" />
     <None Include="Resources\Shaders\PBR\brdf.fs" />
     <None Include="Resources\Shaders\PBR\brdf.vs" />
     <None Include="Resources\Shaders\cubemap.vs" />
@@ -180,6 +298,19 @@
     <None Include="Resources\Shaders\Shadows\ShadowMapP.gs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapP.vs" />
     <None Include="Resources\Shaders\Shadows\ShadowPointPCFold.fs" />
+    <None Include="Resources\Shaders\Basic\VertDefault.vs" />
+    <None Include="Resources\Shaders\Shadows\shadowPointPCF_oldComented.fs" />
+    <None Include="Resources\Shaders\PostProcess\tonemap.fs" />
+    <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Editor\styles1.txt" />
+    <Text Include="Editor\styles2.txt" />
+    <Text Include="Editor\styles3.txt" />
+    <Text Include="styles4.txt" />
+    <Text Include="styles5.txt" />
+    <Text Include="styles6.txt" />
+    <Text Include="styles7.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
