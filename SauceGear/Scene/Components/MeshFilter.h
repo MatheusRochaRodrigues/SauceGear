@@ -22,7 +22,7 @@ struct MeshFilter {
     // Construtor para várias meshes
     MeshFilter(const std::vector<Mesh*>& meshList) : meshes(meshList) {}
 
-    // Retorna todas as meshes
+    // Retorna todas as meshes d ds
     std::vector<Mesh*>& GetMeshes() {
         return meshes;
     }

@@ -13,10 +13,8 @@ public:
     void Load() override {
         // --- Main Camera ---
         Entity cameraEntity = CreateEntity();
-        auto& cameraTransform = AddComponent<Transform>(cameraEntity);  
-        //cameraTransform.position = glm::vec3(0, 2, 5);
-        auto& camComp = AddComponent<CameraComponent>(cameraEntity);
-        /*camComp.camera = new Camera(cameraTransform.position);*/
+        auto& cameraTransform = AddComponent<Transform>(cameraEntity);   
+        auto& camComp = AddComponent<CameraComponent>(cameraEntity); 
         camComp.isMain = true;
 
         {
