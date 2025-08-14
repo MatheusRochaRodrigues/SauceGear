@@ -80,18 +80,16 @@ void RenderSystem::GeometryPass() {
 
     for (auto e : entities) {
         auto& trans = GEngine->scene->GetComponent<Transform>(e);
-        auto& meshR = GEngine->scene->GetComponent<MeshRenderer>(e);
-        if (!meshR.model) continue;
-
-        for (int i = 0; i < meshR.model->GetMeshes().size(); ++i) {
-            Material* mat = meshR.GetMaterial(i);
-            Shader* shader = GEngine->renderer->GetGBufferShader;
-            mat->Apply(shader);                     //shader->use();
-            shader->setMat4("model", trans.GetMatrix());
-            //shader->setMat4("view", view);
-            //shader->setMat4("projection", proj);
-            meshR.model->GetMeshes()[i].Draw();
-        }
+        auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e); 
+         
+        for (auto& [material, meshData] : meshRenderer.batches) {  
+            for (auto& mesh : meshData) {  
+                Shader* shader = GEngine->renderer->GetGBufferShader;
+                material->Apply(shader);                     //shader->use();
+                shader->setMat4("model", trans.GetMatrix()); 
+                mesh->Draw();
+            }
+        } 
     } 
     gBuffer->Unbind();
 }

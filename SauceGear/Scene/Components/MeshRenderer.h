@@ -1,5 +1,3 @@
-
-/*
 #pragma once 
 //#include "../../Core/EngineContext.h"
 #include "../../Resources/Model.h"
@@ -11,7 +9,11 @@ struct MeshRenderer {
     // Chave = ponteiro de material, Valor = vetor de meshes usando esse material
     std::unordered_map<Material*, std::vector<Mesh*>> batches;
 
-    MeshRenderer() = default;
+    Entity entity;
+
+    MeshRenderer() {
+        filter = &GEngine->scene->GetComponent<MeshFilter>(entity);
+    };
 
     MeshRenderer(MeshFilter* f = nullptr) : filter(f) {
         if (filter) RebuildBatches();
@@ -21,6 +23,19 @@ struct MeshRenderer {
         filter = f;
         RebuildBatches();
     }
+
+
+    /*Material* GetMaterial(Mesh*) {
+        for (auto& batch : batches) {
+            if (!model || meshIndex >= model->meshes.size()) {
+                std::cout << "material fora do alcance da mesh";
+                return MaterialDefaults::Get();
+            } 
+        }
+        auto& mesh = model->meshes[meshIndex];
+        if (!mesh.material) mesh.material = MaterialDefaults::Get();
+        return mesh.material;
+    }*/
 
     // Adiciona mesh com material (ou default)
     void Add(Mesh* mesh, Material* material = nullptr) {
@@ -52,8 +67,8 @@ struct MeshRenderer {
         if (!filter) return;
 
         for (auto* mesh : filter->GetMeshes()) {
-            Material* mat = filter->GetMaterialForMesh(mesh); // pega material do Model
-            //if (mat == nullptr) mat = MaterialDefaults::Default();
+            Material* mat = mesh->material; // pega material do Model
+            if (mat == nullptr) mat = MaterialDefaults::Get();
             batches[mat].push_back(mesh);
         }
     }
@@ -70,8 +85,8 @@ struct MeshRenderer {
     //        mat->floatParams["metallic"] = 0.1f;
     //        Add(mesh, mat);
     //    }
-    //}
-
+    //} 
+    
     // Renderiza todas as meshes agrupadas por material
     void DrawAll() const {
         for (auto& [material, meshes] : batches) {
@@ -109,10 +124,10 @@ struct MeshRenderer {
     }
 };
 
- */
  
 
 
+/*
 
 #pragma once
 
@@ -151,3 +166,4 @@ struct MeshRenderer {
 
 };
 
+ */

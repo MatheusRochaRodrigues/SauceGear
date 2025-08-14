@@ -40,14 +40,6 @@ struct MeshFilter {
         for (auto& mesh : model->meshes)
             result.push_back(&mesh);
         return result;
-    }
+    };
 
-    Material* GetMaterialForMesh(Mesh* mesh) {
-        if (!model) return MaterialDefaults::Get();
-        auto it = model->meshMaterials.find(mesh);
-        if (it != model->meshMaterials.end())
-            return it->second;
-        //return nullptr;
-        return MaterialDefaults::Get(); 
-    }
 };

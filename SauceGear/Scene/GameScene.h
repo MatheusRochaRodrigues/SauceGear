@@ -24,10 +24,11 @@ public:
             auto& trans = AddComponent<Transform>(entity);
             trans.position = { 0, 0, 0 };
 
+            auto& meshFilter = AddComponent<MeshFilter>(entity);
+            meshFilter.model = new Model("Resources/Models/backpack/backpack.obj");
             auto& renderer = AddComponent<MeshRenderer>(entity);
 
-            stbi_set_flip_vertically_on_load(true);
-            renderer.model = new Model("Resources/Models/backpack/backpack.obj");
+            stbi_set_flip_vertically_on_load(true); 
 
 
             Entity entity2 = CreateEntity();
@@ -35,17 +36,19 @@ public:
             trans2.position = { 0, -4, 0 };
             trans2.scale = { 0.2, 0.2, 0.2 };
             trans2.rotation = { 90 , 0.2, 0.2 };
+            meshFilter = AddComponent<MeshFilter>(entity2);
+            meshFilter.model = new Model("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
             auto& renderer2 = AddComponent<MeshRenderer>(entity2);
-            stbi_set_flip_vertically_on_load(false);
-            renderer2.model = new Model("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
+            stbi_set_flip_vertically_on_load(false); 
             //renderer2.model = PrimitiveMesh::CreateCube();
 
             Entity Floor = CreateEntity();
             auto& Floort = AddComponent<Transform>(Floor);
             Floort.position = { 0, -4, 0 };
             Floort.scale = { 10, 10, 10 };
-            auto& Floort3 = AddComponent<MeshRenderer>(Floor);
-            Floort3.model = PrimitiveMesh::CreatePlane();
+            meshFilter = AddComponent<MeshFilter>(Floor);
+            meshFilter.model = PrimitiveMesh::CreatePlane();
+            auto& Floort3 = AddComponent<MeshRenderer>(Floor); 
 
         }   
         {
@@ -128,8 +131,9 @@ public:
             trans.scale = glm::vec3(200.0f);
             trans.rotation = glm::vec3(0.0f); // sem rotação
 
-            auto& renderer = AddComponent<MeshRenderer>(room);
-            renderer.model = PrimitiveMesh::CreatePlane( );
+            auto& meshFilter = AddComponent<MeshFilter>(room);
+            meshFilter.model = PrimitiveMesh::CreateCylinder();
+            auto& renderer = AddComponent<MeshRenderer>(room); 
         }
 
         // Cubo 1
@@ -140,8 +144,9 @@ public:
             tname.name = "weqw";
             trans.position = glm::vec3(4.0f, -3.5f, 0.0f);
             trans.scale = glm::vec3(0.5f);
-            auto& renderer = AddComponent<MeshRenderer>(cube);
-            renderer.model = PrimitiveMesh::CreateCube( );
+            auto& meshFilter = AddComponent<MeshFilter>(cube);
+            meshFilter.model = PrimitiveMesh::CreateCylinder();
+            auto& renderer = AddComponent<MeshRenderer>(cube); 
         }
 
         // Cubo 2
@@ -150,8 +155,9 @@ public:
             auto& trans = AddComponent<Transform>(cube);
             trans.position = glm::vec3(2.0f, 3.0f, 1.0f);
             trans.scale = glm::vec3(0.75f);
+            auto& meshFilter = AddComponent<MeshFilter>(cube);
+            meshFilter.model = PrimitiveMesh::CreateCylinder();
             auto& renderer = AddComponent<MeshRenderer>(cube);
-            renderer.model = PrimitiveMesh::CreateCylinder( );
         }
 
         // Cubo 3
@@ -160,8 +166,9 @@ public:
             auto& trans = AddComponent<Transform>(cube);
             trans.position = glm::vec3(-3.0f, -1.0f, 0.0f);
             trans.scale = glm::vec3(0.5f);
-            auto& renderer = AddComponent<MeshRenderer>(cube);
-            renderer.model = PrimitiveMesh::CreateCylinder( );
+            auto& meshFilter = AddComponent<MeshFilter>(cube);
+            meshFilter.model = PrimitiveMesh::CreateCylinder();
+            auto& renderer = AddComponent<MeshRenderer>(cube); 
         }
 
         // Cubo 4
@@ -170,8 +177,9 @@ public:
             auto& trans = AddComponent<Transform>(cube);
             trans.position = glm::vec3(-1.5f, 1.0f, 1.5f);
             trans.scale = glm::vec3(0.5f);
-            auto& renderer = AddComponent<MeshRenderer>(cube);
-            renderer.model = PrimitiveMesh::CreateCube( );
+            auto& meshFilter = AddComponent<MeshFilter>(cube);
+            meshFilter.model = PrimitiveMesh::CreateCylinder();
+            auto& renderer = AddComponent<MeshRenderer>(cube); 
         }
 
         // Cubo 5 (rotacionado)
@@ -185,8 +193,9 @@ public:
             glm::vec3 axis = glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f));
             trans.rotation = glm::degrees(glm::eulerAngles(glm::angleAxis(glm::radians(60.0f), axis)));
 
-            auto& renderer = AddComponent<MeshRenderer>(cube);
-            renderer.model = PrimitiveMesh::CreateCube( );
+            auto& meshFilter = AddComponent<MeshFilter>(cube);
+            meshFilter.model = PrimitiveMesh::CreateCylinder();
+            auto& renderer = AddComponent<MeshRenderer>(cube); 
         }
     }
 

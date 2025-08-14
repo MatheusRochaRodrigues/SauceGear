@@ -147,6 +147,12 @@
     <ClCompile Include="Resources\Primitive.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\BlinnPhongRenderer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\PBRRenderer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -377,6 +383,15 @@
     <ClInclude Include="Scene\Components\MeshFilter.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\BlinnPhongRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PBRRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\IRenderPipeline.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\background.fs">
@@ -448,12 +463,12 @@
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.vs" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Editor\styles1.txt" />
-    <Text Include="Editor\styles2.txt" />
-    <Text Include="Editor\styles3.txt" />
-    <Text Include="styles4.txt" />
-    <Text Include="styles5.txt" />
-    <Text Include="styles6.txt" />
-    <Text Include="styles7.txt" />
+    <Text Include="Editor\Styles\styles1.txt" />
+    <Text Include="Editor\Styles\styles2.txt" />
+    <Text Include="Editor\Styles\styles3.txt" />
+    <Text Include="Editor\Styles\styles4.txt" />
+    <Text Include="Editor\Styles\styles5.txt" />
+    <Text Include="Editor\Styles\styles6.txt" />
+    <Text Include="Editor\Styles\styles7.txt" />
   </ItemGroup>
 </Project>

@@ -8,6 +8,9 @@ void SceneECS::initECS() {
     componentManager->Register<CameraComponent>();
     componentManager->Register<Transform>();
     componentManager->Register<Material>();
+   
+    componentManager->Register<MeshFilter>();
+
     componentManager->Register<MeshRenderer>();
     componentManager->Register<LightComponent>();
     componentManager->Register<HierarchyComponent>();

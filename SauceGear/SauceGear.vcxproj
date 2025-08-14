@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Graphics\BlinnPhongRenderer.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="Editor\EditorApp.cpp" />
     <ClCompile Include="Editor\EditorMain.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="Editor\Panels\IPanelHelper.h" />
+    <ClCompile Include="Graphics\PBRRenderer.cpp" />
     <ClCompile Include="Resources\Primitive.cpp" />
     <ClCompile Include="Scene\Systems\RenderSystem.cpp" />
     <ClCompile Include="Scene\Systems\LightSystem.cpp" />
@@ -175,6 +177,7 @@
     <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Graphics\BlinnPhongRenderer.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\KeyCodes.h" />
@@ -185,6 +188,8 @@
     <ClInclude Include="Graphics\Framebuffer.h" />
     <ClInclude Include="Editor\Panels\IPanel.h" />
     <ClInclude Include="Editor\Panels\Load.h" />
+    <ClInclude Include="Graphics\IRenderPipeline.h" />
+    <ClInclude Include="Graphics\PBRRenderer.h" />
     <ClInclude Include="Scene\Components\MeshFilter.h" />
     <ClInclude Include="PostProcessEffect.h" />
     <ClInclude Include="Resources\Primitive.h" />
@@ -304,13 +309,13 @@
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Editor\styles1.txt" />
-    <Text Include="Editor\styles2.txt" />
-    <Text Include="Editor\styles3.txt" />
-    <Text Include="styles4.txt" />
-    <Text Include="styles5.txt" />
-    <Text Include="styles6.txt" />
-    <Text Include="styles7.txt" />
+    <Text Include="Editor\Styles\styles1.txt" />
+    <Text Include="Editor\Styles\styles2.txt" />
+    <Text Include="Editor\Styles\styles3.txt" />
+    <Text Include="Editor\Styles\styles4.txt" />
+    <Text Include="Editor\Styles\styles5.txt" />
+    <Text Include="Editor\Styles\styles6.txt" />
+    <Text Include="Editor\Styles\styles7.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

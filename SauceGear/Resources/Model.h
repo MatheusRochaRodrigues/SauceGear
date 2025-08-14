@@ -21,7 +21,7 @@ public:
     //std::unordered_map<Mesh*, Material*> meshMaterials; // mapeia cada mesh ao seu material
 
     vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-    vector<Mesh>    meshes;
+    vector<Mesh>    meshes; //subMeshes
     string directory;
     bool gammaCorrection;
 
