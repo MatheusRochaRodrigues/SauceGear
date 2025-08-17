@@ -24,8 +24,7 @@ struct HierarchyPanel : IPanel {
                 // Entidades sem HierarchyComponent são tratadas como raiz também
                 DrawEntityNode(scene, entity);
             }
-        }
-        //}
+        } 
         ImGui::End(); 
     }
 

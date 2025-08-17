@@ -156,6 +156,7 @@
     <ClCompile Include="Editor\Panels\IPanelHelper.h" />
     <ClCompile Include="Graphics\PBRRenderer.cpp" />
     <ClCompile Include="Resources\Primitive.cpp" />
+    <ClCompile Include="Scene\SceneBuilder.h" />
     <ClCompile Include="Scene\Systems\RenderSystem.cpp" />
     <ClCompile Include="Scene\Systems\LightSystem.cpp" />
     <ClCompile Include="Scene\Systems\PostProcessSystem.cpp" />
@@ -167,8 +168,6 @@
     <ClCompile Include="Core\InputSystem.cpp" />
     <ClCompile Include="Core\Logger.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Graphics\Mesh.cpp" />
-    <ClCompile Include="Resources\Model.cpp" />
     <ClCompile Include="Scene\SceneECS.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\SkyboxRenderer.cpp" />
@@ -177,6 +176,7 @@
     <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Resources\AssetManager.h" />
     <ClInclude Include="Graphics\BlinnPhongRenderer.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Input.h" />

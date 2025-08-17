@@ -8,8 +8,7 @@
  
 #include "../Scene/ComponentManager.h"
 #include "../Scene/System.h"
-#include "../Resources/Model.h" 
-//#include "Entity.h" 
+//#include "../Resources/Model.h"  
 #include "../Resources/Primitive.h"
 
 class SceneECS {
@@ -19,10 +18,7 @@ public:
 
     // Entidades 
     Entity CreateEntity();
-    void DestroyEntity(Entity entity);
-
-    //Special Create tools GameOBJ
-    Entity NewGameObj(string name = "GameObject");
+    void DestroyEntity(Entity entity); 
 
     // Componentes
     template<typename T, typename... Args>
@@ -102,7 +98,7 @@ public:
     //    // outros componentes...
     //}
 
-    void AddToParent(Entity parent, Entity child);
+    void AddToParent(Entity, Entity);
 
     //void SwitchToCamera(Camera* newCam) { GEngine->mainCamera = newCam; }
 

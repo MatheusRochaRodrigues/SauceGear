@@ -9,7 +9,7 @@ void SceneECS::initECS() {
     componentManager->Register<Transform>();
     componentManager->Register<Material>();
    
-    componentManager->Register<MeshFilter>();
+    //componentManager->Register<MeshFilter>();
 
     componentManager->Register<MeshRenderer>();
     componentManager->Register<LightComponent>();
@@ -31,50 +31,40 @@ void SceneECS::initECS() {
 
 Entity SceneECS::CreateEntity() {
     return entityManager.CreateEntity();
-}
-
-Entity SceneECS::NewGameObj(string name) {
-    Entity entity = entityManager.CreateEntity(); 
-
-    //Special Components
-    AddComponent<NameComponent>(entity).name = name;                      //AddComponent<NameComponent>(entity, name);
-    
-    AddComponent<Transform>(entity);
-
-    return entity;
-}
-
+} 
 
 void SceneECS::DestroyEntity(Entity entity) {
     return entityManager.DestroyEntity(entity);
 }
 
 
-void SceneECS::AddToParent(Entity parent, Entity child) {
-    if (!HasComponent<HierarchyComponent>(parent))
-        AddComponent<HierarchyComponent>(parent);
+void SceneECS::AddToParent(Entity father, Entity child) {
+    if (!HasComponent<HierarchyComponent>(father))
+        AddComponent<HierarchyComponent>(father);
 
     if (!HasComponent<HierarchyComponent>(child))
         AddComponent<HierarchyComponent>(child);
 
-    auto& parentH = GetComponent<HierarchyComponent>(parent);
+    auto& parentH = GetComponent<HierarchyComponent>(father);
     auto& childH = GetComponent<HierarchyComponent>(child);
-    childH.parent = parent;
+    childH.parent = father;
     if (parentH.firstChild == INVALID_ENTITY) {
         parentH.firstChild = child;
     }
     else {
         Entity current = parentH.firstChild;
-        auto& currentH = GetComponent<HierarchyComponent>(current);
-        while (currentH.nextSibling != INVALID_ENTITY) {
-            current = currentH.nextSibling;
-            currentH = GetComponent<HierarchyComponent>(current);
+        HierarchyComponent* currentH = &GetComponent<HierarchyComponent>(current);
+        while (currentH->nextSibling != INVALID_ENTITY) {
+            current = currentH->nextSibling;
+            currentH = &GetComponent<HierarchyComponent>(current);
         }
-        currentH.nextSibling = child;
+        currentH->nextSibling = child;
     }
 }
 
-
+//Entity parent = SceneBuilder::CreateGameObject("parent 2");
+//Entity child1 = SceneBuilder::CreateGameObject("Child 2");
+//AddToParent(parent, child1);
 
 
 

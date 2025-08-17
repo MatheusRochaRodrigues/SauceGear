@@ -26,44 +26,177 @@ struct Vertex {
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
+struct SubMesh {
+    // faixa de índices dentro do EBO
+    uint32_t indexOffset = 0;   // em elementos (não bytes)
+    uint32_t indexCount = 0;
+    // material “default” associado a esse submesh (pode ser sobrescrito no MeshRenderer)
+    Material* material = nullptr;
+};
+
 class Mesh {
 public:
+    string name;         //name mesh
     // mesh Data
-    vector<Vertex>       vertices;
-    vector<unsigned int> indices;
-    Material*            material;                          
-    GLuint               VAO;
-      
-    //Mesh(vector<Vertex> vertices, vector<unsigned int> indices);
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material* material);
-
-    //Mesh(bool, vector<Vertex> vertices, vector<unsigned int> indices);
-    Mesh(bool,vector<Vertex> vertices, vector<unsigned int> indices, Material* material);
+    vector<Vertex>        vertices;
+    std::vector<uint32_t> indices;
+    std::vector<SubMesh>  submeshes;
+    std::vector<Mesh*>    children;        // hierarquia local
+    std::string           directory;       // diretório do asset
+    GLuint                VAO = 0;
 
     Mesh() = default;
-
-    // render the mesh 
-    void Draw() const;      //(Shader& shader)
-
-    void DrawInstanced(GLsizei count) const;
-    void SetInstanceData(const void* data, size_t dataSize, const std::vector<std::pair<GLuint, GLint>>& attributes);
      
+    Mesh(const std::vector<Vertex>& v, const std::vector<uint32_t>& i, Material* m = nullptr) {
+        vertices = v;
+        indices = i;
+        submeshes.push_back(SubMesh{ 0, (uint32_t)i.size(), m });
+        setupMesh();
+    }
 
-    void SetData(const std::vector<Vertex>& newVertices,
-        const std::vector<unsigned int>& newIndices,
-        Material* newMaterial = nullptr);
-     
-    // Novo: função utilitária para montar a malha a partir de floats crus
-    void BuildFromRawData(const std::vector<float>& rawData, int stride);
+    Mesh(const std::vector<Vertex>& v, const std::vector<uint32_t>& i, const std::vector<SubMesh>& sms, Material* m = nullptr) {
+        vertices = v;
+        indices = i;
+        submeshes = sms; 
+        setupMesh();
+    }
+
+    void Set(const std::vector<Vertex>& v,  const std::vector<uint32_t>& i, const std::vector<SubMesh>& sms) {
+        vertices = v;
+        indices = i;
+        submeshes = sms;
+        setupMesh();
+    }
+
+    void Set(const std::vector<Vertex>& v,const std::vector<uint32_t>& i, Material* m = nullptr) {
+        vertices = v;
+        indices = i;
+        submeshes.push_back(SubMesh{ 0, (uint32_t)i.size(), m });
+        setupMesh();
+    }
+
+    void AddChild(Mesh* child) { children.push_back(child); }
+
+    //Drawing
+    void DrawSubmesh(uint32_t subIndex) const {
+        if (subIndex >= submeshes.size()) return;
+        const auto& sm = submeshes[subIndex];
+        // bind VAO/VBO e draw elements
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
+        glBindVertexArray(0);
+    } 
+
+    void Draw() const {       //AllSubmesh
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+    //Render
+    void Render() const {
+        // desenha todos os submeshes com seus materiais “default” (fallback)
+        glBindVertexArray(VAO);
+        for (const auto& sm : submeshes) {
+            if (sm.material) sm.material->Bind();
+            glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
+        }
+        glBindVertexArray(0);
+    }
+
+    void RenderAll() const {
+        glBindVertexArray(VAO);
+        for (auto& sm : submeshes) {
+            if (sm.material) sm.material->Bind();
+            glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
+        }
+        glBindVertexArray(0);
+
+        for (auto* child : children) if (child) child->RenderAll();
+    }
+
+    // initializes all the buffer objects/arrays
+    void setupMesh() {
+        if (VAO == 0) glGenVertexArrays(1, &VAO);
+        if (VBO == 0) glGenBuffers(1, &VBO);
+        if (EBO == 0) glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
+
+        // layout
+        size_t stride = sizeof(Vertex);
+        // pos
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Position));
+        // normal
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Normal));
+        // uv
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, TexCoords));
+        // tangent
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Tangent));
+        // bitangent
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, stride, (void*)offsetof(Vertex, Bitangent));
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    }
+
+    //Instancing
+    void SetInstanceData(const void* data, size_t dataSize, const std::vector<std::pair<GLuint, GLint>>& attributes) {
+        if (instanceVBO == 0)
+            glGenBuffers(1, &instanceVBO);
+
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_STATIC_DRAW);
+
+        size_t stride = 0;
+        for (const auto& attr : attributes) {
+            stride += sizeof(float) * attr.second;
+        }
+
+        size_t offset = 0;
+        for (const auto& attr : attributes) {
+            GLuint loc = attr.first;
+            GLint size = attr.second;
+
+            glEnableVertexAttribArray(loc);
+            glVertexAttribPointer(loc, size, GL_FLOAT, GL_FALSE, stride, (void*)offset);
+            glVertexAttribDivisor(loc, 1); // este atributo muda por instância
+
+            offset += sizeof(float) * size;
+        }
+
+        glBindVertexArray(0);
+    }
+
+    void DrawInstanced(GLsizei count, uint32_t subIndex = 0) const {
+        if (subIndex >= submeshes.size()) return;
+        const auto& sm = submeshes[subIndex];
+        glBindVertexArray(VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset), count);
+        glBindVertexArray(0);
+    }
+         
 private:
     // render data 
-    GLuint VBO, EBO;
+    GLuint VBO = 0;
+    GLuint EBO = 0;
 
     //Instancing
     GLuint instanceVBO = 0;
-    GLsizei instanceCount = 0;
-
-    // initializes all the buffer objects/arrays
-    void setupMesh();
+    GLsizei instanceCount = 0; 
 };
 #endif

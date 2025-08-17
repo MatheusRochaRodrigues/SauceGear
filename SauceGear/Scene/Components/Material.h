@@ -11,7 +11,11 @@ namespace MaterialDefaults {
 
 struct Material {
     Shader* shader; 
-    std::unordered_map<std::string, Texture*> textures;  
+    //std::unordered_map<std::string, Texture*> textures;
+
+    std::unordered_map<std::string, std::pair<unsigned int,Texture*>> textures;
+
+
     std::unordered_map<std::string, float>    floatParams; 
     glm::vec3 albedoColor = glm::vec3(1.0f);
 
@@ -29,22 +33,46 @@ struct Material {
         floatParams["metallic"] = 0.1f; */
     } 
 
-    void setData(std::string s, Texture* t) { textures[s]    = t; }
-    void setData(std::string s, float f)    { floatParams[s] = f; }
+    //void setData(unsigned int u, std::string s, Texture* t) { textures[s] = { u, t }; }
+    //void setData(std::string s, float f) { floatParams[s] =  f ; }
 
     void Bind() const {
         shader->use();
         // Bind texturas
         int slot = 0;
-        for (auto& [name, tex] : textures) {
+        for (auto& [name, pair] : textures) {        //[name, tex]
             // fallback: se tex for nullptr, usa textura branca
             //if (!tex) tex = Texture::WhiteTexture(); // fallback
             //Texture* finalTex = tex ? tex : Texture::WhiteTexture();
-             
+            
+            auto& tex = pair.second;
+
             glActiveTexture(GL_TEXTURE0 + slot);
             tex->Bind(); // tex->Bind() deve usar glBindTexture(...)
             shader->setInt(name, slot); // "diffuseMap" -> slot 0
             slot++; 
+        }
+
+        // Bind valores float
+        for (auto& [name, value] : floatParams) {
+            shader->setFloat(name, value);
+        }
+    }
+
+    void setLayer() const { 
+        // Bind texturas
+        int slot = 0;
+        for (auto& [name, pair] : textures) {
+            // fallback: se tex for nullptr, usa textura branca
+            //if (!tex) tex = Texture::WhiteTexture(); // fallback
+            //Texture* finalTex = tex ? tex : Texture::WhiteTexture();
+
+            auto& tex = pair.second;
+
+            glActiveTexture(GL_TEXTURE0 + slot);
+            tex->Bind(); // tex->Bind() deve usar glBindTexture(...)
+            shader->setInt(name, slot); // "diffuseMap" -> slot 0
+            slot++;
         }
 
         // Bind valores float
@@ -60,15 +88,20 @@ struct Material {
         activeShader->use();
 
         int unit = 0;
-        for (const auto& [name, tex] : textures) {
-            //Texture* finalTex = tex ? tex : Texture::WhiteTexture();
-            //if (!tex) continue;
+        for (const auto& [name, pair] : textures) {
 
-            glActiveTexture(GL_TEXTURE0 + unit);    //glBindTexture(GL_TEXTURE_2D, tex->ID);
-            
+            auto& tex = pair.second;
+
+            glActiveTexture(GL_TEXTURE0 + unit);    //glBindTexture(GL_TEXTURE_2D, tex->ID); 
+            //glActiveTexture(GL_TEXTURE0 + unit);    //glBindTexture(GL_TEXTURE_2D, tex->ID); 
             tex->Bind();
             activeShader->setInt(name.c_str(), unit);
             unit++;
+        }
+
+        // Bind valores float
+        for (auto& [name, value] : floatParams) {
+            shader->setFloat(name, value);
         }
     }
 
@@ -108,7 +141,7 @@ namespace MaterialDefaults {
     }
 
     //Create white texture default (1x1 resolution)
-    static Texture* WhiteTexture() {
+    inline static Texture* WhiteTexture() {
         if (!whiteTex) {
             uint8_t whitePixel[4] = { 255, 255, 255, 255 };
             whiteTex = new Texture();
@@ -119,16 +152,13 @@ namespace MaterialDefaults {
         return whiteTex;
     }
 
-    inline static Material* Get() {
-        std::cout << "entiur map +++++++++++++++++++++++++++++++++++++++"; 
+    inline static Material* Get() { 
+        Material* defaultMat = new Material();
 
-        Shader* shader = new Shader("BlinnPhong/BaseLighting.vs", "BlinnPhong/BaseLighting.fs");
-        Material* defaultMat = new Material(shader);
-
-        defaultMat->textures["albedoMap"]    = WhiteTexture();
-        defaultMat->textures["specularMap"]  = WhiteTexture();
-        defaultMat->textures["normalMap"]    = WhiteTexture();
-        defaultMat->textures["heightMap"]    = WhiteTexture();
+        defaultMat->textures["albedoMap"]    = { 0,  WhiteTexture() };
+        /*defaultMat->textures["specularMap"]  = { 1,  WhiteTexture() };
+        defaultMat->textures["normalMap"]    = { 2,  WhiteTexture() };
+        defaultMat->textures["heightMap"]    = { 3,  WhiteTexture() };*/
         defaultMat->floatParams["roughness"] = 0.5f;
         defaultMat->floatParams["metallic"]  = 0.1f;
           

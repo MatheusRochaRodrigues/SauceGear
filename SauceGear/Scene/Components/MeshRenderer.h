@@ -1,169 +1,146 @@
-#pragma once 
-//#include "../../Core/EngineContext.h"
-#include "../../Resources/Model.h"
+#pragma once
+#include <unordered_map>
+#include <vector>
 #include "../../Scene/Components/Material.h"
 #include "../../Scene/Components/MeshFilter.h"
 
 struct MeshRenderer {
-    MeshFilter* filter = nullptr;  // Referência para a geometria
-    // Chave = ponteiro de material, Valor = vetor de meshes usando esse material
-    std::unordered_map<Material*, std::vector<Mesh*>> batches;
+    Mesh* mesh = nullptr;
+    std::unordered_map<Material*, std::vector<SubMesh*>> batches;
 
-    Entity entity;
+    MeshRenderer() = default;
 
-    MeshRenderer() {
-        filter = &GEngine->scene->GetComponent<MeshFilter>(entity);
-    };
+    MeshRenderer(Mesh* m) { SetMesh(m); }
 
-    MeshRenderer(MeshFilter* f = nullptr) : filter(f) {
-        if (filter) RebuildBatches();
-    }
-
-    void SetFilter(MeshFilter* f) {
-        filter = f;
+    void SetMesh(Mesh* m) {
+        mesh = m;
         RebuildBatches();
     }
-
-
-    /*Material* GetMaterial(Mesh*) {
-        for (auto& batch : batches) {
-            if (!model || meshIndex >= model->meshes.size()) {
-                std::cout << "material fora do alcance da mesh";
-                return MaterialDefaults::Get();
-            } 
-        }
-        auto& mesh = model->meshes[meshIndex];
-        if (!mesh.material) mesh.material = MaterialDefaults::Get();
-        return mesh.material;
-    }*/
-
-    // Adiciona mesh com material (ou default)
-    void Add(Mesh* mesh, Material* material = nullptr) {
-        if (!mesh) return;
-        Material* mat = material ? material : MaterialDefaults::Get();
-        batches[mat].push_back(mesh);
-    }
-
-    // Troca material de uma mesh
-    void SetMaterial(Mesh* mesh, Material* newMaterial) {
-        if (!mesh) return;
-        Material* mat = newMaterial ? newMaterial : MaterialDefaults::Get();
-
-        // Remove mesh de batches anteriores
-        for (auto& [m, meshes] : batches) {
-            auto it = std::find(meshes.begin(), meshes.end(), mesh);
-            if (it != meshes.end()) {
-                meshes.erase(it);
-                break;
-            }
-        }
-
-        batches[mat].push_back(mesh);
-    }
      
-
     void RebuildBatches() {
         batches.clear();
-        if (!filter) return;
-
-        for (auto* mesh : filter->GetMeshes()) {
-            Material* mat = mesh->material; // pega material do Model
-            if (mat == nullptr) mat = MaterialDefaults::Get();
-            batches[mat].push_back(mesh);
+        if (!mesh) return;
+        for (auto& sm : mesh->submeshes) {
+            if (sm.material == nullptr) std::cout << "mapa defult created  " << mesh->name << "    " << mesh->submeshes.size() << std::endl;
+            sm.material = (sm.material != nullptr) ? sm.material : MaterialDefaults::Get();
+             
+            batches[sm.material].push_back(&sm);
         }
     }
 
-    // Reconstrói os batches usando o MeshFilter
-    //void RebuildBatches() {
-    //    batches.clear();
-    //    if (!filter) return;
-
-    //    for (auto* mesh : filter->GetMeshes()) {
-    //        // Cria material automaticamente se não existir
-    //        Material* mat = new Material();
-    //        mat->floatParams["roughness"] = 0.5f;
-    //        mat->floatParams["metallic"] = 0.1f;
-    //        Add(mesh, mat);
-    //    }
-    //} 
-    
-    // Renderiza todas as meshes agrupadas por material
-    void DrawAll() const {
-        for (auto& [material, meshes] : batches) {
-            if (!material) continue;
-            material->Bind();
-
-            // Aqui você poderia implementar instancing se meshes compartilharem a mesma geometria
-            for (auto* mesh : meshes) {
-                if (mesh) mesh->Draw();
+    void Draw() {
+        if (!mesh) return;
+        for (auto& [mat, sms] : batches) {
+            if (!mat) continue; 
+            for (auto* sm : sms) {
+                glBindVertexArray(mesh->VAO);
+                glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset));
             }
         }
+        glBindVertexArray(0);
     }
 
-    // Renderização instanciada
-    void DrawInstanced(Material* material, GLsizei instanceCount) const {
-        auto it = batches.find(material);
-        if (it == batches.end()) return;
-
-        material->Bind();
-        for (auto* mesh : it->second) {
-            if (!mesh) continue;
-            mesh->DrawInstanced(instanceCount);
+    void Draw(Material* mat) {
+        if (!mesh) return;
+        if (!mat) return;
+        for (auto& sm : batches[mat]) { 
+            glBindVertexArray(mesh->VAO);
+            glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset)); 
         }
+        glBindVertexArray(0);
     }
 
-    // Desenha instanciado
-    void DrawInstanced(GLsizei instanceCount) const {
-        for (auto& [material, meshes] : batches) {
-            if (!material) continue;
-            material->Bind();
-            for (auto* mesh : meshes) {
-                if (mesh) mesh->DrawInstanced(instanceCount);  // Mesma geometria, multiplas instâncias
+    void Paint() {
+        if (!mesh) return;
+        for (auto& [mat, sms] : batches) {
+            if (!mat) continue;
+            mat->Bind();
+            //shader->setMat4("model", trans.GetMatrix());
+            for (auto* sm : sms) {
+                glBindVertexArray(mesh->VAO);
+                glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset));
             }
         }
+        glBindVertexArray(0); 
     }
-};
 
- 
+    void DrawSubM(SubMesh* sm) {
+        glBindVertexArray(mesh->VAO);
+        glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset)); 
+    }
 
-
-/*
-
-#pragma once
-
-//#include "../../Core/EngineContext.h"
-#include "../../Resources/Model.h"
-#include "../../Scene/Components/Material.h"
-
-struct MeshRenderer {
-    //Material* material = nullptr;
-
-    Model* model = nullptr;
-
-    // Um material por mesh (índice corresponde ao model->meshes)
-    //std::vector<Material*> materials;
-
-    MeshRenderer(Model* m = nullptr) : model(m) {}      //, const std::vector<Material*>& mats = {}          materials(mats) 
-
-
-    Material* GetMaterial(size_t meshIndex) {
-        if (!model || meshIndex >= model->meshes.size()) {
-            std::cout << "material fora do alcance da mesh";
-            return MaterialDefaults::Get();
+    //Childs
+    void RebuildBatchesWithChilds() {
+        batches.clear();
+        if (!mesh) return;
+        for (auto& sm : mesh->submeshes) {
+            Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            batches[mat].push_back(&sm);
         }
-        auto& mesh = model->meshes[meshIndex];
-        if (!mesh.material) mesh.material = MaterialDefaults::Get();
-        return mesh.material;
+        for (auto* child : mesh->children) if (child) RebuildBatchesChild(child);
     }
 
-    void SetMaterial(size_t meshIndex, Material* mat) {
-        if (!model || meshIndex >= model->meshes.size()) {
-            std::cout << "you try set material that not exists";
-            return;
-        };
-        model->meshes[meshIndex].material = mat;
+    void DrawAll() {
+        if (!mesh) return;
+        for (auto& [mat, sms] : batches) {
+            if (!mat) continue;
+            mat->Bind();
+            for (auto* sm : sms) {
+                glBindVertexArray(mesh->VAO);
+                glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset));
+            }
+        }
+        glBindVertexArray(0);
+        for (auto* child : mesh->children) if (child) DrawChild(child);
     }
 
+private:
+    void RebuildBatchesChild(Mesh* m) {
+        for (auto& sm : m->submeshes) {
+            Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            batches[mat].push_back(&sm);
+        }
+        for (auto* c : m->children) if (c) RebuildBatchesChild(c);
+    }
+
+    void DrawChild(Mesh* m) {
+        for (auto& sm : m->submeshes) {
+            Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            mat->Bind();
+            glBindVertexArray(m->VAO);
+            glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
+        }
+        for (auto* c : m->children) if (c) DrawChild(c);
+    }
+
+
+//OLD
+public:
+    // Um material por submesh
+    std::vector<Material*> materials; // size == mesh->submeshes.size()
+
+    // Prepara materiais a partir do MeshFilter (copia os defaults da Mesh caso existam)
+    void SyncWithMesh(const MeshFilter& filter) {
+        materials.clear();
+        if (!filter.mesh) return;
+        materials.resize(filter.mesh->submeshes.size(), nullptr);
+        for (size_t i = 0; i < materials.size(); ++i) {
+            auto smMat = filter.mesh->submeshes[i].material;
+            materials[i] = smMat ? smMat : MaterialDefaults::Get();
+        }
+    }
+
+    Material* GetMaterialForSubmesh(size_t i, const MeshFilter& filter) const {
+        if (i >= materials.size()) return MaterialDefaults::Get();
+        // se null, tenta o da mesh, se null, default
+        if (materials[i]) return materials[i];
+        if (filter.mesh && i < filter.mesh->submeshes.size() && filter.mesh->submeshes[i].material)
+            return filter.mesh->submeshes[i].material;
+        return MaterialDefaults::Get();
+    }
+
+    void SetMaterialForSubmesh(size_t i, Material* m) {
+        if (i >= materials.size()) return;
+        materials[i] = m ? m : MaterialDefaults::Get();
+    }
 };
-
- */

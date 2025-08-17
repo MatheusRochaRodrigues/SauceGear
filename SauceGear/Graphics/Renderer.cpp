@@ -45,7 +45,8 @@ void Renderer::RenderSceneWithShader(Shader* shaderOverride) {
         shaderOverride->use();
         shaderOverride->setMat4("model", transform.GetMatrix());
 
-        meshRenderer.model->Draw();
+        meshRenderer.mesh->Draw();
+        //meshRenderer.model->Draw();
     }
 }
 

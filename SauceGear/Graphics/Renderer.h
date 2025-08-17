@@ -23,9 +23,7 @@ public:
     void RenderSceneWithShader(Shader* overrideShader);
 
     void Draw(const Mesh& mesh, const Shader& shader);
-     
-
-    void Draw(Model* mesh, Material* material, const glm::mat4& model);
+      
     void RenderSkybox();
       
 private:  

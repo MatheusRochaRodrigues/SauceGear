@@ -55,7 +55,7 @@ public:
 
             //--------- to end fbo
             //holding data texture for post processing
-            //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(0);
+            //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(2);
             GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0);
             //GEngine->renderer->GetTextureRendered = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun).depthMap;
             glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default 

@@ -10,6 +10,10 @@ struct Transform {
     glm::vec3 rotation = glm::vec3(0.0f); // Euler
     glm::vec3 scale    = glm::vec3(1.0f);
 
+    glm::vec3 localPosition = glm::vec3(0.0f);
+    glm::vec3 localRotation = glm::vec3(0.0f); // Euler
+    glm::vec3 localScale    = glm::vec3(1.0f);
+
     Transform() = default;
 
     Transform(glm::vec3 pos, glm::vec3 rot = glm::vec3(0.0f), glm::vec3 scl = glm::vec3(1.0f))

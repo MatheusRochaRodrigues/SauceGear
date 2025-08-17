@@ -81,20 +81,47 @@ void RenderSystem::GeometryPass() {
     for (auto e : entities) {
         auto& trans = GEngine->scene->GetComponent<Transform>(e);
         auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e); 
-         
+
+        Shader* shader = GEngine->renderer->GetGBufferShader;
+        shader->setMat4("model", trans.GetMatrix());
+
+        //for each material
         for (auto& [material, meshData] : meshRenderer.batches) {  
-            for (auto& mesh : meshData) {  
-                Shader* shader = GEngine->renderer->GetGBufferShader;
-                material->Apply(shader);                     //shader->use();
-                shader->setMat4("model", trans.GetMatrix()); 
-                mesh->Draw();
+            //for each mesh into the material
+            for (auto& mesh : meshData) {
+                material->Apply(shader);
+                meshRenderer.DrawSubM(mesh);   // mesh.Draw();
             }
         } 
     } 
     gBuffer->Unbind();
 }
 
-
+//void RenderSystem::GeometryPass() {
+//    gBuffer->Bind();
+//    glClearColor(0.0, 0.0, 0.0, 1.0); // keep it black so it doesn't leak into g-buffer
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//    auto camera = GEngine->mainCamera;      //auto view = camera->GetViewMatrix(); //auto proj = camera->GetProjectionMatrix(); 
+//    auto entities = GEngine->scene->GetEntitiesWith<Transform, MeshRenderer>();
+//
+//    for (auto e : entities) {
+//        auto& trans = GEngine->scene->GetComponent<Transform>(e);
+//        auto& meshR = GEngine->scene->GetComponent<MeshRenderer>(e);
+//        if (!meshR.mesh) continue;
+//
+//        for (int i = 0; i < meshR.model->GetMeshes().size(); ++i) {
+//            Material* mat = meshR.GetMaterial(i);
+//            Shader* shader = GEngine->renderer->GetGBufferShader;
+//            mat->Apply(shader);                     //shader->use();
+//            shader->setMat4("model", trans.GetMatrix());
+//            //shader->setMat4("view", view);
+//            //shader->setMat4("projection", proj);
+//            meshR.model->GetMeshes()[i].Draw();
+//        }
+//    }
+//    gBuffer->Unbind();
+//}
 
 
 void RenderSystem::LightingPass() { 

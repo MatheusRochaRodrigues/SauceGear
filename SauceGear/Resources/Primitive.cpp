@@ -1,34 +1,64 @@
 #include "Primitive.h"
 #include <cmath>
 
-std::unique_ptr<Model> PrimitiveMesh::cubeMesh = nullptr;
-Model* PrimitiveMesh::CreateCube(Material* material) {
+std::unique_ptr<Mesh> PrimitiveMesh::cubeMesh = nullptr;
+Mesh* PrimitiveMesh::CreateCube(Material* material) {
     if (!cubeMesh) {
-        cubeMesh = std::make_unique<Model>();
-        Mesh mesh = Cube(material);
-        cubeMesh->AddMesh(mesh);
+        cubeMesh = std::make_unique<Mesh>(Cube(material)); 
+        cubeMesh->name = "Cube";
     }
     return cubeMesh.get();
 }
 
-std::unique_ptr<Model> PrimitiveMesh::cubeInverseMesh = nullptr;
-Model* PrimitiveMesh::CreateInverseCube(Material* material) {
+std::unique_ptr<Mesh> PrimitiveMesh::cubeInverseMesh = nullptr;
+Mesh* PrimitiveMesh::CreateInverseCube(Material* material) {
     if (!cubeInverseMesh) {
-        cubeInverseMesh = std::make_unique<Model>();
-        Mesh mesh = CubeInverse(material);
-        cubeInverseMesh->AddMesh(mesh);
+        cubeInverseMesh = std::make_unique<Mesh>(CubeInverse(material)); 
     }
     return cubeInverseMesh.get();
 }
 
-std::unique_ptr<Model> PrimitiveMesh::sphereMesh = nullptr;
-Model* PrimitiveMesh::CreateSphere(Material* material, unsigned int segments, unsigned int rings, float radius) {
+std::unique_ptr<Mesh> PrimitiveMesh::sphereMesh = nullptr;
+Mesh* PrimitiveMesh::CreateSphere(Material* material, unsigned int segments, unsigned int rings, float radius) {
     if (!sphereMesh) {
-        sphereMesh = std::make_unique<Model>();
-        Mesh mesh = Sphere(segments, rings, radius, material);
-        sphereMesh->AddMesh(mesh);
+        sphereMesh = std::make_unique<Mesh>(Sphere(segments, rings, radius, material));
+        sphereMesh->name = "Sphere";
     }
     return sphereMesh.get();
+} 
+
+std::unique_ptr<Mesh> PrimitiveMesh::cylinderMesh = nullptr;
+Mesh* PrimitiveMesh::CreateCylinder(Material* material, unsigned int segments, float height, float radius, bool capped) {
+    if (!cylinderMesh) {
+        cylinderMesh = std::make_unique<Mesh>(Cylinder(segments, height, radius, material)); 
+    }
+    return cylinderMesh.get();
+}
+ 
+std::unique_ptr<Mesh> PrimitiveMesh::planeMesh = nullptr;
+Mesh* PrimitiveMesh::CreatePlane(Material* material) {
+    if (!planeMesh) { 
+        std::vector<Vertex> vertices = {
+            // Posiï¿½ï¿½o    // Normal   // UV   // Tangent  // Bitangent  // BoneIDs         // Weights
+            { {-1, 0, -1}, {0, 1, 0}, {0, 0}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
+            { { 1, 0, -1}, {0, 1, 0}, {1, 0}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
+            { { 1, 0,  1}, {0, 1, 0}, {1, 1}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
+            { {-1, 0,  1}, {0, 1, 0}, {0, 1}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
+        }; 
+        /*std::vector<unsigned int> indices = {
+            0, 1, 2, 2, 3, 0
+        };*/
+
+        // Ordem anti-horï¿½ria vista de cima:
+        std::vector<unsigned int> indices = {
+            0, 3, 2,
+            2, 1, 0
+        };
+
+        planeMesh = std::make_unique<Mesh>(vertices, indices, material);
+        planeMesh->name = "Plane";
+    }
+    return planeMesh.get();
 }
 
 
@@ -36,7 +66,7 @@ Mesh PrimitiveMesh::CubeInverse(Material* material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
-    // Posições únicas dos cantos do cubo
+    // Posiï¿½ï¿½es ï¿½nicas dos cantos do cubo
     glm::vec3 positions[] = {
         {-1, -1, -1}, { 1, -1, -1}, { 1,  1, -1}, { -1,  1, -1}, // Z-
         {-1, -1,  1}, { 1, -1,  1}, { 1,  1,  1}, { -1,  1,  1}  // Z+
@@ -63,17 +93,17 @@ Mesh PrimitiveMesh::CubeInverse(Material* material) {
         { 1,  0,  0}  // X+
     };
 
-    // UVs padrão
+    // UVs padrï¿½o
     glm::vec2 tex[] = {
         {0, 0}, {1, 0}, {1, 1}, {0, 1}
     };
 
-    // Para cada face: 4 vértices (em anti-horário), normais, tangente, bitangente
+    // Para cada face: 4 vï¿½rtices (em anti-horï¿½rio), normais, tangente, bitangente
     auto addFace = [&](glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3,
         glm::vec3 normal) {
             glm::vec3 tangent, bitangent;
             {
-                // Calcula tangente/bitangente para UV padrão
+                // Calcula tangente/bitangente para UV padrï¿½o
                 glm::vec3 edge1 = v1 - v0;
                 glm::vec3 edge2 = v2 - v0;
                 glm::vec2 deltaUV1 = tex[1] - tex[0];
@@ -103,7 +133,7 @@ Mesh PrimitiveMesh::CubeInverse(Material* material) {
             for (int i = 0; i < 4; ++i)
                 vertices.push_back(verts[i]);
 
-            // Triângulos em sentido horário
+            // Triï¿½ngulos em sentido horï¿½rio
             indices.push_back(startIndex + 0);
             indices.push_back(startIndex + 1);
             indices.push_back(startIndex + 2);
@@ -114,7 +144,7 @@ Mesh PrimitiveMesh::CubeInverse(Material* material) {
         };
      
 
-    // Faces em anti-horário
+    // Faces em anti-horï¿½rio
     addFace(positions[0], positions[1], positions[2], positions[3], normals[0] * glm::vec3(-1)); // Back (Z-)
     addFace(positions[5], positions[4], positions[7], positions[6], normals[1] * glm::vec3(-1)); // Front (Z+)
     addFace(positions[4], positions[5], positions[1], positions[0], normals[2] * glm::vec3(-1)); // Bottom (Y-)
@@ -129,7 +159,7 @@ Mesh PrimitiveMesh::Cube(Material* material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
-    // Posições únicas dos cantos do cubo
+    // Posiï¿½ï¿½es ï¿½nicas dos cantos do cubo
     glm::vec3 positions[] = {
         {-1, -1, -1}, { 1, -1, -1}, { 1,  1, -1}, { -1,  1, -1}, // Z-
         {-1, -1,  1}, { 1, -1,  1}, { 1,  1,  1}, { -1,  1,  1}  // Z+
@@ -156,17 +186,17 @@ Mesh PrimitiveMesh::Cube(Material* material) {
         { 1,  0,  0}  // X+
     };
 
-    // UVs padrão
+    // UVs padrï¿½o
     glm::vec2 tex[] = {
         {0, 0}, {1, 0}, {1, 1}, {0, 1}
     };
 
-    // Para cada face: 4 vértices (em anti-horário), normais, tangente, bitangente
+    // Para cada face: 4 vï¿½rtices (em anti-horï¿½rio), normais, tangente, bitangente
     auto addFace = [&](glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3,
         glm::vec3 normal) {
             glm::vec3 tangent, bitangent;
             {
-                // Calcula tangente/bitangente para UV padrão
+                // Calcula tangente/bitangente para UV padrï¿½o
                 glm::vec3 edge1 = v1 - v0;
                 glm::vec3 edge2 = v2 - v0;
                 glm::vec2 deltaUV1 = tex[1] - tex[0];
@@ -196,7 +226,7 @@ Mesh PrimitiveMesh::Cube(Material* material) {
             for (int i = 0; i < 4; ++i)
                 vertices.push_back(verts[i]);
 
-            // Triângulos em anti-horário
+            // Triï¿½ngulos em anti-horï¿½rio
             indices.push_back(startIndex + 0);
             indices.push_back(startIndex + 2);
             indices.push_back(startIndex + 1);
@@ -206,12 +236,12 @@ Mesh PrimitiveMesh::Cube(Material* material) {
             indices.push_back(startIndex + 2);
         };
 
-    //// Índices — anti-horário (CCW)
+    //// ï¿½ndices ï¿½ anti-horï¿½rio (CCW)
     //std::vector<unsigned int> indices = {
     //    // Frente
     //    4, 5, 6,
     //    4, 6, 7,
-    //    // Trás
+    //    // Trï¿½s
     //    0, 2, 1,
     //    0, 3, 2,
     //    // Esquerda
@@ -228,7 +258,7 @@ Mesh PrimitiveMesh::Cube(Material* material) {
     //    0, 5, 4
     //};
 
-    // Faces em anti-horário
+    // Faces em anti-horï¿½rio
     addFace(positions[0], positions[1], positions[2], positions[3], normals[0]); // Back (Z-)
     addFace(positions[5], positions[4], positions[7], positions[6], normals[1]); // Front (Z+)
     addFace(positions[4], positions[5], positions[1], positions[0], normals[2]); // Bottom (Y-)
@@ -279,50 +309,9 @@ Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radi
         }
     }
 
-    return Mesh(vertices, indices, material);;
-}
-
-std::unique_ptr<Model> PrimitiveMesh::planeMesh = nullptr;
-Model* PrimitiveMesh::CreatePlane(Material* material) {
-    if (!planeMesh) {
-        planeMesh = std::make_unique<Model>();
-
-        std::vector<Vertex> vertices = {
-            // Posição    // Normal   // UV   // Tangent  // Bitangent  // BoneIDs         // Weights
-            { {-1, 0, -1}, {0, 1, 0}, {0, 0}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
-            { { 1, 0, -1}, {0, 1, 0}, {1, 0}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
-            { { 1, 0,  1}, {0, 1, 0}, {1, 1}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
-            { {-1, 0,  1}, {0, 1, 0}, {0, 1}, {1, 0, 0}, {0, 0, 1}, {0,0,0,0}, {0,0,0,0} },
-        };
-
-        /*std::vector<unsigned int> indices = {
-            0, 1, 2, 2, 3, 0
-        };*/
-
-        // Ordem anti-horária vista de cima:
-        std::vector<unsigned int> indices = {
-            0, 3, 2,
-            2, 1, 0
-        };
-
-        planeMesh->AddMesh(Mesh(vertices, indices, material));
-    }
-    return planeMesh.get();
-}
-
-
-
-
-std::unique_ptr<Model> PrimitiveMesh::cylinderMesh = nullptr;
-Model* PrimitiveMesh::CreateCylinder(Material* material, unsigned int segments, float height, float radius, bool capped) {
-    if (!cylinderMesh) {
-        cylinderMesh = std::make_unique<Model>();
-        Mesh mesh = Cylinder(segments, height, radius, material);
-        cylinderMesh->AddMesh(mesh);
-    }
-    return cylinderMesh.get();
-}
-
+    return Mesh(vertices, indices, material);
+} 
+ 
 Mesh PrimitiveMesh::Cylinder(unsigned int segments, float height, float radius, bool capped, Material* material) {
     //static std::unordered_map<size_t, Mesh> cached;
     //size_t key = std::hash<std::string>()(std::to_string(segments) + "|" + std::to_string(height) + "|" + std::to_string(radius) + "|" + std::to_string(capped));
@@ -396,10 +385,10 @@ Mesh PrimitiveMesh::Cylinder(unsigned int segments, float height, float radius, 
 }
 
 
-//std::unique_ptr<Model> PrimitiveMesh::cylinderMesh = nullptr;
-//Model* PrimitiveMesh::CreateCylinder(unsigned int segments, float height, float radius, bool capped, Material* material) {
+//std::unique_ptr<Mesh> PrimitiveMesh::cylinderMesh = nullptr;
+//Mesh* PrimitiveMesh::CreateCylinder(unsigned int segments, float height, float radius, bool capped, Material* material) {
 //    if (!cylinderMesh) {
-//        cylinderMesh = std::make_unique<Model>();
+//        cylinderMesh = std::make_unique<Mesh>();
 //        Mesh mesh = Cylinder(segments, height, radius, material);
 //        cylinderMesh->AddMesh(mesh);
 //    }
