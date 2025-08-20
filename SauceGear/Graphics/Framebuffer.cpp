@@ -67,7 +67,14 @@ void Framebuffer::Init() {
             internalFormat = GL_RGBA8;      //GL_RGBA8
             format = GL_RGBA;
             break;
-        }
+
+
+        //PBR
+        case FramebufferTextureType::MetallicRoughnessAO:
+            internalFormat = GL_RGBA8;      //GL_RGBA8          R = Metallic, G = Roughness, B = AO, A = ?
+            format = GL_RGBA;
+            break;
+    }
 
 
         glBindTexture(GL_TEXTURE_2D, colorTextures[i]);

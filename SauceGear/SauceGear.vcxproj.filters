@@ -30,9 +30,6 @@
     <ClCompile Include="Graphics\Shader.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\IBLMapGenerator.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\SkyboxRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -135,19 +132,31 @@
     <ClCompile Include="Scene\Systems\LightSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Systems\RenderSystem.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Resources\Primitive.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\BlinnPhongRenderer.cpp">
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\PBRRenderer.cpp">
+    <ClCompile Include="Graphics\Renderer\PipelinePBR\PBRRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Scene\SceneBuilder.h">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\ForwardPipeline.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\LightingPipeline.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Systems\RenderSystem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -157,9 +166,6 @@
     </ClInclude>
     <ClInclude Include="Graphics\Shader.h">
       <Filter>Arquivos de Origem</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\IBLMapGenerator.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\SkyboxRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
@@ -356,7 +362,7 @@
     <ClInclude Include="Editor\Panels\Load.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\ScriptBehaviour.h">
+    <ClInclude Include="Scene\Components\ScriptComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\MoveScript.h">
@@ -380,16 +386,25 @@
     <ClInclude Include="Scene\Components\MeshFilter.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\BlinnPhongRenderer.h">
+    <ClInclude Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\PBRRenderer.h">
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\IRenderPipeline.h">
+    <ClInclude Include="Graphics\Renderer\IRenderPipeline.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Resources\AssetManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Renderer\RenderHelper.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

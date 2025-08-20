@@ -9,7 +9,9 @@
 enum class FramebufferTextureType {
     Color, Depth, Float16, Integer, ColorRGB, ColorRGBA,
     //Deffered
-    Position, Normal, Albedo    
+    Position, Normal, Albedo,    
+    //PBR
+    MetallicRoughnessAO
 };
 
 struct FramebufferAttachment {

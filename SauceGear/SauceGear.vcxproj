@@ -130,7 +130,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Graphics\BlinnPhongRenderer.cpp" />
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\ForwardPipeline.cpp" />
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\LightingPipeline.cpp" />
+    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.cpp" />
     <ClCompile Include="EditorUI.cpp" />
     <ClCompile Include="Editor\EditorApp.cpp" />
     <ClCompile Include="Editor\EditorMain.cpp" />
@@ -141,6 +144,7 @@
     <ClCompile Include="Editor\Panels\SceneViewPanel.h" />
     <ClCompile Include="Game\GameMain.cpp" />
     <ClCompile Include="Graphics\Framebuffer.cpp" />
+    <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp" />
     <ClCompile Include="ImGui\GraphEditor.cpp" />
     <ClCompile Include="ImGui\ImCurveEdit.cpp" />
     <ClCompile Include="ImGui\ImGradient.cpp" />
@@ -154,30 +158,32 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="Editor\Panels\IPanelHelper.h" />
-    <ClCompile Include="Graphics\PBRRenderer.cpp" />
+    <ClCompile Include="Graphics\Renderer\PipelinePBR\PBRRenderer.cpp" />
     <ClCompile Include="Resources\Primitive.cpp" />
     <ClCompile Include="Scene\SceneBuilder.h" />
-    <ClCompile Include="Scene\Systems\RenderSystem.cpp" />
     <ClCompile Include="Scene\Systems\LightSystem.cpp" />
     <ClCompile Include="Scene\Systems\PostProcessSystem.cpp" />
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\EngineContext.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics\Renderer.cpp" />
-    <ClCompile Include="Graphics\IBLMapGenerator.cpp" />
     <ClCompile Include="Core\InputSystem.cpp" />
     <ClCompile Include="Core\Logger.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene\SceneECS.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\SkyboxRenderer.cpp" />
+    <ClCompile Include="Scene\Systems\RenderSystem.cpp" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h" />
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h" />
+    <ClInclude Include="Graphics\Renderer\RenderHelper.h" />
     <ClInclude Include="Resources\AssetManager.h" />
-    <ClInclude Include="Graphics\BlinnPhongRenderer.h" />
+    <ClInclude Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\KeyCodes.h" />
@@ -188,8 +194,8 @@
     <ClInclude Include="Graphics\Framebuffer.h" />
     <ClInclude Include="Editor\Panels\IPanel.h" />
     <ClInclude Include="Editor\Panels\Load.h" />
-    <ClInclude Include="Graphics\IRenderPipeline.h" />
-    <ClInclude Include="Graphics\PBRRenderer.h" />
+    <ClInclude Include="Graphics\Renderer\IRenderPipeline.h" />
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRRenderer.h" />
     <ClInclude Include="Scene\Components\MeshFilter.h" />
     <ClInclude Include="PostProcessEffect.h" />
     <ClInclude Include="Resources\Primitive.h" />
@@ -239,7 +245,6 @@
     <ClInclude Include="Scene\Camera.h" />
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Graphics\Renderer.h" />
-    <ClInclude Include="Graphics\IBLMapGenerator.h" />
     <ClInclude Include="Graphics\Mesh.h" />
     <ClInclude Include="Resources\Model.h" />
     <ClInclude Include="Scene\SceneECS.h" />
@@ -254,7 +259,7 @@
     <ClInclude Include="Scene\TransformComponent.h" />
     <ClInclude Include="Scene\Systems\ScriptSystem .h" />
     <ClInclude Include="Scene\ScriptBehaviour.h" />
-    <ClInclude Include="Scene\Components\ScriptBehaviour.h" />
+    <ClInclude Include="Scene\Components\ScriptComponent.h" />
     <ClInclude Include="Scene\Components\Tags\TransparentTag.h" />
   </ItemGroup>
   <ItemGroup>

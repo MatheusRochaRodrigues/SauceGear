@@ -27,9 +27,9 @@ public:
             auto& renderer = AddComponent<MeshRenderer>(entity); 
              */
             std::cout << "printf cube" << std::endl;
-            auto* material = new Material();                    //auto* material = new Material(defaultShader);
-            material->textures["albedoMap"] = { 0,  MaterialDefaults::TextureColor(250, 100, 0) };
-            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(material));
+            //auto* material = new Material();                    //auto* material = new Material(defaultShader);
+            //material->textures["albedoMap"] = { 0,  MaterialDefaults::TextureColor(250, 100, 0) };
+            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateCube( ));
 
             stbi_set_flip_vertically_on_load(false); 
             //entity = SceneBuilder::CreateModel("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
@@ -96,7 +96,7 @@ public:
         //    return new PlayerCamera();
         //});
         //  
-        LoadScene2(); 
+        //LoadScene2(); 
     }
 
     // Código ECS equivalente ao renderScene()

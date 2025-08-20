@@ -100,6 +100,7 @@ void main()
         vec3 specular = numerator / denominator;
         
          // kS is equal to Fresnel
+         // quanto sobrou de energia após specula
         vec3 kS = F;
         // for energy conservation, the diffuse and specular light can't
         // be above 1.0 (unless the surface emits light); to preserve this
@@ -108,6 +109,7 @@ void main()
         // multiply kD by the inverse metalness such that only non-metals 
         // have diffuse lighting, or a linear blend if partly metal (pure metals
         // have no diffuse light).
+        //se o material permite difusa
         kD *= 1.0 - metallic;	                
             
         // scale light by NdotL

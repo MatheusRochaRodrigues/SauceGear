@@ -22,6 +22,13 @@ int Application::Init() {
     GEngine->renderer->GetSunLightingShader = new Shader("DeferredShading/DeferredShadingSun.vs", "DeferredShading/DeferredShadingSun.fs");;
 
 
+    // Começa com Blinn-Phong
+    //renderSystem.SetRenderer(std::make_unique<BlinnPhongRenderer>());
+    //renderSystem.Render(scene); 
+    // Troca para PBR
+    //renderSystem.SetRenderer(std::make_unique<PBRRenderer>());
+    //renderSystem.Render(scene);
+
     stbi_set_flip_vertically_on_load(true);
 }
 
