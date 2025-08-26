@@ -1,18 +1,18 @@
 #pragma once
 #include "../Scene/SceneECS.h"
 #include "../Scene/Components/ComponentsHelper.h" 
-#include "IBLMapGenerator.h"
-#include "SkyboxRenderer.h"
+//#include "IBLMapGenerator.h"
+//#include "SkyboxRenderer.h"
 
 //backend de renderização.
 class Renderer {
 public:
-    enum class RenderPass {
+    /*enum class RenderPass {
         Forward,
         Shadow,
         DeferredGBuffer,
         Lighting
-    };
+    };*/
       
     void Init(SceneECS*);
 
@@ -30,8 +30,8 @@ private:
     SceneECS* m_Scene;
     Shader pbrShader;
     Shader baseColorShader;
-    SkyboxRenderer* skybox;
-    IBLMapGenerator* ibl;
+    //SkyboxRenderer* skybox;
+    //IBLMapGenerator* ibl;
        
 public: 
     //GBuffer

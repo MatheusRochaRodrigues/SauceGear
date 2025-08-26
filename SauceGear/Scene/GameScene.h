@@ -22,14 +22,21 @@ public:
         {
             stbi_set_flip_vertically_on_load(true);
             Entity entity = SceneBuilder::CreateModel("Resources/Models/backpack/backpack.obj");
+            //stbi_set_flip_vertically_on_load(false);
+            //Entity entity23 = SceneBuilder::CreateModel("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
+            //stbi_set_flip_vertically_on_load(true);
+            
             /*auto& trans = GetComponent<Transform>(entity);
             trans.position = { 0, 0, 0 }; 
             auto& renderer = AddComponent<MeshRenderer>(entity); 
              */
             std::cout << "printf cube" << std::endl;
-            //auto* material = new Material();                    //auto* material = new Material(defaultShader);
-            //material->textures["albedoMap"] = { 0,  MaterialDefaults::TextureColor(250, 100, 0) };
-            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateCube( ));
+
+            auto* material = new Material();                    //auto* material = new Material(defaultShader);  
+            auto* tex = MaterialDefaults::TextureColor(250, 100, 0);
+            tex->unit = 0;  
+            material->textures["Albedo"] = tex;
+            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateSphere(material));
 
             stbi_set_flip_vertically_on_load(false); 
             //entity = SceneBuilder::CreateModel("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
@@ -104,7 +111,7 @@ public:
     {
         //Material* material = nullptr; // ou carregue o material desejado aqui
         auto* material = new Material();                    //auto* material = new Material(defaultShader);
-        material->textures["albedoMap"] = { 0,  MaterialDefaults::TextureColor(250, 100, 0) };
+        material->textures["Albedo"] = MaterialDefaults::TextureColor(250, 100, 0) ;
 
         // Cubo invertido (sala)
         //{

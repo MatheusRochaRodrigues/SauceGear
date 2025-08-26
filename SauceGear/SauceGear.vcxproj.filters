@@ -153,10 +153,10 @@
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\LightingPipeline.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Systems\RenderSystem.cpp">
+    <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp">
+    <ClCompile Include="Graphics\ShaderLibraries.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -407,24 +407,45 @@
     <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Scene\ScriptInspector.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\PersistenceIBL.hpp">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\MyScript.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\exec.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Components\AABBComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Systems\BoundsSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\utilsAABB.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\background.fs">
+    <None Include="Resources\Shaders\PBR\background.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\background.vs">
+    <None Include="Resources\Shaders\PBR\background.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\cubemap.vs">
+    <None Include="Resources\Shaders\PBR\cubemap.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\equirectangular_to_cubemap.fs">
+    <None Include="Resources\Shaders\PBR\IBL\equirectangular_to_cubemap.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
     <None Include="Resources\Shaders\Basic\Frag.fg">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\irradiance_convolution.fs">
+    <None Include="Resources\Shaders\PBR\IBL\irradiance_convolution.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
     <None Include="Resources\Shaders\PBR\pbr.fs">
@@ -436,9 +457,9 @@
     <None Include="Resources\Shaders\Basic\Vertex.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\prefilter.fs" />
-    <None Include="Resources\Shaders\PBR\brdf.vs" />
-    <None Include="Resources\Shaders\PBR\brdf.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\prefilter.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\brdf.vs" />
+    <None Include="Resources\Shaders\PBR\IBL\brdf.fs" />
     <None Include="Resources\Shaders\CellShading\BaseColor.vs" />
     <None Include="Resources\Shaders\CellShading\BaseColor.fs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapD.vs" />
@@ -476,6 +497,18 @@
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.fs" />
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.vs" />
+    <None Include="Resources\Shaders\PBR\skybox.vs" />
+    <None Include="Resources\Shaders\PBR\skybox.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShading.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_light_volume.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\fullscreen.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_ibl.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\cubemap.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

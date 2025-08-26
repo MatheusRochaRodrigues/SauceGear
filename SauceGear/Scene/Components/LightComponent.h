@@ -34,8 +34,7 @@ struct LightComponent {                             // base alignment       // a
         this->type = type;  
         this->range = (type == ShadowType::Directional) ? 7.5f : 25.0f;
         this->position = (type == ShadowType::Directional) ? glm::vec3(-2.0f, 4.0f, -1.0f) : glm::vec3(0.0f);
-    };
-
+    }; 
 };
 
 //glm::mat4 shadowTransforms[6] = {};             //16                    //80

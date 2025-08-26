@@ -135,7 +135,7 @@ private:
         auto* material = new Material();
 
         unsigned int unitTex = 0;
-        auto LoadSingleTexture = [&](aiTextureType type, const std::string& uniformName, unsigned int unit, Texture* fallback) {
+        auto LoadSingleTexture = [&](aiTextureType type, const std::string& uniformName, Texture* fallback) {
             aiString str;
             if (aiMat->GetTexture(type, 0, &str) == AI_SUCCESS) {
                 const std::string fullPath = directory + "/" + str.C_Str();
@@ -143,7 +143,7 @@ private:
                 // cache local simples por caminho
                 for (const auto& tex : textures_loaded) {
                     if (tex.path == str.C_Str()) {
-                        material->textures[uniformName] = { unit , new Texture(tex) };
+                        material->textures[uniformName] = new Texture(tex) ;
                         return;
                     }
                 } 
@@ -151,7 +151,7 @@ private:
                 tex->unit = unitTex++;
                 tex->LoadFromFile(fullPath.c_str());
                 tex->path = str.C_Str();
-                material->textures[uniformName] = { unit, tex };
+                material->textures[uniformName] = tex;
                 textures_loaded.push_back(*tex);
             }
             else {
@@ -160,7 +160,8 @@ private:
                 if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
                     material->albedoColor = glm::vec3(color.r, color.g, color.b);
                 }
-                material->textures[uniformName] = { unit, MaterialDefaults::TextureColor(
+                material->textures[uniformName] = { 
+                    MaterialDefaults::TextureColor(
                     static_cast<uint8_t>(material->albedoColor.r * 255.0f),
                     static_cast<uint8_t>(material->albedoColor.g * 255.0f),
                     static_cast<uint8_t>(material->albedoColor.b * 255.0f)
@@ -168,9 +169,9 @@ private:
             }
         };
 
-        LoadSingleTexture(aiTextureType_DIFFUSE, "albedoMap", 0, MaterialDefaults::WhiteTexture());
+        LoadSingleTexture(aiTextureType_DIFFUSE, "Albedo", MaterialDefaults::WhiteTexture());
         //LoadSingleTexture(aiTextureType_SPECULAR, "specularMap", MaterialDefaults::WhiteTexture());
-        //LoadSingleTexture(aiTextureType_HEIGHT,   "normalMap",   MaterialDefaults::WhiteTexture());
+        LoadSingleTexture(aiTextureType_HEIGHT, "Normal", MaterialDefaults::WhiteTexture());
         //LoadSingleTexture(aiTextureType_AMBIENT,  "heightMap",   MaterialDefaults::WhiteTexture());
         material->floatParams["roughness"] = 0.5f;
         material->floatParams["metallic"] = 0.1f;

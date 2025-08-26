@@ -12,6 +12,7 @@
 #include "GlobalUniformComponent.h"  
 //#include "NativeScriptComponent.h"  
 #include "HierarchyComponent.h"  
+#include "AABBComponent.h"  
 
 
 // Aqui você pode criar um alias útil:					

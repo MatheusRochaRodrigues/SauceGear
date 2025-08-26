@@ -11,7 +11,21 @@ using Scene = SceneECS;
 class PBRPipeline : public IRenderPipeline {
 public:
     void Init() override;
-    void Render(Scene& scene) override;
+     
+    void Render(Scene& scene) override {
+        HandleFBOs();
+        GeometryPass(scene);
+        LightingPass(scene);
+        //ForwardPass(scene);
+        // 
+        // 3) Skybox (no final pra não interferir na iluminação) 
+        DrawSkybox(); 
+        // saída final
+        GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
+        //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(1);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     void Shutdown() override;
 
 private:
@@ -23,8 +37,8 @@ private:
 
     // IBL
     PBRShaders shaders;
-    IBLSet     ibl{};
-    GLuint     captureFBO = 0, captureRBO = 0;
+    IBLSet     ibl {};
+    GLuint     iblFBO = 0, iblRBO = 0; 
 
     // passes
     void HandleFBOs();

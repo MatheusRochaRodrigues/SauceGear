@@ -1,4 +1,5 @@
 #include"Shader.h"
+#include <regex> 
 
 // Reads a text file and outputs a string with everything in the text file
 std::string get_file_contents(const char* filename)
@@ -15,11 +16,36 @@ std::string get_file_contents(const char* filename)
 	in.read(&contents[0], contents.size());
 	in.close();
 	return contents;
-}
+}  
+
+std::string UpdateDefine(const std::string& shaderCode, const std::vector<std::pair<std::string, int>>& defines) {
+	std::string code = shaderCode;
+
+	for (auto& def : defines) {
+		const std::string& name = def.first;
+		int value = def.second;
+
+		std::regex defineRegex("#define\\s+" + name + "\\s+\\d+");
+		if (std::regex_search(code, defineRegex)) {
+			// Substitui o valor existente
+			code = std::regex_replace(code, defineRegex, "#define " + name + " " + std::to_string(value));
+		}
+		else {
+			// Adiciona o define no topo
+			code = "#define " + name + " " + std::to_string(value) + "\n" + code;
+		}
+	}
+
+	return code;
+} 
 
 // Constructor that build the Shader Program from 2 different shaders
-Shader::Shader(const char* vertexFile, const char* fragmentFile)
+Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines)
 {
+	this->vertexFile = vertexFile;
+	this->geometryFile = NULL;
+	this->fragmentFile = fragmentFile;
+
 	name = vertexFile; 
 	std::string vPath = ShaderPathDefault + vertexFile;
 	std::string fPath = ShaderPathDefault + fragmentFile;
@@ -31,6 +57,10 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 		// Read vertexFile and fragmentFile and store the strings
 		std::string vertexCode = get_file_contents(vertexFile);
 		std::string fragmentCode = get_file_contents(fragmentFile);
+
+		// injeta defines
+		vertexCode = UpdateDefine(vertexCode, defines);
+		fragmentCode = UpdateDefine(fragmentCode, defines);
 
 		// Convert the shader source strings into character arrays
 		const char* vertexSource = vertexCode.c_str();
@@ -74,10 +104,13 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile)
 }
 
 // Constructor that build the Shader Program from 2 different shaders
-Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile)
+Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines)
 {
-	name = vertexFile;
+	this->vertexFile = vertexFile;
+	this->geometryFile = geometryFile;
+	this->fragmentFile = fragmentFile; 
 
+	name = vertexFile; 
 	std::string vPath = ShaderPathDefault + vertexFile;
 	std::string gPath = ShaderPathDefault + geometryFile;
 	std::string fPath = ShaderPathDefault + fragmentFile;
@@ -141,7 +174,7 @@ Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fra
 	catch (const std::exception& e) {
 		std::cerr << "[Error] - To Create Shader (" << vPath << ", " << gPath << ", " << fPath << "):\n" << e.what() << "\n\n";
 	}
-}
+} 
 
 // Activates the Shader Program
 void Shader::use()
@@ -211,6 +244,31 @@ void Shader::setIntArray(const std::string& name, int* values, int count) {
 	}
 }
 
+// Textures Arrays
+void Shader::setTexture2D(const std::string& name, GLuint texID, GLenum unit) const {
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
+}
+
+void Shader::setTexture2DArray(const std::string& name, GLuint texID, GLenum unit) const {
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
+}
+
+void Shader::setTextureCube(const std::string& name, GLuint texID, GLenum unit) const {
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
+}
+
+void Shader::setTextureCubeArray(const std::string& name, GLuint texID, GLenum unit) const {
+	glActiveTexture(GL_TEXTURE0 + unit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, texID);
+	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
+} 
+
 
 // Checks if the different Shaders have compiled properly
 void Shader::compileErrors(unsigned int shader, const char* type)
@@ -245,3 +303,39 @@ void Shader::compileErrors(unsigned int shader, const char* type)
 		}
 	}
 }
+
+ 
+
+
+
+
+//std::string injectDefines(const std::string& code, const std::vector<std::pair<std::string, int>>& defines) {
+//	std::string result;
+//	for (auto& d : defines) {
+//		result += "#define " + d.first + " " + std::to_string(d.second) + "\n";
+//	}
+//	result += code;
+//	return result;
+//}
+
+//std::string UpdateDefine(const std::string& shaderCode, const std::string& defineName, int newValue) {
+//	std::stringstream ss(shaderCode);
+//	std::string line;
+//	std::string newCode;
+//	bool found = false;
+//
+//	while (std::getline(ss, line)) {
+//		if (line.find("#define " + defineName) == 0) {
+//			line = "#define " + defineName + " " + std::to_string(newValue);
+//			found = true;
+//		}
+//		newCode += line + "\n";
+//	}
+//
+//	if (!found) {
+//		// Se não achar, adiciona no início
+//		newCode = "#define " + defineName + " " + std::to_string(newValue) + "\n" + newCode;
+//	}
+//
+//	return newCode;
+//}

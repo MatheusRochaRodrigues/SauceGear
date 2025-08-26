@@ -131,11 +131,11 @@ public:
         return 1;
     }
 
-    static void SetPointsToShader(Shader* shader) {
+    static void SetPointsToShader(Shader* shader, int i = 0) {
         // Enviar para o shader
         shader->use();
         for (auto& [lightEntity, map] : ShadowMaps) {
-            int lightCount = map.second;
+            int lightCount = map.second + i;
             auto& light = GEngine->scene->GetComponent<LightComponent>(lightEntity);
             if (light.type == ShadowType::Point) {
                 shader->setInt("pointShadows[" + std::to_string(lightCount) + "]", lightCount); // começa depois das 2D  

@@ -1,12 +1,8 @@
-#include "IBLManager.h"
-#include <stb/stb_image.h>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <cmath>
+#include "IBLManager.h"   
 #include "../Graphics/Shader.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Graphics/FullscreenQuad.h"
+#include "PersistenceIBL.hpp"
 
 // === Helpers para captura ===
 static glm::mat4 CaptureProjection() {
@@ -23,29 +19,42 @@ static std::vector<glm::mat4> CaptureViews() {
     };
 }
 
+// === Construção ===
+GLuint IBLManager::LoadHDRTexture(const std::string& path) {
+    // pbr: load the HDR environment map
+    // ---------------------------------
+    stbi_set_flip_vertically_on_load(true);
+
+    int width, height, nrComponents;
+    float* data = stbi_loadf(path.c_str(), &width, &height, &nrComponents, 0);
+    if (!data) return 0;
+    GLuint tex = 0; glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    stbi_image_free(data);
+    return tex;
+}
+
 // === Interface principal ===
-//create ambient IBL
+//create ambient IBL                    LoadOrBuild
 IBLSet IBLManager::EnsureIBL(const std::string& hdrPath,
     const std::string& cacheDir,
-    Shader& shEquirect,
-    Shader& shIrradiance,
-    Shader& shPrefilter,
-    Shader& shBRDF,
+    Shader& hdrToCube,
+    Shader& Irradiance,
+    Shader& Prefilter,
+    Shader& BRDF,
     GLuint captureFBO,
     GLuint captureRBO)
 {
-    IBLSet set{};
-    const auto base = MakeBaseName(cacheDir, hdrPath);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST); // às vezes depth atrapalha
 
-    // tenta carregar do cache
-    if (TryLoadFromCache(base, set)) {
-        return set;
-    }
-
-    // gera tudo
-    stbi_set_flip_vertically_on_load(true);
-    int w = 0, h = 0;
-    GLuint hdr = LoadHDRTexture(hdrPath, w, h);
+    IBLSet set{};  
+    GLuint hdr = LoadHDRTexture(hdrPath);
     if (!hdr) {
         std::cerr << "[IBL] Falha ao carregar HDR: " << hdrPath << "\n";
         return set;
@@ -56,20 +65,32 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath,
     const auto proj = CaptureProjection();
     const auto views = CaptureViews();
 
-    set.envCubemap = CreateEnvCubemap(512);
-    RenderToEnvCubemap(hdr, set.envCubemap, shEquirect, proj, views, captureFBO, captureRBO);
+    set.envCubemap = CreateCubemap_Tex(512);
+    RenderHDRToCubemap(hdr, set.envCubemap, hdrToCube, proj, views, captureFBO, captureRBO);
     glDeleteTextures(1, &hdr);
 
-    set.irradiance = CreateIrradiance(32);
-    ConvolveIrradiance(set.envCubemap, set.irradiance, shIrradiance, proj, views, captureFBO, captureRBO);
+    set.irradiance = CreateIrradiance_Tex(32);
+    ConvolveIrradianceToDiffuse(set.envCubemap, set.irradiance, Irradiance, proj, views, captureFBO, captureRBO);
 
-    set.prefilter = CreatePrefilter(128, 5);
-    PrefilterSpecular(set.envCubemap, set.prefilter, shPrefilter, proj, views, captureFBO, captureRBO, 5);
+    set.prefilter = CreatePrefilter_Tex(128, 5);
+    PrefilterToSpecular(set.envCubemap, set.prefilter, Prefilter, proj, views, captureFBO, captureRBO, 5);
 
-    set.brdfLUT = CreateBRDFLUT(512);
-    IntegrateBRDF(set.brdfLUT, shBRDF, captureFBO, captureRBO, 512);
+    set.brdfLUT = CreateBRDFLUT_Tex(512);
+    IntegrateBRDF(set.brdfLUT, BRDF, captureFBO, captureRBO, 512);
+     
 
-    SaveToCache(base, set);
+    //Debug
+     
+    int size = 32;
+    glGenTextures(1, &set.debugFace);
+    glBindTexture(GL_TEXTURE_2D, set.debugFace);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
+
+    // copia os pixels da face do cubemap para a textura 2D
+    glCopyImageSubData(set.irradiance, GL_TEXTURE_CUBE_MAP_POSITIVE_X + 1, 0, 0, 0, 0,
+        set.debugFace, GL_TEXTURE_2D, 0, 0, 0, 0,
+        size, size, 1);
+
     return set;
 }
 
@@ -81,23 +102,8 @@ void IBLManager::Destroy(IBLSet& s) {
     s = {};
 }
 
-// === Construção ===
-GLuint IBLManager::LoadHDRTexture(const std::string& path, int& w, int& h) {
-    int n;
-    float* data = stbi_loadf(path.c_str(), &w, &h, &n, 0);
-    if (!data) return 0;
-    GLuint tex = 0; glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, w, h, 0, GL_RGB, GL_FLOAT, data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    stbi_image_free(data);
-    return tex;
-}
 
-GLuint IBLManager::CreateEnvCubemap(int size) {
+GLuint IBLManager::CreateCubemap_Tex(int size) {
     GLuint id; glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, id);
     for (int i = 0; i < 6; i++)
@@ -110,10 +116,11 @@ GLuint IBLManager::CreateEnvCubemap(int size) {
     return id;
 }
 
-void IBLManager::RenderToEnvCubemap(GLuint hdrTexture, GLuint envCubemap,
+void IBLManager::RenderHDRToCubemap(GLuint hdrTexture, GLuint envCubemap,
     Shader& shEquirect, const glm::mat4& proj,
     const std::vector<glm::mat4>& views,
     GLuint fbo, GLuint rbo) {
+
     shEquirect.use();
     shEquirect.setInt("equirectangularMap", 0);
     shEquirect.setMat4("projection", proj);
@@ -130,6 +137,11 @@ void IBLManager::RenderToEnvCubemap(GLuint hdrTexture, GLuint envCubemap,
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            std::cerr << "FBO incompleto!\n";
+        }
+
         RenderCube();
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -137,7 +149,7 @@ void IBLManager::RenderToEnvCubemap(GLuint hdrTexture, GLuint envCubemap,
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
-GLuint IBLManager::CreateIrradiance(int size) {
+GLuint IBLManager::CreateIrradiance_Tex(int size) {
     GLuint id; glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, id);
     for (int i = 0; i < 6; i++)
@@ -150,7 +162,7 @@ GLuint IBLManager::CreateIrradiance(int size) {
     return id;
 }
 
-void IBLManager::ConvolveIrradiance(GLuint envCubemap, GLuint irradiance,
+void IBLManager::ConvolveIrradianceToDiffuse(GLuint envCubemap, GLuint irradiance,
     Shader& shIrr, const glm::mat4& proj,
     const std::vector<glm::mat4>& views,
     GLuint fbo, GLuint rbo) {
@@ -174,7 +186,7 @@ void IBLManager::ConvolveIrradiance(GLuint envCubemap, GLuint irradiance,
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint IBLManager::CreatePrefilter(int baseSize, int mips) {
+GLuint IBLManager::CreatePrefilter_Tex(int baseSize, int mips) {
     GLuint id; glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, id);
     for (int i = 0; i < 6; i++)
@@ -185,7 +197,7 @@ GLuint IBLManager::CreatePrefilter(int baseSize, int mips) {
     return id;
 }
 
-void IBLManager::PrefilterSpecular(GLuint envCubemap, GLuint prefilter,
+void IBLManager::PrefilterToSpecular(GLuint envCubemap, GLuint prefilter,
     Shader& shPref, const glm::mat4& proj,
     const std::vector<glm::mat4>& views,
     GLuint fbo, GLuint rbo, int maxMip) {
@@ -216,7 +228,7 @@ void IBLManager::PrefilterSpecular(GLuint envCubemap, GLuint prefilter,
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-GLuint IBLManager::CreateBRDFLUT(int size) {
+GLuint IBLManager::CreateBRDFLUT_Tex(int size) {
     GLuint id; glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, size, size, 0, GL_RG, GL_FLOAT, nullptr);
@@ -239,150 +251,4 @@ void IBLManager::IntegrateBRDF(GLuint brdfLUT, Shader& shBRDF,
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     RenderQuad();           // renderQuad();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-// === Cache muito simples ===
-// Formato .bin (use quando não tiver KTX/DDS):
-// header: char[4]="IBL0" + uint32 type (0=CM,1=2D) + uint32 w + uint32 h + uint32 levels + uint32 faces
-// data: glGetTexImage por nível/face em RGB16F (ou RG16F p/ LUT). Sem compressão.
-static bool ReadBin(const std::string& path, std::vector<char>& out) {
-    std::ifstream f(path, std::ios::binary);
-    if (!f) return false;
-    f.seekg(0, std::ios::end); auto sz = f.tellg(); f.seekg(0);
-    out.resize((size_t)sz);
-    f.read(out.data(), sz);
-    return true;
-}
-static bool WriteBin(const std::string& path, const std::vector<char>& buf) {
-    std::ofstream f(path, std::ios::binary);
-    if (!f) return false;
-    f.write(buf.data(), (std::streamsize)buf.size());
-    return true;
-}
-
-static void SaveCubeRGB16F(const std::string& path, GLuint tex, int baseSize, int levels) {
-    std::vector<char> buf;
-    auto put = [&](auto v) { char* p = (char*)&v; buf.insert(buf.end(), p, p + sizeof(v)); };
-
-    // header
-    put(uint32_t('I' << 24 | 'B' << 16 | 'L' << 8 | '0'));
-    put(uint32_t(0)); // type 0=cubemap
-    put(uint32_t(baseSize));
-    put(uint32_t(baseSize));
-    put(uint32_t(levels));
-    put(uint32_t(6));
-
-    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-    for (int lv = 0; lv < levels; ++lv) {
-        int w = std::max(1, baseSize >> lv);
-        int h = std::max(1, baseSize >> lv);
-        std::vector<float> tmp((size_t)w * h * 3);
-        for (int face = 0; face < 6; ++face) {
-            glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lv, GL_RGB, GL_FLOAT, tmp.data());
-            char* p = (char*)tmp.data();
-            buf.insert(buf.end(), p, p + tmp.size() * sizeof(float));
-        }
-    }
-    WriteBin(path, buf);
-}
-
-static GLuint LoadCubeRGB16F(const std::string& path, int& baseSize, int& levels) {
-    std::vector<char> buf;
-    if (!ReadBin(path, buf)) return 0;
-    auto rdU32 = [&](size_t& off) { uint32_t v; memcpy(&v, &buf[off], 4); off += 4; return v; };
-    size_t off = 0;
-    uint32_t magic = rdU32(off); if (magic != uint32_t('I' << 24 | 'B' << 16 | 'L' << 8 | '0')) return 0;
-    uint32_t type = rdU32(off); if (type != 0) return 0;
-    baseSize = (int)rdU32(off);
-    rdU32(off); // h (igual ao w para cubemap)
-    levels = (int)rdU32(off);
-    rdU32(off); // faces=6
-
-    GLuint id; glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-    for (int lv = 0; lv < levels; ++lv) {
-        int w = std::max(1, baseSize >> lv);
-        int h = std::max(1, baseSize >> lv);
-        for (int face = 0; face < 6; ++face) {
-            size_t count = (size_t)w * h * 3;
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, lv, GL_RGB16F, w, h, 0, GL_RGB, GL_FLOAT, &buf[off]);
-            off += count * sizeof(float);
-        }
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    return id;
-}
-
-static void Save2DRG16F(const std::string& path, GLuint tex, int size) {
-    std::vector<char> buf;
-    auto put = [&](auto v) { char* p = (char*)&v; buf.insert(buf.end(), p, p + sizeof(v)); };
-    put(uint32_t('I' << 24 | 'B' << 16 | 'L' << 8 | '0'));
-    put(uint32_t(1)); // type 1 = 2D
-    put(uint32_t(size));
-    put(uint32_t(size));
-    put(uint32_t(1)); // levels
-    put(uint32_t(1)); // faces
-
-    glBindTexture(GL_TEXTURE_2D, tex);
-    std::vector<float> tmp((size_t)size * size * 2);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RG, GL_FLOAT, tmp.data());
-    char* p = (char*)tmp.data();
-    buf.insert(buf.end(), p, p + tmp.size() * sizeof(float));
-    WriteBin(path, buf);
-}
-
-static GLuint Load2DRG16F(const std::string& path, int& size) {
-    std::vector<char> buf;
-    if (!ReadBin(path, buf)) return 0;
-    auto rdU32 = [&](size_t& off) { uint32_t v; memcpy(&v, &buf[off], 4); off += 4; return v; };
-    size_t off = 0;
-    uint32_t magic = rdU32(off); if (magic != uint32_t('I' << 24 | 'B' << 16 | 'L' << 8 | '0')) return 0;
-    uint32_t type = rdU32(off); if (type != 1) return 0;
-    size = (int)rdU32(off);
-    rdU32(off); // h
-    rdU32(off); // levels
-    rdU32(off); // faces
-
-    GLuint id; glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, size, size, 0, GL_RG, GL_FLOAT, &buf[off]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    return id;
-}
-
-bool IBLManager::TryLoadFromCache(const std::string& base, IBLSet& out) {
-    int size = 0, levels = 0;
-    if (GLuint env = LoadCubeRGB16F(base + "_env.bin", size, levels)) out.envCubemap = env; else return false;
-    if (GLuint irr = LoadCubeRGB16F(base + "_irr.bin", size, levels)) out.irradiance = irr; else return false;
-    if (GLuint pre = LoadCubeRGB16F(base + "_pref.bin", size, levels)) out.prefilter = pre; else return false;
-    int lutSz = 0;
-    if (GLuint lut = Load2DRG16F(base + "_brdf.bin", lutSz)) out.brdfLUT = lut; else return false;
-    return true;
-}
-
-void IBLManager::SaveToCache(const std::string& base, const IBLSet& s) {
-    // assumptions de tamanhos default
-    SaveCubeRGB16F(base + "_env.bin", s.envCubemap, 512, 1 + (int)std::floor(std::log2(512)));
-    SaveCubeRGB16F(base + "_irr.bin", s.irradiance, 32, 1);
-    SaveCubeRGB16F(base + "_pref.bin", s.prefilter, 128, 5);
-    Save2DRG16F(base + "_brdf.bin", s.brdfLUT, 512);
-}
-
-std::string IBLManager::MakeBaseName(const std::string& cacheDir, const std::string& hdrPath) {
-    return cacheDir + "/" + HashPath(hdrPath);
-}
-
-std::string IBLManager::HashPath(const std::string& s) {
-    // hash bem simples só pra nome: djb2
-    unsigned long h = 5381;
-    for (unsigned char c : s) h = ((h << 5) + h) + c;
-    std::ostringstream oss; oss << std::hex << h;
-    return oss.str();
-}
+} 

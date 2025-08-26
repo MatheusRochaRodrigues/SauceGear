@@ -5,10 +5,9 @@
 
 class RenderSystem : public System {
 public:   
-    RenderSystem() {
-        std::cout << "r r" << std::endl;
-        SetPipeline(std::make_unique<BlinnPhongPipeline>());
-        //SetPipeline(std::make_unique<PBRPipeline>());
+    RenderSystem() { 
+        //SetPipeline(std::make_unique<BlinnPhongPipeline>());
+        SetPipeline(std::make_unique<PBRPipeline>());
     }
 
     void Update(float dt) override {

@@ -14,6 +14,8 @@ struct Transform {
     glm::vec3 localRotation = glm::vec3(0.0f); // Euler
     glm::vec3 localScale    = glm::vec3(1.0f);
 
+    bool dirty = false;
+
     Transform() = default;
 
     Transform(glm::vec3 pos, glm::vec3 rot = glm::vec3(0.0f), glm::vec3 scl = glm::vec3(1.0f))

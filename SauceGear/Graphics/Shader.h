@@ -27,9 +27,11 @@ public:
 	Shader() = default;
 
 	// Constructor that build the Shader Program from 2 different shaders
-	Shader(const char* vertexFile, const char* fragmentFile);
+	Shader(const char* vertexFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines = {});
 	// Constructor that build geometry shader too
-	Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile);
+	Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines = {});
+
+	void ReloadWithDefines(const std::vector<std::pair<std::string, int>>& defines);
 
 	// Activates the Shader Program
 	void use();
@@ -51,9 +53,20 @@ public:
 
 	// Arrays
 	void setIntArray(const std::string& name, int* values, int count);
+
+	// Textures Arrays
+	void setTexture2D(const std::string& name, GLuint texID, GLenum unit) const;
+	void setTexture2DArray(const std::string& name, GLuint texID, GLenum unit) const;
+	void setTextureCube(const std::string& name, GLuint texID, GLenum unit) const;
+	void setTextureCubeArray(const std::string& name, GLuint texID, GLenum unit) const;
+
 private:
 	// Aqui estava o problema: a função precisa estar declarada dentro da classe!
 	void compileErrors(unsigned int shader, const char* type);
+
+	const char* vertexFile;
+	const char* geometryFile;
+	const char* fragmentFile;
 
 	std::string ShaderPathDefault = "Resources/Shaders/";
 };

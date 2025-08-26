@@ -6,14 +6,11 @@
 namespace MaterialDefaults {
     Texture* WhiteTexture();
 }
-
-
+ 
 struct Material {
     Shader* shader; 
-    //std::unordered_map<std::string, Texture*> textures;
-
-    std::unordered_map<std::string, std::pair<unsigned int,Texture*>> textures;
-
+    std::unordered_map<std::string, Texture*> textures; 
+    //std::unordered_map<std::string, std::pair<unsigned int,Texture*>> textures; 
 
     std::unordered_map<std::string, float>    floatParams; 
     glm::vec3 albedoColor = glm::vec3(1.0f);
@@ -21,15 +18,7 @@ struct Material {
     Material(Shader* shader) : shader(shader) {} 
     Material() { 
         Shader* shader = new Shader("BlinnPhong/BaseLighting.vs", "BlinnPhong/BaseLighting.fs");
-        this->shader = shader;
-
-        //Default
-        /*textures["albedoMap"] = MaterialDefaults::WhiteTexture();
-        textures["specularMap"] = MaterialDefaults::WhiteTexture();
-        textures["normalMap"] = MaterialDefaults::WhiteTexture();
-        textures["heightMap"] = MaterialDefaults::WhiteTexture();
-        floatParams["roughness"] = 0.5f;
-        floatParams["metallic"] = 0.1f; */
+        this->shader = shader; 
     } 
 
     //void setData(unsigned int u, std::string s, Texture* t) { textures[s] = { u, t }; }
@@ -39,18 +28,25 @@ struct Material {
         shader->use();
         // Bind texturas
         int slot = 0;
-        for (auto& [name, pair] : textures) {        //[name, tex]
+        bool hasNormalMap = false;
+
+        for (auto& [name, tex] : textures) {        //[name, tex]
             // fallback: se tex for nullptr, usa textura branca
             //if (!tex) tex = Texture::WhiteTexture(); // fallback
             //Texture* finalTex = tex ? tex : Texture::WhiteTexture();
-            
-            auto& tex = pair.second;
+            slot = tex->unit;
 
             glActiveTexture(GL_TEXTURE0 + slot);
             tex->Bind(); // tex->Bind() deve usar glBindTexture(...)
             shader->setInt(name, slot); // "diffuseMap" -> slot 0
-            slot++; 
+            //slot++; 
+            if (name == "Normal" && tex) { // se realmente tem normalMap carregado
+                hasNormalMap = true;
+            }
         }
+
+        // seta uniform bool
+        shader->setBool("op_Normal", hasNormalMap);
 
         // Bind valores float
         for (auto& [name, value] : floatParams) {
@@ -61,12 +57,8 @@ struct Material {
     void setLayer() const { 
         // Bind texturas
         int slot = 0;
-        for (auto& [name, pair] : textures) {
-            // fallback: se tex for nullptr, usa textura branca
-            //if (!tex) tex = Texture::WhiteTexture(); // fallback
-            //Texture* finalTex = tex ? tex : Texture::WhiteTexture();
-
-            auto& tex = pair.second;
+        for (auto& [name, tex] : textures) {     
+            slot = tex->unit;
 
             glActiveTexture(GL_TEXTURE0 + slot);
             tex->Bind(); // tex->Bind() deve usar glBindTexture(...)
@@ -87,10 +79,7 @@ struct Material {
         activeShader->use();
 
         int unit = 0;
-        for (const auto& [name, pair] : textures) {
-
-            auto& tex = pair.second;
-
+        for (const auto& [name, tex] : textures) {  
             glActiveTexture(GL_TEXTURE0 + unit);    //glBindTexture(GL_TEXTURE_2D, tex->ID); 
             //glActiveTexture(GL_TEXTURE0 + unit);    //glBindTexture(GL_TEXTURE_2D, tex->ID); 
             tex->Bind();
@@ -128,15 +117,11 @@ struct Material {
 namespace MaterialDefaults {
     static Texture* whiteTex = nullptr;
 
-    static Texture* TextureColor(uint8_t x, uint8_t y, uint8_t z) {
-        if (!whiteTex) {
-            uint8_t whitePixel[4] = { x, y, z, 255 };
-            whiteTex = new Texture();
-            whiteTex->Texture::CreateFromMemory(whitePixel, 1, 1, GL_RGBA); // sua função para gerar textura a partir de memória
-
-            //whiteTex = new Texture(1, 1, glm::vec4(1.0f)); // textura branca 1x1
-        }
-        return whiteTex;
+    static Texture* TextureColor(uint8_t x, uint8_t y, uint8_t z) { 
+        uint8_t whitePixel[4] = { x, y, z, 255 };
+        Texture* tex = new Texture();
+        tex->Texture::CreateFromMemory(whitePixel, 1, 1, GL_RGBA); // sua função para gerar textura a partir de memória 
+        return tex;
     }
 
     //Create white texture default (1x1 resolution)
@@ -144,9 +129,7 @@ namespace MaterialDefaults {
         if (!whiteTex) {
             uint8_t whitePixel[4] = { 255, 255, 255, 255 };
             whiteTex = new Texture();
-            whiteTex->Texture::CreateFromMemory(whitePixel, 1, 1, GL_RGBA); // sua função para gerar textura a partir de memória
-
-            //whiteTex = new Texture(1, 1, glm::vec4(1.0f)); // textura branca 1x1
+            whiteTex->Texture::CreateFromMemory(whitePixel, 1, 1, GL_RGBA); // sua função para gerar textura a partir de memória 
         }
         return whiteTex;
     }
@@ -154,7 +137,7 @@ namespace MaterialDefaults {
     inline static Material* Get() { 
         Material* defaultMat = new Material();
 
-        defaultMat->textures["albedoMap"]    = { 0,  WhiteTexture() };
+        defaultMat->textures["albedoMap"]    = WhiteTexture();
         /*defaultMat->textures["specularMap"]  = { 1,  WhiteTexture() };
         defaultMat->textures["normalMap"]    = { 2,  WhiteTexture() };
         defaultMat->textures["heightMap"]    = { 3,  WhiteTexture() };*/

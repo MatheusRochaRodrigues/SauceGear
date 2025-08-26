@@ -173,15 +173,21 @@
     <ClCompile Include="Scene\SceneECS.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\SkyboxRenderer.cpp" />
-    <ClCompile Include="Scene\Systems\RenderSystem.cpp" />
+    <ClCompile Include="Graphics\ShaderLibraries.h" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\exec.h" />
+    <ClInclude Include="Scene\Components\AABBComponent.h" />
+    <ClInclude Include="Scene\Systems\BoundsSystem.h" />
+    <ClInclude Include="Scene\utilsAABB.h" />
+    <ClInclude Include="Scripts\MyScript.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h" />
     <ClInclude Include="Graphics\Renderer\RenderHelper.h" />
+    <ClInclude Include="Graphics\Renderer\PipelinePBR\PersistenceIBL.hpp" />
     <ClInclude Include="Resources\AssetManager.h" />
     <ClInclude Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.h" />
     <ClInclude Include="Core\Camera.h" />
@@ -220,6 +226,7 @@
     <ClInclude Include="Scene\PlayerCamera.h" />
     <ClInclude Include="Scene\Components\NativeScriptComponent.h" />
     <ClInclude Include="Scene\Components\PostEffects\BlurEffectComponent.h" />
+    <ClInclude Include="Scene\ScriptInspector.h" />
     <ClInclude Include="Scene\Systems\GlobalUniformSystem.h" />
     <ClInclude Include="Scene\Systems\PostProcessSystem.h" />
     <ClInclude Include="Scene\Components\PostProcessComponent.h" />
@@ -264,6 +271,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_ibl.fs" />
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.fs" />
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.vs" />
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.fs" />
@@ -273,6 +283,13 @@
     <None Include="Resources\Shaders\DeferredShading\gBuffer.vs" />
     <None Include="Resources\Shaders\BlinnPhong\BaseLightingBAKP.fs" />
     <None Include="Resources\Shaders\DeferredShading\gBufferLegacy.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShading.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_light_volume.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\fullscreen.vs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.vs" />
+    <None Include="Resources\Shaders\PBR\IBL\cubemap.vs" />
     <None Include="Resources\Shaders\PostProcess\BlackAndWhite.fs" />
     <None Include="debug_Cube_depth.vs" />
     <None Include="Resources\Shaders\PostProcess\post.fs" />
@@ -283,24 +300,24 @@
     <None Include="Resources\Shaders\BlinnPhong\BaseShadow.vs" />
     <None Include="Resources\Shaders\CellShading\fragment.fs" />
     <None Include="Resources\Shaders\Debug\debug_Cube_depth.fs" />
-    <None Include="Resources\Shaders\background.fs" />
-    <None Include="Resources\Shaders\background.vs" />
+    <None Include="Resources\Shaders\PBR\background.fs" />
+    <None Include="Resources\Shaders\PBR\background.vs" />
     <None Include="Resources\Shaders\CellShading\BaseColor.fs" />
     <None Include="Resources\Shaders\CellShading\BaseColor.vs" />
     <None Include="Resources\Shaders\BlinnPhong\BaseLighting.fs" />
     <None Include="Resources\Shaders\BlinnPhong\BaseLighting.vs" />
-    <None Include="Resources\Shaders\PBR\brdf.fs" />
-    <None Include="Resources\Shaders\PBR\brdf.vs" />
-    <None Include="Resources\Shaders\cubemap.vs" />
+    <None Include="Resources\Shaders\PBR\IBL\brdf.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\brdf.vs" />
+    <None Include="Resources\Shaders\PBR\cubemap.vs" />
     <None Include="Resources\Shaders\Debug\debug_quad_depth.fs" />
-    <None Include="Resources\Shaders\PBR\equirectangular_to_cubemap.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\equirectangular_to_cubemap.fs" />
     <None Include="Resources\Shaders\Basic\Frag.fg" />
     <None Include="Resources\Shaders\Debug\FrameBufferQuad.fs" />
     <None Include="Resources\Shaders\Debug\FrameBufferQuad.vs" />
-    <None Include="Resources\Shaders\PBR\irradiance_convolution.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\irradiance_convolution.fs" />
     <None Include="Resources\Shaders\PBR\pbr.fs" />
     <None Include="Resources\Shaders\PBR\pbr.vs" />
-    <None Include="Resources\Shaders\PBR\prefilter.fs" />
+    <None Include="Resources\Shaders\PBR\IBL\prefilter.fs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapD.fs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapD.vs" />
     <None Include="Resources\Shaders\Basic\Vertex.vs" />
@@ -312,6 +329,8 @@
     <None Include="Resources\Shaders\Shadows\shadowPointPCF_oldComented.fs" />
     <None Include="Resources\Shaders\PostProcess\tonemap.fs" />
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
+    <None Include="Resources\Shaders\PBR\skybox.fs" />
+    <None Include="Resources\Shaders\PBR\skybox.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

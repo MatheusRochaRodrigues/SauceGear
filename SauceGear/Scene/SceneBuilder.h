@@ -21,8 +21,9 @@ public:
         Mesh* mesh = ModelLoader::LoadModel(url);
         if (mesh == nullptr) { 
             std::cout << "mesh Vazia para a entidade" << std::endl;
-            return INVALID_ENTITY; }
-        std::cout << "Testando aq  21312 " << mesh->name << std::endl;
+            return INVALID_ENTITY; 
+        }
+
         return InstantiateNode(mesh);
     }
 
@@ -30,8 +31,7 @@ public:
         if (mesh == nullptr) {
             std::cout << "mesh Vazia para a entidade" << std::endl;
             return INVALID_ENTITY;
-        } 
-        std::cout << "Testando aq " << mesh->name << std::endl;
+        }  
         return InstantiateNode(mesh);
     }
 
