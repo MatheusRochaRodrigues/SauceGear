@@ -7,3 +7,4 @@
 #include "PostProcessSystem.h" 
 #include "GlobalUniformSystem.h" 
 #include "PickingSystem.h" 
+#include "DayNightSystem.h" 

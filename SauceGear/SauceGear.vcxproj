@@ -179,7 +179,9 @@
     <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scene\Systems\DayNightSystem.h" />
     <ClInclude Include="Engine\exec.h" />
+    <ClInclude Include="Scripts\ScriptABI.h" />
     <ClInclude Include="Utils\MathHelpers.h" />
     <ClInclude Include="Scene\Systems\PickingSystem.h" />
     <ClInclude Include="Scene\Systems\PhysicsSystem.h" />

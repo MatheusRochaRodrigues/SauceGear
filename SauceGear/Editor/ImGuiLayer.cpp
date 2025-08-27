@@ -273,7 +273,7 @@ void ImGuiLayer::ShowDockspace() {
     ImGui::PopStyleVar(2);
     ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f));
-
+    
     // Menu no topo
     //if (ImGui::BeginMenuBar()) {
     //    if (ImGui::BeginMenu("Janela")) {
@@ -287,6 +287,7 @@ void ImGuiLayer::ShowDockspace() {
 
     ImGui::End();
      
+    ShowTopBar();
 
 
 
@@ -316,37 +317,142 @@ void ImGuiLayer::ShowDockspace() {
         ImGui::Text("Conteúdo da hierarquia...");
         ImGui::End();
     }*/
-    ShowTopBar();
 }
-  
+struct WindowState {
+    bool maximized = false;
+    int prevX, prevY, prevW, prevH;
+    bool resizing = false;
+};
+static WindowState m_WindowState;
+
 
 void ImGuiLayer::ShowTopBar() {
+    GLFWwindow* m_Window = GEngine->window->GetNativeWindow();
+    ImGuiIO& io = ImGui::GetIO();
+    const float topBarHeight = 48.0f;
+    const float buttonSize = 28.0f;
+
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 30)); // altura da topbar
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, topBarHeight));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 6));
+
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+
     ImGui::Begin("TopBar", nullptr, flags);
 
-    // Logo
-    //ImGui::Image(myLogoTexture, ImVec2(24, 24));
+    // --- LOGO ---
+    static ImTextureID logoTex = guiLoadTexture("assets/icons/Ilustração2.png");
+    if (logoTex)
+        ImGui::Image(logoTex, ImVec2(topBarHeight - 12, topBarHeight - 12));
+    else
+        ImGui::TextUnformatted("L");
 
-    // Espaço
-    ImGui::SameLine();
-    ImGui::Text("Engine Name"); // opcional
+    // --- TÍTULO CENTRAL ---
+    const char* title = "Minha Engine";
+    ImVec2 textSize = ImGui::CalcTextSize(title);
+    float titleX = (io.DisplaySize.x - textSize.x) * 0.5f;
+    ImGui::SetCursorPos(ImVec2(titleX, 6.0f));
+    ImGui::TextUnformatted(title);
 
-    // Menus à direita
-    ImGui::SameLine(ImGui::GetIO().DisplaySize.x - 100);
+    // --- MENUS E BOTÕES ---
+    ImGui::SetCursorPos(ImVec2(io.DisplaySize.x - 200, 6.0f));
     if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Save Layout")) ImGui::SaveIniSettingsToDisk("layout.ini");
         if (ImGui::MenuItem("Load Layout")) ImGui::LoadIniSettingsFromDisk("layout.ini");
         ImGui::EndMenu();
     }
+    ImGui::SameLine();
+
+    // Botões janela
+    ImGui::SetCursorPos(ImVec2(io.DisplaySize.x - (buttonSize * 3 + 10), 6.0f));
+    if (ImGui::Button("_", ImVec2(buttonSize, buttonSize)))
+        glfwIconifyWindow(m_Window);
+    ImGui::SameLine();
+    if (ImGui::Button("[ ]", ImVec2(buttonSize, buttonSize))) {
+        if (!m_WindowState.maximized) {
+            glfwGetWindowPos(m_Window, &m_WindowState.prevX, &m_WindowState.prevY);
+            glfwGetWindowSize(m_Window, &m_WindowState.prevW, &m_WindowState.prevH);
+            glfwMaximizeWindow(m_Window);
+            m_WindowState.maximized = true;
+        }
+        else {
+            glfwRestoreWindow(m_Window);
+            glfwSetWindowPos(m_Window, m_WindowState.prevX, m_WindowState.prevY);
+            glfwSetWindowSize(m_Window, m_WindowState.prevW, m_WindowState.prevH);
+            m_WindowState.maximized = false;
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("X", ImVec2(buttonSize, buttonSize)))
+        glfwSetWindowShouldClose(m_Window, GLFW_TRUE);
+
+    // --- INVISIBLE DRAG AREA ---
+    ImGui::SetCursorPos(ImVec2(0, 0));
+    ImGui::InvisibleButton("DragArea", ImVec2(io.DisplaySize.x, topBarHeight));
+    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0)) {
+        ImVec2 delta = io.MouseDelta;
+        int x, y;
+        glfwGetWindowPos(m_Window, &x, &y);
+        glfwSetWindowPos(m_Window, x + (int)delta.x, y + (int)delta.y);
+    }
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+        if (!m_WindowState.maximized) {
+            glfwGetWindowPos(m_Window, &m_WindowState.prevX, &m_WindowState.prevY);
+            glfwGetWindowSize(m_Window, &m_WindowState.prevW, &m_WindowState.prevH);
+            glfwMaximizeWindow(m_Window);
+            m_WindowState.maximized = true;
+        }
+        else {
+            glfwRestoreWindow(m_Window);
+            glfwSetWindowPos(m_Window, m_WindowState.prevX, m_WindowState.prevY);
+            glfwSetWindowSize(m_Window, m_WindowState.prevW, m_WindowState.prevH);
+            m_WindowState.maximized = false;
+        }
+    }
 
     ImGui::End();
-    ImGui::PopStyleVar(2);
+    ImGui::PopStyleVar(3);
+
+
+    // --- RESIZE BORDAS (direita/baixo/canto) ---
+    const float BORDER = 6.0f;
+    int winX, winY, winW, winH;
+    glfwGetWindowPos(m_Window, &winX, &winY);
+    glfwGetWindowSize(m_Window, &winW, &winH);
+
+    ImVec2 mousePos = io.MousePos;
+    bool resizing = false;
+
+    // canto inferior direito
+    if (mousePos.x >= winW - BORDER && mousePos.y >= winH - BORDER) {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNWSE);
+        if (ImGui::IsMouseDown(0)) {
+            glfwSetWindowSize(m_Window, (int)mousePos.x, (int)mousePos.y);
+            resizing = true;
+        }
+    }
+    // direita
+    else if (mousePos.x >= winW - BORDER) {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+        if (ImGui::IsMouseDown(0)) {
+            glfwSetWindowSize(m_Window, (int)mousePos.x, winH);
+            resizing = true;
+        }
+    }
+    // inferior
+    else if (mousePos.y >= winH - BORDER) {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+        if (ImGui::IsMouseDown(0)) {
+            glfwSetWindowSize(m_Window, winW, (int)mousePos.y);
+            resizing = true;
+        }
+    }
+
+    m_WindowState.resizing = resizing;
 }
 
 

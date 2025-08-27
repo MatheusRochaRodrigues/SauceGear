@@ -6,32 +6,26 @@ void SceneECS::initECS() {
     //auto* physics = scene.RegisterSystem<PhysicsSystem>();
     componentManager->Register<CameraComponent>();
     componentManager->Register<Transform>();
-    componentManager->Register<Material>();
-   
-    //componentManager->Register<MeshFilter>();
-
+    componentManager->Register<Material>(); 
+    //componentManager->Register<MeshFilter>(); 
     componentManager->Register<MeshRenderer>();
     componentManager->Register<LightComponent>();
     componentManager->Register<HierarchyComponent>();
     componentManager->Register<NameComponent>();
-    //componentManager->Register<PostProcessComponent>();
-
+    //componentManager->Register<PostProcessComponent>(); 
     componentManager->Register<AABBComponent>();
 
     ///----------Systems
     auto* cameraSystem = RegisterSystem <CameraSystem>();
     auto* lightSystem  = RegisterSystem <LightSystem> ();
-    auto* globalUniformSystem = RegisterSystem <GlobalUniformSystem>();
-
-    auto* renderSystem = RegisterSystem <RenderSystem>();
-
-    auto* postProcessSystem = RegisterSystem <PostProcessSystem>();
-
+    auto* globalUniformSystem = RegisterSystem <GlobalUniformSystem>(); 
+    auto* renderSystem = RegisterSystem <RenderSystem>(); 
+    auto* postProcessSystem = RegisterSystem <PostProcessSystem>(); 
     auto* pickingSystem = RegisterSystem <PickingSystem>();
+    auto* dayNightSystem = RegisterSystem <DayNightSystem>();
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
-    //auto* inputSystem = RegisterSystem <InputSystem>();
-
+    //auto* inputSystem = RegisterSystem <InputSystem>(); 
 }
 
 Entity SceneECS::CreateEntity() {
