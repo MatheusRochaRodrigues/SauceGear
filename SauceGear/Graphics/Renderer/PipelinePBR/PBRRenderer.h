@@ -16,10 +16,10 @@ public:
         HandleFBOs();
         GeometryPass(scene);
         LightingPass(scene);
-        //ForwardPass(scene);
+        ForwardPass(scene);
         // 
         // 3) Skybox (no final pra não interferir na iluminação) 
-        DrawSkybox(); 
+        //DrawSkybox(); 
         // saída final
         GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
         //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(1);
@@ -54,6 +54,6 @@ private:
     void DrawSkybox();
 
     // util
-    std::string currentHDR = "Resources/Textures/hdr/tst/rogland_moonlit_night_4k.hdr";
+    std::string currentHDR = "Resources/Textures/hdr/tst/Kloppenheim (1).hdr";
     std::string cacheDir = "Resources/Cache/IBL";
 };

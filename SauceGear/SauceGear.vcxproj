@@ -180,9 +180,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\exec.h" />
+    <ClInclude Include="Utils\MathHelpers.h" />
+    <ClInclude Include="Scene\Systems\PickingSystem.h" />
+    <ClInclude Include="Scene\Systems\PhysicsSystem.h" />
     <ClInclude Include="Scene\Components\AABBComponent.h" />
     <ClInclude Include="Scene\Systems\BoundsSystem.h" />
-    <ClInclude Include="Scene\utilsAABB.h" />
+    <ClInclude Include="Utils\utilsAABB.h" />
     <ClInclude Include="Scripts\MyScript.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h" />

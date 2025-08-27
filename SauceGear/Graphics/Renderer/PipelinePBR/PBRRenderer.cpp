@@ -180,7 +180,7 @@ void PBRPipeline::LightingPass(Scene& scene) {
     LightSystem::SetPointsToShader(pbrPointShader, 0); 
     // instâncias
     std::vector<LightInstanceData> instanceData;
-    for (auto e : LightSystem::lightInActive) {
+    for (auto e : LightSystem::lightInActive.point) {
         auto& light = GEngine->scene->GetComponent<LightComponent>(e);
         auto& trans = GEngine->scene->GetComponent<Transform>(e);  
         // then calculate radius of light volume/sphere
@@ -223,17 +223,33 @@ void PBRPipeline::DrawSkybox() {
     shaders.skybox.setMat4("view", GEngine->mainCamera->GetViewMatrix());
     shaders.skybox.setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.envCubemap); 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.envCubemap);
     RenderCube(); 
     glDepthFunc(GL_LESS);
 }
 
 void PBRPipeline::ForwardPass(Scene& scene) {
     // (opcional) transparências/partículas usando PBR forward com IBL:
-    // copiar depth do gbuffer -> framebuffer se quiser ordenar contra opacos
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->GetID());
-    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetID());
-    // glBlitFramebuffer(0,0,w,h,0,0,w,h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    // copiar depth do gbuffer -> framebuffer se quiser ordenar contra opacos 
+
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LESS);
+
+    int SCR_WIDTH = gBuffer->GetWidth();
+    int SCR_HEIGHT = gBuffer->GetHeight();
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->GetID());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer->GetID()); // write to default framebuffer
+    glBlitFramebuffer(
+        0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST
+    );
+    //framebuffer->Bind();                    // glBindFramebuffer(GL_FRAMEBUFFER, ); 
+
+    // now render light cubes as before
+    auto camera = GEngine->mainCamera;
+    auto view = camera->GetViewMatrix();
+    auto proj = camera->GetProjectionMatrix(); 
+
+    DrawSkybox();
 
     // ... desenhe transparentes com shader PBR forward e BindIBLTo()
 }

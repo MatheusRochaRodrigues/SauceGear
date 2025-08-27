@@ -12,6 +12,7 @@
 //#include "ImGuizmo.h" 
 
 #include "Panels/IPanelHelper.h"
+#include "Panels/InspectorPanel.h"
 
 using Scene = SceneECS; // Apelido dentro da classe 
 
@@ -26,6 +27,7 @@ public:
     void RenderIPanels(Scene&);
     void config_style();
      
+    void ShowTopBar();
 private:
     std::vector<std::shared_ptr<IPanel>> RegisteredPanels;
     void RegisterPanels();

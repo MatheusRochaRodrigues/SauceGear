@@ -16,6 +16,8 @@ void SceneECS::initECS() {
     componentManager->Register<NameComponent>();
     //componentManager->Register<PostProcessComponent>();
 
+    componentManager->Register<AABBComponent>();
+
     ///----------Systems
     auto* cameraSystem = RegisterSystem <CameraSystem>();
     auto* lightSystem  = RegisterSystem <LightSystem> ();
@@ -24,6 +26,8 @@ void SceneECS::initECS() {
     auto* renderSystem = RegisterSystem <RenderSystem>();
 
     auto* postProcessSystem = RegisterSystem <PostProcessSystem>();
+
+    auto* pickingSystem = RegisterSystem <PickingSystem>();
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>();

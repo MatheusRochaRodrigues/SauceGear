@@ -1,6 +1,5 @@
 #include "ImGuiLayer.h"
-#include "../Core/EngineContext.h" 
-#include "../Scene/Components/ComponentsHelper.h" 
+#include "../Core/EngineContext.h"  
 #include "../Graphics/Renderer.h" 
  
 void ImGuiLayer::Init(GLFWwindow* window) {
@@ -291,34 +290,65 @@ void ImGuiLayer::ShowDockspace() {
 
 
 
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Salvar Layout")) {
-                ImGui::SaveIniSettingsToDisk("layout.ini");
-            }
-            if (ImGui::MenuItem("Carregar Layout")) {
-                ImGui::LoadIniSettingsFromDisk("layout.ini");
-            }
-            ImGui::EndMenu();
-        }
+    //if (ImGui::BeginMainMenuBar()) {
+    //    if (ImGui::BeginMenu("File")) {
+    //        if (ImGui::MenuItem("Salvar Layout")) {
+    //            ImGui::SaveIniSettingsToDisk("layout.ini");
+    //        }
+    //        if (ImGui::MenuItem("Carregar Layout")) {
+    //            ImGui::LoadIniSettingsFromDisk("layout.ini");
+    //        }
+    //        ImGui::EndMenu();
+    //    }
 
-        if (ImGui::BeginMenu("View")) {
-            /*ImGui::MenuItem("Hierarquia", nullptr, &showHierarchy);
-            ImGui::MenuItem("Inspetor", nullptr, &showInspector);
-            ImGui::MenuItem("Console", nullptr, &showConsole);*/
-            //ImGui::MenuItem("Modo Tela Cheia", nullptr, &isSceneFullscreen); // Radio Button para alternar o modo
-            ImGui::EndMenu();
-        }
-        ImGui::EndMainMenuBar();
-    }
+    //    if (ImGui::BeginMenu("View")) {
+    //        /*ImGui::MenuItem("Hierarquia", nullptr, &showHierarchy);
+    //        ImGui::MenuItem("Inspetor", nullptr, &showInspector);
+    //        ImGui::MenuItem("Console", nullptr, &showConsole);*/
+    //        //ImGui::MenuItem("Modo Tela Cheia", nullptr, &isSceneFullscreen); // Radio Button para alternar o modo
+    //        ImGui::EndMenu();
+    //    }
+    //    ImGui::EndMainMenuBar();
+    //}
 
     /*if (showHierarchy) {
         ImGui::Begin("Hierarquia", &showHierarchy);
         ImGui::Text("Conteúdo da hierarquia...");
         ImGui::End();
     }*/
+    ShowTopBar();
 }
   
+
+void ImGuiLayer::ShowTopBar() {
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 30)); // altura da topbar
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+    ImGui::Begin("TopBar", nullptr, flags);
+
+    // Logo
+    //ImGui::Image(myLogoTexture, ImVec2(24, 24));
+
+    // Espaço
+    ImGui::SameLine();
+    ImGui::Text("Engine Name"); // opcional
+
+    // Menus à direita
+    ImGui::SameLine(ImGui::GetIO().DisplaySize.x - 100);
+    if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Save Layout")) ImGui::SaveIniSettingsToDisk("layout.ini");
+        if (ImGui::MenuItem("Load Layout")) ImGui::LoadIniSettingsFromDisk("layout.ini");
+        ImGui::EndMenu();
+    }
+
+    ImGui::End();
+    ImGui::PopStyleVar(2);
+}
+
 
 
 void ImGuiLayer::End() {

@@ -29,6 +29,11 @@ public:
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+
+    #ifdef EDITOR_BUILD
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);     //new - to heed bar window white
+    #endif
+
         m_window = glfwCreateWindow(m_width, m_height, m_title, nullptr, nullptr);
         if (!m_window) {
             std::cerr << "Failed to create GLFW window" << std::endl;

@@ -10,6 +10,10 @@ int Time::frames = 0;
 
 unsigned int Time::frameCount = 0;
 
+float Time::fps = 0.0f;
+float Time::fpsMin = 9999.0f;
+float Time::fpsMax = 0.0f;
+
 void Time::Init() {
     s_LastFrameTime = (float)glfwGetTime();
 }
@@ -21,7 +25,30 @@ void Time::Update() {
 
     s_ElapsedTime += s_DeltaTime;
 
-     
+
+
+
+    //FPS - Counter
+    float fpsInstant = (s_DeltaTime > 0.0f) ? (1.0f / s_DeltaTime) : 0.0f;
+
+    frames++;
+    timer += s_DeltaTime;
+
+    // Atualiza min/max
+    if (fpsInstant < fpsMin) fpsMin = fpsInstant;
+    if (fpsInstant > fpsMax) fpsMax = fpsInstant;
+
+    if (timer >= 1.0f) {
+        fps = frames / timer; // média do último segundo
+        frames = 0;
+        timer = 0.0f;
+        //fpsMin = 9999.0f;
+        //fpsMax = 0.0f;
+    }
+
+    
+    //first form
+    /*
     //FPS - Counter
     frames++;
     timer += s_DeltaTime;           //Time::GetDeltaTime();
@@ -29,7 +56,8 @@ void Time::Update() {
         //std::cout << "FPS: " << frames << std::endl;
         frames = 0;
         timer = 0.0f;
-    }
+    } 
+    */
 
     frameCount++;
 }
@@ -44,7 +72,8 @@ float Time::GetTime() {
 
 
 float Time::GetFPS() {
-    return frames;
+    //return frames;
+    return fps;
 }
 
 unsigned int Time::GetFrameCount() {

@@ -36,7 +36,7 @@ public:
             auto* tex = MaterialDefaults::TextureColor(250, 100, 0);
             tex->unit = 0;  
             material->textures["Albedo"] = tex;
-            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateSphere(material));
+            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(material));
 
             stbi_set_flip_vertically_on_load(false); 
             //entity = SceneBuilder::CreateModel("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");

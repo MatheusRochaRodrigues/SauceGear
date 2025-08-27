@@ -8,8 +8,7 @@ int main() {
     EditorApp editor(&app);       // recebe ponteiro para reuso da app
     editor.Run();                 // editor tem loop próprio (com ImGui)
 
-    app.Shutdown();               // encerra subsistemas no fim
-    std::cout << "deu";
+    app.Shutdown();               // encerra subsistemas no fim 
     return 0;
 }
 

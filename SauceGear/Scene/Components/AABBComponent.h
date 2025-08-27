@@ -10,6 +10,8 @@ struct AABBComponent {
     glm::vec3 max = glm::vec3(-FLT_MAX);
 };
 
+
+
 //struct BoundingSphereComponent {
 //    glm::vec3 center = glm::vec3(0.0f);
 //    float radius = 0.0f;

@@ -22,6 +22,11 @@ private:
     static int frames;
 
     static unsigned int frameCount;
+
+
+    static float fps;
+    static float fpsMin;
+    static float fpsMax;
 };
 
 #endif

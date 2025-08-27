@@ -23,16 +23,19 @@ public:
             std::cout << "mesh Vazia para a entidade" << std::endl;
             return INVALID_ENTITY; 
         }
-
-        return InstantiateNode(mesh);
+        Entity i = InstantiateNode(mesh);
+        GEngine->scene->AddComponent<AABBComponent>(i); 
+        return i;
     }
 
     static Entity CreateModel(Mesh* mesh) { 
         if (mesh == nullptr) {
             std::cout << "mesh Vazia para a entidade" << std::endl;
             return INVALID_ENTITY;
-        }  
-        return InstantiateNode(mesh);
+        }   
+        Entity i = InstantiateNode(mesh);                   //return InstantiateNode(mesh);
+        GEngine->scene->AddComponent<AABBComponent>(i);
+        return i;
     }
 
 

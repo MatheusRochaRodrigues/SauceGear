@@ -3,7 +3,7 @@
  
 int Application::Init() {
     // cria janela GLFW
-    if (!window.Create("Editor Window", 1280, 720)) return -1;  // Configura contexto OpenGL e glad  
+    if (!window.Create("Editor Window", 1600, 900)) return -1;  // Configura contexto OpenGL e glad  
     time.Init();     
     renderer.Init(&scene);                                     // setup inicial do renderizador
     scene.initECS();

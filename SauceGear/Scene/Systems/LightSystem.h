@@ -20,7 +20,7 @@ struct LightGroups {
     std::vector<Entity> point;
     std::vector<Entity> spot;
 };
-
+ 
 class LightSystem : public System {
 public:
     LightSystem();
@@ -31,7 +31,9 @@ public:
 
         HandleSunChange();
         HandleShadowMapReturn(posPlayer);
-        lightInActive.clear();
+        //lightInActive.clear();
+        lightInActive.point.clear();
+        lightInActive.directional.clear();
         auto renderLight = [&](Entity light) {
             if (light == currentSun) return;
 
@@ -40,9 +42,7 @@ public:
              
             // Aqui você usa o LOD para escolher qual ShadowSettings usar 
             ShadowLOD lod = ComputeLOD(glm::distance(transform.position, posPlayer));
-            if (lod == ShadowLOD::NONE) return;
-
-            lightInActive.push_back(light);
+            if (lod == ShadowLOD::NONE) return; 
             
             if (l.depthMap == 0) { // Utilize GetAvailableShadowMap para obter o shadowMap adequado  
                 l.depthMap = GetAvailableShadowMap(l.type, lod);
@@ -52,9 +52,11 @@ public:
             glCullFace(GL_FRONT);
             if (l.type == ShadowType::Point) {
                 UpdatePoint(l, transform.position, GetSettingsForLOD(lod), l.depthMap);
+                lightInActive.point.push_back(light);
             }
             if (l.type == ShadowType::Directional) {
                 UpdateDirectional(l, transform.position, GetSettingsForLOD(lod), l.depthMap);
+                lightInActive.directional.push_back(light);
             } 
             glCullFace(GL_BACK); 
         };
@@ -64,20 +66,22 @@ public:
         for (auto& e : closestGroupLights.directional) renderLight(e);
         int updateIndex = GEngine->time->GetFrameCount() % 3;
         if (updateIndex == 0) {
+            //lightInActive.directional.clear();
             //for (auto& e : closestGroupLights.directional) renderLight(e);
         }
         else if (updateIndex == 1) {
+            //lightInActive.point.clear();
             //for (auto& e : closestGroupLights.point) renderLight(e);
         }
         else if (updateIndex == 3) {
-            //lightInActive.clear();
+            //lightInActive.spot.clear(); 
         }
 
         SetLightsToSSBO();
     }
 
     static inline std::unordered_map<Entity, std::pair<ShadowLOD, unsigned int>> ShadowMaps;  // Mapeia luz para textura de sombra
-    static inline std::vector<Entity> lightInActive;
+    static inline LightGroups lightInActive; //static inline std::vector<Entity> lightInActive;
 
     // Lógica para devolver as sombras que não estão mais ativas à pool
     void HandleShadowMapReturn(const glm::vec3& playerPosition) {
@@ -176,7 +180,13 @@ public:
         shader->setInt("albedoMap", 0);
         shader->setVec3("viewPos", GEngine->mainCamera->Position);
     }
-     
+      
+    template <typename Func>
+    static void ForEachLight(LightGroups& lights, Func func) {
+        for (auto& e : lights.directional) func(e);
+        for (auto& e : lights.point)       func(e);
+        for (auto& e : lights.spot)        func(e);
+    }
 
     void SetLightsToSSBO() {      
         // Carregar dados das luzes em SSBO
@@ -185,10 +195,10 @@ public:
         int shadowMapIndexDir = 0; // Usado para determinar o índice do shadow map
         int i = 0;
          
-        for (auto lightEntity : lightInActive) {           //lights
-            auto& light = GEngine->scene->GetComponent<LightComponent> (lightEntity);
-            auto& transform = GEngine->scene->GetComponent<Transform>  (lightEntity);
-             
+        ForEachLight(lightInActive, [&](Entity& lightEntity) {
+            auto& light = GEngine->scene->GetComponent<LightComponent>(lightEntity);
+            auto& transform = GEngine->scene->GetComponent<Transform> (lightEntity);
+
             // Usar diretamente o LightComponent, sem criar uma nova estrutura   
             // Enviar tipo da luz (ShadowType como int)
             glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 0, sizeof(int), &light.type);
@@ -207,10 +217,10 @@ public:
             glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 60, sizeof(bool), &light.castShadow);
             // Enviar matriz de espaço da luz (glm::mat4)
             glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 64, sizeof(glm::mat4), glm::value_ptr(light.lightSpaceMatrix));
-               
+
             int shadowMapIdx = -1;
-            if (light.depthMap != 0 ) {
-                if (light.type == ShadowType::Directional) { 
+            if (light.depthMap != 0) {
+                if (light.type == ShadowType::Directional) {
                     shadowMapIdx = shadowMapIndexDir++;
                     ShadowMaps[lightEntity].second = shadowMapIdx;    // Atribui o índice do shadow map para a luz 
                 }
@@ -221,12 +231,54 @@ public:
             }
             // Enviar o depthMap (GLuint) 
                 //std::cout << i << " uauuuuu " << shadowMapIdx << std::endl;
-            glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 128, sizeof(GLuint), &shadowMapIdx);        //&light.depthMap
-             
-            //shadowMaps.push_back(light.depthMap); // Adiciona o depthMap à lista de shadowMaps
-             
+            glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 128, sizeof(GLuint), &shadowMapIdx);        //&light.depthMap 
+            //shadowMaps.push_back(light.depthMap); // Adiciona o depthMap à lista de shadowMaps 
             i++;
-        } 
+        });
+
+        //for (auto lightEntity : lightInActive) {           //lights
+        //    auto& light = GEngine->scene->GetComponent<LightComponent> (lightEntity);
+        //    auto& transform = GEngine->scene->GetComponent<Transform>  (lightEntity);
+        //     
+        //    // Usar diretamente o LightComponent, sem criar uma nova estrutura   
+        //    // Enviar tipo da luz (ShadowType como int)
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 0, sizeof(int), &light.type);
+        //    // Enviar posição da luz (glm::vec3)
+        //    //EXCLUSIVO PARA POINTS , PQ PARA DIR PRECISA SER A ROTAÇAO
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 16, sizeof(glm::vec3), glm::value_ptr(transform.position));
+        //    // Enviar cor da luz (glm::vec3)
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 32, sizeof(glm::vec3), &light.color);
+        //    // Enviar intensidade da luz (float)
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 48, sizeof(float), &light.intensity);
+        //    // Enviar alcance da luz (float)
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 52, sizeof(float), &light.range);
+        //    // Enviar ângulo da luz (float) para Spot
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 56, sizeof(float), &light.angle);
+        //    // Enviar se a luz projeta sombra (bool, mas enviado como 1 byte)
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 60, sizeof(bool), &light.castShadow);
+        //    // Enviar matriz de espaço da luz (glm::mat4)
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 64, sizeof(glm::mat4), glm::value_ptr(light.lightSpaceMatrix));
+        //       
+        //    int shadowMapIdx = -1;
+        //    if (light.depthMap != 0 ) {
+        //        if (light.type == ShadowType::Directional) { 
+        //            shadowMapIdx = shadowMapIndexDir++;
+        //            ShadowMaps[lightEntity].second = shadowMapIdx;    // Atribui o índice do shadow map para a luz 
+        //        }
+        //        else {
+        //            shadowMapIdx = shadowMapIndexPoint++;
+        //            ShadowMaps[lightEntity].second = shadowMapIdx;
+        //        }
+        //    }
+        //    // Enviar o depthMap (GLuint) 
+        //        //std::cout << i << " uauuuuu " << shadowMapIdx << std::endl;
+        //    glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 128, sizeof(GLuint), &shadowMapIdx);        //&light.depthMap 
+        //    //shadowMaps.push_back(light.depthMap); // Adiciona o depthMap à lista de shadowMaps 
+        //    i++;
+        //} 
+
+
+
         glBindBuffer(GL_UNIFORM_BUFFER, 0);  
     }
      

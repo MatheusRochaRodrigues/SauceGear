@@ -7,8 +7,7 @@
 #include <type_traits>
  
 #include "../Scene/ComponentManager.h"
-#include "../Scene/System.h"
-//#include "../Resources/Model.h"  
+#include "../Scene/System.h" 
 #include "../Resources/Primitive.h"
 
 class SceneECS {

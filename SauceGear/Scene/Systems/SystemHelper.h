@@ -6,3 +6,4 @@
 #include "CameraSystem.h"
 #include "PostProcessSystem.h" 
 #include "GlobalUniformSystem.h" 
+#include "PickingSystem.h" 

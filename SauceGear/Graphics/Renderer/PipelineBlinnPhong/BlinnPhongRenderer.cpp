@@ -83,7 +83,7 @@ void BlinnPhongPipeline::LightingPass(SceneECS& scene) {
     LightSystem::SetPointsToShader(shader);
 
     std::vector<LightInstanceData> instanceData;
-    for (auto e : LightSystem::lightInActive) {
+    for (auto e : LightSystem::lightInActive.point) {
         auto& light = GEngine->scene->GetComponent<LightComponent>(e);
         auto& trans = GEngine->scene->GetComponent<Transform>(e);
 
