@@ -1,6 +1,6 @@
 #pragma once
 #include "../Scene/SceneECS.h"
-#include "../Scene/Components/ComponentsHelper.h" 
+#include "../ECS/Components/ComponentsHelper.h" 
 //#include "IBLMapGenerator.h"
 //#include "SkyboxRenderer.h"
 

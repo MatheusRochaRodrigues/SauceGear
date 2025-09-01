@@ -8,8 +8,8 @@
 #include "../Platform/Window.h"           //TEMP ATE SEPARA ENGINE E FOR OPCIONAL 
 #include "EngineContext.h"                //TEMP ATE SEPARA ENGINE E FOR OPCIONAL 
 #include "../Scene/GameScene.h"   
-#include "../Scene/Components/CameraComponent.h"   
-#include "../Scene/Systems/SystemHelper.h"   
+#include "../ECS/Components/CameraComponent.h"   
+#include "../ECS/Systems/SystemHelper.h"   
 #include "../Graphics/Renderer.h"         //TEMP ATE SEPARA ENGINE E FOR OPCIONAL    
 #include "../Core/Time.h"   
 #include "../Core/InputSystem.h"

@@ -50,6 +50,18 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath,
     GLuint captureFBO,
     GLuint captureRBO)
 {
+    // Lazy init do FBO/RBO default se não tiver sido passado
+    //problema com destrutor
+    if (captureFBO == 0 || captureRBO == 0) {
+        static GLuint defaultFBO = 0; static GLuint defaultRBO = 0; 
+        if (defaultFBO == 0) {
+            glGenFramebuffers(1, &defaultFBO); glGenRenderbuffers(1, &defaultRBO); 
+        }
+        captureFBO = defaultFBO;
+        captureRBO = defaultRBO;
+    }
+
+    //start
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST); // às vezes depth atrapalha
 

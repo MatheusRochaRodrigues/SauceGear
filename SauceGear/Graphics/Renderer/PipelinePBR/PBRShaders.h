@@ -14,12 +14,11 @@ struct PBRShaders {
         "PBR/DeferredShadingPBR/pbr_ibl.fs"
     );
 
-    // Lighting (deferred)
-    Shader dirLight;
-    /*Shader dirLight = Shader(
-        "PBR/DeferredShadingPBR/pbr_deferred_dir.vs", 
-        "PBR/DeferredShadingPBR/pbr_deferred_dir.fs"
-    ); */    // fullscreen quad
+    // Lighting (deferred) 
+    Shader dirLight = Shader(
+        "PBR/DeferredShadingPBR/fullscreen.vs",
+        "PBR/DeferredShadingPBR/pbr_deferred_directional.fs"
+    );     // fullscreen quad
 
     Shader pointLight = Shader(
         "PBR/DeferredShadingPBR/pbr_deferred_light_volume.vs", 
@@ -52,6 +51,8 @@ struct PBRShaders {
         "PBR/IBL/brdf.vs", 
         "PBR/IBL/brdf.fs"
     );
+
+
 };
 
 

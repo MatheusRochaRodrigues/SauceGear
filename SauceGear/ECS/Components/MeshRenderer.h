@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
-#include "../../Scene/Components/Material.h"
-#include "../../Scene/Components/MeshFilter.h"
+#include "../../ECS/Components/Material.h"
+#include "../../ECS/Components/MeshFilter.h"
 
 struct MeshRenderer {
     Mesh* mesh = nullptr;

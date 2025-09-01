@@ -1,6 +1,6 @@
 #pragma once
 #include "../IRenderPipeline.h"
-#include "../../Scene/Systems/LightSystem.h"
+#include "../../ECS/Systems/LightSystem.h"
 #include "../../Framebuffer.h"
 #include "../../../Resources/Primitive.h"
 #include "IBLManager.h"
@@ -22,6 +22,7 @@ public:
         //DrawSkybox(); 
         // saída final
         GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
+        //auto& light = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun); GEngine->renderer->GetTextureRendered = light.depthMap;
         //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(1);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -54,6 +55,7 @@ private:
     void DrawSkybox();
 
     // util
-    std::string currentHDR = "Resources/Textures/hdr/tst/Kloppenheim (1).hdr";
+    std::string currentHDR = "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr";
+    //std::string currentHDR = "Resources/Textures/hdr/tst/Kloppenheim (1).hdr";
     std::string cacheDir = "Resources/Cache/IBL";
 };

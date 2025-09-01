@@ -4,7 +4,7 @@
 #include "../../Core/Time.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Scene/SceneECS.h"
-#include "../../Scene/Components/ComponentsHelper.h"
+#include "../../ECS/Components/ComponentsHelper.h"
 
 #define MAX_LIGHTS_PROJECTION 3
 
@@ -20,7 +20,9 @@ struct LightGroups {
     std::vector<Entity> point;
     std::vector<Entity> spot;
 };
- 
+
+//std::vector<float> shadowCascadeLevels;
+
 class LightSystem : public System {
 public:
     LightSystem();

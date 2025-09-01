@@ -28,6 +28,12 @@ public:
     void config_style();
      
     void ShowTopBar();
+    bool draggingWindow = false; 
+     ImVec2 dragStartWindowPos;
+     ImVec2 dragStartMousePos;
+     double prevMouseX = 0.0, prevMouseY = 0.0;
+     ImVec2 clickOffset; // diferença entre mouse e canto da janela ao iniciar drag
+
 private:
     std::vector<std::shared_ptr<IPanel>> RegisteredPanels;
     void RegisterPanels();

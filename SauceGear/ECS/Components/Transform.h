@@ -1,9 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
-
+#include <glm/gtx/euler_angles.hpp> 
 #include <glm/gtx/matrix_decompose.hpp>
+#include "../Reflection/Macros.h"
 
 struct Transform {
     glm::vec3 position = glm::vec3(0.0f);
@@ -13,6 +13,21 @@ struct Transform {
     glm::vec3 localPosition = glm::vec3(0.0f);
     glm::vec3 localRotation = glm::vec3(0.0f); // Euler
     glm::vec3 localScale    = glm::vec3(1.0f);
+
+    /*REFLECT_CLASS(Transform) {
+        REFLECT_FIELD(position);
+        REFLECT_FIELD(rotation);
+        REFLECT_FIELD(scale);
+
+    }  */
+
+    REFLECT_CLASS(Transform) {
+        REFLECT_FIELD(Transform, position);
+        REFLECT_FIELD(Transform, rotation);
+        REFLECT_FIELD(Transform, scale);
+        //REFLECT_FIELD(Transform, visible);
+    }
+
 
     bool dirty = false;
 
@@ -55,9 +70,7 @@ struct Transform {
         direction = glm::vec3(rotationMatrix * glm::vec4(0, 0, -1, 0)); // forward
 
         return glm::normalize(direction);
-    }
-
-
+    }  
 
     bool DecomposeTransform(const glm::mat4& transformMatrix) {
         using namespace glm;

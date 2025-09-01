@@ -1,5 +1,5 @@
 #include "SceneECS.h"
-#include "../Scene/Systems/SystemHelper.h" 
+#include "../ECS/Systems/SystemHelper.h" 
 
 void SceneECS::initECS() {
     ///----------Components
@@ -21,8 +21,9 @@ void SceneECS::initECS() {
     auto* globalUniformSystem = RegisterSystem <GlobalUniformSystem>(); 
     auto* renderSystem = RegisterSystem <RenderSystem>(); 
     auto* postProcessSystem = RegisterSystem <PostProcessSystem>(); 
-    auto* pickingSystem = RegisterSystem <PickingSystem>();
-    auto* dayNightSystem = RegisterSystem <DayNightSystem>();
+
+    //auto* pickingSystem = RegisterSystem <PickingSystem>();
+    //auto* dayNightSystem = RegisterSystem <DayNightSystem>();
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>(); 

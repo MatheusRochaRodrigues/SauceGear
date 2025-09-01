@@ -153,7 +153,8 @@ void main()
     vec3 WorldPos    = texture(gPosition, uv).rgb;
     
     //vec3 N = getNormalFromMap(uv);                  
-    vec3 N = texture(gNormal,   uv).rgb; 
+    vec3 N = texture(gNormal, uv).rgb; 
+    //vec3 N = normalize(texture(gNormal, uv).xyz * 2.0 - 1.0);  it's not necessary'  //convert [0,1] to [-1,1]
 
     //discard fragment
     if(all(lessThan(abs(N), vec3(1e-6)))) discard;
@@ -170,6 +171,10 @@ void main()
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
+
+    //F0 = vec3(1.0, 0.0, 0.0);
+    //metallic = 0;
+    //vec3 F    = fresnelSchlick(max(dot(N, V), 0.0), F0);
 
     Light light = lights[instanceID];
     if (light.type != 1) discard; // only point lights are allowed
@@ -223,7 +228,6 @@ void main()
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
     //vec3 ambient = vec3(0.03) * albedo * ao;
-    
     //vec3 color = ambient + Lo;
 
     vec3 color = Lo;

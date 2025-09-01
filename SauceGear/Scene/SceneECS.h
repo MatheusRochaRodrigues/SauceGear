@@ -7,8 +7,9 @@
 #include <type_traits>
  
 #include "../Scene/ComponentManager.h"
-#include "../Scene/System.h" 
+#include "../ECS/System.h" 
 #include "../Resources/Primitive.h"
+#include "../ECS/Reflection/Macros.h"
 
 class SceneECS {
 public:
@@ -98,6 +99,41 @@ public:
     //}
 
     void AddToParent(Entity, Entity);
+
+
+    bool HasComponentType(Entity e, std::type_index type) const {
+        return componentManager->HasComponentType(e, type);
+    }
+    std::vector<std::type_index> GetComponentTypes(Entity e) const {
+        return componentManager->GetComponentTypes(e);
+    } 
+
+    // Retorna um vetor de tipos de componentes da entidade
+    // Retorna os tipos refletidos que a entidade realmente possui
+    std::vector<TypeInfo*> GetComponentTypes(Entity entity) {
+        std::vector<TypeInfo*> result;
+
+        const auto& storages = componentManager->GetAllStorages();
+        for (const auto& [typeIdx, storagePtr] : storages) {
+            if (storagePtr->Has(entity)) {
+                if (auto* ti = ReflectionRegistry::Get().Get(typeIdx)) {
+                    result.push_back(ti);
+                }
+            }
+        }
+        return result;
+    } 
+     
+    // Retorna ponteiro cru para o componente
+    void* GetComponentRaw(Entity entity, const TypeInfo& type) {
+        const auto& storages = componentManager->GetAllStorages();
+        auto it = storages.find(type.typeIndex);
+        if (it == storages.end()) return nullptr;
+
+        IComponentStorage* storage = it->second.get(); // pega o ponteiro cru
+        return storage->GetRaw(entity);
+    } 
+
 
     //void SwitchToCamera(Camera* newCam) { GEngine->mainCamera = newCam; }
 

@@ -1,23 +1,19 @@
 #pragma once
 #include "IPanel.h"
-#include "../Scene/Components/ComponentsHelper.h" 
-#include "../Graphics/Renderer.h"  
-#include "../Core/Time.h"
-#include "../Core/EngineContext.h"
+#include "../Utils/InspectorDrawer.h"
+#include "../Scene/SceneECS.h"
 
-struct InspectorPanel : IPanel { 
+struct InspectorPanel : IPanel {
     void Draw(SceneECS& scene) override {
-        ImGui::Begin("Inspector"); 
-        ImGui::Text("FPS == %.1f", GEngine->time->GetFPS()); 
+        ImGui::Begin("Inspector");
+
         Entity selected = scene.GetSelectedEntity();
         if (selected != INVALID_ENTITY) {
-            //DrawComponents(selected, scene);
+            InspectorDrawer::DrawEntity(scene, selected);
         }
-        ImGui::End();
 
+        ImGui::End();
     }
 
-    const char* GetName() override { return "Scene"; }
-     
+    const char* GetName() override { return "Inspector"; }
 };
-

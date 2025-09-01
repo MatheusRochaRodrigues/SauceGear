@@ -1,4 +1,4 @@
-#include "../Entity.h"
+#include "../Scene/Entity.h"
 #include <iostream>
 
 #pragma once

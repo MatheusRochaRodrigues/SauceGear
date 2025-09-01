@@ -1,5 +1,5 @@
 #pragma once
-#include "../Scene/Components/AABBComponent.h"
+#include "../ECS/Components/AABBComponent.h"
 #include "../Graphics/Mesh.h"
 
 struct Ray {

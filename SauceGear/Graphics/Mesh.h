@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
    
-#include "../Scene/Components/Material.h"                     
+#include "../ECS/Components/Material.h"                     
 
 using namespace std;
 

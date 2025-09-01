@@ -4,8 +4,8 @@
 #include "../../Core/Camera.h"  
 #include "../../Platform/Window.h"  
 #include "../Utils/utilsAABB.h"  
-#include "../../Scene/Components/ComponentsHelper.h"
-#include "../SceneECS.h"  
+#include "../../ECS/Components/ComponentsHelper.h"
+#include "../Scene/SceneECS.h"  
 
 //Ele percorre todas entidades com mesh + transform + AABB, testa interseção, e seleciona a mais próxima.
 class PickingSystem : public System {

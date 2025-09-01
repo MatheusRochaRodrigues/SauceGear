@@ -29,8 +29,8 @@ public:
         Shader& shIrradiance,
         Shader& shPrefilter,
         Shader& shBRDF,
-        GLuint captureFBO,
-        GLuint captureRBO);
+        GLuint captureFBO = 0,
+        GLuint captureRBO = 0);
 
     // Destrói GL objects (se você quiser liberar explicitamente)
     static void Destroy(IBLSet& set);
@@ -60,10 +60,39 @@ private:
     static GLuint CreateBRDFLUT_Tex(int size);
     static void   IntegrateBRDF(GLuint brdfLUT, Shader& shBRDF,
         GLuint captureFBO, GLuint captureRBO, int size);
-
-      
+     
 };
 
 // render helpers (internos — implementados em .cpp com o seu renderCube/renderQuad)
 //void ibl_renderCube() {  };
 //void ibl_renderQuad() {  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//class Engine {
+//public:
+//    static Engine& GetInstance() {
+//        static Engine instance; // criado 1x
+//        return instance;
+//    }
+//
+//    void Init() { /* ... */ }
+//    void Run() { /* ... */ }
+//
+//private:
+//    Engine() {}                        // construtor privado
+//    Engine(const Engine&) = delete;    // sem cópia
+//    Engine& operator=(const Engine&) = delete;
+//};

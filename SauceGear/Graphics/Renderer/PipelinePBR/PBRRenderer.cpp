@@ -1,7 +1,7 @@
 #include "PBRRenderer.h"
-#include "../../Scene/Components/Transform.h"
-#include "../../Scene/Components/MeshRenderer.h"
-#include "../../Scene/Components/Material.h"
+#include "../../ECS/Components/Transform.h"
+#include "../../ECS/Components/MeshRenderer.h"
+#include "../../ECS/Components/Material.h"
 #include "../Graphics/FullscreenQuad.h"
 
 void PBRPipeline::Init() {
@@ -22,15 +22,20 @@ void PBRPipeline::Init() {
 
     sphereMesh = PrimitiveMesh::CreateSphere2RenderingLight();
 
+    /*
     // FBO p/ IBL
     glGenFramebuffers(1, &iblFBO);
-    glGenRenderbuffers(1, &iblRBO); 
-     
+    glGenRenderbuffers(1, &iblRBO);  
     //PBR
     // prepara IBL (com cache)
     ibl = IBLManager::EnsureIBL(currentHDR, cacheDir,
         shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf,
         iblFBO, iblRBO);
+    */
+    ibl = IBLManager::EnsureIBL(currentHDR, cacheDir,
+        shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf,
+        0, 0);
+
     
     //=================================== bindings fixos
     shaders.iblAmbientShader.use();
@@ -144,40 +149,34 @@ void PBRPipeline::LightingPass(Scene& scene) {
     shaders.iblAmbientShader.setVec3("viewPos", GEngine->mainCamera->GetPosition());
     BindGBufferTo(&shaders.iblAmbientShader);
     BindIBLTo(&shaders.iblAmbientShader);
-    RenderQuad();
-
-    // BLEND aditivo (para pontos); direcional renderiza primeiro sem blend
-    // 1) Luz direcional (fullscreen)
-    //if (LightSystem::SetSunToShader(&shaders.dirLight) != 0) {
-    //    shaders.dirLight.use();
-    //    shaders.dirLight.setVec2("screenSize", glm::vec2(framebuffer->GetWidth(), framebuffer->GetHeight()));
-    //    BindGBufferTo(&shaders.dirLight);
-    //    BindIBLTo(&shaders.dirLight);
-    //    // uniforms comuns (camPos para especular ao usar view-dependent BRDF)
-    //    shaders.dirLight.setVec3("camPos", GEngine->mainCamera->GetPosition());
-    //    RenderQuad();
-    //}
+    RenderQuad(); 
 
 
-
-
-    // 2) Luzes pontuais (light volumes instanciados) + IBL (o shader soma IBL toda passada) 
-
-    // 2) LUZES PONTUAIS PBR (aditivo via esferas instanciadas)
+    //(aditivo para acrescentar as luzes instanciadas) IBL (o shader soma IBL toda passada)
     glEnable(GL_BLEND); glBlendEquation(GL_FUNC_ADD); glBlendFunc(GL_ONE, GL_ONE);
     glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
-
+     
+    // 1) Luz direcional (fullscreen)
+    if (LightSystem::SetSunToShader(&shaders.dirLight) != 0) {
+        shaders.dirLight.use(); 
+        BindGBufferTo(&shaders.dirLight);
+        BindIBLTo(&shaders.dirLight);
+        // uniforms comuns (camPos para especular ao usar view-dependent BRDF)
+        shaders.dirLight.setVec3("camPos", GEngine->mainCamera->GetPosition());
+        RenderQuad();
+    } 
+     
+    // 2) LUZES PONTUAIS PBR (aditivo via esferas instanciadas) 
     Shader* pbrPointShader = &shaders.pointLight;
     pbrPointShader->use();
     pbrPointShader->setVec3("viewPos", GEngine->mainCamera->GetPosition());
     pbrPointShader->setVec2("screenSize", glm::vec2(GEngine->renderer->frameScreen->GetWidth(), GEngine->renderer->frameScreen->GetHeight()));
-    pbrPointShader->setFloat("far_plane", 25); // adapte ao seu sistema
-
-    BindGBufferTo(pbrPointShader);
-    //BindIBLTo(pbrPointShader);
+    pbrPointShader->setFloat("far_plane", 25); // adapte ao seu sistema 
+    BindGBufferTo(pbrPointShader); //BindIBLTo(pbrPointShader);
 
     // UBO de luzes já está bound no binding=1 (igual seu shader antigo)
     LightSystem::SetPointsToShader(pbrPointShader, 0); 
+
     // instâncias
     std::vector<LightInstanceData> instanceData;
     for (auto e : LightSystem::lightInActive.point) {
@@ -200,16 +199,9 @@ void PBRPipeline::LightingPass(Scene& scene) {
         }
     ); 
     // Renderiza as esferas instanciadas, uma para cada luz pontual
-    sphereMesh->DrawInstanced(instanceData.size());
+    sphereMesh->DrawInstanced(instanceData.size());  
 
-
-
-
-
-
-    /*glEnable(GL_BLEND); glBlendFunc(GL_ONE, GL_ONE);
-    glEnable(GL_CULL_FACE); glCullFace(GL_BACK);*/
-      
+    //End  
     glDisable(GL_BLEND);
     glDisable(GL_CULL_FACE);  
     //DrawSkybox();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Scene/Components/ComponentsHelper.h"
+#include "../../ECS/Components/ComponentsHelper.h"
 
 class GlobalUniformSystem : public System {
 public:

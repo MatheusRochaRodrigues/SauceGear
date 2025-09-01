@@ -1,5 +1,5 @@
 #pragma once
-#include "../SceneECS.h"
+#include "../../Scene/SceneECS.h"
 #include "../Components/PostProcessComponent.h"
 #include "../../Graphics/Renderer.h"
 

@@ -14,6 +14,9 @@ public:
     virtual ~IComponentStorage() = default;
     virtual void Remove(Entity entity) = 0;
     virtual bool Has(Entity entity) const = 0;
+
+    //acesso void* universal.
+    virtual void* GetRaw(Entity e) = 0;
 };
 
 template<typename T>
@@ -37,6 +40,10 @@ public:
         return components.at(entity);
     }
 
+    void* GetRaw(Entity entity) override {
+        return &components.at(entity); // ponteiro cru
+    }
+
     std::unordered_set<Entity>& GetEntitySet() {
         return entities;
     }
@@ -50,6 +57,7 @@ private:
 
 class ComponentManager {
 public:
+    // Registra um componente
     template<typename T>
     void Register() {
         std::type_index type = std::type_index(typeid(T));
@@ -60,6 +68,7 @@ public:
         }
     }
 
+    // Registra um componente
     template<typename T, typename... Args>
     T& AddComponent(Entity entity, Args&&... args) {   
         try {
@@ -82,6 +91,7 @@ public:
         storage->Remove(entity);
     }
 
+    // Checagem compile-time
     template<typename T>
     bool HasComponent(Entity entity) const {
         auto* storage = GetStorage<T>();
@@ -110,6 +120,39 @@ public:
         return result;
     }
 
+    // Checagem runtime
+    bool HasComponentType(Entity entity, std::type_index type) const {
+        auto it = storages.find(type);
+        if (it == storages.end()) return false;
+        return it->second->Has(entity);
+    }
+
+    // Lista de tipos de componentes de uma entidade
+    std::vector<std::type_index> GetComponentTypes(Entity entity) const {
+        std::vector<std::type_index> result;
+        for (auto& [type, storage] : storages) {
+            if (storage->Has(entity))
+                result.push_back(type);
+        }
+        return result;
+    }
+
+    // Retorna todos os storages registrados
+    //const std::unordered_map<std::type_index, IComponentStorage*>& GetAllStorages() const {
+    //    // map temporário só com ponteiros para IComponentStorage
+    //    static std::unordered_map<std::type_index, IComponentStorage*> cache;
+    //    cache.clear();
+    //    for (auto& [type, storage] : storages) {
+    //        cache[type] = storage.get();
+    //    }
+    //    return cache;
+    //}
+
+    // Exponha o mapa REAL (sem cache temporário)
+    const std::unordered_map<std::type_index, std::unique_ptr<IComponentStorage>>&
+        GetAllStorages() const {
+        return storages;
+    }
 
 private:
     std::unordered_map<std::type_index, std::unique_ptr<IComponentStorage>> storages;

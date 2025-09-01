@@ -1,10 +1,8 @@
 #pragma once
 #include "SceneECS.h" 
 #include "../Graphics/Framebuffer.h" 
-#include "Components/ComponentsHelper.h"
-#include <stdexcept>
-
-#include "PlayerCamera.h"
+#include "../ECS/Components/ComponentsHelper.h"
+#include <stdexcept> 
 #include "SceneBuilder.h"
 
 
@@ -54,8 +52,22 @@ public:
             //auto& Floort3 = AddComponent<MeshRenderer>(Floor, PrimitiveMesh::CreatePlane());
 
         }   
+        {
+            Entity pointLight = SceneBuilder::CreateGameObject("Light1");
+            auto& pTransform = AddComponent<Transform>(pointLight);
+            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
+            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+            pTransform.position = glm::vec3(0, -1, 0);
+            auto& pLight = AddComponent<LightComponent>(pointLight);
+            //pLight.type = ShadowType::Point;
+            pLight.SetTypeLight(ShadowType::Directional);
+            pLight.color = glm::vec3(1, 0, 1);
+            pLight.intensity = 1.0f;
+        }
         //{
-        //    Entity pointLight = SceneBuilder::CreateGameObject("Light1");
+        //    Entity pointLight = SceneBuilder::CreateGameObject("Light2");
         //    auto& pTransform = AddComponent<Transform>(pointLight);
         //    pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
         //    /*auto& redn = AddComponent<MeshRenderer>(pointLight);
@@ -64,24 +76,10 @@ public:
         //    pTransform.position = glm::vec3(0, 0, 0);
         //    auto& pLight = AddComponent<LightComponent>(pointLight);
         //    //pLight.type = ShadowType::Point;
-        //    pLight.SetTypeLight(ShadowType::Directional);
-        //    pLight.color = glm::vec3(1, 1, 1);
+        //    pLight.SetTypeLight(ShadowType::Point);
+        //    pLight.color = glm::vec3(0, 1, 0);
         //    pLight.intensity = 1.0f;
         //}
-        {
-            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
-            auto& pTransform = AddComponent<Transform>(pointLight);
-            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
-            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            pTransform.position = glm::vec3(0, 0, 0);
-            auto& pLight = AddComponent<LightComponent>(pointLight);
-            //pLight.type = ShadowType::Point;
-            pLight.SetTypeLight(ShadowType::Point);
-            pLight.color = glm::vec3(0, 1, 0);
-            pLight.intensity = 1.0f;
-        }
         //  
         
 

@@ -8,7 +8,7 @@
 #include "../Scene/SceneManager.h"
 
 #include "../Scene/GameScene.h"   
-#include "../Scene/Systems/SystemHelper.h"   
+#include "../ECS/Systems/SystemHelper.h"   
 
 EngineContext* GEngine = nullptr;
 

@@ -60,7 +60,7 @@
     <ClCompile Include="Graphics\Framebuffer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Systems\PostProcessSystem.cpp">
+    <ClCompile Include="ECS\Systems\PostProcessSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -129,7 +129,7 @@
     <ClCompile Include="Editor\Panels\IPanelHelper.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\Systems\LightSystem.cpp">
+    <ClCompile Include="ECS\Systems\LightSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Resources\Primitive.cpp">
@@ -197,7 +197,7 @@
     <ClInclude Include="Core\InputSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\PhysicsSystem.h">
+    <ClInclude Include="ECS\PhysicsSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Mesh.h">
@@ -206,7 +206,7 @@
     <ClInclude Include="Resources\Model.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\System.h">
+    <ClInclude Include="ECS\System.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Texture.h">
@@ -215,52 +215,52 @@
     <ClInclude Include="Graphics\RenderUtils.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\TransformComponent.h">
+    <ClInclude Include="ECS\Components\TransformComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Scene\ComponentManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\MoveSystem.h">
+    <ClInclude Include="ECS\Systems\MoveSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Transform.h">
+    <ClInclude Include="ECS\Components\Transform.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Velocity.h">
+    <ClInclude Include="ECS\Components\Velocity.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\MeshRenderer.h">
+    <ClInclude Include="ECS\Components\MeshRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\RenderSystem.h">
+    <ClInclude Include="ECS\Systems\RenderSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Material.h">
+    <ClInclude Include="ECS\Components\Material.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\LightingUtils.h">
+    <ClInclude Include="ECS\LightingUtils.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\CameraComponent.h">
+    <ClInclude Include="ECS\Components\CameraComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\CameraSystem.h">
+    <ClInclude Include="ECS\Systems\CameraSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\LightSystem.h">
+    <ClInclude Include="ECS\Systems\LightSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\LightComponent.h">
+    <ClInclude Include="ECS\Components\LightComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\ComponentsHelper.h">
+    <ClInclude Include="ECS\Components\ComponentsHelper.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\SystemHelper.h">
+    <ClInclude Include="ECS\Systems\SystemHelper.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Core\Camera.h">
@@ -272,34 +272,34 @@
     <ClInclude Include="Core\KeyCodes.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\PostProcessComponent.h">
+    <ClInclude Include="ECS\Components\PostProcessComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Framebuffer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\PostProcessSystem.h">
+    <ClInclude Include="ECS\Systems\PostProcessSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\FullscreenQuad.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\PostEffects\BlurEffectComponent.h">
+    <ClInclude Include="ECS\Components\PostEffects\BlurEffectComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\GlobalUniformSystem.h">
+    <ClInclude Include="ECS\Systems\GlobalUniformSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\ScriptSystem .h">
+    <ClInclude Include="ECS\Systems\ScriptSystem .h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\ScriptBehaviour.h">
+    <ClInclude Include="ECS\ScriptBehaviour.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\NativeScriptComponent.h">
+    <ClInclude Include="ECS\Components\NativeScriptComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\PlayerCamera.h">
+    <ClInclude Include="ECS\PlayerCamera.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\EditorApp.h">
@@ -353,7 +353,7 @@
     <ClInclude Include="ImGui\ImZoomSlider.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\HierarchyComponent.h">
+    <ClInclude Include="ECS\Components\HierarchyComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Panels\IPanel.h">
@@ -362,7 +362,7 @@
     <ClInclude Include="Editor\Panels\Load.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\ScriptComponent.h">
+    <ClInclude Include="ECS\Components\ScriptComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\MoveScript.h">
@@ -371,10 +371,10 @@
     <ClInclude Include="Scene\GameScene.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Tags\ForwardTag.h">
+    <ClInclude Include="ECS\Components\Tags\ForwardTag.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\Tags\TransparentTag.h">
+    <ClInclude Include="ECS\Components\Tags\TransparentTag.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="PostProcessEffect.h">
@@ -383,7 +383,7 @@
     <ClInclude Include="Resources\Primitive.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\MeshFilter.h">
+    <ClInclude Include="ECS\Components\MeshFilter.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.h">
@@ -407,7 +407,7 @@
     <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\ScriptInspector.h">
+    <ClInclude Include="ECS\ScriptInspector.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Renderer\PipelinePBR\PersistenceIBL.hpp">
@@ -419,19 +419,19 @@
     <ClInclude Include="Engine\exec.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Components\AABBComponent.h">
+    <ClInclude Include="ECS\Components\AABBComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\BoundsSystem.h">
+    <ClInclude Include="ECS\Systems\BoundsSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Utils\utilsAABB.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\PhysicsSystem.h">
+    <ClInclude Include="ECS\Systems\PhysicsSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\PickingSystem.h">
+    <ClInclude Include="ECS\Systems\PickingSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Utils\MathHelpers.h">
@@ -440,7 +440,34 @@
     <ClInclude Include="Scripts\ScriptABI.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Systems\DayNightSystem.h">
+    <ClInclude Include="Editor\Utils\ImGuiUtils.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Drawers\TransformDrawer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Drawers\MeshRendererDrawer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Drawers\CameraDrawer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Drawers\LightDrawer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Utils\InspectorMacros.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Reflection\Meta.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Reflection\Macros.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Reflection\Registry.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Utils\InspectorDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -516,7 +543,7 @@
     <None Include="Resources\Shaders\PBR\skybox.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShading.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_light_volume.vs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_directional.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\fullscreen.vs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.vs" />

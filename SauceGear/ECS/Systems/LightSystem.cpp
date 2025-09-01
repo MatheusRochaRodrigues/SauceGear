@@ -1,6 +1,6 @@
 #include "LightSystem.h"
 
-LightSystem::LightSystem() { 
+LightSystem::LightSystem() {
     glGenFramebuffers(1, &depthMapFBO);
     // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -19,18 +19,24 @@ LightSystem::LightSystem() {
     glBufferData(GL_UNIFORM_BUFFER, MAX_LIGHTS * offBuff, NULL, GL_STATIC_DRAW); // allocate 160 bytes of memory 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightSSBO);
-     
+
     //// Carregar mapas de sombra em um segundo SSBO
     //glGenBuffers(1, &shadowMapSSBO);
     //glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadowMapSSBO);
     //glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_LIGHTS * 192, NULL, GL_STATIC_DRAW); // allocate 192 bytes of memory 
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
     //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, shadowMapSSBO);
-     
-     
+
+
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::HIGH,    std::deque<GLuint>(), std::deque<GLuint>() });  //1024
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::MEDIUM,  std::deque<GLuint>(), std::deque<GLuint>() });  //512
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::LOW,     std::deque<GLuint>(), std::deque<GLuint>() });  //256  
+
+
+    /*shadowCascadeLevels.push_back(GEngine->mainCamera->farClip / 50.0f);
+    shadowCascadeLevels.push_back(GEngine->mainCamera->farClip / 25.0f);
+    shadowCascadeLevels.push_back(GEngine->mainCamera->farClip / 10.0f);
+    shadowCascadeLevels.push_back(GEngine->mainCamera->farClip / 2.0f); */
 }
 
 ShadowLOD LightSystem::ComputeLOD(float distance) {

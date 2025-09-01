@@ -299,13 +299,23 @@ Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radi
             unsigned int i2 = i0 + (segments + 1);
             unsigned int i3 = i2 + 1;
 
-            indices.push_back(i0);
+            /*indices.push_back(i0);
             indices.push_back(i2);
             indices.push_back(i1);
 
             indices.push_back(i1);
             indices.push_back(i2);
+            indices.push_back(i3);*/
+
+            // Primeiro triângulo
+            indices.push_back(i0);
+            indices.push_back(i1);
+            indices.push_back(i2);
+
+            // Segundo triângulo
+            indices.push_back(i1);
             indices.push_back(i3);
+            indices.push_back(i2);
         }
     }
 
