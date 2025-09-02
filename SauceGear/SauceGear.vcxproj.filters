@@ -470,6 +470,9 @@
     <ClInclude Include="Editor\Utils\InspectorDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">

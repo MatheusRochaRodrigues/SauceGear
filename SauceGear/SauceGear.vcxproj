@@ -190,6 +190,7 @@
     <ClInclude Include="Editor\Drawers\LightDrawer.h" />
     <ClInclude Include="ECS\Reflection\Macros.h" />
     <ClInclude Include="ECS\Reflection\Registry.h" />
+    <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
     <ClInclude Include="Scripts\ScriptABI.h" />
     <ClInclude Include="Utils\MathHelpers.h" />
     <ClInclude Include="ECS\Systems\PickingSystem.h" />

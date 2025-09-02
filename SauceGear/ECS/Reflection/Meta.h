@@ -5,10 +5,18 @@
 #include <typeindex>
 #include <cstddef>
 
+enum class FieldKind {
+    Value,    // campo normal
+    Header,   // header visual
+    Space     // espaço vertical
+};
+
 struct FieldInfo {
     std::string name;
     std::type_index type{ typeid(void) }; // inicializa com typeid(void)
     size_t offset = 0; 
+
+    FieldKind kind = FieldKind::Value; // default é campo normal
 };
 
 struct TypeInfo {

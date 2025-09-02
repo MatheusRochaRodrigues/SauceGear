@@ -12,32 +12,39 @@ struct Transform {
 
     glm::vec3 localPosition = glm::vec3(0.0f);
     glm::vec3 localRotation = glm::vec3(0.0f); // Euler
-    glm::vec3 localScale    = glm::vec3(1.0f);
+    glm::vec3 localScale    = glm::vec3(1.0f); 
+
+    glm::mat4 model; 
+    bool dirty = true;
 
     /*REFLECT_CLASS(Transform) {
+        REFLECT_FIELD(Transform, position);
+        REFLECT_FIELD(Transform, rotation);
+        REFLECT_FIELD(Transform, scale);
+    }*/
+
+    REFLECT_CLASS(Transform) {
+        REFLECT_HEADER("Global Transform");
         REFLECT_FIELD(position);
         REFLECT_FIELD(rotation);
         REFLECT_FIELD(scale);
 
-    }  */
+        REFLECT_SPACE();
 
-    REFLECT_CLASS(Transform) {
-        REFLECT_FIELD(Transform, position);
-        REFLECT_FIELD(Transform, rotation);
-        REFLECT_FIELD(Transform, scale);
-        //REFLECT_FIELD(Transform, visible);
+        REFLECT_HEADER("Local Transform")
+        REFLECT_FIELD(localPosition);
+        REFLECT_FIELD(localRotation);
+        REFLECT_FIELD(localScale);
     }
-
-
-    bool dirty = false;
 
     Transform() = default;
 
     Transform(glm::vec3 pos, glm::vec3 rot = glm::vec3(0.0f), glm::vec3 scl = glm::vec3(1.0f))
         : position(pos), rotation(rot), scale(scl) {
-    }
+    }  
 
-    glm::mat4 GetMatrix() const {
+
+    /*glm::mat4 GetMatrix() const {
         glm::mat4 model = glm::mat4(1.0f);
 
         model = glm::translate(model, position);
@@ -47,7 +54,21 @@ struct Transform {
         model = glm::scale(model, scale);
 
         return model;
-    }
+    }*/
+
+    const glm::mat4& GetMatrix() {
+        if (dirty) {  
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, position);
+            model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+            model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+            model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+            model = glm::scale(model, scale); 
+            dirty = true;
+            // pode chamar o calculo do bolding box pro picking
+        }
+        return model;
+    } 
 
     glm::vec3 GetForwardDirection(const glm::vec3& rotationEuler) {
         glm::vec3 direction;
@@ -98,6 +119,8 @@ struct Transform {
 
         return true;
     }*/
+
+    void MarkDirty() { dirty = true; }
 
 };
 

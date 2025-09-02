@@ -7,6 +7,11 @@
 struct MeshRenderer {
     Mesh* mesh = nullptr;
     std::unordered_map<Material*, std::vector<SubMesh*>> batches;
+     
+    /*REFLECT_CLASS(MeshRenderer) {
+        REFLECT_HEADER("Mesh");
+        REFLECT_FIELD(mesh->);
+    }*/
 
     MeshRenderer() = default;
 

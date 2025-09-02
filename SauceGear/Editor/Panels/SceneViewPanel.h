@@ -93,9 +93,16 @@ struct SceneViewPanel : IPanel {
             //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
 
             //if (isSceneHovered && isSceneFocused) 
-            if (ImGuizmo::IsUsing()) {
-                tc.DecomposeTransform(transform); 
-            }
+
+
+            float translation[3], rot[3], scale[3];
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), translation, rot, scale);
+
+            tc.position = glm::make_vec3(translation);
+            tc.rotation = glm::make_vec3(rot);   // já em graus
+            tc.scale = glm::make_vec3(scale); 
+
+            //if (ImGuizmo::IsUsing())  tc.DecomposeTransform(transform);  
         } 
 
 

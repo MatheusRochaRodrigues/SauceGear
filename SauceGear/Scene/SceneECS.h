@@ -41,6 +41,15 @@ public:
         componentManager->RemoveComponent<T>(entity);
     }
 
+    void RemoveComponent(Entity entity, const TypeInfo& type) {
+        const auto& storages = componentManager->GetAllStorages();
+        auto it = storages.find(type.typeIndex);
+        if (it != storages.end()) {
+            it->second->Remove(entity);
+        }
+    }
+
+
     template<typename T>
     bool HasComponent(Entity entity) const {
         return componentManager->HasComponent<T>(entity);
