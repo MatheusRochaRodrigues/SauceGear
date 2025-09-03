@@ -517,12 +517,12 @@
     <None Include="Resources\Shaders\Shadows\ShadowMapP.vs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapP.fs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapP.gs" />
-    <None Include="Resources\Shaders\Shadows\ShadowPointPCFold.fs" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowPointPCFold.fs" />
     <None Include="Resources\Shaders\Debug\debug_Cube_depth.fs" />
     <None Include="debug_Cube_depth.vs" />
     <None Include="Resources\Shaders\Basic\VertDefault.vs" />
     <None Include="Resources\Shaders\CellShading\fragment.fs" />
-    <None Include="Resources\Shaders\Shadows\shadowPointPCF_oldComented.fs" />
+    <None Include="Resources\Shaders\Shadows\Extras\shadowPointPCF_oldComented.fs" />
     <None Include="Resources\Shaders\BlinnPhong\BaseShadow.fs" />
     <None Include="Resources\Shaders\BlinnPhong\BaseShadow.vs" />
     <None Include="Resources\Shaders\PostProcess\postprocess.vs" />
@@ -557,6 +557,10 @@
     <None Include="Resources\Shaders\Utils\utils.glsl" />
     <None Include="Resources\Shaders\Utils\lighting.glsl" />
     <None Include="Resources\Shaders\Utils\vertex.glsl" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapCasc.vs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapCasc.gs" />
+    <None Include="Resources\Shaders\Shadows\ShadowMapCasc.fs" />
+    <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

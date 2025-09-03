@@ -42,7 +42,8 @@ public:
     //Default Shaders
     Shader* GetDefaultShader;
 
-    Shader* GetShadowShader;
+    Shader* GetShadowShader_Sun;            //GetShadowShader_DirectionalCascade
+    Shader* GetShadowShader_Directional;
     Shader* GetShadowShader_Point;
 
     //FrameScreenResult

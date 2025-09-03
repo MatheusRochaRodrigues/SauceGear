@@ -1,23 +1,11 @@
 #include "Renderer.h" 
-#include "../Core/EngineContext.h"
-
-//Renderer::Renderer(SceneECS* scene) {
-//    m_Scene = scene;
-//}
+#include "../Core/EngineContext.h" 
 
 void Renderer::Init(SceneECS* scene) {
-    m_Scene = scene; 
-
-    /*try { m_Scene->Load(); }
-    catch (const std::exception& e) { std::cerr << "[EXCEÇÃO - Load] " << e.what() << "\n"; } */
+    m_Scene = scene;  
 }
 
-void Renderer::Initialize() {
-
-    // Suponha que DefaultLit seja seu shader básico
-    // 
-    //Material material(GEngine->renderer->GetDefaultShader);
-
+void Renderer::Initialize() { 
     try {  m_Scene->Load(); } catch (const std::exception& e) { std::cerr << "[EXCEÇÃO - Load] " << e.what() << "\n"; }
 
     //pbrShader = Shader("PBR/pbr.vs", "PBR/pbr.fs");
@@ -45,28 +33,10 @@ void Renderer::RenderSceneWithShader(Shader* shaderOverride) {
         shaderOverride->use();
         shaderOverride->setMat4("model", transform.GetMatrix());
 
-        meshRenderer.mesh->Draw();
-        //meshRenderer.model->Draw();
+        meshRenderer.mesh->Draw(); 
     }
 }
-
-
-// ==== OBS: você precisa agora mover os headers e .cpp de Shader, Camera, Model, Lighting etc. para seus diretórios indicados. ====
-
-//void Renderer::Draw(Mesh* mesh, Material* material, const glm::mat4& modelMatrix) {
-//    if (!mesh || !material || !material->shader) return;
-//
-//    Shader* shader = material->shader;
-//    shader->use();
-//
-//    shader->setMat4("model", modelMatrix);
-//    shader->setMat4("view", GEngine->mainCamera->GetViewMatrix());
-//    shader->setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
-//
-//    material->Apply(shader);  // seta texturas, cor, etc
-//
-//    mesh->Draw();
-//}
+ 
 
 //Use glDepthFunc(GL_LEQUAL) para desenhar atrás de tudo
 void Renderer::RenderSkybox() { //const Camera& camera

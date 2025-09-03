@@ -88,18 +88,18 @@ public:
         return projectionMatrix;   //glm::perspective(glm::radians(Zoom), (float)GEngine->window->m_width / (float)GEngine->window->m_height, 0.1f, 100.0f); 
     }
 
-    float aspect;
+    float aspectRatio;
     float nearClip = 0.1f;
     float farClip = 100.0f;
 
-    void SetAspectRatio(float aspect) {
-        this->aspect = aspect;
-        projectionMatrix = glm::perspective(glm::radians(Zoom), aspect, nearClip, farClip);      //FOV
+    void SetAspectRatio(float aspectRatio) {
+        this->aspectRatio = aspectRatio;
+        projectionMatrix = glm::perspective(glm::radians(Zoom), aspectRatio, nearClip, farClip);      //FOV
     }
 
     void SetProjection(float width, float height) {
-        float aspect = width / height;
-        projectionMatrix = glm::perspective(glm::radians(Zoom), aspect, nearClip, farClip);
+        aspectRatio = width / height;
+        projectionMatrix = glm::perspective(glm::radians(Zoom), aspectRatio, nearClip, farClip);
     }
 
 

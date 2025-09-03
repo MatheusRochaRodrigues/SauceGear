@@ -7,6 +7,7 @@
 #include "../../ECS/Components/ComponentsHelper.h"
 
 #define MAX_LIGHTS_PROJECTION 3
+#define MAX_CASCADES 4
 
 
 struct ShadowSettings {
@@ -21,17 +22,24 @@ struct LightGroups {
     std::vector<Entity> spot;
 };
 
-//std::vector<float> shadowCascadeLevels;
-
 class LightSystem : public System {
-public:
+public: 
+    static inline std::vector<float> shadowCascadeLevels; 
+    static inline GLuint cascadeDepthMapArray; 
+    static inline GLuint cascadeFBO; 
+    static inline std::vector<glm::mat4> lightSpaceMatrices;
+    
+    static inline GLuint cascadeMatricesUBO;
+
     LightSystem();
+
+    void InitCascade();
 
     void Update(float dt) override {
         glm::vec3 posPlayer = GEngine->mainCamera->Position;
         LightGroups closestGroupLights = GroupLightsByType(SelectLightsToCastShadow(GetClosestLights(posPlayer)));
 
-        HandleSunChange();
+        //Sun();
         HandleShadowMapReturn(posPlayer);
         //lightInActive.clear();
         lightInActive.point.clear();
@@ -65,8 +73,8 @@ public:
 
 
         for (auto& e : closestGroupLights.point) renderLight(e);
-        for (auto& e : closestGroupLights.directional) renderLight(e);
-        int updateIndex = GEngine->time->GetFrameCount() % 3;
+        //for (auto& e : closestGroupLights.directional) renderLight(e);
+        int updateIndex = GEngine->time->GetFrameCount() % 2;
         if (updateIndex == 0) {
             //lightInActive.directional.clear();
             //for (auto& e : closestGroupLights.directional) renderLight(e);
@@ -74,16 +82,14 @@ public:
         else if (updateIndex == 1) {
             //lightInActive.point.clear();
             //for (auto& e : closestGroupLights.point) renderLight(e);
-        }
-        else if (updateIndex == 3) {
-            //lightInActive.spot.clear(); 
-        }
-
+        }  
         SetLightsToSSBO();
     }
 
-    static inline std::unordered_map<Entity, std::pair<ShadowLOD, unsigned int>> ShadowMaps;  // Mapeia luz para textura de sombra
-    static inline LightGroups lightInActive; //static inline std::vector<Entity> lightInActive;
+    std::vector<glm::mat4> GetLightSpaceMatrices(const glm::vec3& lightDir);
+
+    static inline std::unordered_map<Entity, std::pair<ShadowLOD, unsigned int>> ShadowMaps;   
+    static inline LightGroups lightInActive;  
 
     // Lógica para devolver as sombras que não estão mais ativas à pool
     void HandleShadowMapReturn(const glm::vec3& playerPosition) {
@@ -95,8 +101,7 @@ public:
 
             // Verificar se a luz está dentro do alcance
             ShadowLOD currentLod = ComputeLOD(glm::distance(transform.position, playerPosition)); 
-            if (currentLod != lodMapShadow.first) {  //lod == ShadowLOD::NONE || lod != lodMapShadow
-                std::cout << " lod atualizado "   << std::endl;
+            if (currentLod != lodMapShadow.first) {  
                 // Devolver o shadow map à pool se a luz estiver fora do alcance
                 ReturnShadowMapToPool(currentLod, light.depthMap, light.type);
                 light.depthMap = 0;  // Limpar o depthMap da luz
@@ -250,7 +255,7 @@ private:
 
     std::vector<ShadowSettings> poolShadowsTex;                
 
-    void HandleSunChange(); 
+    void Sun();
     // Lógica para atualizar luz direcional
     void UpdateDirectional(LightComponent& light, const glm::vec3& pos, unsigned int resolution, GLuint Texture); 
     // Lógica para atualizar luz pontual

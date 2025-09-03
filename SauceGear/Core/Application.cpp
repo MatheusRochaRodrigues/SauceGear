@@ -11,7 +11,8 @@ int Application::Init() {
     GEngine->input->Initialize(GEngine->window);                 // conecta input ao contexto da janela 
     renderer.Initialize();                              // inicializa entidades/sistemas da cena                scene.Init();   
      
-    GEngine->renderer->GetShadowShader = new Shader("Shadows/ShadowMapD.vs", "Shadows/ShadowMapD.fs");
+    GEngine->renderer->GetShadowShader_Sun = new Shader("Shadows/ShadowMapCasc.vs", "Shadows/ShadowMapCasc.gs", "Shadows/ShadowMapCasc.fs");
+    GEngine->renderer->GetShadowShader_Directional = new Shader("Shadows/ShadowMapD.vs", "Shadows/ShadowMapD.fs");
     GEngine->renderer->GetShadowShader_Point = new Shader("Shadows/ShadowMapP.vs", "Shadows/ShadowMapP.gs", "Shadows/ShadowMapP.fs");
      
 
