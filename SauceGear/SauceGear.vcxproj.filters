@@ -156,7 +156,7 @@
     <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\ShaderLibraries.h">
+    <ClCompile Include="Graphics\ShaderPreprocessor.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -554,6 +554,9 @@
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
     <None Include="Resources\Shaders\PBR\IBL\cubemap.vs" />
+    <None Include="Resources\Shaders\Utils\utils.glsl" />
+    <None Include="Resources\Shaders\Utils\lighting.glsl" />
+    <None Include="Resources\Shaders\Utils\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

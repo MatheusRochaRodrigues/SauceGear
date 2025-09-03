@@ -26,6 +26,24 @@ uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
    
 
+float ShadowCalculationDirectional2(vec4 fragPosLightSpace)
+{
+    vec3 Normal = texture(gNormal, TexCoords).rgb;
+    vec3 FragPos = texture(gPosition, TexCoords).rgb;
+
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMapSun, projCoords.xy).r; 
+    float currentDepth = projCoords.z;
+
+    // Correção: usa bias baseado na normal para suavizar sombras
+    float bias = max(0.005 * (1.0 - dot(Normal, -light.direction)), 0.0005); 
+
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
+}
+
 float ShadowCalculationDirectional(vec4 fragPosLightSpace)
 {
     vec3 Normal = texture(gNormal, TexCoords).rgb;
@@ -41,7 +59,7 @@ float ShadowCalculationDirectional(vec4 fragPosLightSpace)
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
     vec3 normal = normalize(Normal);
-    vec3 lightDir = normalize(light.position - FragPos);                //lights[i].direction
+    vec3 lightDir = normalize(light.direction - FragPos);                //light.position   lights[i].direction
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     // check whether current frag pos is in shadow
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
@@ -85,7 +103,7 @@ void main() {
     float attenuation = 1.0;
 
     if (light.type == 0) {              // Tipo Direcional
-        lightDir = normalize(-light.position); // Ajuste para usar position no lugar de direction    
+        lightDir = normalize(-light.direction);   //normalize(-light.position)   // Ajuste para usar position no lugar de direction    
         vec4 FragPosLightSpace = light.lightMatrix * vec4(FragPos, 1.0);
         shadow = ShadowCalculationDirectional(FragPosLightSpace); 
         //result = vec3(shadow);  

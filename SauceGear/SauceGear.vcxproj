@@ -173,7 +173,7 @@
     <ClCompile Include="Scene\SceneECS.cpp" />
     <ClCompile Include="Graphics\Shader.cpp" />
     <ClCompile Include="Graphics\SkyboxRenderer.cpp" />
-    <ClCompile Include="Graphics\ShaderLibraries.h" />
+    <ClCompile Include="Graphics\ShaderPreprocessor.h" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Core\Time.cpp" />
@@ -286,6 +286,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
+    <None Include="Resources\Shaders\Utils\lighting.glsl" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_ibl.fs" />
@@ -346,6 +347,8 @@
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
     <None Include="Resources\Shaders\PBR\skybox.fs" />
     <None Include="Resources\Shaders\PBR\skybox.vs" />
+    <None Include="Resources\Shaders\Utils\utils.glsl" />
+    <None Include="Resources\Shaders\Utils\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

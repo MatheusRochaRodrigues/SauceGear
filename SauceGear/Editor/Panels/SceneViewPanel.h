@@ -100,7 +100,7 @@ struct SceneViewPanel : IPanel {
 
             tc.position = glm::make_vec3(translation);
             tc.rotation = glm::make_vec3(rot);   // já em graus
-            tc.scale = glm::make_vec3(scale); 
+            tc.scale =    glm::make_vec3(scale); 
 
             //if (ImGuizmo::IsUsing())  tc.DecomposeTransform(transform);  
         } 

@@ -1,43 +1,4 @@
 #include"Shader.h"
-#include <regex> 
-
-// Reads a text file and outputs a string with everything in the text file
-std::string get_file_contents(const char* filename)
-{
-	std::ifstream in(filename, std::ios::binary);
-	if (!in)
-		throw std::runtime_error(std::string("\n<Error> To open archive Shader : ") + filename);
-		//throw(errno);
-
-	std::string contents;
-	in.seekg(0, std::ios::end);
-	contents.resize(in.tellg());
-	in.seekg(0, std::ios::beg);
-	in.read(&contents[0], contents.size());
-	in.close();
-	return contents;
-}  
-
-std::string UpdateDefine(const std::string& shaderCode, const std::vector<std::pair<std::string, int>>& defines) {
-	std::string code = shaderCode;
-
-	for (auto& def : defines) {
-		const std::string& name = def.first;
-		int value = def.second;
-
-		std::regex defineRegex("#define\\s+" + name + "\\s+\\d+");
-		if (std::regex_search(code, defineRegex)) {
-			// Substitui o valor existente
-			code = std::regex_replace(code, defineRegex, "#define " + name + " " + std::to_string(value));
-		}
-		else {
-			// Adiciona o define no topo
-			code = "#define " + name + " " + std::to_string(value) + "\n" + code;
-		}
-	}
-
-	return code;
-} 
 
 // Constructor that build the Shader Program from 2 different shaders
 Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines)
@@ -51,16 +12,16 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vect
 	std::string fPath = ShaderPathDefault + fragmentFile;
 
 	try {
-		vertexFile = vPath.c_str(); 
+		vertexFile   = vPath.c_str(); 
 		fragmentFile = fPath.c_str();
 
-		// Read vertexFile and fragmentFile and store the strings
-		std::string vertexCode = get_file_contents(vertexFile);
-		std::string fragmentCode = get_file_contents(fragmentFile);
+		// Read vertexFile and fragmentFile and store the strings 
+		//std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines);
+		//std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines); 
 
-		// injeta defines
-		vertexCode = UpdateDefine(vertexCode, defines);
-		fragmentCode = UpdateDefine(fragmentCode, defines);
+		std::string vertexCode = ShaderPreprocessor::get_file_contents(vertexFile);
+		std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
+
 
 		// Convert the shader source strings into character arrays
 		const char* vertexSource = vertexCode.c_str();
@@ -106,7 +67,7 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vect
 // Constructor that build the Shader Program from 2 different shaders
 Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines)
 {
-	this->vertexFile = vertexFile;
+	this->vertexFile   = vertexFile;
 	this->geometryFile = geometryFile;
 	this->fragmentFile = fragmentFile; 
 
@@ -116,17 +77,23 @@ Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fra
 	std::string fPath = ShaderPathDefault + fragmentFile;
 
 	try {
-		vertexFile = vPath.c_str();
+		vertexFile   = vPath.c_str();
 		geometryFile = gPath.c_str();
 		fragmentFile = fPath.c_str();
 
-		// Read vertexFile and fragmentFile and store the strings
-		std::string vertexCode = get_file_contents(vertexFile);
-		std::string geometryCode = get_file_contents(geometryFile);
-		std::string fragmentCode = get_file_contents(fragmentFile);
+		// Read vertexFile and fragmentFile and store the strings 
+		/*
+		std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines);
+		std::string geometryCode = ShaderPreprocessor::ProcessFile(geometryFile, defines);
+		std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines);
+		*/
+
+		std::string vertexCode =   ShaderPreprocessor::get_file_contents(vertexFile);
+		std::string geometryCode = ShaderPreprocessor::get_file_contents(geometryFile);
+		std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
 
 		// Convert the shader source strings into character arrays
-		const char* vertexSource = vertexCode.c_str();
+		const char* vertexSource   = vertexCode.c_str();
 		const char* geometrySource = geometryCode.c_str();
 		const char* fragmentSource = fragmentCode.c_str();
 
