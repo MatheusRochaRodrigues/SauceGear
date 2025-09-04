@@ -287,6 +287,7 @@
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
     <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
     <None Include="Resources\Shaders\Utils\lighting.glsl" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />

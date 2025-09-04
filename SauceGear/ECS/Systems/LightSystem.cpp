@@ -33,17 +33,11 @@ LightSystem::LightSystem() {
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::LOW,     std::deque<GLuint>(), std::deque<GLuint>() });  //256  
 
      
-    //InitCascade();
+    InitCascade();
 }
 
 void LightSystem::InitCascade() {
-    // Cascade Shadow Setup
-    shadowCascadeLevels = {
-        GEngine->mainCamera->farClip / 50.0f,
-        GEngine->mainCamera->farClip / 25.0f,
-        GEngine->mainCamera->farClip / 10.0f,
-        GEngine->mainCamera->farClip / 2.0f
-    };
+    // Cascade Shadow Setup - to later
 
     glGenFramebuffers(1, &cascadeFBO);
     glGenTextures(1, &cascadeDepthMapArray);
@@ -65,14 +59,14 @@ void LightSystem::InitCascade() {
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cascadeDepthMapArray, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+    verify();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
     //UBO
     // UBO para cascaded shadows
-    GLuint lightMatricesUBO;
-    glGenBuffers(1, &lightMatricesUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, lightMatricesUBO);
+    glGenBuffers(1, &cascadeMatricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, cascadeMatricesUBO);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 16, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -81,10 +75,7 @@ void LightSystem::InitCascade() {
     glUniformBlockBinding(GEngine->renderer->GetShadowShader_Sun->ID, blockIndex, 2);*/
 
     // Liga o buffer ao binding point 0
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, lightMatricesUBO);
-
-    // Guarda em membro estático (pra não recriar sempre)
-    cascadeMatricesUBO = lightMatricesUBO;
+    glBindBufferBase(GL_UNIFORM_BUFFER, 2, cascadeMatricesUBO); 
 
 }
 
@@ -125,7 +116,13 @@ std::vector<glm::mat4> LightSystem::GetLightSpaceMatrices(const glm::vec3& light
         for (auto& v : frustumCorners) center += glm::vec3(v);
         center /= frustumCorners.size();
 
-        glm::mat4 lightView = glm::lookAt(center - lightDir * 50.0f, center, glm::vec3(0, 1, 0));
+        //glm::mat4 lightView = glm::lookAt(center - lightDir * 50.0f, center, glm::vec3(0, 1, 0));
+        const auto lightView = glm::lookAt(
+            center + lightDir,
+            center,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
 
         // Define limites ortográficos
         float minX = FLT_MAX, maxX = -FLT_MAX;
@@ -147,31 +144,50 @@ std::vector<glm::mat4> LightSystem::GetLightSpaceMatrices(const glm::vec3& light
     return matrices;
 }
 
+static void UpdateShadowCascades() {
+    auto cam = GEngine->mainCamera;
+    if (!cam) return; // câmera não existe ainda 
+    // Verifica se a farClip mudou
+    static float lastFarClip = -1.0f;
+    if (cam->farClip != lastFarClip) {
+        lastFarClip = cam->farClip;
+        LightSystem::shadowCascadeLevels.clear();
+        LightSystem::shadowCascadeLevels = {
+            cam->farClip / 50.0f,
+            cam->farClip / 25.0f,
+            cam->farClip / 10.0f,
+            cam->farClip / 2.0f
+        };
+    } 
+} 
 
-void LightSystem::Sun() {
+void LightSystem::Sun() { 
+    UpdateShadowCascades();  
     // Se não houver um "sol" atual, atribui o primeiro light directional como sol
     // Verifica se o "sol" atual foi deletado ou removido
-    if (currentSun == INVALID_ENTITY) {           //if (currentSun != INVALID_ENTITY) return;
+    if (LightSystem::currentSun == INVALID_ENTITY) {           //if (currentSun != INVALID_ENTITY) return;
         //if (currentSun != nullptr && GEngine->scene->EntityExists(currentSun)) return; 
         auto entities = GEngine->scene->GetEntitiesWith<LightComponent, Transform>();
         // Se o "sol" for removido, troque pelo próximo directional ativo
         for (auto& lightEntity : entities) {
             auto& light = GEngine->scene->GetComponent<LightComponent>(lightEntity);
             if (light.type == ShadowType::Directional) {
-                currentSun = lightEntity;
+                LightSystem::currentSun = lightEntity;
                 break;
             }
         }
     }
-    if (currentSun == INVALID_ENTITY) return;
+    if (LightSystem::currentSun == INVALID_ENTITY) return;
 
     auto& transform = GEngine->scene->GetComponent<Transform>(currentSun);
     auto& l = GEngine->scene->GetComponent<LightComponent>(currentSun);
-    if (l.depthMap == 0) l.depthMap = GetAvailableShadowMap(ShadowType::Directional, ShadowLOD::HIGH);
-
-    UpdateDirectional(l, transform.rotation, GetSettingsForLOD(ShadowLOD::HIGH), l.depthMap); 
-
+      
     // Gera cascades
+    //Se transform.GetForwardDirection() retornar (0,0,0), lookAt(center - dir*50, center, up) quebra (NaN). Proteja:
+    /*glm::vec3 dir = transform.GetForwardDirection();
+    if (glm::length2(dir) < 1e-8f) dir = glm::normalize(glm::vec3(0.3f, -1.0f, 0.2f));
+    lightSpaceMatrices = GetLightSpaceMatrices(dir);*/
+
     lightSpaceMatrices = GetLightSpaceMatrices(transform.GetForwardDirection());
 
     Shader* shadowShader = GEngine->renderer->GetShadowShader_Sun;
@@ -185,8 +201,7 @@ void LightSystem::Sun() {
     // Atualiza UBO com as matrizes
     glBindBuffer(GL_UNIFORM_BUFFER, cascadeMatricesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * lightSpaceMatrices.size(), lightSpaceMatrices.data());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    //
+    glBindBuffer(GL_UNIFORM_BUFFER, 0); 
 
     glViewport(0, 0, 2048, 2048);
     glBindFramebuffer(GL_FRAMEBUFFER, cascadeFBO);
@@ -196,6 +211,7 @@ void LightSystem::Sun() {
     glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    GEngine->window->SetWindowViewport0();
 }
 
 ShadowLOD LightSystem::ComputeLOD(float distance) {

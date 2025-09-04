@@ -1,6 +1,6 @@
 #version 460 core
 
-layout(triangles, invocations = 5) in;
+layout(triangles, invocations = 4) in;	//5
 layout(triangle_strip, max_vertices = 3) out;
  
 layout(std140, binding = 2) uniform LightSpaceMatrices {

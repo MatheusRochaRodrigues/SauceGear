@@ -561,6 +561,7 @@
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.fs" />
     <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

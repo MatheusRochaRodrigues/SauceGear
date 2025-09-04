@@ -53,7 +53,7 @@ public:
 
         }   
         {
-            Entity pointLight = SceneBuilder::CreateGameObject("Light1");
+            Entity pointLight = SceneBuilder::CreateGameObject("Sun");
             auto& pTransform = AddComponent<Transform>(pointLight);
             pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
             /*auto& redn = AddComponent<MeshRenderer>(pointLight);

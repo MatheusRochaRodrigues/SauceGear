@@ -28,8 +28,10 @@ public:
     static inline GLuint cascadeDepthMapArray; 
     static inline GLuint cascadeFBO; 
     static inline std::vector<glm::mat4> lightSpaceMatrices;
-    
+     
     static inline GLuint cascadeMatricesUBO;
+
+    //lightMatricesUBO
 
     LightSystem();
 
@@ -39,7 +41,7 @@ public:
         glm::vec3 posPlayer = GEngine->mainCamera->Position;
         LightGroups closestGroupLights = GroupLightsByType(SelectLightsToCastShadow(GetClosestLights(posPlayer)));
 
-        //Sun();
+        Sun();
         HandleShadowMapReturn(posPlayer);
         //lightInActive.clear();
         lightInActive.point.clear();
@@ -114,17 +116,14 @@ public:
 
     static int SetSunToShader(Shader* shader) {
         //PROBLEMA DA FORMA COMO ESCREVI SHADERS DO FORWARD NAO TERAM ACESSO A SOMBRAS DO SOL E NEM LUZ DELE 
-        if (currentSun == INVALID_ENTITY) return 0;
-
+        if (currentSun == INVALID_ENTITY) return 0; 
         shader->use();
         shader->setFloat("far_plane", 7.5f);     //shader->setFloat("far_plane", light.range);
         auto& light = GEngine->scene->GetComponent<LightComponent>(currentSun);
         auto& transform = GEngine->scene->GetComponent<Transform>(currentSun);
           
-        std::string prefix = "light";   
-        
-        shader->setVec3(prefix + ".position", transform.position);  //ERADO TEM Q SER DIREÇAO
-
+        std::string prefix = "light";    
+        shader->setVec3(prefix + ".position", transform.position);  //ERADO TEM Q SER DIREÇAO 
         //shader->setVec3(prefix + ".color", light.color * light.intensity);
         shader->setVec3(prefix + ".color", light.color);
         shader->setInt(prefix + ".type", static_cast<int>(light.type)); 
@@ -133,12 +132,25 @@ public:
         shader->setMat4(prefix + ".lightMatrix", light.lightSpaceMatrix); 
         //shader->setInt(prefix + ".indexMap", light.depthMap); 
 
-        shader->setInt("shadowMapSun", 4); // começa depois das 2D   
-        glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, light.depthMap);     //light.depthMap 
-
+        //shader->setInt("shadowMapSun", 4); // começa depois das 2D   
+        //glActiveTexture(GL_TEXTURE4);
+        //glBindTexture(GL_TEXTURE_2D, light.depthMap);     //light.depthMap  
         //light.textureIndex = textureUnit; // <- sincroniza o índice
         //shader.setInt("shadows", shadows); // enable/disable shadows by pressing 'SPACE'
+
+
+        //UBO
+        shader->setMat4("view", GEngine->mainCamera->GetViewMatrix());
+        for (size_t i = 0; i < shadowCascadeLevels.size(); i++) {
+            shader->setFloat("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+            //shader->setMat4("lightSpaceMatrices[" + std::to_string(i) + "]", lightSpaceMatrices[i]);
+        }
+        shader->setInt("cascadeCount", (int)shadowCascadeLevels.size()); // 4
+         
+        shader->setInt("cascadeShadowMap", 5);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, cascadeDepthMapArray);
+
         return 1;
     }
 
