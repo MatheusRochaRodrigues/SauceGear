@@ -181,7 +181,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ECS\Reflection\Meta.h" />
-    <ClInclude Include="ECS\Systems\DayNightSystem.h" />
     <ClInclude Include="Editor\Drawers\CameraDrawer.h" />
     <ClInclude Include="Editor\Icons\MaterialIcons.h" />
     <ClInclude Include="Editor\Utils\InspectorDrawer.h" />

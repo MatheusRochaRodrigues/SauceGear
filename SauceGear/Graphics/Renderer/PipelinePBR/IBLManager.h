@@ -13,6 +13,20 @@ struct IBLSet {
     bool   valid() const { return envCubemap && irradiance && prefilter && brdfLUT; }
 
     GLuint debugFace = 0;
+
+    bool valid() const {
+        return envCubemap && irradiance && prefilter && brdfLUT;
+    }
+
+    void destroy() {
+        if (envCubemap) glDeleteTextures(1, &envCubemap);
+        if (irradiance) glDeleteTextures(1, &irradiance);
+        if (prefilter)  glDeleteTextures(1, &prefilter);
+        if (brdfLUT)    glDeleteTextures(1, &brdfLUT);
+        if (debugFace)  glDeleteTextures(1, &debugFace);
+
+        envCubemap = irradiance = prefilter = brdfLUT = debugFace = 0;
+    }
 };
 
 class Shader;

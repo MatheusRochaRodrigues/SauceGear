@@ -1,11 +1,10 @@
-// === DayNightSystem.h ===
 #pragma once
 #include "../System.h"
 #include "../Scene/SceneECS.h"
 #include "../Core/EngineContext.h"
 #include "../Components/Transform.h" 
-#include "../Graphics/Renderer/PipelinePBR/PBRRenderer.h" 
-#include "../Graphics/Renderer/PipelinePBR/IBLManager.h"
+#include "../../Graphics/Renderer/PipelinePBR/PBRRenderer.h" 
+#include "../../Graphics/Renderer/PipelinePBR/IBLManager.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp> // para glm::pi etc
@@ -22,15 +21,7 @@ struct DayNightCycle {
     float speed = 0.05f;       // Velocidade do ciclo
     LightComponent sun;           //DirectionalLight
 
-    std::pair<string, IBLSet> dayHDR   = { "Resources/Textures/hdr/tst/Kloppenheim (1).hdr",    {} };   // HDR para o dia            HDRCubemap*
-    std::pair<string, IBLSet> dawnHDR  = { "Resources/Textures/hdr/spruit_sunrise_4k.hdr",      {} };   // HDR para o dia            HDRCubemap*
-    std::pair<string, IBLSet> nightHDR = { "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };   // HDR para a noite
-    IBLSet currentEnvMap; // Interpolação atual
-    float exposure = 1.0f;     // Exposição HDR adaptativa
-};
 
-class DayNightSystem : public System {
-public:
     float timeOfDay = 12.0f; // 0-24h
     float daySpeed = 0.1f;   // horas por segundo (controla velocidade do ciclo)
 
@@ -45,19 +36,31 @@ public:
     glm::vec3 dawnColor = { 0.9f, 0.5f, 0.3f };
     glm::vec3 dayColor = { 1.0f, 1.0f, 0.95f };
     glm::vec3 duskColor = { 0.9f, 0.4f, 0.2f };
-     
+
+
+    std::pair<string, IBLSet> dayHDR   = { "Resources/Textures/hdr/tst/Kloppenheim (1).hdr",    {} };   // HDR para o dia            HDRCubemap*
+    std::pair<string, IBLSet> dawnHDR  = { "Resources/Textures/hdr/spruit_sunrise_4k.hdr",      {} };   // HDR para o dia            HDRCubemap*
+    std::pair<string, IBLSet> nightHDR = { "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };   // HDR para a noite
+    IBLSet currentEnvMap; // Interpolação atual
+    float exposure = 1.0f;     // Exposição HDR adaptativa
+};
+
+class DayNightSystem : public System {
+public:
+    static inline DayNightCycle cicle;
+
     void prepareIBL(IBLSet ibl, string path){ 
-        auto& shaders = &PBRPipeline::shaders;
+        //faça a geraçao ibl para cada map sempre q for chamado, imcompleto ainda
+        auto shaders = PBRPipeline::shaders;
         ibl = IBLManager::EnsureIBL(path, cacheDir,
             shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf,
             iblFBO, iblRBO);
     }
 
-    DayNightSystem() {
-
-        IBLSet dayHDR = { "Resources/Textures/hdr/tst/Kloppenheim (1).hdr",    {} };   // HDR para o dia            HDRCubemap*
-        IBLSet dawnHDR = { "Resources/Textures/hdr/spruit_sunrise_4k.hdr",      {} };   // HDR para o dia            HDRCubemap*
-        IBLSet nightHDR = { "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };   // HDR para a noite 
+    DayNightSystem() { 
+        prepareIBL(cicle.dayHDR.second,   cicle.dayHDR.first);
+        prepareIBL(cicle.dawnHDR.second,  cicle.dawnHDR.first);
+        prepareIBL(cicle.nightHDR.second, cicle.nightHDR.first);
     }
 
     void Update(float dt) override {
@@ -145,50 +148,43 @@ private:
     }
       
     //Se não houver grandes mudanças, pode atualizar a cada N frames
-    Cubemap LerpCubemap(const Cubemap& night, const Cubemap& day, float t) {
-        Cubemap result;
-        result.width = day.width;
-        result.height = day.height;
-        result.mipLevels = day.mipLevels;
-        result.format = day.format;
+    void ComputeLerpCubemap(const Cubemap& prev, const Cubemap& next, float t, Cubemap& out) {
+        // Bind shader
+        lerpCubemapShader.Use();
+        lerpCubemapShader.SetFloat("lerpFactor", t);
 
-        glGenTextures(1, &result.id);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, result.id);
+        glBindImageTexture(2, out.id, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 
-        for (int mip = 0; mip < day.mipLevels; ++mip) {
-            int mipWidth = day.width >> mip;
-            int mipHeight = day.height >> mip;
+        int mipCount = prev.mipLevels;
+        for (int mip = 0; mip < mipCount; ++mip) {
+            lerpCubemapShader.SetInt("mipLevel", mip);
 
-            for (int face = 0; face < 6; ++face) {
-                // Obter dados dos cubemaps de dia e noite
-                std::vector<float> dataDay(mipWidth * mipHeight * 3);
-                std::vector<float> dataNight(mipWidth * mipHeight * 3);
-                day.GetFaceData(face, mip, dataDay.data());         //deve retornar os pixels RGB float do cubemap filtrado
-                night.GetFaceData(face, mip, dataNight.data());
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, prev.id);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, next.id);
 
-                // Interpolação pixel a pixel
-                std::vector<float> dataLerp(dataDay.size());
-                for (size_t i = 0; i < dataDay.size(); ++i)
-                    dataLerp[i] = glm::mix(dataNight[i], dataDay[i], t);
+            // Dispatch: cubemap é normalmente quadrado
+            int size = prev.width >> mip;
+            int groups = (size + 7) / 8; // local_size = 8
+            glDispatchCompute(groups, groups, 6);
 
-                // Upload do mip interpolado
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip,
-                    GL_RGB16F, mipWidth, mipHeight, 0, GL_RGB, GL_FLOAT, dataLerp.data());
-            }
+            glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         }
-
-        // Configurações padrão
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-        return result;
     }
-
      
     std::string cacheDir = "Resources/Cache/IBL";
+
+
+    //Orientações
+    //UpdateDayNightWithDawnDusk(dayNight, deltaTime);
+
+    //// O compute shader já faz interpolações suaves
+    //// Só bindar os resultados nos shaders PBR
+    //shader.SetFloat("exposure", dayNight.exposure);
+    //BindCubemap("irradianceMap", dayNight.currentIrradiance);
+    //BindCubemap("prefilterMap", dayNight.currentPrefilter);
+    //BindCubemap("skyboxMap", dayNight.currentSkybox);
 };
 
 
@@ -356,3 +352,51 @@ void UpdateDayNightWithDawnDusk(DayNightCycle& cycle, float deltaTime) {
     ComputeLerpCubemap(*prevPref, *nextPref, t, cycle.currentPrefilter);
 }
 */
+
+
+
+
+
+
+//para texture 2d e rodado por face
+//Cubemap LerpCubemap(const Cubemap& night, const Cubemap& day, float t) {
+//    Cubemap result;
+//    result.width = day.width;
+//    result.height = day.height;
+//    result.mipLevels = day.mipLevels;
+//    result.format = day.format;
+//
+//    glGenTextures(1, &result.id);
+//    glBindTexture(GL_TEXTURE_CUBE_MAP, result.id);
+//
+//    for (int mip = 0; mip < day.mipLevels; ++mip) {
+//        int mipWidth = day.width >> mip;
+//        int mipHeight = day.height >> mip;
+//
+//        for (int face = 0; face < 6; ++face) {
+//            // Obter dados dos cubemaps de dia e noite
+//            std::vector<float> dataDay(mipWidth * mipHeight * 3);
+//            std::vector<float> dataNight(mipWidth * mipHeight * 3);
+//            day.GetFaceData(face, mip, dataDay.data());         //deve retornar os pixels RGB float do cubemap filtrado
+//            night.GetFaceData(face, mip, dataNight.data());
+//
+//            // Interpolação pixel a pixel
+//            std::vector<float> dataLerp(dataDay.size());
+//            for (size_t i = 0; i < dataDay.size(); ++i)
+//                dataLerp[i] = glm::mix(dataNight[i], dataDay[i], t);
+//
+//            // Upload do mip interpolado
+//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip,
+//                GL_RGB16F, mipWidth, mipHeight, 0, GL_RGB, GL_FLOAT, dataLerp.data());
+//        }
+//    }
+//
+//    // Configurações padrão
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//
+//    return result;
+//}
