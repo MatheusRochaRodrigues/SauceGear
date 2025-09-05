@@ -1,19 +1,122 @@
-#pragma once
+﻿#pragma once
 #include "IPanel.h"
 #include "../ECS/Components/ComponentsHelper.h" 
 #include "../Graphics/Renderer.h"  
+#include "../../Scene/SceneBuilder.h"  
+#include "../../Core/KeyCodes.h"  
 
-struct HierarchyPanel : IPanel {
+struct HierarchyPanel : IPanel {  
+    void ShowAddMenu(Material* defaultMaterial) {
+        static char meshToSpawn[32] = "";     // Tipo selecionado para configuração
+        static bool showConfigWindow = false; // Janela de parâmetros
+
+        ImVec2 mousePos = ImGui::GetMousePos();
+
+        // Shift + A
+        if (ImGui::IsKeyDown(ImGuiKey_LeftShift) && ImGui::IsKeyPressed(ImGuiKey_A, true)) {
+            ImGui::OpenPopup("AddObjectMenu");
+            ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
+        }
+
+        // Clique direito sobre a Hierarchy (ou qualquer janela)
+        // Detecta clique direito sobre a Hierarchy
+        //if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+            ImGui::OpenPopup("AddObjectMenu");
+            ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
+        }
+
+        // Clique direito sobre a Hierarchy
+        //if (ImGui::BeginPopupContextWindow("HierarchyContext", ImGuiPopupFlags_MouseButtonRight)) {
+        //    if (ImGui::MenuItem("Add Object")) {
+        //        ImGui::CloseCurrentPopup();        // Fecha o menu do clique direito
+        //        ImGui::OpenPopup("AddObjectMenu"); // Marca o outro popup como aberto
+        //        ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
+        //    }
+        //    //ImGui::EndPopup();
+        //}
+
+        // Menu principal
+        if (ImGui::BeginPopup("AddObjectMenu", ImGuiWindowFlags_AlwaysAutoResize)) {
+
+            if (ImGui::BeginMenu("Mesh")) {
+
+                // Cube spawn direto
+                if (ImGui::MenuItem("Cube")) {
+                    SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(defaultMaterial));
+                    ImGui::CloseCurrentPopup();
+                }
+
+                // Sphere → abre janela de configuração
+                if (ImGui::MenuItem("Sphere")) {
+                    strcpy_s(meshToSpawn, sizeof(meshToSpawn), "Sphere");
+                    showConfigWindow = true;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                // Cylinder → abre janela de configuração
+                if (ImGui::MenuItem("Cylinder")) {
+                    strcpy_s(meshToSpawn, sizeof(meshToSpawn), "Cylinder"); 
+                    showConfigWindow = true;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndPopup();
+        }
+
+        // Janela de configuração para Sphere / Cylinder
+        if (showConfigWindow) {
+            ImGui::Begin("Object Settings", &showConfigWindow, ImGuiWindowFlags_AlwaysAutoResize);
+
+            if (strcmp(meshToSpawn, "Sphere") == 0) {
+                static int segments = 16;
+                static int rings = 16;
+                static float radius = 1.0f;
+
+                ImGui::InputInt("Segments", &segments);
+                ImGui::InputInt("Rings", &rings);
+                ImGui::InputFloat("Radius", &radius);
+
+                if (ImGui::Button("Spawn Sphere")) {
+                    SceneBuilder::CreateModel(PrimitiveMesh::CreateSphere(defaultMaterial, segments, rings, radius));
+                    showConfigWindow = false;
+                }
+            }
+            else if (strcmp(meshToSpawn, "Cylinder") == 0) {
+                static int segments = 16;
+                static float height = 2.0f;
+                static float radius = 1.0f;
+                static bool capped = true;
+
+                ImGui::InputInt("Segments", &segments);
+                ImGui::InputFloat("Height", &height);
+                ImGui::InputFloat("Radius", &radius);
+                ImGui::Checkbox("Capped", &capped);
+
+                if (ImGui::Button("Spawn Cylinder")) {
+                    SceneBuilder::CreateModel(PrimitiveMesh::CreateCylinder(defaultMaterial, segments, height, radius, capped));
+                    showConfigWindow = false;
+                }
+            }
+
+            ImGui::End();
+        }
+    }
+
+
+
     void Draw(SceneECS& scene) override { 
         ImGui::Begin("Hierarchy");
-        //for (auto entity : scene.GetAllEntities()) {
-            //if (ImGui::Selectable(entity.GetName().c_str(), entity == scene.GetSelectedEntity())) {
-            /*if (ImGui::Selectable("entity", entity == scene.GetSelectedEntity())) {
-                scene.SelectEntity(entity);
-            }*/
+         
+        ShowAddMenu(nullptr);
+
+        //DrawHierarchyPopup("currentDirectory");
 
         for (Entity entity : scene.GetAllEntities()) {
-            // S� renderiza se n�o tiver pai (ou seja, � um n� raiz da hierarquia)
+            // Só renderiza se nao tiver pai (ou seja, é um nó raiz da hierarquia)
             if (scene.HasComponent<HierarchyComponent>(entity)) {
                 const auto& hierarchy = scene.GetComponent<HierarchyComponent>(entity);
                 if (hierarchy.parent == INVALID_ENTITY) {
@@ -21,7 +124,7 @@ struct HierarchyPanel : IPanel {
                 }
             }
             else {
-                // Entidades sem HierarchyComponent s�o tratadas como raiz tamb�m
+                // Entidades sem HierarchyComponent sao tratadas como raiz também
                 DrawEntityNode(scene, entity);
             }
         } 
@@ -65,9 +168,10 @@ private:
         }
 
         if (!hasChildren)
-            ImGui::TreePop(); // necess�rio para manter o estado correto se n�o tiver filhos
+            ImGui::TreePop(); // necessário para manter o estado correto se não tiver filhos
     }
 
      
 };
 
+  

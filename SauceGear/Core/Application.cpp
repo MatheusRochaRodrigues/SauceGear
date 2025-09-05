@@ -17,10 +17,10 @@ int Application::Init() {
      
 
     //GBuffer
-    GEngine->renderer->GetGBufferShader = new Shader("DeferredShading/gBuffer.vs", "DeferredShading/gBuffer.fs");;
+    GEngine->renderer->GetGBufferShader = new Shader("DeferredShading/gBuffer.vs", "DeferredShading/gBuffer.fs");
     //Lighting pos GBuffer
-    GEngine->renderer->GetLightingShader = new Shader("DeferredShading/DeferredShading.vs", "DeferredShading/DeferredShading.fs");;
-    GEngine->renderer->GetSunLightingShader = new Shader("DeferredShading/DeferredShadingSun.vs", "DeferredShading/DeferredShadingSun.fs");;
+    GEngine->renderer->GetLightingShader = new Shader("DeferredShading/DeferredShading.vs", "DeferredShading/DeferredShading.fs");
+    GEngine->renderer->GetSunLightingShader = new Shader("DeferredShading/DeferredShadingSun.vs", "DeferredShading/DeferredShadingSun.fs");
 
 
     // Começa com Blinn-Phong

@@ -1,4 +1,4 @@
-#include "ImGuiLayer.h"
+Ôªø#include "ImGuiLayer.h"
 #include "../Core/EngineContext.h"  
 #include "../Graphics/Renderer.h" 
  
@@ -7,12 +7,31 @@ void ImGuiLayer::Init(GLFWwindow* window) {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.IniFilename = "GearSauce.init"; // N„o salva nem carrega layouts em arquivo
+    io.IniFilename = "GearSauce.init"; // N√£o salva nem carrega layouts em arquivo
 
     ImGuiStyle& style = ImGui::GetStyle();
-    ImVec4* colors = style.Colors; 
-    //io.Fonts->AddFontFromFileTTF("fa-solid-900.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesDefault()); 
-    
+    ImVec4* colors = style.Colors;
+    // Fonte normal
+    //io.Fonts->AddFontFromFileTTF("Assets/Fonts/ProggyTiny.ttf", 14.5f);
+    //io.Fonts->AddFontFromFileTTF("fa-solid-900.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesDefault());  
+ 
+    // Carregar fonte padr√£o (ex: Roboto, Arial, etc.)
+    io.Fonts->AddFontFromFileTTF("Assets/Fonts/SF_Cartoonist_Hand_Bold.ttf", 19.5);
+     
+    // Intervalo da Private Use Area da Material Icons          Range dos √≠cones (Material Icons ficam nesse bloco Unicode)
+    static const ImWchar icons_ranges[] = { ICON_MIN_MI, ICON_MAX_MI, 0 };
+
+    // Config pra mesclar com a fonte padr√£o
+    ImFontConfig config;
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+
+    // Carregar Material Icons
+    io.Fonts->AddFontFromFileTTF("Assets/Fonts/MaterialIcons-Regular.ttf", 18.0f, &config, icons_ranges);
+
+    //ImGui::GetStyle().ScaleAllSizes(1.5f); // aumenta o tamanho global
+
+
     //style.FrameRounding = 0.0f;
     //style.WindowRounding = 0.0f; 
     // 
@@ -32,7 +51,7 @@ void ImGuiLayer::Init(GLFWwindow* window) {
 
     ImGui::StyleColorsDark(); // Ou Light()
 
-    //// Para m˙ltiplas janelas
+    //// Para m√∫ltiplas janelas
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Para arrastar para fora da janela
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         style.WindowRounding = 0.0f;
@@ -58,7 +77,7 @@ void ImGuiLayer::Init(GLFWwindow* window) {
 
     ImGui::GetStyle().FramePadding = ImVec2(5, 5);   // Ajuste do padding do frame 
     ImVec4 dockingPreviewColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);  // Cor verde para o preview de docking
-    ImVec4 dockingEmptyBgColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);  // Cor verde para ·rea de docking vazia
+    ImVec4 dockingEmptyBgColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);  // Cor verde para √°rea de docking vazia
 
     ImGui::GetStyle().Colors[ImGuiCol_DockingPreview] = dockingPreviewColor;
     ImGui::GetStyle().Colors[ImGuiCol_DockingEmptyBg] = dockingEmptyBgColor;
@@ -83,7 +102,7 @@ void ImGuiLayer::RegisterPanels() {
 }
 
 void ImGuiLayer::RenderIPanels(Scene& scene) {
-    // Chamar painÈis registrados
+    // Chamar pain√©is registrados
     for (auto& panel : RegisteredPanels)
         panel->Draw(scene);
 }
@@ -158,19 +177,19 @@ void ImGuiLayer::ShowTopBar() {
     ImGui::Begin("TopBar", nullptr, flags);
 
     // --- LOGO ---
-    static ImTextureID logoTex = guiLoadTexture("assets/icons/IlustraÁ„o2.png");
+    static ImTextureID logoTex = guiLoadTexture("assets/icons/Ilustra√ß√£o2.png");
     if (logoTex)
         ImGui::Image(logoTex, ImVec2(topBarHeight - 12, topBarHeight - 12), ImVec2(0, 1), ImVec2(1, 0));
     else ImGui::TextUnformatted("L");
 
-    // --- TÕTULO CENTRAL ---
+    // --- T√çTULO CENTRAL ---
     const char* title = "Gear Sauce";
     ImVec2 textSize = ImGui::CalcTextSize(title);
     float titleX = (io.DisplaySize.x - textSize.x) * 0.5f;  //centraliza o texto horizontalmente.    //Calula largura do texto e coloca o cursor de texto no X centralizado
     ImGui::SetCursorPos(ImVec2(titleX, 6.0f));
     ImGui::TextUnformatted(title);
 
-    // --- MENUS E BOT’ES ---
+    // --- MENUS E BOT√ïES ---
     /*ImGui::SetCursorPos(ImVec2(io.DisplaySize.x - 200, 6.0f));
     if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Save Layout")) ImGui::SaveIniSettingsToDisk("layout.ini");
@@ -179,7 +198,7 @@ void ImGuiLayer::ShowTopBar() {
     }
     ImGui::SameLine();*/
 
-    // Botıes janela
+    // Bot√µes janela
     ImGui::SetCursorPos(ImVec2(io.DisplaySize.x - (buttonSize * 3 + 25), 6.0f));
     if (ImGui::Button("_", ImVec2(buttonSize, buttonSize)))
         glfwIconifyWindow(m_Window);

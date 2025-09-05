@@ -1,10 +1,9 @@
 #pragma once
-#include "IPanel.h"
-#include "../ECS/Components/ComponentsHelper.h" 
-#include "../Graphics/Renderer.h"  
-
 #include <filesystem>
-#include "Load.h"
+#include "popup.h"
+#include "../../ECS/Components/ComponentsHelper.h" 
+#include "../../Graphics/Renderer.h"   
+#include "../Load.h"
 
 
 struct FileExplorerPanel : IPanel {
@@ -17,27 +16,27 @@ struct FileExplorerPanel : IPanel {
     FileExplorerPanel() {
         stbi_set_flip_vertically_on_load(false);
         FolderIcon = guiLoadTexture("assets/icons/FolderIcon.png");
-        FileIcon = guiLoadTexture("assets/icons/FileIcon.png");
-        ImageIcon = guiLoadTexture("assets/icons/ImageIcon.png");
-        CodeIcon = guiLoadTexture("assets/icons/CodeIcon.png");
+        FileIcon   = guiLoadTexture("assets/icons/FileIcon.png");
+        ImageIcon  = guiLoadTexture("assets/icons/ImageIcon.png");
+        CodeIcon   = guiLoadTexture("assets/icons/CodeIcon.png");
 
     }
 
-    ViewMode currentMode = ViewMode::Hierarchy;
+    ViewMode currentMode = ViewMode::HierarchyIcons;
 
     void Draw(SceneECS& scene) override {
-        ImGui::Begin("File Explorer");
+        ImGui::Begin("File Explorer"); 
 
-        if (ImGui::Button("Modo Padrao")) {
+        if (ImGui::Button(ICON_MD_HOME)) {
             currentMode = ViewMode::HierarchyIcons;
         }
         ImGui::SameLine();
-        if (ImGui::Button("Modo Icones")) {
+        if (ImGui::Button(ICON_MD_INFO)) {
             currentMode = ViewMode::Icons;
         }
         ImGui::SameLine();
         // Seleção do modo de visualização
-        if (ImGui::Button("Modo Hierarquia")) {
+        if (ImGui::Button(ICON_MD_BUILD)) {
             currentMode = ViewMode::Hierarchy;
         }
 
@@ -143,7 +142,10 @@ private:
 
         // Começa o painel direito para os ícones com o restante da largura disponível
         float rightPanelWidth = availableWidth - leftPanelWidth;
-        ImGui::BeginChild("RightPanel", ImVec2(rightPanelWidth, 0), false);  // O painel direito ocupa o restante do espaço
+        ImGui::BeginChild("RightPanel", ImVec2(rightPanelWidth, 0), false);  // O painel direito ocupa o restante do espaço 
+
+        DrawFilePopup(currentDirectory);
+
         DrawIconsMode();  // Desenha os ícones de arquivos
         ImGui::EndChild();
 
@@ -175,7 +177,8 @@ private:
 
         // Definindo o layout da coluna
         ImGui::Columns(columns, nullptr, false);  // Desabilita a borda, 5 colunas
-         
+
+        static std::filesystem::path selectedItem;
         for (auto& entry : std::filesystem::directory_iterator(currentDirectory)) {     //"Assets"
             ImGui::PushID(entry.path().filename().string().c_str());
 
@@ -212,6 +215,10 @@ private:
                     }
                 }
             }
+
+            // Guardar path pra usar no popup
+            selectedItem = entry.path();
+            DrawFileItemPopup(selectedItem);
 
             // Exibe o nome do arquivo abaixo do ícone
             ImGui::Text("%s", entry.path().filename().string().c_str());

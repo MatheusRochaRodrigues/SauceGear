@@ -90,7 +90,7 @@
     <ClCompile Include="Editor\Panels\HierarchyPanel.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Editor\Panels\FileExplorerPanel.h">
+    <ClCompile Include="Editor\Panels\FileExplorer\FileExplorerPanel.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Editor\Panels\InspectorPanel.h">
@@ -157,6 +157,9 @@
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\ShaderPreprocessor.h">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Panels\FileExplorer\popup.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -473,6 +476,12 @@
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Editor\Icons\MaterialIcons.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\DayNightSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
@@ -561,7 +570,11 @@
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.fs" />
     <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />
+    <None Include="Resources\Shaders\Utils\PBR.glsl" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
+    <None Include="Resources\Shaders\Utils\Shadows.glsl" />
+    <None Include="Resources\Shaders\Compute\LerpCubemap.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />
@@ -571,5 +584,10 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />
+    <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />
+    <Font Include="Assets\Fonts\ProggyTiny.ttf" />
   </ItemGroup>
 </Project>

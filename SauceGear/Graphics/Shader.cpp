@@ -1,7 +1,8 @@
 #include"Shader.h"
 
 // Constructor that build the Shader Program from 2 different shaders
-Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines)
+Shader::Shader(const char* vertexFile, const char* fragmentFile, 
+	const std::vector<std::pair<std::string, int>>& defines, bool debug)
 {
 	this->vertexFile = vertexFile;
 	this->geometryFile = NULL;
@@ -16,11 +17,11 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vect
 		fragmentFile = fPath.c_str();
 
 		// Read vertexFile and fragmentFile and store the strings 
-		//std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines);
-		//std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines); 
+		std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines, debug);
+		std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines, debug);
 
-		std::string vertexCode = ShaderPreprocessor::get_file_contents(vertexFile);
-		std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
+		//std::string vertexCode = ShaderPreprocessor::get_file_contents(vertexFile);
+		//std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
 
 
 		// Convert the shader source strings into character arrays
@@ -65,7 +66,8 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile, const std::vect
 }
 
 // Constructor that build the Shader Program from 2 different shaders
-Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines)
+Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, 
+	const std::vector<std::pair<std::string, int>>& defines, bool debug)
 {
 	this->vertexFile   = vertexFile;
 	this->geometryFile = geometryFile;
@@ -82,15 +84,15 @@ Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fra
 		fragmentFile = fPath.c_str();
 
 		// Read vertexFile and fragmentFile and store the strings 
-		/*
-		std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines);
-		std::string geometryCode = ShaderPreprocessor::ProcessFile(geometryFile, defines);
-		std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines);
-		*/
+		
+		std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines, debug);
+		std::string geometryCode = ShaderPreprocessor::ProcessFile(geometryFile, defines, debug);
+		std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines, debug);
+		
 
-		std::string vertexCode =   ShaderPreprocessor::get_file_contents(vertexFile);
-		std::string geometryCode = ShaderPreprocessor::get_file_contents(geometryFile);
-		std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
+		//std::string vertexCode =   ShaderPreprocessor::get_file_contents(vertexFile);
+		//std::string geometryCode = ShaderPreprocessor::get_file_contents(geometryFile);
+		//std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
 
 		// Convert the shader source strings into character arrays
 		const char* vertexSource   = vertexCode.c_str();

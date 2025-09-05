@@ -22,8 +22,7 @@ uniform sampler2D shadowMaps[MAX_LIGHTS];  // Mapas de sombra direcionais
 uniform samplerCube pointShadows[MAX_LIGHTS];  // Mapas de sombra ponto
 
 uniform vec3 viewPos;
-uniform float far_plane;
-
+uniform float far_plane; 
 
 flat in int instanceID;
 out vec4 FragColor;

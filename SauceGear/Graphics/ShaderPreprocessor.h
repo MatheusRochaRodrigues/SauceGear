@@ -1,40 +1,38 @@
 #pragma once
 #include <string>
 #include <filesystem>
-#include <regex> 
+#include <regex>
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <cerrno>
 #include <vector>
-#include <unordered_map> 
-#include <stdexcept> 
+#include <unordered_map>
+#include <stdexcept>
 
 class ShaderPreprocessor {
 public:
-    static std::string get_file_contents(const char* filename)
-    {
-        std::ifstream in(filename, std::ios::binary);
-        if (!in)
-            throw std::runtime_error(std::string("\n<Error> To open archive Shader : ") + filename);
-        //throw(errno);
-
-        std::string contents;
-        in.seekg(0, std::ios::end);
-        contents.resize(in.tellg());
-        in.seekg(0, std::ios::beg);
-        in.read(&contents[0], contents.size());
-        in.close();
-        return contents;
+    // Função de debug para salvar shader processado em arquivo .txt
+    inline static void SaveShaderDebug(const std::string& shaderCode, const std::filesystem::path& outputPath) {
+        std::ofstream outFile(outputPath);
+        if (!outFile.is_open()) {
+            std::cerr << "Falha ao salvar shader de debug em: " << outputPath << std::endl;
+            return;
+        }
+        outFile << shaderCode;
+        outFile.close();
+        std::cout << "Shader debug salvo em: " << outputPath << std::endl;
     }
 
     // Expande includes e injeta defines
     inline static std::string ProcessFile(const std::filesystem::path& filePath,
-        const std::vector<std::pair<std::string, int>>& defines)
+        const std::vector<std::pair<std::string, int>>& defines, bool debug)
     {
+        includeCounter = 1; // reset contador por chamada
         std::string source = ReadFile(filePath);
         source = ProcessSource(source, filePath.parent_path(), 0, defines);
         source = UpdateDefine(source, defines);
+
+        if(debug) SaveShaderDebug(source, "ShaderDebug.txt");
         return source;
     }
 
@@ -43,13 +41,13 @@ public:
     }
 
 private:
-    inline static const std::filesystem::path GLOBAL_SHADER_DIR = "resources/shaders/utils/";
+    inline static const std::filesystem::path GLOBAL_SHADER_DIR = "Resources/Shaders/Utils/";
     inline static std::unordered_map<std::string, std::string> includeCache;
+    inline static int includeCounter = 1; // contador de arquivos para #line
 
     // Lê um arquivo e retorna string, com cache
     inline static std::string ReadFile(const std::filesystem::path& path) {
         std::string key = std::filesystem::absolute(path).string();
-
         auto it = includeCache.find(key);
         if (it != includeCache.end()) return it->second;
 
@@ -76,12 +74,12 @@ private:
         if (isGlobal) {
             includePath = GLOBAL_SHADER_DIR / includeFile;
             if (!std::filesystem::exists(includePath))
-                throw std::runtime_error("Include global <" + includeFile + "> não encontrado em " + GLOBAL_SHADER_DIR.string());
+                throw std::runtime_error("\nInclude global <" + includeFile + "> não encontrado em " + GLOBAL_SHADER_DIR.string());
         }
         else {
             includePath = baseDir / includeFile;
             if (!std::filesystem::exists(includePath))
-                throw std::runtime_error("Include relativo \"" + includeFile + "\" não encontrado relativo a " + baseDir.string());
+                throw std::runtime_error("\nInclude relativo \"" + includeFile + "\" não encontrado relativo a " + baseDir.string());
         }
         return ReadFile(includePath);
     }
@@ -93,11 +91,10 @@ private:
         const std::vector<std::pair<std::string, int>>& defines)
     {
         if (depth > 32)
-            throw std::runtime_error("Include recursivo muito profundo (>32)");
+            throw std::runtime_error("\nInclude recursivo muito profundo (>32)");
 
         std::stringstream output;
         std::regex includeRegex(R"(#include\s*([<"])([^">]+)[">])");
-
         std::istringstream iss(source);
         std::string line;
         int lineNumber = 1;
@@ -107,13 +104,15 @@ private:
             if (std::regex_search(line, match, includeRegex)) {
                 bool isGlobal = (match[1] == "<");
                 std::string includeFile = match[2];
-
                 std::string includeSource = LoadInclude(includeFile, baseDir, isGlobal);
 
-                // #line para erros do compilador
-                output << "#line 1 \"" << includeFile << "\"\n";
+                // ID único para cada arquivo incluído
+                int fileID = includeCounter++;
+
+                // GLSL não aceita aspas no #line
+                output << "#line 1 " << fileID << "\n";
                 output << ProcessSource(includeSource, isGlobal ? GLOBAL_SHADER_DIR : baseDir, depth + 1, defines);
-                output << "#line " << (lineNumber + 1) << " \"" << baseDir.filename().string() << "\"\n";
+                output << "#line " << (lineNumber + 1) << " 0\n"; // volta ao arquivo original, 0 = arquivo principal
             }
             else {
                 output << line << "\n";
@@ -141,22 +140,3 @@ private:
         return code;
     }
 };
-
-
-
-
-
-/*
-//Legacy
-// Read vertexFile and fragmentFile and store the strings
-
-vertexFile = vPath.c_str();
-fragmentFile = fPath.c_str();
-try {
-	std::string vertexCode = get_file_contents(vertexFile);
-	std::string fragmentCode = get_file_contents(fragmentFile);
-
-std::string get_file_contents(const char* filename);
-// Reads a text file and outputs a string with everything in the text file
-
-*/

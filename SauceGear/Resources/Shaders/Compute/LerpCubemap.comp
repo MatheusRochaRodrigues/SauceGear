@@ -1,0 +1,30 @@
+#version 430
+
+//layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout (local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
+
+layout (binding = 0) uniform samplerCube prevCube; // HDR anterior
+layout (binding = 1) uniform samplerCube nextCube; // HDR seguinte
+layout (binding = 2, rgba16f) uniform imageCube outCube; // Cubemap de saída
+
+uniform float lerpFactor;   // 0.0 -> prevCube, 1.0 -> nextCube
+uniform int mipLevel;       // Nível do mipmap
+
+void main() {
+    uvec3 gid = gl_GlobalInvocationID; // índice 3D
+
+    ivec2 texSize = textureSize(prevCube, mipLevel).xy;
+    if(gid.x >= uint(texSize.x) || gid.y >= uint(texSize.y)) return;
+
+    // Para cada face do cubemap (0-5)
+    for(int face = 0; face < 6; ++face) {
+        vec2 uv = (vec2(gid.xy) + 0.5) / vec2(texSize);
+
+        vec3 colorPrev = textureLod(prevCube, vec3(uv, 0.0), float(mipLevel)).rgb;
+        vec3 colorNext = textureLod(nextCube, vec3(uv, 0.0), float(mipLevel)).rgb;
+
+        vec3 lerpedColor = mix(colorPrev, colorNext, lerpFactor);
+
+        imageStore(outCube, ivec3(gid.xy, face), vec4(lerpedColor, 1.0));
+    }
+}

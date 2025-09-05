@@ -1,6 +1,9 @@
 #version 440 core
+
+#include <PBR.glsl>
+#include <Shadows.glsl>
+
 #define MAX_LIGHTS 16
-#define MAX_CASCADES 16
 
 in vec2 TexCoords;
 
@@ -15,17 +18,7 @@ struct Light {
     mat4  lightMatrix; 
     int   indexMap;
 }; 
-uniform Light light;  
-
-// Cascaded shadows
-layout(std140, binding = 2) uniform LightSpaceMatrices {
-    mat4 lightSpaceMatrices[MAX_CASCADES];
-};
-uniform sampler2DArray cascadeShadowMap;
-uniform float cascadePlaneDistances[MAX_CASCADES];
-uniform int cascadeCount;
-
-uniform mat4 view;
+uniform Light light;   
 
 // G-Buffer
 uniform sampler2D gPosition;
@@ -35,107 +28,10 @@ uniform sampler2D gMRA;
 
 uniform vec3 viewPos;
 
-out vec4 FragColor;
-
-const float PI = 3.14159265359;
-
-// ==== PBR helpers (sem alteração) ====
-// ----------------------------------------------------------------------------
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a = roughness*roughness;
-    float a2 = a*a;
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH*NdotH;
-
-    float nom   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-
-    return nom / denom;
-}
-// ----------------------------------------------------------------------------
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float nom   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-// ----------------------------------------------------------------------------
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-
-    return ggx1 * ggx2;
-}
-// ----------------------------------------------------------------------------
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-} 
+out vec4 FragColor; 
 
 
-// ==== Seleção do cascade pelo depth em view space ====
-int GetCascadeIndex(vec3 worldPos) {
-    vec4 viewPos4 = view * vec4(worldPos, 1.0);
-    float depth = abs(viewPos4.z);
-    for (int i = 0; i < cascadeCount; ++i) {
-        if (depth < cascadePlaneDistances[i])
-            return i;
-    }
-    return cascadeCount - 1;
-}
 
-// ==== Shadow calculation com cascades ====
-float ShadowCalculationCascade(vec3 WorldPos, vec3 Normal, vec3 lightDir) {
-    int layer = GetCascadeIndex(WorldPos);
-    vec4 fragPosLightSpace = lightSpaceMatrices[layer] * vec4(WorldPos, 1.0);
-
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-    
-    // get depth of current fragment from light's perspective
-    //float currentDepth = projCoords.z;   é igual
-
-    if (projCoords.z > 1.0) return 0.0;
-
-    float bias = max(0.0015 * (1.0 - dot(normalize(Normal), normalize(-lightDir))), 0.0005);
-    
-    // calculate bias (based on depth map resolution and slope)
-    //vec3 normal = normalize(Normal);
-    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    //const float biasModifier = 0.5f;
-    //if (layer == cascadeCount)
-    //{
-    //    bias *= 1 / (farPlane * biasModifier);
-    //}
-    //else
-    //{
-    //    bias *= 1 / (cascadePlaneDistances[layer] * biasModifier);
-    //}
-
-
-    // PCF
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(cascadeShadowMap, 0).xy;
-    for(int x=-1; x<=1; ++x) {
-        for(int y=-1; y<=1; ++y) {
-            float pcfDepth = texture(cascadeShadowMap,
-                                     vec3(projCoords.xy + vec2(x,y)*texelSize,
-                                          layer)).r;
-            shadow += (projCoords.z - bias > pcfDepth) ? 1.0 : 0.0;
-        }
-    }
-    shadow /= 9.0;
-    return shadow;
-}
 
 // ==== Main PBR lighting pass ====
 void main()
@@ -186,33 +82,3 @@ void main()
 
 
 
-
-
-
-    //2 form
-  //  vec3 WorldPos = texture(gPosition, TexCoords).rgb;   
-
-  //  int cascadeIndex = GetCascadeIndex(WorldPos); // sua função
-  //  float depth = texture(cascadeShadowMap, vec3(TexCoords, cascadeIndex)).r;
-  //  vec3 color2;
-  //  if (cascadeIndex == 0){ 
-  //      color2 = vec3(1,0,0); 
-  //  }   // vermelho
-  //  else if (cascadeIndex == 1){ 
-  //      color2 = vec3(0,1,0);
-  //  } // verde
-  //  else if (cascadeIndex == 2){ 
-   //     color2 = vec3(0,0,1); 
-  //  }// azul
-  //  else{ 
-   //     color2 = vec3(1,1,0);
- //   } // amarelo
-
- //   FragColor = vec4(depth * color2, 1.0); // escala em tons de cinza
-
-  //  return;
-
-    //1 form
-  //  float depth = texture(cascadeShadowMap, vec3(TexCoords, 1)).r;
-   // FragColor = vec4(vec3(depth), 1.0); // escala em tons de cinza
-   // return;

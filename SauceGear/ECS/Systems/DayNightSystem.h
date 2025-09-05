@@ -135,7 +135,7 @@ private:
         // Exemplo simples: enviar cor pro shader de skybox.
 
         // Interpolação GPU (compute shader)
-        ComputeLerpCubemap(*prevHDR, *nextHDR, t, cycle.currentSkybox);
+        ComputeLerpCubemap(*prevHDR, *nextHDR, t, cycle.currentSkybox);     // Interpola cubemaps filtrados para reflexos PBR
         ComputeLerpCubemap(*prevIrr, *nextIrr, t, cycle.currentIrradiance);
         ComputeLerpCubemap(*prevPref, *nextPref, t, cycle.currentPrefilter);
 
@@ -143,6 +143,50 @@ private:
         skyShader->use();
         skyShader->setVec3("skyColor", skyColor);
     }
+      
+    //Se não houver grandes mudanças, pode atualizar a cada N frames
+    Cubemap LerpCubemap(const Cubemap& night, const Cubemap& day, float t) {
+        Cubemap result;
+        result.width = day.width;
+        result.height = day.height;
+        result.mipLevels = day.mipLevels;
+        result.format = day.format;
+
+        glGenTextures(1, &result.id);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, result.id);
+
+        for (int mip = 0; mip < day.mipLevels; ++mip) {
+            int mipWidth = day.width >> mip;
+            int mipHeight = day.height >> mip;
+
+            for (int face = 0; face < 6; ++face) {
+                // Obter dados dos cubemaps de dia e noite
+                std::vector<float> dataDay(mipWidth * mipHeight * 3);
+                std::vector<float> dataNight(mipWidth * mipHeight * 3);
+                day.GetFaceData(face, mip, dataDay.data());         //deve retornar os pixels RGB float do cubemap filtrado
+                night.GetFaceData(face, mip, dataNight.data());
+
+                // Interpolação pixel a pixel
+                std::vector<float> dataLerp(dataDay.size());
+                for (size_t i = 0; i < dataDay.size(); ++i)
+                    dataLerp[i] = glm::mix(dataNight[i], dataDay[i], t);
+
+                // Upload do mip interpolado
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip,
+                    GL_RGB16F, mipWidth, mipHeight, 0, GL_RGB, GL_FLOAT, dataLerp.data());
+            }
+        }
+
+        // Configurações padrão
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        return result;
+    }
+
      
     std::string cacheDir = "Resources/Cache/IBL";
 };
@@ -150,6 +194,7 @@ private:
 
 
 
+//float t = glm::clamp((sin(cycle.timeOfDay / 24.0f * glm::pi<float>() * 2.0f) + 1.0f) / 2.0f, 0.0f, 1.0f);
 
 
 //struct DirectionalLight {

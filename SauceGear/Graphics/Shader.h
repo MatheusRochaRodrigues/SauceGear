@@ -19,9 +19,11 @@ public:
 	Shader() = default;
 
 	// Constructor that build the Shader Program from 2 different shaders
-	Shader(const char* vertexFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines = {});
+	Shader(const char* vertexFile, const char* fragmentFile, 
+		const std::vector<std::pair<std::string, int>>& defines = {}, bool debug = false);
 	// Constructor that build geometry shader too
-	Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, const std::vector<std::pair<std::string, int>>& defines = {});
+	Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, 
+		const std::vector<std::pair<std::string, int>>& defines = {}, bool debug = false);
 
 	void ReloadWithDefines(const std::vector<std::pair<std::string, int>>& defines);
 

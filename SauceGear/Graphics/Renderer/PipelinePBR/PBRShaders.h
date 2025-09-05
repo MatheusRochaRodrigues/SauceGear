@@ -17,7 +17,8 @@ struct PBRShaders {
     // Lighting (deferred) 
     Shader dirLight = Shader(
         "PBR/DeferredShadingPBR/fullscreen.vs",
-        "PBR/DeferredShadingPBR/pbr_deferred_directional.fs"
+        "PBR/DeferredShadingPBR/pbr_deferred_directional.fs",
+        {}, true
     );     // fullscreen quad
 
     Shader pointLight = Shader(

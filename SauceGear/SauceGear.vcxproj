@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\ForwardPipeline.cpp" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\LightingPipeline.cpp" />
@@ -138,7 +139,7 @@
     <ClCompile Include="Editor\EditorApp.cpp" />
     <ClCompile Include="Editor\EditorMain.cpp" />
     <ClCompile Include="Editor\ImGuiLayer.cpp" />
-    <ClCompile Include="Editor\Panels\FileExplorerPanel.h" />
+    <ClCompile Include="Editor\Panels\FileExplorer\FileExplorerPanel.h" />
     <ClCompile Include="Editor\Panels\HierarchyPanel.h" />
     <ClCompile Include="Editor\Panels\InspectorPanel.h" />
     <ClCompile Include="Editor\Panels\SceneViewPanel.h" />
@@ -180,7 +181,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ECS\Reflection\Meta.h" />
+    <ClInclude Include="ECS\Systems\DayNightSystem.h" />
     <ClInclude Include="Editor\Drawers\CameraDrawer.h" />
+    <ClInclude Include="Editor\Icons\MaterialIcons.h" />
     <ClInclude Include="Editor\Utils\InspectorDrawer.h" />
     <ClInclude Include="Editor\Drawers\TransformDrawer.h" />
     <ClInclude Include="Editor\Utils\ImGuiUtils.h" />
@@ -286,8 +289,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
-    <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\Compute\LerpCubemap.comp" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
+    <None Include="Resources\Shaders\Utils\PBR.glsl" />
+    <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
+    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />
     <None Include="Resources\Shaders\Utils\lighting.glsl" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
@@ -349,6 +355,7 @@
     <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
     <None Include="Resources\Shaders\PBR\skybox.fs" />
     <None Include="Resources\Shaders\PBR\skybox.vs" />
+    <None Include="Resources\Shaders\Utils\Shadows.glsl" />
     <None Include="Resources\Shaders\Utils\utils.glsl" />
     <None Include="Resources\Shaders\Utils\vertex.glsl" />
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.fs" />
@@ -363,6 +370,11 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />
+    <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />
+    <Font Include="Assets\Fonts\ProggyTiny.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
