@@ -34,3 +34,12 @@
 
 #define REFLECT_SPACE() \
     GetTypeInfo().fields.push_back({ "", typeid(void), 0, FieldKind::Space });
+
+
+
+#define REFLECT_ON_EDITED(BODY) \
+    GetTypeInfo().onEdited = [](void* instance) { \
+        using T = __CurrentClass; \
+        T* obj = static_cast<T*>(instance); \
+        BODY \
+    };

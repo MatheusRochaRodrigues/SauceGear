@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\ForwardPipeline.cpp" />
@@ -180,7 +181,10 @@
     <ClCompile Include="Core\Time.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ECS\Components\ComputeSyncComponent.h" />
     <ClInclude Include="ECS\Reflection\Meta.h" />
+    <ClInclude Include="ECS\Systems\ComputeSyncSystem.h" />
+    <ClInclude Include="ECS\Systems\DayNightSystem.h" />
     <ClInclude Include="Editor\Drawers\CameraDrawer.h" />
     <ClInclude Include="Editor\Icons\MaterialIcons.h" />
     <ClInclude Include="Editor\Utils\InspectorDrawer.h" />
@@ -192,6 +196,8 @@
     <ClInclude Include="Editor\Drawers\LightDrawer.h" />
     <ClInclude Include="ECS\Reflection\Macros.h" />
     <ClInclude Include="ECS\Reflection\Registry.h" />
+    <ClInclude Include="Graphics\ComputeShader.h" />
+    <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
     <ClInclude Include="Scripts\ScriptABI.h" />
     <ClInclude Include="Utils\MathHelpers.h" />
@@ -288,7 +294,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
+    <None Include="Resources\Shaders\Compute\extras\LerpCubemap.comp" />
+    <None Include="Resources\Shaders\Compute\extras\LerpCubemap3.comp" />
     <None Include="Resources\Shaders\Compute\LerpCubemap.comp" />
+    <None Include="Resources\Shaders\Compute\extras\LerpCubemap2.comp" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
     <None Include="Resources\Shaders\Utils\PBR.glsl" />
     <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
@@ -360,6 +369,7 @@
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.fs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.vs" />
+    <None Include="Resources\Shaders\Compute\TestCube.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

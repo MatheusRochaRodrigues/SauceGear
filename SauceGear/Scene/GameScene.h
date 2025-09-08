@@ -18,6 +18,12 @@ public:
         camComp.isMain = true;
 
         {
+            Entity entity = CreateEntity();
+            AddComponent<ComputeSyncComponent>(computeManager);
+            std::cout << "[INFO Scene] ComputeManager entity criado: " << computeManager << "\n";
+        }
+
+        {
             stbi_set_flip_vertically_on_load(true);
             Entity entity = SceneBuilder::CreateModel("Resources/Models/backpack/backpack.obj");
             //stbi_set_flip_vertically_on_load(false);

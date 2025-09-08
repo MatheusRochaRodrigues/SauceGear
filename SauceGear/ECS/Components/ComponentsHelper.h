@@ -13,6 +13,7 @@
 //#include "NativeScriptComponent.h"  
 #include "HierarchyComponent.h"  
 #include "AABBComponent.h"  
+#include "ComputeSyncComponent.h"  
 
 
 // Aqui você pode criar um alias útil:					

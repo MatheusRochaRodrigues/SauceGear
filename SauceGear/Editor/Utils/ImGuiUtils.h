@@ -13,22 +13,21 @@ inline ImVec4 operator*(const ImVec4& a, float s) {
 }
 
 namespace ImGuiUtils {
-     
-
-    inline void DragFloat(const char* label, float& value) {
-        ImGui::DragFloat(label, &value, 0.1f);
+      
+    inline bool DragFloat(const char* label, float& value) { 
+        return ImGui::DragFloat(label, &value, 0.1f);
     }
 
-    inline void DragInt(const char* label, int& value) {
-        ImGui::DragInt(label, &value);
+    inline bool DragInt(const char* label, int& value) {
+        return ImGui::DragInt(label, &value);
     }
 
-    inline void Checkbox(const char* label, bool& value) {
-        ImGui::Checkbox(label, &value);
+    inline bool Checkbox(const char* label, bool& value) {
+        return ImGui::Checkbox(label, &value);
     }
 
-    inline void DragVec2(const char* label, glm::vec2& value) {
-        ImGui::DragFloat2(label, &value.x, 0.1f);
+    inline bool DragVec2(const char* label, glm::vec2& value) {
+        return ImGui::DragFloat2(label, &value.x, 0.1f);
     }
 
     // Função auxiliar para desenhar glm::vec2 com cores 
@@ -68,8 +67,8 @@ namespace ImGuiUtils {
     }
 
 
-    inline void DragVec3(const char* label, glm::vec3& value) {
-        ImGui::DragFloat3(label, &value.x, 0.1f);
+    inline bool DragVec3(const char* label, glm::vec3& value) {
+        return ImGui::DragFloat3(label, &value.x, 0.1f);
     }
 
     inline bool DragVec3Colored(const char* label, glm::vec3& value, float speed = 0.1f) {
@@ -118,8 +117,8 @@ namespace ImGuiUtils {
     }
 
 
-    inline void DragVec4(const char* label, glm::vec4& value) {
-        ImGui::DragFloat4(label, &value.x, 0.1f);
+    inline bool DragVec4(const char* label, glm::vec4& value) {
+        return ImGui::DragFloat4(label, &value.x, 0.1f);
     }
 
     /*inline void InputString(const char* label, std::string& str) {

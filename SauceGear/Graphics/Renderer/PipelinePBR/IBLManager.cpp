@@ -92,16 +92,19 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath,
      
 
     //Debug
-     
-    int size = 32;
-    glGenTextures(1, &set.debugFace);
-    glBindTexture(GL_TEXTURE_2D, set.debugFace);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
+    
+    set.width = 512;
+    set.mipLevels = 5;
 
-    // copia os pixels da face do cubemap para a textura 2D
-    glCopyImageSubData(set.irradiance, GL_TEXTURE_CUBE_MAP_POSITIVE_X + 1, 0, 0, 0, 0,
-        set.debugFace, GL_TEXTURE_2D, 0, 0, 0, 0,
-        size, size, 1);
+    //int size = 32;
+    //glGenTextures(1, &set.debugFace);
+    //glBindTexture(GL_TEXTURE_2D, set.debugFace);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
+
+    //// copia os pixels da face do cubemap para a textura 2D
+    //glCopyImageSubData(set.irradiance, GL_TEXTURE_CUBE_MAP_POSITIVE_X + 1, 0, 0, 0, 0,
+    //    set.debugFace, GL_TEXTURE_2D, 0, 0, 0, 0,
+    //    size, size, 1);
 
     return set;
 }
@@ -264,3 +267,49 @@ void IBLManager::IntegrateBRDF(GLuint brdfLUT, Shader& shBRDF,
     RenderQuad();           // renderQuad();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 } 
+
+
+
+//Helpers
+IBLSet IBLManager::CreateEmptyIBL(int width, int mipLevels) {
+    IBLSet set{};
+
+    set.width = 512;
+    set.mipLevels = 5;
+
+    set.envCubemap = CreateEmptyCubemap (512, 1);        // skybox                 //512
+    set.irradiance = CreateEmptyCubemap (32,  1);        // irradiance menor       //32
+    set.prefilter  = CreateEmptyCubemap (128, 5);                                  //128
+
+    //set.width = width;
+    //set.mipLevels = mipLevels;
+
+    //set.envCubemap = CreateEmptyCubemap(width, 1);        // skybox                 //512
+    //set.irradiance = CreateEmptyCubemap(width / 4, 1);    // irradiance menor       //32
+    //set.prefilter = CreateEmptyCubemap(width, mipLevels);                           //128
+
+    return set;
+}
+
+GLuint IBLManager::CreateEmptyCubemap(int width, int mipLevels) {
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+    for (int face = 0; face < 6; ++face) {
+        for (int mip = 0; mip < mipLevels; ++mip) {
+            int w = std::max(1, width >> mip);  //divide por 2, provavelmente operaçao logica bit a bit de deslocamento a direita
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip,
+                GL_RGBA16F, w, w, 0, GL_RGBA, GL_FLOAT, nullptr);
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    return tex;
+}

@@ -33,19 +33,33 @@ vec3 uvToDir(int face, vec2 uv)
 
 void main()
 {
-    uvec3 gid = gl_GlobalInvocationID; // x,y = pixel, z = face
+    uvec2 gid = gl_GlobalInvocationID.xy; // índice 2D
     ivec2 texSize = textureSize(prevCube, mipLevel).xy;
+
     if(gid.x >= uint(texSize.x) || gid.y >= uint(texSize.y)) return;
 
-    vec2 uv = (vec2(gid.xy) + 0.5) / vec2(texSize);
-    vec3 dir = uvToDir(int(gid.z), uv);
+    // Loop por cada face do cubemap
+    for(int face = 0; face < 6; ++face)
+    {
+        // UV do centro do texel
+        vec2 uv = (vec2(gid) + 0.5) / vec2(texSize);
 
-    vec3 colorPrev = textureLod(prevCube, dir, float(mipLevel)).rgb;
-    vec3 colorNext = textureLod(nextCube, dir, float(mipLevel)).rgb;
-    vec3 lerpedColor = mix(colorPrev, colorNext, lerpFactor);
+        // Direção correta da face
+        vec3 dir = uvToDir(face, uv);
 
-    //imageStore(outCube, ivec3(gid), vec4(lerpedColor,1.0)); 
-    imageStore(outCube, ivec3(gid), vec4(0,1,1,1.0)); 
+        // Amostra os cubemaps
+        vec3 colorPrev = textureLod(prevCube, dir, float(mipLevel)).rgb;
+        vec3 colorNext = textureLod(nextCube, dir, float(mipLevel)).rgb;
+
+        // Interpola
+        vec3 lerpedColor = mix(colorPrev, colorNext, lerpFactor);
+
+        // Escreve no cubemap de saída
+        imageStore(outCube, ivec3(gid, face), vec4(lerpedColor,1.0));
+
+        // Sincroniza invocações do mesmo work group (opcional aqui, mas seguro)
+        barrier();
+    }
 
     // Garante que todas as writes em outCube fiquem visíveis fora do compute
     memoryBarrierImage();

@@ -3,6 +3,7 @@
 #include "../../ECS/Components/MeshRenderer.h"
 #include "../../ECS/Components/Material.h"
 #include "../Graphics/FullscreenQuad.h"
+#include "../ECS/Systems/DayNightSystem.h"
 
 void PBRPipeline::Init() {
     const unsigned int width = GEngine->window->GetWidth();
@@ -215,7 +216,11 @@ void PBRPipeline::DrawSkybox() {
     shaders.skybox.setMat4("view", GEngine->mainCamera->GetViewMatrix());
     shaders.skybox.setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.envCubemap);
+
+     
+    glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::CreateTestCubemap(512));
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::currentIBL.envCubemap);
+
     RenderCube(); 
     glDepthFunc(GL_LESS);
 }

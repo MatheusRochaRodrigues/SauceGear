@@ -8,6 +8,8 @@ public:
     RenderSystem() { 
         //SetPipeline(std::make_unique<BlinnPhongPipeline>());
         SetPipeline(std::make_unique<PBRPipeline>());
+
+        //GEngine->pipeline = pipeline.get(); // EngineContext só referencia
     }
 
     void Update(float dt) override {

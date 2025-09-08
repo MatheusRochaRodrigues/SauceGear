@@ -1,310 +1,111 @@
-#include"Shader.h"
-
-// Constructor that build the Shader Program from 2 different shaders
-Shader::Shader(const char* vertexFile, const char* fragmentFile, 
-	const std::vector<std::pair<std::string, int>>& defines, bool debug)
-{
-	this->vertexFile = vertexFile;
-	this->geometryFile = NULL;
-	this->fragmentFile = fragmentFile;
-
-	name = vertexFile; 
-	std::string vPath = ShaderPathDefault + vertexFile;
-	std::string fPath = ShaderPathDefault + fragmentFile;
-
-	try {
-		vertexFile   = vPath.c_str(); 
-		fragmentFile = fPath.c_str();
-
-		// Read vertexFile and fragmentFile and store the strings 
-		std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines, debug);
-		std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines, debug);
-
-		//std::string vertexCode = ShaderPreprocessor::get_file_contents(vertexFile);
-		//std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
-
-
-		// Convert the shader source strings into character arrays
-		const char* vertexSource = vertexCode.c_str();
-		const char* fragmentSource = fragmentCode.c_str();
-
-		// Create Vertex Shader Object and get its reference
-		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		// Attach Vertex Shader source to the Vertex Shader Object
-		glShaderSource(vertexShader, 1, &vertexSource, NULL);
-		// Compile the Vertex Shader into machine code
-		glCompileShader(vertexShader);
-		// Checks if Shader compiled succesfully
-		compileErrors(vertexShader, "VERTEX");
-
-		// Create Fragment Shader Object and get its reference
-		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		// Attach Fragment Shader source to the Fragment Shader Object
-		glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-		// Compile the Vertex Shader into machine code
-		glCompileShader(fragmentShader);
-		// Checks if Shader compiled succesfully
-		compileErrors(fragmentShader, "FRAGMENT");
-
-		// Create Shader Program Object and get its reference
-		ID = glCreateProgram();
-		// Attach the Vertex and Fragment Shaders to the Shader Program
-		glAttachShader(ID, vertexShader);
-		glAttachShader(ID, fragmentShader);
-		// Wrap-up/Link all the shaders together into the Shader Program
-		glLinkProgram(ID);
-		// Checks if Shaders linked succesfully
-		compileErrors(ID, "PROGRAM");
-
-		// Delete the now useless Vertex and Fragment Shader objects
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-	}
-	catch (const std::exception& e) {
-		std::cerr << "[Error] - To Create Shader (" << vPath << ", " << fPath << "):\n" << e.what() << "\n\n";
-	}
-}
-
-// Constructor that build the Shader Program from 2 different shaders
-Shader::Shader(const char* vertexFile, const char* geometryFile, const char* fragmentFile, 
-	const std::vector<std::pair<std::string, int>>& defines, bool debug)
-{
-	this->vertexFile   = vertexFile;
-	this->geometryFile = geometryFile;
-	this->fragmentFile = fragmentFile; 
-
-	name = vertexFile; 
-	std::string vPath = ShaderPathDefault + vertexFile;
-	std::string gPath = ShaderPathDefault + geometryFile;
-	std::string fPath = ShaderPathDefault + fragmentFile;
-
-	try {
-		vertexFile   = vPath.c_str();
-		geometryFile = gPath.c_str();
-		fragmentFile = fPath.c_str();
-
-		// Read vertexFile and fragmentFile and store the strings 
-		
-		std::string vertexCode   = ShaderPreprocessor::ProcessFile(vertexFile, defines, debug);
-		std::string geometryCode = ShaderPreprocessor::ProcessFile(geometryFile, defines, debug);
-		std::string fragmentCode = ShaderPreprocessor::ProcessFile(fragmentFile, defines, debug);
-		
-
-		//std::string vertexCode =   ShaderPreprocessor::get_file_contents(vertexFile);
-		//std::string geometryCode = ShaderPreprocessor::get_file_contents(geometryFile);
-		//std::string fragmentCode = ShaderPreprocessor::get_file_contents(fragmentFile);
-
-		// Convert the shader source strings into character arrays
-		const char* vertexSource   = vertexCode.c_str();
-		const char* geometrySource = geometryCode.c_str();
-		const char* fragmentSource = fragmentCode.c_str();
-
-		// Create Vertex Shader Object and get its reference
-		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		// Attach Vertex Shader source to the Vertex Shader Object
-		glShaderSource(vertexShader, 1, &vertexSource, NULL);
-		// Compile the Vertex Shader into machine code
-		glCompileShader(vertexShader);
-		// Checks if Shader compiled succesfully
-		compileErrors(vertexShader, "VERTEX");
-
-		// Create Geometry Shader
-		GLuint geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-		glShaderSource(geometryShader, 1, &geometrySource, NULL);
-		glCompileShader(geometryShader);
-		//Check Error
-		compileErrors(geometryShader, "GEOMETRY");
-
-		// Create Fragment Shader Object and get its reference
-		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		// Attach Fragment Shader source to the Fragment Shader Object
-		glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-		// Compile the Vertex Shader into machine code
-		glCompileShader(fragmentShader);
-		// Checks if Shader compiled succesfully
-		compileErrors(fragmentShader, "FRAGMENT");
-
-		// Create Shader Program Object and get its reference
-		ID = glCreateProgram();
-		// Attach the Vertex and Fragment Shaders to the Shader Program
-		glAttachShader(ID, vertexShader);
-		glAttachShader(ID, fragmentShader);
-		glAttachShader(ID, geometryShader);
-		// Wrap-up/Link all the shaders together into the Shader Program
-		glLinkProgram(ID);
-		// Checks if Shaders linked succesfully
-		compileErrors(ID, "PROGRAM");
-
-		// Delete the now useless Vertex and Fragment Shader objects
-		glDeleteShader(vertexShader);
-		glDeleteShader(geometryShader);
-		glDeleteShader(fragmentShader);
-	}
-	catch (const std::exception& e) {
-		std::cerr << "[Error] - To Create Shader (" << vPath << ", " << gPath << ", " << fPath << "):\n" << e.what() << "\n\n";
-	}
-} 
-
-// Activates the Shader Program
-void Shader::use()
-{
-	glUseProgram(ID);
-}
-
-// Deletes the Shader Program
-void Shader::Delete()
-{
-	glDeleteProgram(ID);
-}
-
-// utility uniform functions
-// ------------------------------------------------------------------------
-void Shader::setBool(const std::string& name, bool value) const
-{
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
-}
-// ------------------------------------------------------------------------
-void Shader::setInt(const std::string& name, int value) const
-{
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
-}
-// ------------------------------------------------------------------------
-void Shader::setFloat(const std::string& name, float value) const
-{
-	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
-}
-
-void Shader::setMat4(const std::string& name, glm::mat4 matrix) {
-	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void Shader::setMat3(const std::string& name, glm::mat3 matrix) {
-	glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void Shader::setVec3(const std::string& name, float v1, float v2, float v3) {
-	glUniform3f(glGetUniformLocation(ID, name.c_str()), v1, v2, v3);
-
-}
-
-void Shader::setVec3(const std::string& name, glm::vec3 vector) {
-	glUniform3f(glGetUniformLocation(ID, name.c_str()), vector.x, vector.y, vector.z);
-}
-
-void Shader::setVec4(const std::string& name, float v1, float v2, float v3, float v4) {
-	glUniform4f(glGetUniformLocation(ID, name.c_str()), v1, v2, v3, v4);
-
-}
-
-
-void Shader::setVec2(const std::string& name, float v1, float v2) {
-	glUniform2f(glGetUniformLocation(ID, name.c_str()), v1, v2);
-
-}
-
-void Shader::setVec2(const std::string& name, glm::vec2 vector) {
-	glUniform2f(glGetUniformLocation(ID, name.c_str()), vector.x, vector.y);
-}
-
-void Shader::setIntArray(const std::string& name, int* values, int count) {
-	for (int i = 0; i < count; ++i) {
-		std::string indexedName = name + "[" + std::to_string(i) + "]";
-		glUniform1i(glGetUniformLocation(ID, indexedName.c_str()), values[i]);
-	}
-}
-
-// Textures Arrays
-void Shader::setTexture2D(const std::string& name, GLuint texID, GLenum unit) const {
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_2D, texID);
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
-}
-
-void Shader::setTexture2DArray(const std::string& name, GLuint texID, GLenum unit) const {
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
-}
-
-void Shader::setTextureCube(const std::string& name, GLuint texID, GLenum unit) const {
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
-}
-
-void Shader::setTextureCubeArray(const std::string& name, GLuint texID, GLenum unit) const {
-	glActiveTexture(GL_TEXTURE0 + unit);
-	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, texID);
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), unit);
-} 
-
-
-// Checks if the different Shaders have compiled properly
-void Shader::compileErrors(unsigned int shader, const char* type)
-{
-	// Stores status of compilation
-	GLint hasCompiled;
-	// Character array to store error message in
-	char infoLog[1024];
-
-	if (type != "PROGRAM")
-	{
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
-		if (hasCompiled == GL_FALSE)
-		{
-			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "SHADER_COMPILATION_ERROR for:" << type << "\n" << infoLog << std::endl;
-			std::cout << std::endl << "name of shader : " + name << std::endl;
-			// aqui você pode lançar exceção se quiser:
-			// throw std::runtime_error(infoLog);
-		}
-	}
-	else
-	{
-		glGetProgramiv(shader, GL_LINK_STATUS, &hasCompiled);
-		if (hasCompiled == GL_FALSE)
-		{
-			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "SHADER_LINKING_ERROR for:" << type << "\n" << infoLog << std::endl;
-			std::cout << std::endl << "name of shader : " + name << std::endl;
-			// aqui você pode lançar exceção se quiser:
-			// throw std::runtime_error(infoLog);
-		}
-	}
-}
-
+#include "Shader.h"
+#include <iostream> 
  
+Shader::Shader(string vertex, string fragment, const std::vector<std::pair<std::string, int>>& defines, bool debug) {
+    vertexFile = vertex;
+    fragmentFile = fragment;
+    name = vertex;
+
+    //path increment
+    this->vertexFile   = ShaderPathDefault + path + vertexFile;
+    this->fragmentFile = ShaderPathDefault + path + fragmentFile;
+     
+    try {
+        std::string vCode = ProcessFileWithDefines(vertexFile.c_str(), defines, debug);
+        std::string fCode = ProcessFileWithDefines(fragmentFile.c_str(), defines, debug);
+        const char* vSrc = vCode.c_str();
+        const char* fSrc = fCode.c_str();
+
+        GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vShader, 1, &vSrc, nullptr);
+        glCompileShader(vShader);
+        compileErrors(vShader, "VERTEX");
+
+        GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fShader, 1, &fSrc, nullptr);
+        glCompileShader(fShader);
+        compileErrors(fShader, "FRAGMENT");
+
+        ID = glCreateProgram();
+        glAttachShader(ID, vShader);
+        glAttachShader(ID, fShader);
+        glLinkProgram(ID);
+        compileErrors(ID, "PROGRAM");
+
+        glDeleteShader(vShader);
+        glDeleteShader(fShader);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[Shader Error] " << e.what() << "\n";
+    }
+}
+
+Shader::Shader(string vertex, string geometry, string fragment, const std::vector<std::pair<std::string, int>>& defines, bool debug) {
+    vertexFile = vertex;
+    geometryFile = geometry;
+    fragmentFile = fragment;
+    name = vertex;
+
+    //path increment
+    this->vertexFile   = ShaderPathDefault + path + vertexFile;
+    this->geometryFile = ShaderPathDefault + path + geometryFile;
+    this->fragmentFile = ShaderPathDefault + path + fragmentFile;
+
+    try {
+        std::string vCode = ProcessFileWithDefines(vertexFile.c_str(), defines, debug);
+        std::string gCode = ProcessFileWithDefines(geometryFile.c_str(), defines, debug);
+        std::string fCode = ProcessFileWithDefines(fragmentFile.c_str(), defines, debug);
+
+        const char* vSrc = vCode.c_str();
+        const char* gSrc = gCode.c_str();
+        const char* fSrc = fCode.c_str();
+
+        GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vShader, 1, &vSrc, nullptr);
+        glCompileShader(vShader);
+        compileErrors(vShader, "VERTEX");
+
+        GLuint gShader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(gShader, 1, &gSrc, nullptr);
+        glCompileShader(gShader);
+        compileErrors(gShader, "GEOMETRY");
+
+        GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fShader, 1, &fSrc, nullptr);
+        glCompileShader(fShader);
+        compileErrors(fShader, "FRAGMENT");
+
+        ID = glCreateProgram();
+        glAttachShader(ID, vShader);
+        glAttachShader(ID, gShader);
+        glAttachShader(ID, fShader);
+        glLinkProgram(ID);
+        compileErrors(ID, "PROGRAM");
+
+        glDeleteShader(vShader);
+        glDeleteShader(gShader);
+        glDeleteShader(fShader);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[Shader Error] " << e.what() << "\n";
+    }
+}
+
+void Shader::ReloadWithDefines(const std::vector<std::pair<std::string, int>>& defines) {
+    if (!vertexFile.empty() && !fragmentFile.empty()) { 
+        if (!geometryFile.empty()) {
+            Shader temp( vertexFile.c_str(), geometryFile.c_str(), fragmentFile.c_str(), defines, true );
+            ID = temp.ID;
+        } else {
+            Shader temp( vertexFile.c_str(), fragmentFile.c_str(), defines, true ); 
+            ID = temp.ID;
+        }
+
+    }
+
+}
 
 
 
 
-//std::string injectDefines(const std::string& code, const std::vector<std::pair<std::string, int>>& defines) {
-//	std::string result;
-//	for (auto& d : defines) {
-//		result += "#define " + d.first + " " + std::to_string(d.second) + "\n";
-//	}
-//	result += code;
-//	return result;
-//}
-
-//std::string UpdateDefine(const std::string& shaderCode, const std::string& defineName, int newValue) {
-//	std::stringstream ss(shaderCode);
-//	std::string line;
-//	std::string newCode;
-//	bool found = false;
-//
-//	while (std::getline(ss, line)) {
-//		if (line.find("#define " + defineName) == 0) {
-//			line = "#define " + defineName + " " + std::to_string(newValue);
-//			found = true;
-//		}
-//		newCode += line + "\n";
-//	}
-//
-//	if (!found) {
-//		// Se não achar, adiciona no início
-//		newCode = "#define " + defineName + " " + std::to_string(newValue) + "\n" + newCode;
-//	}
-//
-//	return newCode;
-//}
+//Shader::Shader(const char* vertex, const char* geometry, const char* fragment, const std::vector<std::pair<std::string, int>>& defines, bool debug) {

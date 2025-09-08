@@ -15,6 +15,10 @@ layout(binding = 2, rgba16f) uniform imageCube outCube;
 uniform float lerpFactor;   // 0.0 -> prevCube, 1.0 -> nextCube
 uniform int mipLevel;       // Nível do mipmap
 
+layout(binding=4, offset=0) uniform atomic_uint myCounter; 
+
+
+
 // Converte (face, uv) -> direção 3D para amostrar cubemap
 vec3 uvToDir(int face, vec2 uv)
 {
@@ -33,6 +37,9 @@ vec3 uvToDir(int face, vec2 uv)
 
 void main()
 {
+    atomicCounterIncrement(myCounter);
+    return;
+
     uvec3 gid = gl_GlobalInvocationID; // x,y = pixel, z = face
     ivec2 texSize = textureSize(prevCube, mipLevel).xy;
     if(gid.x >= uint(texSize.x) || gid.y >= uint(texSize.y)) return;

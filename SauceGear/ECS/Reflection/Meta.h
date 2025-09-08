@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <cstddef>
+#include <functional>
 
 enum class FieldKind {
     Value,    // campo normal
@@ -23,6 +24,9 @@ struct TypeInfo {
     std::string name;
     std::vector<FieldInfo> fields;
     std::type_index typeIndex = typeid(void); // novo: armazena type_index real
+
+    // em TypeInfo:
+    std::function<void(void* instance)> onEdited = nullptr; 
 };
 
 class ReflectionRegistry {

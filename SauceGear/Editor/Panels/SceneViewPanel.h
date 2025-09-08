@@ -84,25 +84,16 @@ struct SceneViewPanel : IPanel {
             //ImGuizmo::SetGizmoSizeClipSpace(0.09f);  // Ajuste o valor conforme necessário 
 
             // Manipula o transform da entidade com o gizmo, apenas se a janela de cena estiver focada
-            //if (isSceneHovered && isSceneFocused) {
+            //if (isSceneHovered && isSceneFocused) { 
+
             ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
                 currentGizmoMode, ImGuizmo::LOCAL, glm::value_ptr(transform));
 
-
-            //ImGuizmo::DrawGrid(glm::value_ptr(view), glm::value_ptr(proj), glm::value_ptr(glm::mat4(1.0f)), 100.f);
-            //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
-
-            //if (isSceneHovered && isSceneFocused) 
-
-
-            float translation[3], rot[3], scale[3];
-            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), translation, rot, scale);
-
-            tc.position = glm::make_vec3(translation);
-            tc.rotation = glm::make_vec3(rot);   // já em graus
-            tc.scale =    glm::make_vec3(scale); 
-
-            //if (ImGuizmo::IsUsing())  tc.DecomposeTransform(transform);  
+            if (ImGuizmo::IsUsing()) {
+                tc.DecomposeTransform(transform);  // já converte para quat
+                tc.MarkDirty();
+            }
+            //if (isSceneHovered && isSceneFocused)   
         } 
 
 

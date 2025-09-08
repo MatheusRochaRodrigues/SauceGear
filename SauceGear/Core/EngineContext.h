@@ -24,11 +24,11 @@ struct EngineContext
     }
     Camera* mainCamera = nullptr;   // câmera separada
     Camera* GetMainCamera();
-
+     
+    //IRenderPipeline* pipeline = nullptr; // apenas ponteiro cru
 
     //SceneManager* sceneManager;
-
-
+     
     // Ex: Input, Audio, Physics, ResourceManager...
     // InputSystem* input = nullptr;
 };

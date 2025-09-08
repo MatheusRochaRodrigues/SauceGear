@@ -1,4 +1,3 @@
-// CameraSystem.h
 #pragma once
 #include "../../Core/Camera.h" 
 #include "../../ECS/Components/ComponentsHelper.h"

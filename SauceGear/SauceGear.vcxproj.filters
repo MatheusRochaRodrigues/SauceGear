@@ -162,6 +162,9 @@
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\ComputeShader.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -479,6 +482,21 @@
     <ClInclude Include="Editor\Icons\MaterialIcons.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="ECS\Systems\DayNightSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ShaderBase.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ComputeShader.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components\ComputeSyncComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\ComputeSyncSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
@@ -572,6 +590,10 @@
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
     <None Include="Resources\Shaders\Utils\Shadows.glsl" />
     <None Include="Resources\Shaders\Compute\LerpCubemap.comp" />
+    <None Include="Resources\Shaders\Compute\extras\LerpCubemap2.comp" />
+    <None Include="Resources\Shaders\Compute\extras\LerpCubemap3.comp" />
+    <None Include="Resources\Shaders\Compute\extras\LerpCubemap.comp" />
+    <None Include="Resources\Shaders\Compute\TestCube.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />
