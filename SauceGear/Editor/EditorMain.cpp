@@ -1,5 +1,8 @@
 #define EDITOR_BUILD
 #include "EditorApp.h"
+#include "../Core/Application.h"   // <- precisa desse
+
+//#include "../ECS/Systems/SystemHelper.h"  
 
 int main() { 
     Application app;

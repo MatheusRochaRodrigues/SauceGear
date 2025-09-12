@@ -1,8 +1,12 @@
-#pragma once 
+#pragma once
 #include "ImGuiLayer.h"  
-#include "../Core/Application.h"
- 
-//namespace Editor {
+
+// forward declarations
+class Application;
+class Window;
+class SceneECS;
+class GameScene;
+
 class EditorApp {
 public:
     EditorApp(Application* app);
@@ -10,6 +14,9 @@ public:
 private:
     Application* app;
     Window* window;
-    Scene* scene;   
+    Scene* scene;
 };
+
+ 
+//namespace Editor {
 //}

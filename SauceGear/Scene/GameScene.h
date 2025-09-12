@@ -18,7 +18,7 @@ public:
         camComp.isMain = true;
 
         {
-            Entity entity = CreateEntity();
+            computeManager = CreateEntity();
             AddComponent<ComputeSyncComponent>(computeManager);
             std::cout << "[INFO Scene] ComputeManager entity criado: " << computeManager << "\n";
         }

@@ -142,19 +142,8 @@ public:
         return storage->GetRaw(entity);
     } 
 
-
-    Entity FindEntityByName(const std::string& name) {
-        auto entities = GetEntitiesWith<NameComponent>();
-        for (Entity e : entities) {
-            auto& comp = GetComponent<NameComponent>(e);
-            if (comp.name == name) {
-                return e;
-            }
-        }
-        return INVALID_ENTITY;
-    }
-    Entity computeManager = INVALID_ENTITY; // global para syncs
-
+    //Entity FindEntityByName(const std::string& name);
+    Entity computeManager = INVALID_ENTITY; // global para syncs 
 
     //void SwitchToCamera(Camera* newCam) { GEngine->mainCamera = newCam; }
 

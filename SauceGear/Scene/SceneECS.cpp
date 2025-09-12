@@ -17,6 +17,7 @@ void SceneECS::initECS() {
 
     ///----------Systems
     auto* cameraSystem =        RegisterSystem <CameraSystem>();
+    auto* computeSyncComponent =RegisterSystem <ComputeSyncSystem>();
     auto* dayNightSystem =      RegisterSystem <DayNightSystem>();
     auto* lightSystem  =        RegisterSystem <LightSystem> ();
     auto* globalUniformSystem = RegisterSystem <GlobalUniformSystem>(); 
@@ -68,6 +69,16 @@ void SceneECS::AddToParent(Entity father, Entity child) {
 
 
 
+//Entity SceneECS::FindEntityByName(const std::string& name) {
+//    auto entities = GetEntitiesWith<NameComponent>();
+//    for (Entity e : entities) {
+//        auto& comp = GetComponent<NameComponent>(e);
+//        if (comp.name == name) {
+//            return e;
+//        }
+//    }
+//    return INVALID_ENTITY;
+//}
 
 
 //template<typename... Components>

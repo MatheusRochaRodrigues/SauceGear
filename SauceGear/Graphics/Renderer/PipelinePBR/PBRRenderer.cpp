@@ -217,9 +217,12 @@ void PBRPipeline::DrawSkybox() {
     shaders.skybox.setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
     glActiveTexture(GL_TEXTURE0);
 
-     
-    glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::CreateTestCubemap(512));
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::currentIBL.envCubemap);
+    // Nunca chame StartCubemapJob() dentro do draw. Faça no Update
+
+    // Bind seguro
+    glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront());
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::frontIBL.envCubemap);
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.envCubemap);
 
     RenderCube(); 
     glDepthFunc(GL_LESS);

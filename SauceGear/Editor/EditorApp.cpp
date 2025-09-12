@@ -1,4 +1,8 @@
 #include "EditorApp.h"
+#include "../Core/Application.h"
+#include "../Platform/Window.h"
+#include "../Scene/GameScene.h"
+
 
 void EditorApp::Run() {
     ImGuiLayer imguiLayer;
@@ -27,8 +31,8 @@ void EditorApp::Run() {
 
 EditorApp::EditorApp(Application* app) {
     this->app = app;
-    window = &app->window;
-    scene  = &app->scene; 
+    window = app->window;
+    scene  = app->scene; 
 }
 
 

@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Apenas forward declarations aqui 
 class SceneECS;
 class Renderer;

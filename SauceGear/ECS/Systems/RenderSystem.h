@@ -7,12 +7,11 @@ class RenderSystem : public System {
 public:   
     RenderSystem() { 
         //SetPipeline(std::make_unique<BlinnPhongPipeline>());
-        SetPipeline(std::make_unique<PBRPipeline>());
-
+        SetPipeline(std::make_unique<PBRPipeline>()); 
         //GEngine->pipeline = pipeline.get(); // EngineContext só referencia
     }
 
-    void Update(float dt) override {
+    void Update(float dt) override { 
         //RENDER
         try {  
             Render();

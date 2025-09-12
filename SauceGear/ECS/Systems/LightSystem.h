@@ -30,9 +30,7 @@ public:
     static inline std::vector<glm::mat4> lightSpaceMatrices;
      
     static inline GLuint cascadeMatricesUBO;
-
-    //lightMatricesUBO
-
+      
     LightSystem();
 
     void InitCascade();

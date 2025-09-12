@@ -165,6 +165,9 @@
     <ClCompile Include="Graphics\ComputeShader.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="ECS\Systems\DayNightSystem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -470,9 +473,6 @@
     <ClInclude Include="ECS\Reflection\Macros.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Reflection\Registry.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Editor\Utils\InspectorDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -594,6 +594,7 @@
     <None Include="Resources\Shaders\Compute\extras\LerpCubemap3.comp" />
     <None Include="Resources\Shaders\Compute\extras\LerpCubemap.comp" />
     <None Include="Resources\Shaders\Compute\TestCube.comp" />
+    <None Include="Resources\Shaders\Compute\extras\TestCube2.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

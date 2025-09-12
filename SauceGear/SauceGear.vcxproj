@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ECS\Systems\DayNightSystem.cpp" />
     <ClCompile Include="Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
@@ -195,7 +196,6 @@
     <ClInclude Include="Editor\Drawers\MeshRendererDrawer.h" />
     <ClInclude Include="Editor\Drawers\LightDrawer.h" />
     <ClInclude Include="ECS\Reflection\Macros.h" />
-    <ClInclude Include="ECS\Reflection\Registry.h" />
     <ClInclude Include="Graphics\ComputeShader.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
@@ -299,6 +299,7 @@
     <None Include="Resources\Shaders\Compute\LerpCubemap.comp" />
     <None Include="Resources\Shaders\Compute\extras\LerpCubemap2.comp" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
+    <None Include="Resources\Shaders\Compute\extras\TestCube2.comp" />
     <None Include="Resources\Shaders\Utils\PBR.glsl" />
     <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
     <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />

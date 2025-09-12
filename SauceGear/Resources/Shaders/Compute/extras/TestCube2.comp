@@ -1,0 +1,23 @@
+#version 430
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(binding = 0, rgba16f) uniform imageCube outCube;
+
+void main() {
+    uvec3 gid = gl_GlobalInvocationID;
+    ivec2 size = ivec2(imageSize(outCube).xy);
+
+    if(gid.x >= uint(size.x) || gid.y >= uint(size.y)) return;
+
+    vec4 color;
+    // cada face terá uma cor diferente
+    if(gid.z == 0) color = vec4(1,0,0,1); // +X vermelho
+    else if(gid.z == 1) color = vec4(0,1,0,1); // -X verde
+    else if(gid.z == 2) color = vec4(0,0,1,1); // +Y azul
+    else if(gid.z == 3) color = vec4(1,1,0,1); // -Y amarelo
+    else if(gid.z == 4) color = vec4(1,0,1,1); // +Z magenta
+    else color = vec4(0,1,1,1); // -Z ciano
+     
+
+    imageStore(outCube, ivec3(gid.xy, gid.z), color);
+}

@@ -2,8 +2,7 @@
 #include <iostream>
 
 #pragma once
-struct NameComponent {
-    //NameComponent(string name) { this->name = name; };
+struct NameComponent { 
     std::string name;
 };
 

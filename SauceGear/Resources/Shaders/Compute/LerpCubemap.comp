@@ -44,8 +44,8 @@ void main()
     vec3 colorNext = textureLod(nextCube, dir, float(mipLevel)).rgb;
     vec3 lerpedColor = mix(colorPrev, colorNext, lerpFactor);
 
-    //imageStore(outCube, ivec3(gid), vec4(lerpedColor,1.0)); 
-    imageStore(outCube, ivec3(gid), vec4(0,1,1,1.0)); 
+    imageStore(outCube, ivec3(gid), vec4(lerpedColor,1.0)); 
+    //imageStore(outCube, ivec3(gid), vec4(0,1,1,1.0)); 
 
     // Garante que todas as writes em outCube fiquem visíveis fora do compute
     memoryBarrierImage();

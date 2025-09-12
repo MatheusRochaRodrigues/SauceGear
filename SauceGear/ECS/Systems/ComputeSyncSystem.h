@@ -1,47 +1,61 @@
-#pragma once 
-#include "../../ECS/Components/ComponentsHelper.h"
+#pragma once
+#include "../System.h"
 #include "../../Scene/SceneECS.h"
-#include "../../ECS/System.h"
- 
+#include "../Components/ComputeSyncComponent.h" // o novo estático
+#include <algorithm>
+#include <iostream>
+
+#ifndef DEBUG_COMPUTE_SYNC
+#define DEBUG_COMPUTE_SYNC 0
+#endif
+
 class ComputeSyncSystem : public System {
 public:
     void Update(float deltaTime) override {
         try {
-            // pega a entidade manager 
-            Entity manager = GEngine->scene->computeManager;    //Entity manager = GEngine->scene->FindEntityByName("ComputeManager");
-            if (manager == INVALID_ENTITY || !GEngine->scene->HasComponent<ComputeSyncComponent>(manager))
-                return;
+            int callbacksExecuted = 0;
 
-            auto& comp = GEngine->scene->GetComponent<ComputeSyncComponent>(manager);
+            for (auto& s : ComputeSyncComponent::syncs) {
+                if (s.completed || !s.sync) continue;
 
-            for (auto& s : comp.syncs) {
-                if (!s.completed && s.sync) {
-                    GLenum result = glClientWaitSync(s.sync, 0, 0);
+                GLenum result = glClientWaitSync(s.sync, 0, 0);
 
-                    if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED) {
-                        s.completed = true;
+                if (result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED) {
+                    s.completed = true;
 
-                        if (s.onComplete) s.onComplete();
+                    glDeleteSync(s.sync);
+                    s.sync = 0;
 
-                        glDeleteSync(s.sync);
-                        s.sync = 0;
+                    if (s.onComplete) {
+                        s.onComplete();
+                        callbacksExecuted++;
                     }
+
+                    #if DEBUG_COMPUTE_SYNC
+                        std::cout << "[ComputeSyncSystem] Fence concluída, callback executado.\n";
+                    #endif
+
+                    if (callbacksExecuted >= maxCallbacksPerFrame)
+                        break;
                 }
             }
 
-            comp.syncs.erase(
-                std::remove_if(comp.syncs.begin(), comp.syncs.end(),
+            // remove finalizados
+            auto& syncs = ComputeSyncComponent::syncs;
+            syncs.erase(
+                std::remove_if(syncs.begin(), syncs.end(),
                     [](auto& s) { return s.completed; }),
-                comp.syncs.end()
+                syncs.end()
             );
-
         }
         catch (const std::exception& e) {
             std::cerr << "[EXCEÇÃO - ComputeSyncSystem] " << e.what() << "\n";
         }
-    }  
+    }
+
+private:
+    int maxCallbacksPerFrame = 32; // throttle para não travar CPU
 };
- 
 
 
 
