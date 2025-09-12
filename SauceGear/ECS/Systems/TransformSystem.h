@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "../Components/Transform.h"
 #include "../Components/HierarchyComponent.h"
 #include "../Scene/SceneECS.h"
@@ -6,8 +6,8 @@
 #include "../System.h"
 #include <vector> 
 
-// Helper simples para atualizar a ·rvore de transforms.
-// Adapte scene.GetAllEntities() para a sua API de ECS se necess·rio.
+// Helper simples para atualizar a √°rvore de transforms.
+// Adapte scene.GetAllEntities() para a sua API de ECS se necess√°rio.
 
 namespace TransformSys {
 
@@ -15,54 +15,62 @@ namespace TransformSys {
     inline void UpdateRecursive(SceneECS& scene, Entity entity, const glm::mat4& parentWorld) {
         Transform& t = scene.GetComponent<Transform>(entity);
 
-        // Recalcula localMatrix se necessario e depois worldMatrix
-        t.UpdateWorldFromParent(parentWorld);
+        // Recalcula localMatrix se necessario e depois worldMatrix 
+        if (t.localDirty || t.worldDirty)          // S√≥ recalcula se estiver marcado como sujo
+            t.UpdateWorldFromParent(parentWorld);
 
-        // Recurre para filhos
+        // FAZ RECURS√ÉO para filhos e Propaga "dirty" para os filhos
         if (scene.HasComponent<HierarchyComponent>(entity)) {
             HierarchyComponent& h = scene.GetComponent<HierarchyComponent>(entity);
             Entity child = h.firstChild;
             while (child != INVALID_ENTITY) {
-                UpdateRecursive(scene, child, t.model);
-                HierarchyComponent& childH = scene.GetComponent<HierarchyComponent>(child);
-                child = childH.nextSibling;
+                Transform& ct = scene.GetComponent<Transform>(child);
+                ct.MarkWorldDirty(); // marca os filhos como sujos
+
+                UpdateRecursive(scene, child, t.model); 
+                child = scene.GetComponent<HierarchyComponent>(child).nextSibling;
             }
         }
     }
 
-    // Atualiza todas entidades: encontra raÌzes (parent == INVALID_ENTITY) e atualiza a ·rvore
+    // Atualiza todas entidades: encontra ra√≠zes (parent == INVALID_ENTITY) e atualiza a √°rvore
     inline void UpdateAllTransforms(SceneECS& scene) {
-        // --- NOTE: adapte esta iteraÁ„o ‡ sua API ---
-        std::vector<Entity> all = scene.GetAllEntities(); // se vocÍ n„o tiver, troque por seu mÈtodo
+        // --- NOTE: adapte esta itera√ß√£o √† sua API ---
+        std::vector<Entity> all = scene.GetAllEntities(); // se voc√™ n√£o tiver, troque por seu m√©todo
         for (Entity e : all) {
             if (!scene.HasComponent<Transform>(e)) continue;
+             
+            // s√≥ processa se estiver sujo
+            Transform& t = scene.GetComponent<Transform>(e);
+            if (!(t.localDirty || t.worldDirty)) continue;
 
-            // root detection: se tem HierarchyComponent e parent != INVALID_ENTITY -> n„o È root
+            // root detection: se tem HierarchyComponent e parent != INVALID_ENTITY -> n√£o √© root
             bool isRoot = true;
             if (scene.HasComponent<HierarchyComponent>(e)) {
                 HierarchyComponent& h = scene.GetComponent<HierarchyComponent>(e);
                 if (h.parent != INVALID_ENTITY) isRoot = false;
             }
             if (isRoot) {
-                Transform& t = scene.GetComponent<Transform>(e);
                 // updated as root
                 t.UpdateWorldAsRoot();
 
-                // children
+                // children                 // agora Propagamos dirty pros filhos
                 if (scene.HasComponent<HierarchyComponent>(e)) {
                     HierarchyComponent& h = scene.GetComponent<HierarchyComponent>(e);
                     Entity child = h.firstChild;
                     while (child != INVALID_ENTITY) {
+                        Transform& ct = scene.GetComponent<Transform>(child);
+                        ct.MarkWorldDirty();
+
                         UpdateRecursive(scene, child, t.model);
-                        HierarchyComponent& childH = scene.GetComponent<HierarchyComponent>(child);
-                        child = childH.nextSibling;
+                        child = scene.GetComponent<HierarchyComponent>(child).nextSibling;
                     }
                 }
             }
         }
     }
 
-    // Atualiza somente a subtree de uma entidade (chame apÛs ediÁ„o no inspector ou gizmo)
+    // Atualiza somente a subtree de uma entidade (chame ap√≥s edi√ß√£o no inspector ou gizmo)
     inline void UpdateSubtree(SceneECS& scene, Entity root) {
         // pega matrix do parent se existir
         glm::mat4 parentWorld = glm::mat4(1.0f);
@@ -74,13 +82,49 @@ namespace TransformSys {
         }
         UpdateRecursive(scene, root, parentWorld);
     }
+
+
+
+    //void MarkDirtyRecursive(SceneECS& scene, Entity self) {
+    //    Transform& tc = scene.GetComponent<Transform>(self);
+    //    if (tc.dirty) return; // j√° marcado
+
+    //    dirty = true;
+
+    //    // se tiver filhos, marca eles tamb√©m
+    //    if (scene.HasComponent<HierarchyComponent>(self)) {
+    //        HierarchyComponent& h = scene.GetComponent<HierarchyComponent>(self);
+    //        Entity child = h.firstChild;
+    //        while (child != INVALID_ENTITY) {
+    //            if (scene.HasComponent<Transform>(child)) {
+    //                scene.GetComponent<Transform>(child).MarkDirty(scene, child);
+    //            }
+    //            child = scene.GetComponent<HierarchyComponent>(child).nextSibling;
+    //        }
+    //    }
+    //}
+
 }
 
 
-// Sistema ECS que roda no comeÁo do frame
+// Sistema ECS que roda no come√ßo do frame
 class TransformSystem : public System {
 public:
+    bool HasDirty(SceneECS& scene) {
+        //preste atencao no const
+        const auto& entities = scene.GetAllEntities();
+        for (Entity e : entities) {
+            if (!scene.HasComponent<Transform>(e)) continue;
+            Transform& t = scene.GetComponent<Transform>(e);
+            if (t.localDirty || t.worldDirty) return true;
+        }
+        return false;
+    }
+
     void Update(float deltaTime) override {
+        // roda s√≥ se existir algum dirty
+        if (!HasDirty(*GEngine->scene)) return;
+
         TransformSys::UpdateAllTransforms(*GEngine->scene);
     }
 };

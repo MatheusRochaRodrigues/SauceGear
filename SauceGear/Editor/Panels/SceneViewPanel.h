@@ -90,8 +90,7 @@ struct SceneViewPanel : IPanel {
                 currentGizmoMode, ImGuizmo::LOCAL, glm::value_ptr(worldMat));
 
             if (ImGuizmo::IsUsing()) {
-                //ApplyGizmoTransform(scene, selected, worldMat);
-                
+                //ApplyGizmoTransform(scene, selected, worldMat); 
                 // new world matrix gerada pelo gizmo
                 glm::mat4 newWorld = worldMat;
 
@@ -110,8 +109,13 @@ struct SceneViewPanel : IPanel {
                 else {
                     tc.SetLocalFromWorldMatrixAsRoot(newWorld);
                 }
+                 
+                // não precisa MarkDirty() porque os SetLocalFromWorldMatrix já fazem isso internamente
+                // só garante que o Update do TransformSystem vai recalcular na próxima passada
 
                 // atualiza subtree imediatamente (filhos precisam seguir)
+                // não precisa atualizar subtree manual aqui → deixa o sistema cuidar no próximo frame
+                // forçar atualização só da subtree editada
                 TransformSys::UpdateSubtree(scene, selected);
             }
              

@@ -55,6 +55,63 @@ struct Transform {
 
     Transform() = default;
 
+    // ----------------------------
+    // Métodos locais
+    // ----------------------------
+    void SetLocalPosition(const glm::vec3& pos) {
+        localPosition = pos;
+        MarkLocalDirty();
+    }
+
+    void SetLocalRotation(const glm::quat& rot) {
+        localRotation = rot;
+        MarkLocalDirty();
+    }
+
+    void SetLocalScale(const glm::vec3& scl) {
+        localScale = scl;
+        MarkLocalDirty();
+    }
+
+    // setters combinados (úteis em gizmo)
+    void SetLocalTRS(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scl) {
+        localPosition = pos;
+        localRotation = rot;
+        localScale = scl;
+        MarkLocalDirty();
+    }
+
+    // ----------------------------
+    // Métodos globais
+    // ----------------------------
+    void SetWorldPosition(const glm::vec3& pos) {
+        position = pos;
+        MarkWorldDirty();
+    }
+
+    void SetWorldRotation(const glm::quat& rot) {
+        rotation = rot;
+        MarkWorldDirty();
+    }
+
+    void SetWorldScale(const glm::vec3& scl) {
+        scale = scl;
+        MarkWorldDirty();
+    }
+
+    // setters combinados
+    void SetWorldTRS(const glm::vec3& pos, const glm::quat& rot, const glm::vec3& scl) {
+        position = pos;
+        rotation = rot;
+        scale = scl;
+        MarkWorldDirty();
+    } 
+
+
+    // ----------------------------
+    // Métodos auxiliares para Gizmo
+    // ---------------------------- 
+
     // Recalcula localMatrix quando localDirty
     void UpdateLocalMatrixIfNeeded() {
         if (!localDirty) return;
@@ -97,11 +154,59 @@ struct Transform {
         return model;
     }
 
+
+    // Quando ImGuizmo retorna uma nova world matrix (newWorld):
+    // - Se existe parentWorld, local = inverse(parentWorld) * newWorld -> decompose local e salvar em local*
+    // - Se nao tem parent -> decompose newWorld em local* (comportamento de "mover root")
+    bool SetLocalFromWorldMatrix(const glm::mat4& newWorld, const glm::mat4& parentWorld) {
+        glm::mat4 local = glm::inverse(parentWorld) * newWorld;
+        if (!DecomposeMatrix(local, localPosition, localRotation, localScale)) return false;
+        MarkLocalDirty();
+        return true;
+    }
+
+    bool SetLocalFromWorldMatrixAsRoot(const glm::mat4& newWorld) {
+        if (!DecomposeMatrix(newWorld, localPosition, localRotation, localScale)) return false;
+        MarkLocalDirty(); 
+        return true;
+    } 
+
+    // ----------------------------
+    // Flags
+    // ----------------------------
+     
+    void MarkDirty() {
+        localDirty = true;
+        worldDirty = true;
+    }
+     
     // Marca local como alterado (ex.: inspector)
     void MarkLocalDirty() {
         localDirty = true;
         MarkWorldDirty(); // se local sujou, mundo também
     }
+
+    /*Quando você marca MarkLocalDirty() em um filho, você também precisa marcar o root como dirty, 
+    porque só ele dispara a atualização da árvore.Ou seja, MarkLocalDirty() deveria subir pela hierarquia.
+    ou
+    segunda opçao que é Quando o gizmo altera o local de uma entidade, 
+    você pode forçar UpdateSubtree(scene, selected) imediatamente, em vez de esperar o próximo frame.
+    */
+    //void MarkLocalDirty(SceneECS& scene, Entity self) {
+    //    localDirty = true;
+    //    MarkWorldDirty();
+
+    //    // sobe até o root e marca dirty
+    //    Entity parent = INVALID_ENTITY;
+    //    if (scene.HasComponent<HierarchyComponent>(self)) {
+    //        parent = scene.GetComponent<HierarchyComponent>(self).parent;
+    //    }
+
+    //    if (parent != INVALID_ENTITY && scene.HasComponent<Transform>(parent)) {
+    //        scene.GetComponent<Transform>(parent).MarkWorldDirty();
+    //    }
+    //}
+
 
     // marca world dirty (filhos precisam recalcular)
     void MarkWorldDirty() {
@@ -109,43 +214,25 @@ struct Transform {
         // filhos serão sujos no UpdateAllTransforms
     }
 
+    // ----------------------------
+    // Helpers
+    // ----------------------------
     // Helper: decompose uma matrix para (pos, quat, scale)
-    static bool DecomposeMatrix(const glm::mat4& m, glm::vec3& outPos, glm::quat& outRot, glm::vec3& outScale) {
-        using namespace glm;
-        vec3 skew;
-        vec4 perspective;
-        if (!decompose(m, outScale, outRot, outPos, skew, perspective)) return false;
-        outRot = glm::normalize(outRot);
+    static bool DecomposeMatrix(const glm::mat4& mat, glm::vec3& pos, glm::quat& rot, glm::vec3& scl) {
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        if (!glm::decompose(mat, scl, rot, pos, skew, perspective)) return false;
+        rot = glm::normalize(rot);
         return true;
+    } 
+
+    //to quaternion
+    glm::vec3 GetForwardDirection() const {
+        return glm::normalize(rotation * glm::vec3(0, 0, -1));
     }
 
-    // Quando ImGuizmo retorna uma nova world matrix (newWorld):
-    // - Se existe parentWorld, local = inverse(parentWorld) * newWorld -> decompose local e salvar em local*
-    // - Se nao tem parent -> decompose newWorld em local* (comportamento de "mover root")
-    bool SetLocalFromWorldMatrix(const glm::mat4& newWorld, const glm::mat4& parentWorld) {
-        glm::mat4 invParent = glm::inverse(parentWorld);
-        glm::mat4 newLocal = invParent * newWorld;
 
-        glm::vec3 lp; glm::quat lr; glm::vec3 ls;
-        if (!DecomposeMatrix(newLocal, lp, lr, ls)) return false;
 
-        localPosition = lp;
-        localRotation = glm::normalize(lr);
-        localScale = ls;
-        MarkLocalDirty();
-        return true;
-    }
-
-    bool SetLocalFromWorldMatrixAsRoot(const glm::mat4& newWorld) {
-        glm::vec3 lp; glm::quat lr; glm::vec3 ls;
-        if (!DecomposeMatrix(newWorld, lp, lr, ls)) return false;
-
-        localPosition = lp;
-        localRotation = glm::normalize(lr);
-        localScale = ls;
-        MarkLocalDirty();
-        return true;
-    }
 
     // Caso alguém queira decompor worldMatrix diretamente para world fields (compat)
     bool DecomposeTransformToWorld(const glm::mat4& transformMatrix) {
@@ -158,10 +245,5 @@ struct Transform {
         rotation = glm::normalize(orientation);
         MarkWorldDirty();
         return true;
-    }
-
-
-    glm::vec3 GetForwardDirection() const {
-        return glm::normalize(rotation * glm::vec3(0, 0, -1));
     }
 };

@@ -74,13 +74,13 @@ public:
         s_cycle.nightHDR = { "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };
         s_cycle.dawnHDR = { "Resources/Textures/hdr/spruit_sunrise_4k.hdr", {} };
         s_cycle.dayHDR = { "Resources/Textures/hdr/tst/Kloppenheim (1).hdr", {} };
-        s_cycle.duskHDR = { "Resources/Textures/hdr/tst/rogland_moonlit_night_4k.hdr", {} };
+        //s_cycle.duskHDR = { "Resources/Textures/hdr/tst/rogland_moonlit_night_4k.hdr", {} };
 
         // pré-processa HDR → cubemap, irradiance, prefilter
         s_cycle.dayHDR.second = IBLManager::EnsureIBL(s_cycle.dayHDR.first, cacheDir, shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf, 0, 0);
         s_cycle.dawnHDR.second = IBLManager::EnsureIBL(s_cycle.dawnHDR.first, cacheDir, shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf, 0, 0);
         s_cycle.nightHDR.second = IBLManager::EnsureIBL(s_cycle.nightHDR.first, cacheDir, shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf, 0, 0);
-        s_cycle.duskHDR.second = IBLManager::EnsureIBL(s_cycle.duskHDR.first, cacheDir, shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf, 0, 0);
+        //s_cycle.duskHDR.second = IBLManager::EnsureIBL(s_cycle.duskHDR.first, cacheDir, shaders.hdrToCube, shaders.irradiance, shaders.prefilter, shaders.brdf, 0, 0);
 
         backIBL = IBLManager::CreateEmptyIBL();
         frontIBL = IBLManager::CreateEmptyIBL();
@@ -133,8 +133,8 @@ private:
             s_cycle.prevIBL = &s_cycle.dayHDR.second; s_cycle.nextIBL = &s_cycle.duskHDR.second; 
             return my_smoothstep(0, 1, phase - 2.0f); 
         }
-
-        s_cycle.prevIBL = &s_cycle.duskHDR.second; s_cycle.nextIBL = &s_cycle.nightHDR.second; 
+         
+        s_cycle.prevIBL = &s_cycle.dawnHDR.second; s_cycle.nextIBL = &s_cycle.dayHDR.second;  //s_cycle.prevIBL = &s_cycle.duskHDR.second; s_cycle.nextIBL = &s_cycle.nightHDR.second;
         return my_smoothstep(0, 1, phase - 3.0f);
     }
 
