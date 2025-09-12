@@ -108,34 +108,49 @@ namespace InspectorDrawer {
     }
 
     inline void DrawProperty(const FieldInfo& field, void* instance, TypeInfo* ownerType = nullptr) {
-        if (!instance) return;
+        switch (field.kind) {
+        case FieldKind::Value: {
+            char* base = static_cast<char*>(instance);
+            void* ptr = base + field.offset;
+            bool changed = false;
 
-        char* base = static_cast<char*>(instance);
-        void* ptr = base + field.offset;
-        bool changed = false;
+            if (field.type == typeid(float))   changed = ImGuiUtils::DragFloat(field.name.c_str(), *static_cast<float*>(ptr));
+            else if (field.type == typeid(int)) changed = ImGuiUtils::DragInt(field.name.c_str(), *static_cast<int*>(ptr));
+            else if (field.type == typeid(bool)) changed = ImGuiUtils::Checkbox(field.name.c_str(), *static_cast<bool*>(ptr));
+            else if (field.type == typeid(glm::vec2)) changed = ImGuiUtils::DragVec2Colored(field.name.c_str(), *static_cast<glm::vec2*>(ptr));
+            else if (field.type == typeid(glm::vec3)) changed = ImGuiUtils::DragVec3Colored(field.name.c_str(), *static_cast<glm::vec3*>(ptr));
+            else if (field.type == typeid(glm::vec4)) changed = ImGuiUtils::DragVec4(field.name.c_str(), *static_cast<glm::vec4*>(ptr));
+            else if (field.type == typeid(glm::quat)) { 
+                changed = DrawQuatAsEuler(field.name, static_cast<glm::quat*>(ptr)); 
+            }
+            // ... strings, enums etc 
 
-        // Tipos primitivos e vetores
-        if (field.type == typeid(float)) changed = ImGuiUtils::DragFloat(field.name.c_str(), *static_cast<float*>(ptr));
-        else if (field.type == typeid(int)) changed = ImGuiUtils::DragInt(field.name.c_str(), *static_cast<int*>(ptr));
-        else if (field.type == typeid(bool)) changed = ImGuiUtils::Checkbox(field.name.c_str(), *static_cast<bool*>(ptr));
-        else if (field.type == typeid(glm::vec2)) changed = ImGuiUtils::DragVec2Colored(field.name.c_str(), *static_cast<glm::vec2*>(ptr));
-        else if (field.type == typeid(glm::vec3)) changed = ImGuiUtils::DragVec3Colored(field.name.c_str(), *static_cast<glm::vec3*>(ptr));
-        else if (field.type == typeid(glm::vec4)) changed = ImGuiUtils::DragVec4(field.name.c_str(), *static_cast<glm::vec4*>(ptr));
+            /*if (field.type == typeid(std::string)) {
+                std::string* s = static_cast<std::string*>(ptr);
+                char buf[512];
+                std::strncpy(buf, s->c_str(), sizeof(buf));
+                buf[sizeof(buf) - 1] = '\0';
+                if (ImGui::InputText(field.name.c_str(), buf, sizeof(buf))) {
+                    *s = std::string(buf);
+                    if (ownerType && ownerType->onEdited) ownerType->onEdited(instance);
+                }
+            }*/
 
-        // --- Quaternion handling
-        else if (field.type == typeid(glm::quat)) {
-            changed = DrawQuatAsEuler(field.name, static_cast<glm::quat*>(ptr));
+
+            if (changed && ownerType && ownerType->onEdited) {
+                ownerType->onEdited(instance);
+            }
+            break;
         }
-
-        // Dispara o callback onEdited do ownerType se houver mudança
-        if (changed && ownerType && ownerType->onEdited) {
-            ownerType->onEdited(instance);
+        case FieldKind::Header:
+            ImGuiUtils::Header(field.name);
+            break;
+        case FieldKind::Space:
+            ImGuiUtils::Space();
+            break;
         }
-
-        // Headers e spaces
-        if (field.kind == FieldKind::Header) ImGuiUtils::Header(field.name);
-        else if (field.kind == FieldKind::Space) ImGuiUtils::Space();
     }
+
 
 
     inline void DrawType(const char* label, void* instance, TypeInfo* type) {

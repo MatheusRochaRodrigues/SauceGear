@@ -464,9 +464,6 @@
     <ClInclude Include="Editor\Drawers\LightDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\Utils\InspectorMacros.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="ECS\Reflection\Meta.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -495,6 +492,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Systems\ComputeSyncSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\TransformSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

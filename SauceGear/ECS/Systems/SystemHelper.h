@@ -9,3 +9,4 @@
 #include "PickingSystem.h" 
 #include "DayNightSystem.h"  
 #include "ComputeSyncSystem.h"  
+#include "TransformSystem.h"  

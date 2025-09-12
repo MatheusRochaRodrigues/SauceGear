@@ -186,12 +186,12 @@
     <ClInclude Include="ECS\Reflection\Meta.h" />
     <ClInclude Include="ECS\Systems\ComputeSyncSystem.h" />
     <ClInclude Include="ECS\Systems\DayNightSystem.h" />
+    <ClInclude Include="ECS\Systems\TransformSystem.h" />
     <ClInclude Include="Editor\Drawers\CameraDrawer.h" />
     <ClInclude Include="Editor\Icons\MaterialIcons.h" />
     <ClInclude Include="Editor\Utils\InspectorDrawer.h" />
     <ClInclude Include="Editor\Drawers\TransformDrawer.h" />
     <ClInclude Include="Editor\Utils\ImGuiUtils.h" />
-    <ClInclude Include="Editor\Utils\InspectorMacros.h" />
     <ClInclude Include="Engine\exec.h" />
     <ClInclude Include="Editor\Drawers\MeshRendererDrawer.h" />
     <ClInclude Include="Editor\Drawers\LightDrawer.h" />

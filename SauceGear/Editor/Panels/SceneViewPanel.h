@@ -1,8 +1,10 @@
-#pragma once
+Ôªø#pragma once
 #include "IPanel.h"
 #include "../ECS/Components/ComponentsHelper.h" 
 #include "../Graphics/Renderer.h"  
 #include "Load.h"
+
+#include "../../ECS/Systems/TransformSystem.h" 
 
 struct SceneViewPanel : IPanel {
     SceneViewPanel() { 
@@ -20,7 +22,7 @@ struct SceneViewPanel : IPanel {
             GEngine->renderer->frameScreen->Resize((int)viewportSize.x, (int)viewportSize.y);     //GEngine->renderer->ResizeFramebuffer((int)viewportSize.x, (int)viewportSize.y);
             lastSize = viewportSize;
 
-            // TambÈm redimensiona a projeÁ„o da c‚mera
+            // Tamb√©m redimensiona a proje√ß√£o da c√¢mera
             GEngine->mainCamera->SetProjection((float)viewportSize.x, (float)viewportSize.y);
             GEngine->mainCamera->SetAspectRatio(viewportSize.x / viewportSize.y);
 
@@ -38,9 +40,9 @@ struct SceneViewPanel : IPanel {
             ImGui::Image((ImTextureID)(uintptr_t)textureID, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
         }
         else {
-            // opcional: vocÍ pode exibir uma tela preta tempor·ria
+            // opcional: voc√™ pode exibir uma tela preta tempor√°ria
             ImGui::Dummy(viewportSize);
-            framebufferDirty = false; // libera no prÛximo frame 
+            framebufferDirty = false; // libera no pr√≥ximo frame 
         }
 
 
@@ -64,44 +66,63 @@ struct SceneViewPanel : IPanel {
         // ImGuizmo
         Entity selected = scene.GetSelectedEntity();
         if (selected != INVALID_ENTITY) {
-            //Presume-se que toda entidade selecion·vel tem um TransformComponent. 
-            Transform& tc = scene.GetComponent<Transform>(selected); 
+            //Presume-se que toda entidade selecion√°vel tem um TransformComponent. 
+            // ... c√≥digo anterior ...
+            Transform& tc = scene.GetComponent<Transform>(selected);
 
+            //DESNECESSARIO
+            // Atualiza antes do gizmo (garante que a matriz est√° correta)
+            //TransformSystem::UpdateSubtree(scene, selected);
+
+            // Prepara rect / view / proj
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
-            // Certifique-se de definir corretamente a ·rea onde o gizmo pode desenhar
-            //ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
             ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
 
             glm::mat4 view = GEngine->mainCamera->GetViewMatrix();
             glm::mat4 proj = GEngine->mainCamera->GetProjectionMatrix();
-            glm::mat4 transform = tc.GetMatrix();  //std::cout << "aqui + " << tc.position.x << " " << tc.position.y << " " << tc.position.z << std::endl; 
-             
-            if (ImGui::IsKeyPressed(ImGuiKey_1)) currentGizmoMode = ImGuizmo::TRANSLATE;
-            if (ImGui::IsKeyPressed(ImGuiKey_2)) currentGizmoMode = ImGuizmo::ROTATE;
-            if (ImGui::IsKeyPressed(ImGuiKey_3)) currentGizmoMode = ImGuizmo::SCALE; 
 
-            //ImGuizmo::SetGizmoSizeClipSpace(0.09f);  // Ajuste o valor conforme necess·rio 
-
-            // Manipula o transform da entidade com o gizmo, apenas se a janela de cena estiver focada
-            //if (isSceneHovered && isSceneFocused) { 
+            // IMPORTANTE: aqui usamos a matrix world do transform.
+            // Certifique-se que voc√™ chamou TransformSystem::UpdateAllTransforms(scene) neste frame antes de desenhar gizmos.
+            glm::mat4 worldMat = tc.GetMatrix(); // GetMatrix() retorna model/worldMatrix
 
             ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
-                currentGizmoMode, ImGuizmo::LOCAL, glm::value_ptr(transform));
+                currentGizmoMode, ImGuizmo::LOCAL, glm::value_ptr(worldMat));
 
             if (ImGuizmo::IsUsing()) {
-                tc.DecomposeTransform(transform);  // j· converte para quat
-                tc.MarkDirty();
+                //ApplyGizmoTransform(scene, selected, worldMat);
+                
+                // new world matrix gerada pelo gizmo
+                glm::mat4 newWorld = worldMat;
+
+                // se tiver parent -> converte para local
+                glm::mat4 parentWorld = glm::mat4(1.0f);
+                if (scene.HasComponent<HierarchyComponent>(selected)) {
+                    HierarchyComponent& h = scene.GetComponent<HierarchyComponent>(selected);
+                    if (h.parent != INVALID_ENTITY && scene.HasComponent<Transform>(h.parent)) {
+                        parentWorld = scene.GetComponent<Transform>(h.parent).model;
+                        tc.SetLocalFromWorldMatrix(newWorld, parentWorld);
+                    }
+                    else {
+                        tc.SetLocalFromWorldMatrixAsRoot(newWorld);
+                    }
+                }
+                else {
+                    tc.SetLocalFromWorldMatrixAsRoot(newWorld);
+                }
+
+                // atualiza subtree imediatamente (filhos precisam seguir)
+                TransformSys::UpdateSubtree(scene, selected);
             }
-            //if (isSceneHovered && isSceneFocused)   
+             
+            //if (isSceneHovered && isSceneFocused)     // Manipula o transform da entidade com o gizmo, apenas se a janela de cena estiver focada
         } 
 
-
-
+         
         const char* items[] = { "Scene", "Hierarchy", "Inspector", "Project" };
         static int current_item = 0;
 
-        if (ImGui::Begin("Painel Customiz·vel")) {
+        if (ImGui::Begin("Painel Customiz√°vel")) {
             if (ImGui::BeginCombo("Tipo de Painel", items[current_item])) {
                 for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
                     bool is_selected = (current_item == i);
@@ -125,11 +146,23 @@ struct SceneViewPanel : IPanel {
         }
         ImGui::End();
 
-
-
+         
         ImGui::End();
 
     }
+
+    void ApplyGizmoTransform(SceneECS& scene, Entity e, const glm::mat4& newWorld) {
+        Transform& t = scene.GetComponent<Transform>(e);
+        glm::mat4 parentWorld = glm::mat4(1.0f);
+        if (scene.HasComponent<HierarchyComponent>(e)) {
+            auto& h = scene.GetComponent<HierarchyComponent>(e);
+            if (h.parent != INVALID_ENTITY && scene.HasComponent<Transform>(h.parent))
+                parentWorld = scene.GetComponent<Transform>(h.parent).model;
+        }
+        t.SetLocalFromWorldMatrix(newWorld, parentWorld);
+        TransformSys::UpdateSubtree(scene, e);
+    }
+
 
     const char* GetName() override { return "Scene"; }
 
@@ -146,12 +179,4 @@ private:
 };
 
  
-
-//if (!useWindow)
-//{
-//    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-//}
-//else
-//{
-//    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-//}
+ 

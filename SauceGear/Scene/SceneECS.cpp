@@ -16,13 +16,14 @@ void SceneECS::initECS() {
     componentManager->Register<AABBComponent>();
 
     ///----------Systems
-    auto* cameraSystem =        RegisterSystem <CameraSystem>();
-    auto* computeSyncComponent =RegisterSystem <ComputeSyncSystem>();
-    auto* dayNightSystem =      RegisterSystem <DayNightSystem>();
-    auto* lightSystem  =        RegisterSystem <LightSystem> ();
-    auto* globalUniformSystem = RegisterSystem <GlobalUniformSystem>(); 
-    auto* renderSystem =        RegisterSystem <RenderSystem>(); 
-    auto* postProcessSystem =   RegisterSystem <PostProcessSystem>(); 
+    //auto* transformSystem =      RegisterSystem <TransformSystem>();
+    auto* cameraSystem =         RegisterSystem <CameraSystem>();
+    auto* computeSyncComponent = RegisterSystem <ComputeSyncSystem>();
+    auto* dayNightSystem =       RegisterSystem <DayNightSystem>();
+    auto* lightSystem  =         RegisterSystem <LightSystem> ();
+    auto* globalUniformSystem =  RegisterSystem <GlobalUniformSystem>(); 
+    auto* renderSystem =         RegisterSystem <RenderSystem>(); 
+    auto* postProcessSystem =    RegisterSystem <PostProcessSystem>(); 
 
     //auto* pickingSystem = RegisterSystem <PickingSystem>();
 
