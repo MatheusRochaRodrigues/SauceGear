@@ -1,10 +1,8 @@
-#pragma once
- 
+#pragma once 
 #include <string>
 #include <vector>
 #include "../Graphics/Shader.h"
-#include <stb/stb_image.h>
- 
+#include <stb/stb_image.h> 
 
 class Texture {
 public:
@@ -37,9 +35,7 @@ public:
     //    // glGetTexImage(...); -> requires a lot of boilerplate
 
     //    // Alternativa: em vez de duplicar a textura, **compartilhe o ponteiro** (mais leve e seguro)
-    //}
-
-
+    //}  
 
     // Textura para framebuffer (2D ou multisample)
     Texture(unsigned int width, unsigned int height,

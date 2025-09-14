@@ -212,6 +212,24 @@ GLuint IBLManager::CreatePrefilter_Tex(int baseSize, int mips) {
     return id;
 }
 
+//Forma mais explicita de gerar mips sem depender de glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+//GLuint IBLManager::CreatePrefilter_Tex(int baseSize, int mips) {
+//    GLuint id; glGenTextures(1, &id);
+//    glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+//
+//    for (int face = 0; face < 6; face++) {
+//        for (int mip = 0; mip < mips; mip++) {
+//            int w = std::max(1, baseSize >> mip);
+//            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip,
+//                GL_RGB16F, w, w, 0, GL_RGB, GL_FLOAT, nullptr);
+//        }
+//    } 
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    return id;
+//}
+
+
 void IBLManager::PrefilterToSpecular(GLuint envCubemap, GLuint prefilter,
     Shader& shPref, const glm::mat4& proj,
     const std::vector<glm::mat4>& views,
@@ -270,7 +288,12 @@ void IBLManager::IntegrateBRDF(GLuint brdfLUT, Shader& shBRDF,
 
 
 
-//Helpers
+
+
+//=====================================================
+//============= Helpers to others entitys =============
+//=====================================================
+
 IBLSet IBLManager::CreateEmptyIBL(int width, int mipLevels) {
     IBLSet set{};
 
@@ -309,6 +332,32 @@ GLuint IBLManager::CreateEmptyCubemap(int width, int mipLevels) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    return tex;
+}
+
+
+GLuint IBLManager::CreateCubemap(int size, GLenum internalFormat, int mipLevels) {
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+    for (int mip = 0; mip < mipLevels; ++mip) {
+        int mipSize = std::max(1, size >> mip);
+        for (int face = 0; face < 6; ++face) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalFormat,
+                mipSize, mipSize, 0, GL_RGBA, GL_FLOAT, nullptr);
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
+        mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     return tex;

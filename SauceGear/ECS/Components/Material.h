@@ -9,10 +9,9 @@ namespace MaterialDefaults {
  
 struct Material {
     Shader* shader; 
-    std::unordered_map<std::string, Texture*> textures; 
-    //std::unordered_map<std::string, std::pair<unsigned int,Texture*>> textures; 
+    std::unordered_map<std::string, Texture*> textures;  
+    std::unordered_map<std::string, float>    floatParams;
 
-    std::unordered_map<std::string, float>    floatParams; 
     glm::vec3 albedoColor = glm::vec3(1.0f);
 
     Material(Shader* shader) : shader(shader) {} 
@@ -20,9 +19,6 @@ struct Material {
         Shader* shader = new Shader("BlinnPhong/BaseLighting.vs", "BlinnPhong/BaseLighting.fs");
         this->shader = shader; 
     } 
-
-    //void setData(unsigned int u, std::string s, Texture* t) { textures[s] = { u, t }; }
-    //void setData(std::string s, float f) { floatParams[s] =  f ; }
 
     void Bind() const {
         shader->use();
@@ -110,8 +106,6 @@ struct Material {
     }*/  
 
 };
-    //static Shader* DefaultMaterial;
-
 
 // Fallbacks e registros
 namespace MaterialDefaults {

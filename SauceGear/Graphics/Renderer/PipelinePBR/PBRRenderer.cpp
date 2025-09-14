@@ -220,7 +220,7 @@ void PBRPipeline::DrawSkybox() {
     // Nunca chame StartCubemapJob() dentro do draw. Faça no Update
 
     // Bind seguro
-    glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront());
+    glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront().envCubemap);
     //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::frontIBL.envCubemap);
     //glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.envCubemap);
 

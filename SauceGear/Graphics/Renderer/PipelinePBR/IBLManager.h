@@ -83,6 +83,9 @@ private:
     //Helpers 
     // Cria um IBLSet vazio (para ser preenchido via GPU_Lerp)
 public:
+
+    static GLuint CreateCubemap(int size, GLenum internalFormat, int mipLevels = 1);
+
     static IBLSet CreateEmptyIBL(int width = 512, int mipLevels = 5);
 private:
     static GLuint CreateEmptyCubemap(int width, int mipLevels);
