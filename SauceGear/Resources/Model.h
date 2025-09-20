@@ -9,7 +9,9 @@
 #include "../Graphics/Mesh.h" 
 #include "AssetManager.h"
 
-using matCache = std::unordered_map<unsigned int, Material*>;
+#include "DefineMaterials/TextureCache.h"
+
+using matCache = std::unordered_map<unsigned int, std::shared_ptr<MaterialInstance>>;
 static std::vector<Texture> textures_loaded;
 
 class ModelLoader {
@@ -107,13 +109,13 @@ private:
                 const uint32_t indexCount = static_cast<uint32_t>(indices.size()) - indexOffset;
 
                 // material (com cache por materialIndex)
-                Material* mat = nullptr;
+                MaterialInstance* mat = nullptr;
                 auto it = materialCache.find(matIndex);
                 if (it != materialCache.end())  
-                    mat = it->second; 
+                    mat = it->second.get(); 
                 else {
-                    mat = CreateMaterialFrom(scene->mMaterials[matIndex], meshNode->directory);
-                    materialCache[matIndex] = mat;
+                    materialCache[matIndex] = CreateMaterialInstanceFrom(scene->mMaterials[matIndex], meshNode->directory);
+                    mat = materialCache[matIndex].get();
                 } 
                 submeshes.push_back(SubMesh{ indexOffset, indexCount, mat });
             } 
@@ -128,9 +130,82 @@ private:
 
         return meshNode;
     }
-
     //static Mesh* ProcessMesh(aiNode* node, aiMesh* aimesh, const aiScene* scene, const std::string& directory, matCache& materialCache) { }
 
+    static std::shared_ptr<MaterialInstance> CreateMaterialInstanceFrom(aiMaterial* aiMat, const std::string& directory) {
+        // Base do material: PBR ou outro material custom
+        auto baseMat = std::make_shared<PBRMaterial>();
+
+        // Define parâmetros padrão
+        baseMat->DefineParameters();
+
+        auto instance = std::make_shared<MaterialInstance>(baseMat);
+
+        // Load textures / cores
+        aiColor3D color(1.f, 1.f, 1.f);
+        if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
+            instance->SetFallbackColor("Albedo", glm::vec3(color.r, color.g, color.b));
+        }
+
+        aiString texPath;
+        if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+            std::string fullPath = directory + "/" + texPath.C_Str(); 
+            instance->SetTexture("Albedo", TextureCache::Get().Load(fullPath));
+        }
+
+        // fallback de metallic e roughness
+        instance->SetFallbackFloat("Metallic", 0.1f);
+        instance->SetFallbackFloat("Roughness", 0.5f);
+
+        return instance;
+    }
+    
+    /*
+    static std::shared_ptr<MaterialInstance> CreateMaterialFrom(aiMaterial* aiMat, const std::string& directory) {
+        // 1. Criar o MaterialBase (ou uma subclasse se quiser special bindings)
+        auto baseMat = std::make_shared<MaterialBase>(ShaderManager::GetShader("PBR"));
+        baseMat->DefineParameters(); // define defaults (albedo, roughness, metallic, etc)
+
+        // 2. Criar a MaterialInstance a partir do base
+        auto instance = std::make_shared<MaterialInstance>(baseMat);
+
+        // 3. Carregar texturas do aiMaterial
+        auto LoadTexture = [&](aiTextureType type, const std::string& uniformName, const glm::vec3& fallbackColor) {
+            aiString str;
+            if (aiMat->GetTexture(type, 0, &str) == AI_SUCCESS) {
+                const std::string fullPath = directory + "/" + str.C_Str();
+                auto tex = std::make_shared<Texture>();
+                tex->LoadFromFile(fullPath.c_str());
+                instance->SetTexture(uniformName, tex);
+            }
+            else {
+                // fallback: cor
+                instance->SetFallbackColor(uniformName, fallbackColor);
+            }
+            };
+
+        // Albedo
+        aiColor3D diffuse(1.f, 1.f, 1.f);
+        aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+        LoadTexture(aiTextureType_DIFFUSE, "albedo", glm::vec3(diffuse.r, diffuse.g, diffuse.b));
+
+        // Roughness (float fallback)
+        float roughness = 0.5f;
+        instance->SetFallbackFloat("roughness", roughness);
+
+        // Metallic (float fallback)
+        float metallic = 0.1f;
+        instance->SetFallbackFloat("metallic", metallic);
+
+        // Normal map (fallback branco)
+        LoadTexture(aiTextureType_HEIGHT, "normal", glm::vec3(1.f, 1.f, 1.f));
+
+        return instance;
+    }
+    */
+
+
+    /*
     static Material* CreateMaterialFrom(aiMaterial* aiMat, const std::string& directory) {
         auto* material = new Material();
 
@@ -178,7 +253,7 @@ private:
 
         return material;
     }
-     
+     */
 };
 
 #endif

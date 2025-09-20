@@ -11,6 +11,7 @@ public:
     std::string path;         // Caminho original (se aplicável)
     GLenum format = GL_RGB;   // Formato de leitura
     GLuint unit = 0;          // Unidade de textura vinculada
+    bool sucess = false;
 
     // Construtores
     Texture() = default;
@@ -62,7 +63,7 @@ public:
 
 
 
-    void Bind() const;
+    void Bind(int slot = -1) const;
     void Unbind() const;
     void Delete();
 

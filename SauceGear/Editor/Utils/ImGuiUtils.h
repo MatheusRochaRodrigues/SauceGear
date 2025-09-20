@@ -160,3 +160,37 @@ namespace ImGuiUtils {
 //        ImGui::TreePop();
 //    }
 //}
+
+
+
+
+/*
+
+inline void DrawMaterialInstance(MaterialInstance& inst) {
+    auto& params = inst.overrides;
+
+    for (auto& [name, param] : params) {
+        if (std::holds_alternative<float>(param.value)) {
+            float& v = std::get<float>(param.value);
+            ImGui::SliderFloat(name.c_str(), &v, 0.0f, 1.0f);
+        }
+        else if (std::holds_alternative<glm::vec3>(param.value)) {
+            glm::vec3& v = std::get<glm::vec3>(param.value);
+            ImGui::ColorEdit3(name.c_str(), &v.x);
+        }
+        else if (std::holds_alternative<std::shared_ptr<Texture>>(param.value)) {
+            auto& tex = std::get<std::shared_ptr<Texture>>(param.value);
+            if (tex) {
+                ImGui::Text("%s: [Texture Loaded]", name.c_str());
+                // poderia mostrar preview aqui
+            }
+            else {
+                ImGui::Text("%s: [None]", name.c_str());
+                if (ImGui::Button(("Assign##" + name).c_str())) {
+                    // abrir file picker
+                }
+            }
+        }
+    }
+}
+*/

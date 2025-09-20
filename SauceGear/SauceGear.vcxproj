@@ -199,6 +199,11 @@
     <ClInclude Include="Graphics\ComputeShader.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
+    <ClInclude Include="Resources\DefineMaterials\Material.h" />
+    <ClInclude Include="Resources\DefineMaterials\MaterialInstance.h" />
+    <ClInclude Include="Resources\DefineMaterials\MaterialUtils.h" />
+    <ClInclude Include="Resources\DefineMaterials\PBRMaterial.h" />
+    <ClInclude Include="Resources\DefineMaterials\TextureCache.h" />
     <ClInclude Include="Scripts\ScriptABI.h" />
     <ClInclude Include="Utils\MathHelpers.h" />
     <ClInclude Include="ECS\Systems\PickingSystem.h" />

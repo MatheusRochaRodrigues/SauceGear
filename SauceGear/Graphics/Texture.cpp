@@ -158,8 +158,9 @@ void Texture::GenerateRenderTarget(unsigned int width, unsigned int height,
 
 
 
-void Texture::Bind() const {
-    glActiveTexture(GL_TEXTURE0 + Texture::unit);
+void Texture::Bind(int slot) const {
+    slot = (slot == -1) ? Texture::unit : slot;
+    glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, ID);
 }
 
@@ -223,6 +224,8 @@ unsigned int Texture::LoadFromFile(const std::string& filename, bool gamma)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
+
+        sucess = true;
     }
     else
     {

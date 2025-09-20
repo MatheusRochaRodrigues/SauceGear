@@ -1,17 +1,26 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
-#include "../../ECS/Components/Material.h"
+#include "../../Resources/DefineMaterials/MaterialInstance.h"
 #include "../../ECS/Components/MeshFilter.h"
 
 struct MeshRenderer {
-    Mesh* mesh = nullptr;
-    std::unordered_map<Material*, std::vector<SubMesh*>> batches;
+    /*Mesh* mesh = nullptr;
+    std::unordered_map<Material*, std::vector<SubMesh*>> batches;*/
      
-    /*REFLECT_CLASS(MeshRenderer) {
-        REFLECT_HEADER("Mesh");
-        REFLECT_FIELD(mesh->);
-    }*/
+    std::shared_ptr<Mesh> mesh; // referência ao mesh da entidade
+    std::vector<std::shared_ptr<MaterialInstance>> materials;
+    
+    void Render(Shader* overrideShader = nullptr) {
+        if (!mesh) return;
+        for (size_t i = 0; i < mesh->GetSubMeshes().size(); ++i) {
+            auto& sub = mesh->GetSubMeshes()[i];
+            if (i < materials.size() && materials[i]) {
+                materials[i]->Apply(overrideShader);
+            }
+            mesh->DrawSubMesh(i);
+        }
+    }
 
     MeshRenderer() = default;
 
