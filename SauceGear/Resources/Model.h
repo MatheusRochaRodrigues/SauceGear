@@ -108,6 +108,7 @@ private:
                 }
                 const uint32_t indexCount = static_cast<uint32_t>(indices.size()) - indexOffset;
 
+                 
                 // material (com cache por materialIndex)
                 MaterialInstance* mat = nullptr;
                 auto it = materialCache.find(matIndex);
@@ -134,19 +135,14 @@ private:
 
     static std::shared_ptr<MaterialInstance> CreateMaterialInstanceFrom(aiMaterial* aiMat, const std::string& directory) {
         // Base do material: PBR ou outro material custom
-        auto baseMat = std::make_shared<PBRMaterial>();
-
-        // Define parâmetros padrão
-        baseMat->DefineParameters();
-
+        auto baseMat = std::make_shared<PBRMaterial>(); 
         auto instance = std::make_shared<MaterialInstance>(baseMat);
 
         // Load textures / cores
         aiColor3D color(1.f, 1.f, 1.f);
-        if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
+        if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color))  
             instance->SetFallbackColor("Albedo", glm::vec3(color.r, color.g, color.b));
-        }
-
+          
         aiString texPath;
         if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
             std::string fullPath = directory + "/" + texPath.C_Str(); 

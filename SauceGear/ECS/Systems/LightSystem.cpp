@@ -1,6 +1,9 @@
 #include "LightSystem.h"
 
 LightSystem::LightSystem() {
+
+    std::cout << "13" << std::endl;
+
     glGenFramebuffers(1, &depthMapFBO);
     // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -26,12 +29,10 @@ LightSystem::LightSystem() {
     //glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_LIGHTS * 192, NULL, GL_STATIC_DRAW); // allocate 192 bytes of memory 
     //glBindBuffer(GL_UNIFORM_BUFFER, 0);
     //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, shadowMapSSBO);
-
-
+     
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::HIGH,    std::deque<GLuint>(), std::deque<GLuint>() });  //1024
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::MEDIUM,  std::deque<GLuint>(), std::deque<GLuint>() });  //512
     poolShadowsTex.push_back(ShadowSettings{ ShadowLOD::LOW,     std::deque<GLuint>(), std::deque<GLuint>() });  //256  
-
      
     InitCascade();
 }

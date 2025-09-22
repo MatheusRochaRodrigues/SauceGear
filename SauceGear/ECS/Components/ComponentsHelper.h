@@ -4,7 +4,7 @@
 
 #include "Transform.h"
 #include "MeshRenderer.h" 
-#include "Material.h" 
+//#include "Material.h" 
 #include "Velocity.h" 
 #include "LightComponent.h" 
 #include "CameraComponent.h" 

@@ -3,27 +3,17 @@
 #include <vector>
 #include "../../Resources/DefineMaterials/MaterialInstance.h"
 #include "../../ECS/Components/MeshFilter.h"
+#include "../../Resources/DataBase/AssetDatabase.h"
 
 struct MeshRenderer {
-    /*Mesh* mesh = nullptr;
-    std::unordered_map<Material*, std::vector<SubMesh*>> batches;*/
+    Mesh* mesh = nullptr; 
+    // WARNING ---- ISSO ASSUME Q É O UNICO DETENTOR DE MESH, LOGO SE O CONTEXTO FOR TROCARDO, MESH RENDERER SER DELETADO PELO SHARED_PTR
+    //std::shared_ptr<Mesh> mesh; // referência ao mesh da entidade
+
+    std::unordered_map<std::shared_ptr<MaterialInstance>, std::vector<SubMesh*>> batches; 
      
-    std::shared_ptr<Mesh> mesh; // referência ao mesh da entidade
-    std::vector<std::shared_ptr<MaterialInstance>> materials;
-    
-    void Render(Shader* overrideShader = nullptr) {
-        if (!mesh) return;
-        for (size_t i = 0; i < mesh->GetSubMeshes().size(); ++i) {
-            auto& sub = mesh->GetSubMeshes()[i];
-            if (i < materials.size() && materials[i]) {
-                materials[i]->Apply(overrideShader);
-            }
-            mesh->DrawSubMesh(i);
-        }
-    }
 
-    MeshRenderer() = default;
-
+    MeshRenderer() = default; 
     MeshRenderer(Mesh* m) { SetMesh(m); }
 
     void SetMesh(Mesh* m) {
@@ -34,13 +24,26 @@ struct MeshRenderer {
     void RebuildBatches() {
         batches.clear();
         if (!mesh) return;
-        for (auto& sm : mesh->submeshes) {
-            if (sm.material == nullptr) std::cout << "mapa defult created  " << mesh->name << "    " << mesh->submeshes.size() << std::endl;
-            sm.material = (sm.material != nullptr) ? sm.material : MaterialDefaults::Get();
-             
+        for (auto& sm : mesh->submeshes) { 
+            if (!sm.material) {
+                std::cout << "[DEBUG] - material gerado em RebuildBatches" << std::endl;
+                //sm.material = std::make_shared<MaterialInstance>(std::make_shared<PBRMaterial>());
+                sm.material = (sm.material) ? sm.material : AssetDatabase::Load<MaterialInstance>("__default_material__");
+            } 
             batches[sm.material].push_back(&sm);
         }
     }
+
+    /*void Render(Shader* overrideShader = nullptr) {
+        if (!mesh) return;
+        for (size_t i = 0; i < mesh->GetSubMeshes().size(); ++i) {
+            auto& sub = mesh->GetSubMeshes()[i];
+            if (i < materials.size() && materials[i]) {
+                materials[i]->Apply(overrideShader);
+            }
+            mesh->DrawSubMesh(i);
+        }
+    }*/
 
     void Draw() {
         if (!mesh) return;
@@ -54,7 +57,7 @@ struct MeshRenderer {
         glBindVertexArray(0);
     }
 
-    void Draw(Material* mat) {
+    void Draw(MaterialInstance* mat) {
         if (!mesh) return;
         if (!mat) return;
         for (auto& sm : batches[mat]) { 
@@ -68,8 +71,7 @@ struct MeshRenderer {
         if (!mesh) return;
         for (auto& [mat, sms] : batches) {
             if (!mat) continue;
-            mat->Bind();
-            //shader->setMat4("model", trans.GetMatrix());
+            mat->Bind(); 
             for (auto* sm : sms) {
                 glBindVertexArray(mesh->VAO);
                 glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset));
@@ -88,7 +90,7 @@ struct MeshRenderer {
         batches.clear();
         if (!mesh) return;
         for (auto& sm : mesh->submeshes) {
-            Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            MaterialInstance* mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
             batches[mat].push_back(&sm);
         }
         for (auto* child : mesh->children) if (child) RebuildBatchesChild(child);
@@ -111,7 +113,7 @@ struct MeshRenderer {
 private:
     void RebuildBatchesChild(Mesh* m) {
         for (auto& sm : m->submeshes) {
-            Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            MaterialInstance* mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
             batches[mat].push_back(&sm);
         }
         for (auto* c : m->children) if (c) RebuildBatchesChild(c);
@@ -119,7 +121,7 @@ private:
 
     void DrawChild(Mesh* m) {
         for (auto& sm : m->submeshes) {
-            Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            MaterialInstance* mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
             mat->Bind();
             glBindVertexArray(m->VAO);
             glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
@@ -130,8 +132,9 @@ private:
 
 //OLD
 public:
+    /*
     // Um material por submesh
-    std::vector<Material*> materials; // size == mesh->submeshes.size()
+    std::vector<std::shared_ptr<MaterialInstance>> materials; 
 
     // Prepara materiais a partir do MeshFilter (copia os defaults da Mesh caso existam)
     void SyncWithMesh(const MeshFilter& filter) {
@@ -157,4 +160,5 @@ public:
         if (i >= materials.size()) return;
         materials[i] = m ? m : MaterialDefaults::Get();
     }
+    */
 };

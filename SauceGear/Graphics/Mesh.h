@@ -32,7 +32,7 @@ struct SubMesh {
     uint32_t indexOffset = 0;   // em elementos (não bytes)
     uint32_t indexCount = 0;
     // material “default” associado a esse submesh (pode ser sobrescrito no MeshRenderer)
-    MaterialInstance* material = nullptr;
+    std::shared_ptr<MaterialInstance> material;
 };
 
 class Mesh {

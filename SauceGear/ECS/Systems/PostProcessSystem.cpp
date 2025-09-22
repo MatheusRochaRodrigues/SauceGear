@@ -2,6 +2,8 @@
 #include "../../Graphics/Framebuffer.h"
  
 PostProcessSystem::PostProcessSystem() {
+
+    std::cout << "1433" << std::endl;
     shaderView = new Shader("PostProcess/post.vs", "PostProcess/post.fs");
     //passes.push_back(new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)));
 }

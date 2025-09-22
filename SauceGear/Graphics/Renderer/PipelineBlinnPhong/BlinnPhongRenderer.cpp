@@ -1,7 +1,7 @@
 #include "BlinnPhongRenderer.h" 
 #include "../../ECS/Components/Transform.h"
 #include "../../ECS/Components/MeshRenderer.h"
-#include "../../ECS/Components/Material.h"
+//#include "../../ECS/Components/Material.h"
 #include "../../ECS/Systems/LightSystem.h"
 
 #include "../Graphics/FullscreenQuad.h"

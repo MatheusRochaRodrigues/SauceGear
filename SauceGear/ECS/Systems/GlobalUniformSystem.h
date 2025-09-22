@@ -16,6 +16,7 @@ public:
     }
 
     void Update(float time) override {
+        std::cout << "f5" << std::endl;
         //GlobalUniforms data;
         //data.time = time;
         //data.cameraPosition = GEngine->mainCamera->Position;

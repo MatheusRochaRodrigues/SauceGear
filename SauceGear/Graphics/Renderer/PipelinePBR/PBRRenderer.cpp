@@ -1,11 +1,14 @@
 #include "PBRRenderer.h"
 #include "../../ECS/Components/Transform.h"
 #include "../../ECS/Components/MeshRenderer.h"
-#include "../../ECS/Components/Material.h"
+//#include "../../ECS/Components/Material.h"
 #include "../Graphics/FullscreenQuad.h"
 #include "../ECS/Systems/DayNightSystem.h"
 
 void PBRPipeline::Init() {
+
+    std::cout << "12ew" << std::endl;
+
     const unsigned int width = GEngine->window->GetWidth();
     const unsigned int height = GEngine->window->GetHeight();
 
@@ -74,7 +77,9 @@ void PBRPipeline::Init() {
 
     // Shaders defaults
     shaders.skybox.use(); 
-    shaders.skybox.setInt("environmentMap", 0);  
+    shaders.skybox.setInt("environmentMap", 0);
+
+    std::cout << "14we" << std::endl;
 }
 
 void PBRPipeline::Shutdown() {
@@ -108,6 +113,7 @@ void PBRPipeline::GeometryPass(Scene& scene) {
     Shader* s = &shaders.gbuffer;
     s->use(); 
 
+    std::cout << "f67" << std::endl;
     for (auto e : entities) {
         auto& tr = scene.GetComponent<Transform>(e);
         auto& mr = scene.GetComponent<MeshRenderer>(e);
@@ -120,6 +126,7 @@ void PBRPipeline::GeometryPass(Scene& scene) {
             }
         }
     }
+    std::cout << "f77" << std::endl;
 
     gBuffer->Unbind();
 }
@@ -138,6 +145,8 @@ void PBRPipeline::BindIBLTo(Shader* s) {
 }
 
 void PBRPipeline::LightingPass(Scene& scene) {
+
+    std::cout << "1" << std::endl;
     // acumulamos direto no framebuffer final
     framebuffer->Bind();
     glDisable(GL_DEPTH_TEST);
@@ -208,6 +217,8 @@ void PBRPipeline::LightingPass(Scene& scene) {
     //DrawSkybox();
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);         // não escreve no depth
+
+    std::cout << "2" << std::endl;
 }
 
 void PBRPipeline::DrawSkybox() { 

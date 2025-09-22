@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "Material.h"
 #include "MaterialUtils.h" 
 #include <unordered_map> 
@@ -7,42 +7,161 @@
 #include <memory>         // std::shared_ptr
 #include <glm/glm.hpp>    // glm::vec3, glm::vec4
  
-using MatValue = std::variant<std::monostate, float, glm::vec3, glm::vec4, std::shared_ptr<Texture>>;
-
-struct MaterialParam {
-    MatValue value;
-    MatValue fallback; // sempre algo "edit·vel" no inspector       //bool useFallback = true; // se true, ignora value e gera a textura 1x1 do fallback
-};
  
 class MaterialInstance {
 public:
+    inline static int sdbg2 = 0;
+    int dbg2 = 0;
     MaterialInstance(std::shared_ptr<MaterialBase> base) : base(base) {
-        if (base) {
-            params = base->GetDefaultParams(); // j· clona defaults
+        if (!this->base) {
+            std::cerr << "[Apply] Erro: base is nullptr in Material Instance\n";
+            throw std::runtime_error("MaterialInstance criado sem base!");
         }
-    }
+        std::cout << std::endl << std::endl << std::endl << " dsa aq = " << base->GetDefaultParams().size() << std::endl;
+        MatParams = base->GetDefaultParams(); // j√° clona defaults
+        std::cout << std::endl << std::endl << " dgb aq = " << base->dbg << std::endl;
+         
+        dbg2 = sdbg2++;
+        std::cout << std::endl<< " debug = " << dbg2 << std::endl;
 
+        // build param types map for quick lookup (used para decidir se um float deve virar 1x1 texture)
+        //for (const auto& def : base->GetParamDefs()) paramTypes[def.name] = def.type;
+    }
+    //MaterialInstance() {
+    //    base = std::make_shared<PBRMaterial>();         //std::make_shared<PBRMaterial>(); 
+    //    if (!this->base) {
+    //        std::cerr << "[Apply] Erro: base is nullptr in Material Instance\n";
+    //        throw std::runtime_error("MaterialInstance criado sem base!");
+    //    }
+    //    std::cout << std::endl << std::endl << std::endl << " dsa aq = " << base->GetDefaultParams().size() << std::endl;
+    //    MatParams = base->GetDefaultParams(); // j√° clona defaults 
+    //    std::cout << std::endl << std::endl << std::endl << " dsa22 aq = " << MatParams.size() << std::endl;
+    //    std::cout << std::endl << std::endl << " dgb aq = " << base->dbg << std::endl;
+    //    
+    //    //for (auto& [name, param] : base->GetDefaultParams()) { //MatParams[name] = param; //} // copia defaults do pai
+    //}
+     
+
+    /*
+    void ApplyBindingsBaseChain(const MaterialBase* mat, Shader* shader, int depth = 0) {
+        if (!mat) {
+            std::cout << "[ApplyBindingsBaseChain] mat == nullptr\n";
+            return;
+        }
+        if (!shader) {
+            std::cerr << "[ApplyBindingsBaseChain] ERROR: shader == nullptr\n";
+            return;
+        }
+        auto parentShared = mat->GetParent();
+        if (!parentShared) {
+            std::cout << "[ApplyBindingsBaseChain] parent == nullptr\n";
+        }
+        else {
+            std::cout << "[ApplyBindingsBaseChain] parent OK\n";
+        }
+
+        // safety: limit recursion depth to detect cycles / runaway recursion
+        if (depth > 64) {
+            std::cerr << "[ApplyBindingsBaseChain] recursion depth exceeded (possible cycle). Stopping.\n";
+            return;
+        }
+
+        // Print diagnostic: addresses and (if possible) parent pointer info
+        std::cout << "[ApplyBindingsBaseChain] mat: " << static_cast<const void*>(mat)
+            << " depth=" << depth << "\n";
+
+        // try-catch around access in case of exceptions (not typical for raw pointer deref,
+        // but keeps controlled prints)
+        try {
+            auto parentShared = mat->GetParent(); // copy the shared_ptr
+            if (parentShared) {
+                std::cout << "[ApplyBindingsBaseChain] parent: " << static_cast<const void*>(parentShared.get())
+                    << " use_count=" << parentShared.use_count() << "\n";
+
+                // detect self-parent (common bug)
+                if (parentShared.get() == mat) {
+                    std::cerr << "[ApplyBindingsBaseChain] ERROR: parent points to self. Breaking to avoid infinite recursion.\n";
+                }
+                else {
+                    ApplyBindingsBaseChain(parentShared.get(), shader, depth + 1);
+                }
+            }
+            else {
+                std::cout << "[ApplyBindingsBaseChain] parent == nullptr\n";
+            }
+        }
+        catch (const std::exception& e) {
+            std::cerr << "[ApplyBindingsBaseChain] exception when reading parent: " << e.what() << "\n";
+            return;
+        }
+        catch (...) {
+            std::cerr << "[ApplyBindingsBaseChain] unknown exception when reading parent\n";
+            return;
+        }
+
+        // depois aplica os do material atual
+        std::cout << "[ApplyBindingsBaseChain] calling ApplyBaseBindings on " << static_cast<const void*>(mat) << "\n";
+        mat->ApplyBaseBindings(shader);
+    }
+    */
+    
     void ApplyBindingsBaseChain(const MaterialBase* mat, Shader* shader) {
         if (!mat) return; 
         // primeiro aplica os do pai
-        if (mat->GetParent()) {
+        std::cout << "g911132    " << (mat->GetParent() != nullptr) << std::endl;
+        if (mat->GetParent() != nullptr) {
+            std::cout << "g9111111" << std::endl;
             ApplyBindingsBaseChain(mat->GetParent().get(), shader);
-        } 
+            std::cout << "g9211111" << std::endl;
+        }
+        std::cout << "gf92332" << std::endl;
         // depois aplica os do material atual
-        mat->ApplyBaseBindings(shader);
+        mat->BaseBindings(shader);
     } 
+
+    /*
+    // chama ApplyBaseBindings de pai primeiro, depois filho
+    void ApplyBaseBindingsChain(const MaterialBase* mat, Shader* sh) {
+        if (!mat) return;
+        if (mat->GetParent()) ApplyBaseBindingsChain(mat->GetParent().get(), sh);
+        mat->ApplyBaseBindings(sh);
+    }
+    void ApplySpecialBindingsChain(const MaterialBase* mat, Shader* sh) {
+        if (!mat) return;
+        if (mat->GetParent()) ApplySpecialBindingsChain(mat->GetParent().get(), sh);
+        mat->ApplySpecialBindings(sh);
+    }
+    */
       
     void Apply(Shader* overrideShader = nullptr) {
-        Shader* active = overrideShader ? overrideShader : base->GetShader().get();
-        if (!active) return;
+        Shader* active = nullptr;
+        if (!base) {
+            std::cerr << "[Apply] Erro: base √© nullptr\n";
+            return;
+        } 
+
+        if (overrideShader) active = overrideShader; 
+        else if (base->tag == RenderTag::Forward) active = base->GetShader().get(); 
+         
+        if (!active) {  // Ex: PBRMaterial (deferred) ‚Üí usa o shader do pipeline
+            std::cerr << "[Apply] Erro: Shader ativo √© nullptr\n";
+            return;
+        } 
         active->use();
-
-        // Aplica binds do material base
-        ApplyBindingsBaseChain(base.get(), active);         // aplica os "base bindings" do pai atÈ o filho            
-
+         
+        std::cout << "before ApplyBindingsBaseChain parent ptr: " << base.get() << " shader: " << active << "\n";
+        //ApplyBindingsBaseChain(base.get(), active);
+        std::cout << "after ApplyBindingsBaseChain\n";
+        // aplica os "base bindings" do pai at√© o filho            
+         
         int texUnit = 0;
-        for (auto& [name, param] : params) {
-            // se È float/vec3, envia direto como uniform (se shader espera float/vec3)
+        std::cout << "2131";
+        std::cout << std::endl << std::endl << " dgb aq = " << base->dbg << std::endl;
+        std::cout << std::endl << " debug = " << dbg2 << std::endl;
+        std::cout << "params.size() = " << MatParams.size() << std::endl;
+        for (auto& [name, param] : MatParams) {
+            std::cerr << "222";
+            // se √© float/vec3, envia direto como uniform (se shader espera float/vec3)
             if (auto pFloat = std::get_if<float>(&param.value)) {
                 active->setFloat(name.c_str(), *pFloat);
                 continue;
@@ -54,86 +173,59 @@ public:
             if (auto pVec4 = std::get_if<glm::vec4>(&param.value)) {
                 active->setVec4(name.c_str(), *pVec4);
                 continue;
-            }
-
-            auto tex = std::get_if<std::shared_ptr<Texture>>(&param.value);
-            if (tex && *tex) {
-                if (*tex) { // verifica se n„o È nullptr
-                    // Usa a textura definida      //auto tex = std::get<std::shared_ptr<Texture>>(param.value); //glActiveTexture(GL_TEXTURE0 + texUnit);
-                    (*tex)->Bind();
-                    active->setInt(name, texUnit++);
-                }
-            } else {
-                if (std::holds_alternative<std::monostate>(param.fallback)) continue; //flag to know if exists some fallback
-
-                // Usa fallback como textura 1x1  
-                if (auto pVec3 = std::get_if<glm::vec3>(&param.fallback)) {
-                    tex = &resolveTexture(glm::vec4(*pVec3, 1.0f));      //tex = TextureCache::Get().GetSolidColor(glm::vec4(std::get<glm::vec3>(param.fallback), 1.0f));
-                }
-                if (auto pVec4 = std::get_if<glm::vec4>(&param.fallback)) {
-                    tex = &resolveTexture(*pVec4);
-                }
-                if (auto pFloat = std::get_if<float>(&param.fallback)) {
-                    tex = &resolveTexture(glm::vec4(*pFloat, *pFloat, *pFloat, 1));
-                } 
-
-                if (tex) {
-                    glActiveTexture(GL_TEXTURE0 + texUnit);
-                    (*tex)->Bind();
-                    active->setInt(name, texUnit++);
-                }
             } 
-        }
 
-        // Binds especiais do material (tempo, animaÁ„o, etc)  
-        base->ApplySpecialBindings(active);
+            // Textures
+            std::shared_ptr<Texture> texPtr; 
+            if (auto tex = std::get_if<std::shared_ptr<Texture>>(&param.value)) {
+                texPtr = *tex; // textura definida
+            }
+            else if (!std::holds_alternative<std::monostate>(param.fallback)) {
+                // fallback como textura 1x1
+                if (auto pVec3 = std::get_if<glm::vec3>(&param.fallback)) {
+                    texPtr = resolveTexture(glm::vec4(*pVec3, 1.0f));        //tex = TextureCache::Get().GetSolidColor(glm::vec4(std::get<glm::vec3>(param.fallback), 1.0f));
+                }
+                else if (auto pVec4 = std::get_if<glm::vec4>(&param.fallback)) {
+                    texPtr = resolveTexture(*pVec4);
+                }
+                else if (auto pFloat = std::get_if<float>(&param.fallback)) {
+                    texPtr = resolveTexture(glm::vec4(*pFloat, *pFloat, *pFloat, 1.0f));
+                }
+            }
+            // Bind da textura
+            if (texPtr) {
+                glActiveTexture(GL_TEXTURE0 + texUnit);
+                texPtr->Bind();
+                active->setInt(name, texUnit++);
+            } 
+        } 
+        // Binds especiais do material (tempo, anima√ß√£o, etc)  
+        //base->BindSpecial(active);
+        std::cerr << "222sav";
     }
-
-    // Reflection-friendly getters (editor usa)
-    MaterialParam& GetParam(const std::string& name) { return params[name]; }
-    const std::shared_ptr<MaterialBase>& GetBase() const { return base; } 
-
-    // Seta par‚metro generico (texture)
-    void SetTexture(const std::string& name, std::shared_ptr<Texture> tex) {
-        params[name].value = tex;
-    }
-    void SetFloat(const std::string& name, float v) {
-        params[name].value = v;
-    }
-    void SetVec3(const std::string& name, const glm::vec3& v) {
-        params[name].value = v;
-    }
-
-    // Fallback setters (editor vai usar esses campos via reflection)
-    void SetFallbackColor(const std::string& name, const glm::vec3& c) {
-        params[name].fallback = c;
-    }
-    void SetFallbackFloat(const std::string& name, float f) {
-        params[name].fallback = f;
-    }
-    void SetFallbackTexture(const std::string& name, std::shared_ptr<Texture> t) {
-        params[name].fallback = t;
-    }
-
     // Registra campos para o reflection (exemplo)
     static void RegisterFieldsForReflection() {
         // usar REFLECT_CLASS / REFLECT_FIELD nas classes concretas do editor;
-        // aqui deixamos vazio ó editor pode iterar params via API p˙blica (GetParam)
-    } 
-
-    void Bind() {
-        Apply();
-    }
+        // aqui deixamos vazio ‚Äî editor pode iterar params via API p√∫blica (GetParam)
+    }  
+     
+    void Bind() { Apply(); } 
+    const std::shared_ptr<MaterialBase>& GetBase() const { return base; }
+    // Reflection-friendly getters (editor usa)
+    MaterialParam& GetParam(const std::string& name) { return MatParams[name]; }
+    // Seta par√¢metro generico (texture)
+    void SetTexture(const std::string& name, std::shared_ptr<Texture> tex) { MatParams[name].value = tex; }
+    void SetFloat(const std::string& name, float v) { MatParams[name].value = v; }
+    void SetVec3(const std::string& name, const glm::vec3& v) { MatParams[name].value = v; }
+    // Fallback setters (editor vai usar esses campos via reflection)
+    void SetFallbackColor(const std::string& name, const glm::vec3& c) { MatParams[name].fallback = c; }
+    void SetFallbackFloat(const std::string& name, float f) { MatParams[name].fallback = f; }
+    void SetFallbackTexture(const std::string& name, std::shared_ptr<Texture> t) { MatParams[name].fallback = t; }
 
 private:
     std::shared_ptr<MaterialBase> base;
-    std::unordered_map<std::string, MaterialParam> params;
-
-    // Texturas transitÛrias criadas a cada Apply (1x1 fallbacks) para manter alive
-    //std::vector<std::shared_ptr<Texture>> transientTextures;
-
-
-
+    std::unordered_map<std::string, MaterialParam> MatParams; //overrides
+     
     void ApplyFallback(MaterialParam& param, Shader* sh, const std::string& name, int& texUnit) {
         std::shared_ptr<Texture> tex = nullptr;
         if (auto pVec3 = std::get_if<glm::vec3>(&param.fallback)) {
@@ -150,6 +242,9 @@ private:
             sh->setInt(name, texUnit++);
         }
     }
+
+    // Texturas transit√≥rias criadas a cada Apply (1x1 fallbacks) para manter alive
+    //std::vector<std::shared_ptr<Texture>> transientTextures;
 };
 
 
@@ -164,12 +259,12 @@ private:
         if (!sh) return;
         sh->use();
 
-        base->ApplyBaseBindings(sh); // permite binds fixos da famÌlia de material
+        base->ApplyBaseBindings(sh); // permite binds fixos da fam√≠lia de material
 
         int texUnit = 0;
         // percorre params e faz bind/uni
         for (auto& [name, pv] : params) {
-            // se valor È texture
+            // se valor √© texture
             if (auto pTex = std::get_if<std::shared_ptr<Texture>>(&pv.value)) {
                 if (pTex && *pTex) {
                     glActiveTexture(GL_TEXTURE0 + texUnit);
@@ -179,7 +274,7 @@ private:
                 }
             }
 
-            // se È float/vec3, envia direto como uniform (se shader espera float/vec3)
+            // se √© float/vec3, envia direto como uniform (se shader espera float/vec3)
             if (auto pFloat = std::get_if<float>(&pv.value)) {
                 sh->setFloat(name.c_str(), *pFloat);
                 continue;
@@ -189,15 +284,15 @@ private:
                 continue;
             }
 
-            // Se chegou aqui: n„o h· valor concreto -> usar fallback (converter para texture 1x1)
+            // Se chegou aqui: n√£o h√° valor concreto -> usar fallback (converter para texture 1x1)
             if (pv.useFallbackTexture) {
-                // determinÌstico cache key
-                // se shader espera sampler2D para esse nome, enviamos texture 1x1; para floats/vec3 j· enviados acima
+                // determin√≠stico cache key
+                // se shader espera sampler2D para esse nome, enviamos texture 1x1; para floats/vec3 j√° enviados acima
                 std::shared_ptr<Texture> fallbackTex;
-                // decide comparar se h· fallbackFloat ou fallbackColor (usuario decide via editor)
+                // decide comparar se h√° fallbackFloat ou fallbackColor (usuario decide via editor)
                 // se fallbackFloat != 0 ou usuario quer, cria float texture
-                // heurÌstica: se fallbackFloat est· diferente de 0..1? sÛ usar se explicitado; aqui sempre suportamos ambos
-                // preferencia: se par‚metro nome contÈm "metal" ou "rough" ou "ao" -> usar fallbackFloat
+                // heur√≠stica: se fallbackFloat est√° diferente de 0..1? s√≥ usar se explicitado; aqui sempre suportamos ambos
+                // preferencia: se par√¢metro nome cont√©m "metal" ou "rough" ou "ao" -> usar fallbackFloat
                 bool preferFloat = (name.find("metal") != std::string::npos) ||
                     (name.find("rough") != std::string::npos) ||
                     (name.find("ao") != std::string::npos);
@@ -212,15 +307,15 @@ private:
                 glActiveTexture(GL_TEXTURE0 + texUnit);
                 fallbackTex->Bind();
                 sh->setInt(name.c_str(), texUnit++);
-                // store temporary to keep alive this frame (cache global opcional) - aqui podemos push pra um container tempor·rio
+                // store temporary to keep alive this frame (cache global opcional) - aqui podemos push pra um container tempor√°rio
                 transientTextures.push_back(fallbackTex);
             }
             else {
-                // se n„o usar fallback, set uniform 0/vec3(0) para evitar undefined behaviour
+                // se n√£o usar fallback, set uniform 0/vec3(0) para evitar undefined behaviour
                 sh->setFloat(name.c_str(), pv.fallbackFloat);
             }
         }
-        // ao terminar de usar, limpa transientTextures se quiser liberar depois (shared_ptr far· cleanup)
+        // ao terminar de usar, limpa transientTextures se quiser liberar depois (shared_ptr far√° cleanup)
         transientTextures.clear();
     }
     */

@@ -62,6 +62,7 @@ struct DayNightSystem : public System {
     DayNightCycle s_cycle;
 
     DayNightSystem() {
+        std::cout << "111121232131f1" << std::endl;
         // pré-carrega os HDRs em IBL sets
         s_cycle.nightHDR = { "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };
         s_cycle.dawnHDR = { "Resources/Textures/hdr/spruit_sunrise_4k.hdr", {} };
@@ -81,6 +82,7 @@ struct DayNightSystem : public System {
     }
 
     void Update(float dt) override {
+        std::cout << "f3" << std::endl;
         s_cycle.timeOfDay += s_cycle.daySpeed * dt;
         if (s_cycle.timeOfDay >= 24.0f) s_cycle.timeOfDay -= 24.0f;
 

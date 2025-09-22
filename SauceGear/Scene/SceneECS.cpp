@@ -6,7 +6,7 @@ void SceneECS::initECS() {
     //auto* physics = scene.RegisterSystem<PhysicsSystem>();
     componentManager->Register<CameraComponent>();
     componentManager->Register<Transform>();
-    componentManager->Register<Material>(); 
+    //componentManager->Register<Material>(); 
     //componentManager->Register<MeshFilter>(); 
     componentManager->Register<MeshRenderer>();
     componentManager->Register<LightComponent>();

@@ -13,8 +13,11 @@ public:
     void Init() override;
      
     void Render(Scene& scene) override {
+        std::cout << "f9" << std::endl;
         HandleFBOs();
+        std::cout << "f19" << std::endl;
         GeometryPass(scene);
+        std::cout << "f1119" << std::endl;
         LightingPass(scene);
         ForwardPass(scene);
         // 

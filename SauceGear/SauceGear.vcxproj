@@ -130,7 +130,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ECS\Systems\Backup\DayNightSystem.cpp" />
     <ClCompile Include="Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
@@ -162,6 +161,7 @@
     <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="Editor\Panels\IPanelHelper.h" />
     <ClCompile Include="Graphics\Renderer\PipelinePBR\PBRRenderer.cpp" />
+    <ClCompile Include="Resources\DataBase\AssetDatabase.h" />
     <ClCompile Include="Resources\Primitive.cpp" />
     <ClCompile Include="Scene\SceneBuilder.h" />
     <ClCompile Include="ECS\Systems\LightSystem.cpp" />
@@ -199,6 +199,8 @@
     <ClInclude Include="Graphics\ComputeShader.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
+    <ClInclude Include="Resources\DataBase\AssetDatabaseEntry.h" />
+    <ClInclude Include="Resources\DataBase\AssetDatabaseEntry.cpp" />
     <ClInclude Include="Resources\DefineMaterials\Material.h" />
     <ClInclude Include="Resources\DefineMaterials\MaterialInstance.h" />
     <ClInclude Include="Resources\DefineMaterials\MaterialUtils.h" />

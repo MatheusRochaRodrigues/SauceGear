@@ -83,6 +83,16 @@ public:
         } 
     }
 
+    //Seu TextureCache poderia ser implementado em cima do AssetDatabase genérico
+    /*std::shared_ptr<Texture> Load(const std::string& filename) {
+        auto tex = AssetDatabase::Load<Texture>(filename);
+        if (!tex->IsLoaded())
+            tex->LoadFromFile(filename);
+        return tex;
+    }*/
+    //Ou seja, TextureCache vira só um wrapper de conveniência em cima do AssetDatabase.
+
+
 private:
     TextureCache() = default;
     std::unordered_map<std::string, std::shared_ptr<Texture>> texCache;

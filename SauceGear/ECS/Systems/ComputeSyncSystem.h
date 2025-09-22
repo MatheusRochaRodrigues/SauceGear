@@ -12,6 +12,7 @@
 class ComputeSyncSystem : public System {
 public:
     void Update(float deltaTime) override {
+        std::cout << "f1" << std::endl;
         try {
             int callbacksExecuted = 0;
 

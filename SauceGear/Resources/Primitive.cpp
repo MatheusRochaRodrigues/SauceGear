@@ -2,7 +2,7 @@
 #include <cmath>
 
 std::unique_ptr<Mesh> PrimitiveMesh::cubeMesh = nullptr;
-Mesh* PrimitiveMesh::CreateCube(Material* material) {
+Mesh* PrimitiveMesh::CreateCube(MaterialInstance* material) {
     if (!cubeMesh) {
         cubeMesh = std::make_unique<Mesh>(Cube(material)); 
         cubeMesh->name = "Cube";
@@ -11,7 +11,7 @@ Mesh* PrimitiveMesh::CreateCube(Material* material) {
 }
 
 std::unique_ptr<Mesh> PrimitiveMesh::cubeInverseMesh = nullptr;
-Mesh* PrimitiveMesh::CreateInverseCube(Material* material) {
+Mesh* PrimitiveMesh::CreateInverseCube(MaterialInstance* material) {
     if (!cubeInverseMesh) {
         cubeInverseMesh = std::make_unique<Mesh>(CubeInverse(material)); 
     }
@@ -19,7 +19,7 @@ Mesh* PrimitiveMesh::CreateInverseCube(Material* material) {
 }
 
 std::unique_ptr<Mesh> PrimitiveMesh::sphereMesh = nullptr;
-Mesh* PrimitiveMesh::CreateSphere(Material* material, unsigned int segments, unsigned int rings, float radius) {
+Mesh* PrimitiveMesh::CreateSphere(MaterialInstance* material, unsigned int segments, unsigned int rings, float radius) {
     if (!sphereMesh) {
         sphereMesh = std::make_unique<Mesh>(Sphere(segments, rings, radius, material));
         sphereMesh->name = "Sphere";
@@ -28,7 +28,7 @@ Mesh* PrimitiveMesh::CreateSphere(Material* material, unsigned int segments, uns
 } 
 
 std::unique_ptr<Mesh> PrimitiveMesh::cylinderMesh = nullptr;
-Mesh* PrimitiveMesh::CreateCylinder(Material* material, unsigned int segments, float height, float radius, bool capped) {
+Mesh* PrimitiveMesh::CreateCylinder(MaterialInstance* material, unsigned int segments, float height, float radius, bool capped) {
     if (!cylinderMesh) {
         cylinderMesh = std::make_unique<Mesh>(Cylinder(segments, height, radius, material)); 
     }
@@ -36,7 +36,7 @@ Mesh* PrimitiveMesh::CreateCylinder(Material* material, unsigned int segments, f
 }
  
 std::unique_ptr<Mesh> PrimitiveMesh::planeMesh = nullptr;
-Mesh* PrimitiveMesh::CreatePlane(Material* material) {
+Mesh* PrimitiveMesh::CreatePlane(MaterialInstance* material) {
     if (!planeMesh) { 
         std::vector<Vertex> vertices = {
             // Posi��o    // Normal   // UV   // Tangent  // Bitangent  // BoneIDs         // Weights
@@ -62,7 +62,7 @@ Mesh* PrimitiveMesh::CreatePlane(Material* material) {
 }
 
 
-Mesh PrimitiveMesh::CubeInverse(Material* material) {
+Mesh PrimitiveMesh::CubeInverse(MaterialInstance* material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -155,7 +155,7 @@ Mesh PrimitiveMesh::CubeInverse(Material* material) {
     return Mesh(vertices, indices, material);
 }
 
-Mesh PrimitiveMesh::Cube(Material* material) {
+Mesh PrimitiveMesh::Cube(MaterialInstance* material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -272,7 +272,7 @@ Mesh PrimitiveMesh::Cube(Material* material) {
 
 
 
-Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radius, Material* material) {
+Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radius, MaterialInstance* material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -322,7 +322,7 @@ Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radi
     return Mesh(vertices, indices, material);
 } 
  
-Mesh PrimitiveMesh::Cylinder(unsigned int segments, float height, float radius, bool capped, Material* material) {
+Mesh PrimitiveMesh::Cylinder(unsigned int segments, float height, float radius, bool capped, MaterialInstance* material) {
     //static std::unordered_map<size_t, Mesh> cached;
     //size_t key = std::hash<std::string>()(std::to_string(segments) + "|" + std::to_string(height) + "|" + std::to_string(radius) + "|" + std::to_string(capped));
     //if (cached.find(key) != cached.end()) return cached[key];

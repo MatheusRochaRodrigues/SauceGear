@@ -36,20 +36,20 @@ public:
              */
             std::cout << "printf cube" << std::endl;
 
-            auto* material = new Material();                    //auto* material = new Material(defaultShader);  
-            auto* tex = MaterialDefaults::TextureColor(250, 100, 0);
-            tex->unit = 0;  
-            material->textures["Albedo"] = tex;
-            Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(material));
+            //auto* material = new Material();                    //auto* material = new Material(defaultShader);  
+            //auto* tex = MaterialDefaults::TextureColor(250, 100, 0);
+            //tex->unit = 0;  
+            //material->textures["Albedo"] = tex;
+            //Entity entity2 = SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(nullptr));
 
-            stbi_set_flip_vertically_on_load(false); 
+            //stbi_set_flip_vertically_on_load(false); 
             //entity = SceneBuilder::CreateModel("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
             /*auto& trans2 = GetComponent<Transform>(entity);
             trans2.position = { 0, -4, 0 };
             trans2.scale = { 0.2, 0.2, 0.2 };
             trans2.rotation = { 90 , 0.2, 0.2 };  */
 
-            stbi_set_flip_vertically_on_load(true);
+            //stbi_set_flip_vertically_on_load(true);
 
             //Entity Floor = CreateEntity();
             //auto& Floort = AddComponent<Transform>(Floor);
@@ -58,36 +58,37 @@ public:
             //auto& Floort3 = AddComponent<MeshRenderer>(Floor, PrimitiveMesh::CreatePlane());
 
         }   
-        {
-            Entity pointLight = SceneBuilder::CreateGameObject("Sun");
-            auto& pTransform = AddComponent<Transform>(pointLight);
-            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
-            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            pTransform.position = glm::vec3(0, -1, 0);
-            auto& pLight = AddComponent<LightComponent>(pointLight);
-            //pLight.type = ShadowType::Point;
-            pLight.SetTypeLight(ShadowType::Directional);
-            pLight.color = glm::vec3(1, 0, 1);
-            pLight.intensity = 1.0f;
-        }
-        {
-            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
-            auto& pTransform = AddComponent<Transform>(pointLight);
-            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
-            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            pTransform.position = glm::vec3(0, 0, 0);
-            auto& pLight = AddComponent<LightComponent>(pointLight);
-            //pLight.type = ShadowType::Point;
-            pLight.SetTypeLight(ShadowType::Point);
-            pLight.color = glm::vec3(0, 1, 0);
-            pLight.intensity = 1.0f;
-        }
-        //  
-        
+
+        //{
+        //    Entity pointLight = SceneBuilder::CreateGameObject("Sun");
+        //    auto& pTransform = AddComponent<Transform>(pointLight);
+        //    pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+        //    /*auto& redn = AddComponent<MeshRenderer>(pointLight);
+        //    redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+        //    pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+        //    pTransform.position = glm::vec3(0, -1, 0);
+        //    auto& pLight = AddComponent<LightComponent>(pointLight);
+        //    //pLight.type = ShadowType::Point;
+        //    pLight.SetTypeLight(ShadowType::Directional);
+        //    pLight.color = glm::vec3(1, 0, 1);
+        //    pLight.intensity = 1.0f;
+        //}
+        //{
+        //    Entity pointLight = SceneBuilder::CreateGameObject("Light2");
+        //    auto& pTransform = AddComponent<Transform>(pointLight);
+        //    pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+        //    /*auto& redn = AddComponent<MeshRenderer>(pointLight);
+        //    redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+        //    pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+        //    pTransform.position = glm::vec3(0, 0, 0);
+        //    auto& pLight = AddComponent<LightComponent>(pointLight);
+        //    //pLight.type = ShadowType::Point;
+        //    pLight.SetTypeLight(ShadowType::Point);
+        //    pLight.color = glm::vec3(0, 1, 0);
+        //    pLight.intensity = 1.0f;
+        //} 
+
+        std::cout << "DSADSA LIf cube" << std::endl;
 
         // Render para um framebuffer
         //GLuint sceneFBO, sceneTexture;
@@ -114,8 +115,8 @@ public:
     void LoadScene2()
     {
         //Material* material = nullptr; // ou carregue o material desejado aqui
-        auto* material = new Material();                    //auto* material = new Material(defaultShader);
-        material->textures["Albedo"] = MaterialDefaults::TextureColor(250, 100, 0) ;
+        //auto* material = new Material();                    //auto* material = new Material(defaultShader);
+        //material->textures["Albedo"] = MaterialDefaults::TextureColor(250, 100, 0) ;
 
         // Cubo invertido (sala)
         //{
@@ -135,7 +136,7 @@ public:
             trans.position = glm::vec3(0.0f, -2, 0);
             trans.scale = glm::vec3(200.0f);
             trans.rotation = glm::vec3(0.0f); // sem rotação  
-            auto& renderer = AddComponent<MeshRenderer>(room, PrimitiveMesh::CreateCylinder(material));
+            auto& renderer = AddComponent<MeshRenderer>(room, PrimitiveMesh::CreateCylinder());
         }
 
         // Cubo 1
@@ -145,7 +146,7 @@ public:
             auto& tname = AddComponent<NameComponent>(cube); 
             trans.position = glm::vec3(4.0f, -3.5f, 0.0f);
             trans.scale = glm::vec3(0.5f); 
-            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder(material));
+            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder());
         }
 
         // Cubo 2
@@ -154,7 +155,7 @@ public:
             auto& trans = AddComponent<Transform>(cube);
             trans.position = glm::vec3(2.0f, 3.0f, 1.0f);
             trans.scale = glm::vec3(0.75f); 
-            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder(material));
+            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder());
         }
 
         // Cubo 3
@@ -163,7 +164,7 @@ public:
             auto& trans = AddComponent<Transform>(cube);
             trans.position = glm::vec3(-3.0f, -1.0f, 0.0f);
             trans.scale = glm::vec3(0.5f); 
-            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder(material));
+            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder());
         }
 
         // Cubo 4
@@ -172,7 +173,7 @@ public:
             auto& trans = AddComponent<Transform>(cube);
             trans.position = glm::vec3(-1.5f, 1.0f, 1.5f);
             trans.scale = glm::vec3(0.5f); 
-            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder(material));
+            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder());
         }
 
         // Cubo 5 (rotacionado)
@@ -186,7 +187,7 @@ public:
             glm::vec3 axis = glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f));
             trans.rotation = glm::degrees(glm::eulerAngles(glm::angleAxis(glm::radians(60.0f), axis)));
              
-            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder(material));
+            auto& renderer = AddComponent<MeshRenderer>(cube, PrimitiveMesh::CreateCylinder());
         }
     }
 
