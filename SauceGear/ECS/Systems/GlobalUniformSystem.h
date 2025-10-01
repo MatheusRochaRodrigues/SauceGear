@@ -15,8 +15,7 @@ public:
         //glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, 2 * sizeof(glm::mat4));                             
     }
 
-    void Update(float time) override {
-        std::cout << "f5" << std::endl;
+    void Update(float time) override { 
         //GlobalUniforms data;
         //data.time = time;
         //data.cameraPosition = GEngine->mainCamera->Position;

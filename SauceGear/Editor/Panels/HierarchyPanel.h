@@ -6,7 +6,7 @@
 #include "../../Core/KeyCodes.h"  
 
 struct HierarchyPanel : IPanel {  
-    void ShowAddMenu(MaterialInstance* defaultMaterial) {
+    void ShowAddMenu(std::shared_ptr<MaterialInstance> defaultMaterial) {
         static char meshToSpawn[32] = "";     // Tipo selecionado para configuração
         static bool showConfigWindow = false; // Janela de parâmetros
 

@@ -3,12 +3,8 @@
 #include "../../ECS/Components/MeshRenderer.h"
 //#include "../../ECS/Components/Material.h"
 #include "../Graphics/FullscreenQuad.h"
-#include "../ECS/Systems/DayNightSystem.h"
 
-void PBRPipeline::Init() {
-
-    std::cout << "12ew" << std::endl;
-
+void PBRPipeline::Init() {  
     const unsigned int width = GEngine->window->GetWidth();
     const unsigned int height = GEngine->window->GetHeight();
 
@@ -77,9 +73,7 @@ void PBRPipeline::Init() {
 
     // Shaders defaults
     shaders.skybox.use(); 
-    shaders.skybox.setInt("environmentMap", 0);
-
-    std::cout << "14we" << std::endl;
+    shaders.skybox.setInt("environmentMap", 0); 
 }
 
 void PBRPipeline::Shutdown() {
@@ -112,8 +106,7 @@ void PBRPipeline::GeometryPass(Scene& scene) {
 
     Shader* s = &shaders.gbuffer;
     s->use(); 
-
-    std::cout << "f67" << std::endl;
+     
     for (auto e : entities) {
         auto& tr = scene.GetComponent<Transform>(e);
         auto& mr = scene.GetComponent<MeshRenderer>(e);
@@ -125,8 +118,7 @@ void PBRPipeline::GeometryPass(Scene& scene) {
                 mr.DrawSubM(sub);
             }
         }
-    }
-    std::cout << "f77" << std::endl;
+    } 
 
     gBuffer->Unbind();
 }
@@ -144,9 +136,7 @@ void PBRPipeline::BindIBLTo(Shader* s) {
     glActiveTexture(GL_TEXTURE6); glBindTexture(GL_TEXTURE_2D, ibl.brdfLUT);
 }
 
-void PBRPipeline::LightingPass(Scene& scene) {
-
-    std::cout << "1" << std::endl;
+void PBRPipeline::LightingPass(Scene& scene) { 
     // acumulamos direto no framebuffer final
     framebuffer->Bind();
     glDisable(GL_DEPTH_TEST);
@@ -216,9 +206,7 @@ void PBRPipeline::LightingPass(Scene& scene) {
     glDisable(GL_CULL_FACE);  
     //DrawSkybox();
     glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);         // não escreve no depth
-
-    std::cout << "2" << std::endl;
+    glDepthMask(GL_TRUE);         // não escreve no depth 
 }
 
 void PBRPipeline::DrawSkybox() { 
@@ -231,9 +219,8 @@ void PBRPipeline::DrawSkybox() {
     // Nunca chame StartCubemapJob() dentro do draw. Faça no Update
 
     // Bind seguro
-    glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront().envCubemap);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::frontIBL.envCubemap);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.envCubemap);
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront().envCubemap); 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.prefilter);
 
     RenderCube(); 
     glDepthFunc(GL_LESS);

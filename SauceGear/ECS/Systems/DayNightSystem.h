@@ -2,8 +2,7 @@
 #include "../../ECS/Components/ComponentsHelper.h"
 #include "../../Scene/SceneECS.h"
 #include "../../ECS/System.h"
-#include "../../Graphics/Renderer/PipelinePBR/IBLManager.h"
-#include "../../Graphics/Renderer/PipelinePBR/PBRRenderer.h"
+#include "../../Graphics/Renderer/PipelinePBR/IBLManager.h" 
 #include "../../Graphics/ComputeShader.h"
 #include "../../Core/EngineContext.h" 
 
@@ -61,8 +60,7 @@ struct DayNightSystem : public System {
 
     DayNightCycle s_cycle;
 
-    DayNightSystem() {
-        std::cout << "111121232131f1" << std::endl;
+    DayNightSystem() { 
         // pré-carrega os HDRs em IBL sets
         s_cycle.nightHDR = { "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };
         s_cycle.dawnHDR = { "Resources/Textures/hdr/spruit_sunrise_4k.hdr", {} };
@@ -77,12 +75,13 @@ struct DayNightSystem : public System {
         initIBLSet(backIBL);
         initIBLSet(idleIBL);
 
+        frontIBL.brdfLUT = s_cycle.dayHDR.second.brdfLUT;
+
         computeShader = new ComputeShader("TestCube.comp");
         lerpCubemapShader = new ComputeShader("LerpCubemap.comp");
     }
 
-    void Update(float dt) override {
-        std::cout << "f3" << std::endl;
+    void Update(float dt) override { 
         s_cycle.timeOfDay += s_cycle.daySpeed * dt;
         if (s_cycle.timeOfDay >= 24.0f) s_cycle.timeOfDay -= 24.0f;
 
@@ -159,7 +158,7 @@ private:
         set.envCubemap = IBLManager::CreateCubemap(512, GL_RGBA16F);
         set.irradiance = IBLManager::CreateCubemap(32,  GL_RGBA16F);
         set.prefilter  = IBLManager::CreateCubemap(128, GL_RGBA16F, 5);
-        set.brdfLUT = 0; // opcional 
+        //set.brdfLUT = 0; // opcional 
     }
 
     void EnqueueSkyboxJob() {

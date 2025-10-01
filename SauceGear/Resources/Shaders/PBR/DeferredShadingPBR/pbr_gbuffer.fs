@@ -9,9 +9,13 @@ in vec3 FragPos;
 in vec3 NormalVertex;
 in mat3 TBN;
  
-uniform sampler2D Albedo;
-uniform sampler2D Normal;
-uniform sampler2D MRAO; 
+uniform sampler2D Normal;     // 0
+
+uniform sampler2D Albedo;     // 1
+uniform sampler2D Metallic;   // 2
+uniform sampler2D Roughness;  // 3
+
+//uniform sampler2D MRAO;     // OTIMIZADO
 
 uniform bool op_Normal; 
 
@@ -32,6 +36,6 @@ void main()
     // and the diffuse per-fragment color
     gAlbedo.rgb = texture(Albedo, TexCoords).rgb;
     // store specular intensity in gAlbedoSpec's alpha component 
-    //gMRAO = vec4(0.5f, 0.5f, 1.0f, 1.0f);
-    gMRAO = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    gMRAO = vec4(1,  0.0f, 1.0f, 1.0f);
+    //gMRAO = vec4(1.0f, 0.0f, 1.0f, 1.0f);
 }

@@ -48,14 +48,14 @@ public:
 
     Mesh() = default;
      
-    Mesh(const std::vector<Vertex>& v, const std::vector<uint32_t>& i, MaterialInstance* m = nullptr) {
+    Mesh(const std::vector<Vertex>& v, const std::vector<uint32_t>& i, std::shared_ptr<MaterialInstance> m = nullptr) {
         vertices = v;
         indices = i;
         submeshes.push_back(SubMesh{ 0, (uint32_t)i.size(), m });
         setupMesh();
     }
 
-    Mesh(const std::vector<Vertex>& v, const std::vector<uint32_t>& i, const std::vector<SubMesh>& sms, MaterialInstance* m = nullptr) {
+    Mesh(const std::vector<Vertex>& v, const std::vector<uint32_t>& i, const std::vector<SubMesh>& sms, std::shared_ptr<MaterialInstance> m = nullptr) {
         vertices = v;
         indices = i;
         submeshes = sms; 
@@ -69,7 +69,7 @@ public:
         setupMesh();
     }
 
-    void Set(const std::vector<Vertex>& v,const std::vector<uint32_t>& i, MaterialInstance* m = nullptr) {
+    void Set(const std::vector<Vertex>& v,const std::vector<uint32_t>& i, std::shared_ptr<MaterialInstance> m = nullptr) {
         vertices = v;
         indices = i;
         submeshes.push_back(SubMesh{ 0, (uint32_t)i.size(), m });

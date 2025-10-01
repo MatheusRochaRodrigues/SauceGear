@@ -11,8 +11,7 @@ public:
         //GEngine->pipeline = pipeline.get(); // EngineContext só referencia
     }
 
-    void Update(float dt) override {
-        std::cout << "f7" << std::endl;
+    void Update(float dt) override { 
         //RENDER
         try {  
             Render();

@@ -199,6 +199,7 @@ void Texture::BindToUnit(Shader& shader, const char* uniformName, GLuint texture
 
 unsigned int Texture::LoadFromFile(const std::string& filename, bool gamma)
 {
+    path = filename;
     //unsigned int textureID;
     glGenTextures(1, &ID);
 
@@ -225,6 +226,7 @@ unsigned int Texture::LoadFromFile(const std::string& filename, bool gamma)
 
         stbi_image_free(data);
 
+        std::cout << filename.c_str() << std::endl;
         sucess = true;
     }
     else
@@ -264,6 +266,7 @@ Texture* Texture::WhiteTexture() {
 
 
 void Texture::CreateFromMemory(uint8_t* data, int width, int height, GLenum format) {
+    path = "color Fallback";
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
 

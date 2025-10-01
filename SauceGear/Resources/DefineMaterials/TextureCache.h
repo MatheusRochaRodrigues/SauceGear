@@ -12,9 +12,9 @@
 inline std::string ColorKey(const glm::vec4& c) {
     std::ostringstream ss;
     ss << std::setw(3) << (int)std::round(c.r * 255.0f) << "_"
-        << std::setw(3) << (int)std::round(c.g * 255.0f) << "_"
-        << std::setw(3) << (int)std::round(c.b * 255.0f) << "_"
-        << std::setw(3) << (int)std::round(c.a * 255.0f);
+       << std::setw(3) << (int)std::round(c.g * 255.0f) << "_"
+       << std::setw(3) << (int)std::round(c.b * 255.0f) << "_"
+       << std::setw(3) << (int)std::round(c.a * 255.0f);
     return ss.str();
 }
 inline std::string FloatKey(float v) {
@@ -42,7 +42,7 @@ public:
         px[0] = static_cast<uint8_t>(glm::clamp(color.r, 0.0f, 1.0f) * 255.0f);
         px[1] = static_cast<uint8_t>(glm::clamp(color.g, 0.0f, 1.0f) * 255.0f);
         px[2] = static_cast<uint8_t>(glm::clamp(color.b, 0.0f, 1.0f) * 255.0f);
-        px[3] = static_cast<uint8_t>(glm::clamp(color.a, 0.0f, 1.0f) * 255.0f);
+        px[3] = static_cast<uint8_t>(glm::clamp(color.a, 0.0f, 1.0f) * 255.0f); 
 
         auto tex = std::make_shared<Texture>();
         tex->CreateFromMemory(px, 1, 1, GL_RGBA); // ajusta se necessário
@@ -55,10 +55,9 @@ public:
         auto key = FloatKey(value);
         std::lock_guard<std::mutex> l(mutex);
         auto it = floatCache.find(key);
-        if (it != floatCache.end()) return it->second;
-
+        if (it != floatCache.end()) return it->second; 
         uint8_t vv = static_cast<uint8_t>(glm::clamp(value, 0.0f, 1.0f) * 255.0f);
-        uint8_t px[4] = { vv, vv, vv, 255 };
+        uint8_t px[4] = { vv, vv, vv, 255 }; 
 
         auto tex = std::make_shared<Texture>();
         tex->CreateFromMemory(px, 1, 1, GL_RGBA);

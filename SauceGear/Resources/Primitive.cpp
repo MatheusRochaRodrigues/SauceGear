@@ -2,7 +2,7 @@
 #include <cmath>
 
 std::unique_ptr<Mesh> PrimitiveMesh::cubeMesh = nullptr;
-Mesh* PrimitiveMesh::CreateCube(MaterialInstance* material) {
+Mesh* PrimitiveMesh::CreateCube(shared_ptr<MaterialInstance> material) {
     if (!cubeMesh) {
         cubeMesh = std::make_unique<Mesh>(Cube(material)); 
         cubeMesh->name = "Cube";
@@ -11,7 +11,7 @@ Mesh* PrimitiveMesh::CreateCube(MaterialInstance* material) {
 }
 
 std::unique_ptr<Mesh> PrimitiveMesh::cubeInverseMesh = nullptr;
-Mesh* PrimitiveMesh::CreateInverseCube(MaterialInstance* material) {
+Mesh* PrimitiveMesh::CreateInverseCube(shared_ptr<MaterialInstance> material) {
     if (!cubeInverseMesh) {
         cubeInverseMesh = std::make_unique<Mesh>(CubeInverse(material)); 
     }
@@ -19,7 +19,7 @@ Mesh* PrimitiveMesh::CreateInverseCube(MaterialInstance* material) {
 }
 
 std::unique_ptr<Mesh> PrimitiveMesh::sphereMesh = nullptr;
-Mesh* PrimitiveMesh::CreateSphere(MaterialInstance* material, unsigned int segments, unsigned int rings, float radius) {
+Mesh* PrimitiveMesh::CreateSphere(shared_ptr<MaterialInstance> material, unsigned int segments, unsigned int rings, float radius) {
     if (!sphereMesh) {
         sphereMesh = std::make_unique<Mesh>(Sphere(segments, rings, radius, material));
         sphereMesh->name = "Sphere";
@@ -28,15 +28,15 @@ Mesh* PrimitiveMesh::CreateSphere(MaterialInstance* material, unsigned int segme
 } 
 
 std::unique_ptr<Mesh> PrimitiveMesh::cylinderMesh = nullptr;
-Mesh* PrimitiveMesh::CreateCylinder(MaterialInstance* material, unsigned int segments, float height, float radius, bool capped) {
+Mesh* PrimitiveMesh::CreateCylinder(shared_ptr<MaterialInstance> material, unsigned int segments, float height, float radius, bool capped) {
     if (!cylinderMesh) {
-        cylinderMesh = std::make_unique<Mesh>(Cylinder(segments, height, radius, material)); 
+        cylinderMesh = std::make_unique<Mesh>(Cylinder(segments, height, radius, capped, material));
     }
     return cylinderMesh.get();
 }
  
 std::unique_ptr<Mesh> PrimitiveMesh::planeMesh = nullptr;
-Mesh* PrimitiveMesh::CreatePlane(MaterialInstance* material) {
+Mesh* PrimitiveMesh::CreatePlane(shared_ptr<MaterialInstance> material) {
     if (!planeMesh) { 
         std::vector<Vertex> vertices = {
             // Posi��o    // Normal   // UV   // Tangent  // Bitangent  // BoneIDs         // Weights
@@ -62,7 +62,7 @@ Mesh* PrimitiveMesh::CreatePlane(MaterialInstance* material) {
 }
 
 
-Mesh PrimitiveMesh::CubeInverse(MaterialInstance* material) {
+Mesh PrimitiveMesh::CubeInverse(std::shared_ptr<MaterialInstance> material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -155,7 +155,7 @@ Mesh PrimitiveMesh::CubeInverse(MaterialInstance* material) {
     return Mesh(vertices, indices, material);
 }
 
-Mesh PrimitiveMesh::Cube(MaterialInstance* material) {
+Mesh PrimitiveMesh::Cube(shared_ptr<MaterialInstance> material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -272,7 +272,7 @@ Mesh PrimitiveMesh::Cube(MaterialInstance* material) {
 
 
 
-Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radius, MaterialInstance* material) {
+Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radius, shared_ptr<MaterialInstance> material) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
@@ -322,7 +322,7 @@ Mesh PrimitiveMesh::Sphere(unsigned int segments, unsigned int rings, float radi
     return Mesh(vertices, indices, material);
 } 
  
-Mesh PrimitiveMesh::Cylinder(unsigned int segments, float height, float radius, bool capped, MaterialInstance* material) {
+Mesh PrimitiveMesh::Cylinder(unsigned int segments, float height, float radius, bool capped, shared_ptr<MaterialInstance> material) {
     //static std::unordered_map<size_t, Mesh> cached;
     //size_t key = std::hash<std::string>()(std::to_string(segments) + "|" + std::to_string(height) + "|" + std::to_string(radius) + "|" + std::to_string(capped));
     //if (cached.find(key) != cached.end()) return cached[key];

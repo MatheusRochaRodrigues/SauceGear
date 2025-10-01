@@ -10,8 +10,9 @@
 #include "AssetManager.h"
 
 #include "DefineMaterials/TextureCache.h"
+#include "DataBase/AssetDatabase.h"
 
-using matCache = std::unordered_map<unsigned int, std::shared_ptr<MaterialInstance>>;
+//using matCache = std::unordered_map<unsigned int, std::shared_ptr<MaterialInstance>>;         matCache materialCache;
 static std::vector<Texture> textures_loaded;
 
 class ModelLoader {
@@ -34,9 +35,8 @@ public:
         //auto* root = new Mesh();
         //root->name = scene->mRootNode->mName.C_Str();
         //root->directory = path.substr(0, path.find_last_of("/\\"));
-
-        matCache materialCache;
-        Mesh* mesh = ProcessNode(scene->mRootNode, scene, materialCache, path.substr(0, path.find_last_of("/\\")));     //ProcessNode(scene->mRootNode, scene, root, materialCache);
+         
+        Mesh* mesh = ProcessNode(scene->mRootNode, scene, path.substr(0, path.find_last_of("/\\")));     //ProcessNode(scene->mRootNode, scene, root, materialCache);
         mesh->name = scene->mRootNode->mName.C_Str();
 
         return mesh;  
@@ -47,11 +47,15 @@ private:
     static glm::quat AiToQuat(const aiQuaternion& q) { return { q.w, q.x, q.y, q.z }; }
 
     // Converte Assimp node -> Mesh (agregando TODAS as aiMeshes desse node como submeshes)
-    static Mesh* ProcessNode(aiNode* node, const aiScene* scene, matCache& materialCache, string path) {
+    static Mesh* ProcessNode(aiNode* node, const aiScene* scene, string path) {
         // Cria um Mesh “container” pra este node (mesmo se não tiver geometria, mantemos o nó pra hierarquia)
         auto* meshNode = new Mesh();
         meshNode->name = node->mName.C_Str();
         meshNode->directory = path;                        //meshNode->directory = parent->directory;
+
+
+        std::string modelName = path.substr(path.find_last_of("/\\") + 1); // nome do arquivo com extensão
+        auto pos = modelName.find_last_of('.'); if (pos != std::string::npos) modelName = modelName.substr(0, pos);
 
         // Se o node tem meshes, agregamos todas em um só Mesh (com submeshes)
         if (node->mNumMeshes > 0) {
@@ -107,17 +111,9 @@ private:
                         indices.push_back(baseVertex + face.mIndices[j]);
                 }
                 const uint32_t indexCount = static_cast<uint32_t>(indices.size()) - indexOffset;
-
                  
-                // material (com cache por materialIndex)
-                MaterialInstance* mat = nullptr;
-                auto it = materialCache.find(matIndex);
-                if (it != materialCache.end())  
-                    mat = it->second.get(); 
-                else {
-                    materialCache[matIndex] = CreateMaterialInstanceFrom(scene->mMaterials[matIndex], meshNode->directory);
-                    mat = materialCache[matIndex].get();
-                } 
+                // material (com cache por materialIndex)  
+                auto mat = CreateMaterialInstanceFrom(scene->mMaterials[matIndex], meshNode->directory, modelName); 
                 submeshes.push_back(SubMesh{ indexOffset, indexCount, mat });
             } 
             meshNode->Set(vertices, indices, submeshes); // chama setupMesh()
@@ -126,35 +122,73 @@ private:
         // Recursão pros filhos Assimp
         for (unsigned int i = 0; i < node->mNumChildren; ++i) {
             // Anexa este node ao pai
-            meshNode->AddChild (ProcessNode(node->mChildren[i], scene, materialCache, path));
+            meshNode->AddChild (ProcessNode(node->mChildren[i], scene, path));
         }
 
         return meshNode;
     }
     //static Mesh* ProcessMesh(aiNode* node, aiMesh* aimesh, const aiScene* scene, const std::string& directory, matCache& materialCache) { }
 
-    static std::shared_ptr<MaterialInstance> CreateMaterialInstanceFrom(aiMaterial* aiMat, const std::string& directory) {
-        // Base do material: PBR ou outro material custom
-        auto baseMat = std::make_shared<PBRMaterial>(); 
-        auto instance = std::make_shared<MaterialInstance>(baseMat);
+    static std::shared_ptr<MaterialInstance> CreateMaterialInstanceFrom(aiMaterial* aiMat,
+        const std::string& directory,
+        const std::string& modelName)
+    { 
+        // Chave única: modelName + materialName
+        std::string key = AssetDatabaseUtils::MakeMaterialKey(modelName, aiMat->GetName().C_Str());
 
-        // Load textures / cores
-        aiColor3D color(1.f, 1.f, 1.f);
-        if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color))  
-            instance->SetFallbackColor("Albedo", glm::vec3(color.r, color.g, color.b));
-          
-        aiString texPath;
-        if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
-            std::string fullPath = directory + "/" + texPath.C_Str(); 
-            instance->SetTexture("Albedo", TextureCache::Get().Load(fullPath));
-        }
+        // Se já existe, retorna
+        auto existing = AssetDatabase::Load<MaterialInstance>(key, [&]() -> std::shared_ptr<MaterialInstance> {
+            // Base do material: PBR ou outro custom
+            auto baseMat = std::make_shared<PBRMaterial>();          //std::shared_ptr<MaterialBase> baseMat = std::make_shared<PBRMaterial>();
+            auto instance = std::make_shared<MaterialInstance>(baseMat);
 
-        // fallback de metallic e roughness
-        instance->SetFallbackFloat("Metallic", 0.1f);
-        instance->SetFallbackFloat("Roughness", 0.5f);
+            // Load cores / fallback
+            aiColor3D color(1.f, 1.f, 1.f); 
 
-        return instance;
+            // Textura difusa
+            aiString texPath;
+            if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+                std::string fullPath = directory + "/" + texPath.C_Str();
+                instance->SetTexture("Albedo", TextureCache::Get().Load(fullPath)).unit = 1; 
+            }
+
+            // fallback de metallic e roughness
+            instance->SetFallbackFloat("Metallic", 0.1f).unit = 2;
+            instance->SetFallbackFloat("Roughness", 0.5f). unit = 3;
+
+            return instance;
+        });
+
+        return existing;
     }
+
+
+
+    //static std::shared_ptr<MaterialInstance> CreateMaterialInstanceFrom(aiMaterial* aiMat, const std::string& directory) {
+    //    std::string matName = aiMat->GetName().C_Str();
+    //    auto mat = AssetDatabase::Load<MaterialInstance>(matName);
+
+    //    // Base do material: PBR ou outro material custom
+    //    auto baseMat = std::make_shared<PBRMaterial>(); 
+    //    auto instance = std::make_shared<MaterialInstance>(baseMat);
+
+    //    // Load textures / cores
+    //    aiColor3D color(1.f, 1.f, 1.f);
+    //    if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color))  
+    //        instance->SetFallbackColor("Albedo", glm::vec3(color.r, color.g, color.b));
+    //      
+    //    aiString texPath;
+    //    if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+    //        std::string fullPath = directory + "/" + texPath.C_Str(); 
+    //        instance->SetTexture("Albedo", TextureCache::Get().Load(fullPath));
+    //    }
+
+    //    // fallback de metallic e roughness
+    //    instance->SetFallbackFloat("Metallic", 0.1f);
+    //    instance->SetFallbackFloat("Roughness", 0.5f);
+
+    //    return instance;
+    //}
     
     /*
     static std::shared_ptr<MaterialInstance> CreateMaterialFrom(aiMaterial* aiMat, const std::string& directory) {

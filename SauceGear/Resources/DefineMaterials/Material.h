@@ -6,6 +6,7 @@
 
 using MatValue = std::variant<std::monostate, float, glm::vec3, glm::vec4, std::shared_ptr<Texture>>; 
 struct MaterialParam {
+    unsigned int unit;
     MatValue value;
     MatValue fallback; // sempre algo "editável" no inspector       //bool useFallback = true; // se true, ignora value e gera a textura 1x1 do fallback
 };
@@ -36,19 +37,20 @@ public:
                     nativeParams[name] = param; // herda se não sobrescrito
                 }
             }
-        } 
-        dbg = sdbg++;
+        }  
     }  
 
     virtual ~MaterialBase() = default;
 
     // subclasses definem parâmetros default (nomes e tipos)
     virtual void DefineParameters() {
+        /*
         // Parâmetros comuns PBR
-        nativeParams["Albedo"].fallback = glm::vec3(1.0f);
-        nativeParams["Metallic"].fallback = 0.0f;
-        nativeParams["Roughness"].fallback = 0.5f;
-        nativeParams["AO"].fallback = 1.0f;
+        nativeParams["Albedo"].fallback = glm::vec3(0.5f, 0.5f, 1.0f);         // 0
+        nativeParams["Metallic"].fallback = 0.0f;                   // 1
+        nativeParams["Roughness"].fallback = 0.5f;                  // 2
+        nativeParams["AO"].fallback = 1.0f;                         // 3
+        */
     }
 
     // Aplica todos os parâmetros no shader (usado pelo renderer - chama ApplyInstance)
@@ -65,9 +67,21 @@ public:
     const std::unordered_map<std::string, MaterialParam>& GetDefaultParams() const { return nativeParams; } 
     const std::shared_ptr<Shader>& GetShader() const { return shader; }
     std::shared_ptr<MaterialBase> GetParent() const { return parent; }
+    
+    void AddParam(unsigned int unit, const std::string& name, MatValue value) {
+        MaterialParam param;
+        param.value = std::move(value);
+        param.unit = unit;
+        nativeParams[name] = std::move(param);
+    }
 
-    inline static int sdbg = 0;
-    int dbg = 0;
+    void AddFallParam(unsigned int unit, const std::string& name, MatValue fallback) {
+        MaterialParam param;
+        param.fallback = std::move(fallback);
+        param.unit = unit;
+        nativeParams[name] = std::move(param);
+    } 
+    //inline static unsigned int s_unit = 0;
 protected:
     // não armazena valores por si só aqui; valores concretos ficam nas MaterialInstance
     std::shared_ptr<Shader> shader = nullptr;

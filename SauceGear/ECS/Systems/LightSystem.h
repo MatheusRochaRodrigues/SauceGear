@@ -35,8 +35,7 @@ public:
 
     void InitCascade();
 
-    void Update(float dt) override {
-        std::cout << "f4" << std::endl;
+    void Update(float dt) override { 
         glm::vec3 posPlayer = GEngine->mainCamera->Position;
         LightGroups closestGroupLights = GroupLightsByType(SelectLightsToCastShadow(GetClosestLights(posPlayer)));
 

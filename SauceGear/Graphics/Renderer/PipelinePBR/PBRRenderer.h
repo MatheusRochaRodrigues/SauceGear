@@ -5,6 +5,7 @@
 #include "../../../Resources/Primitive.h"
 #include "IBLManager.h"
 #include "PBRShaders.h"
+#include "../ECS/Systems/DayNightSystem.h"
 
 using Scene = SceneECS;
 
@@ -12,12 +13,10 @@ class PBRPipeline : public IRenderPipeline {
 public:
     void Init() override;
      
-    void Render(Scene& scene) override {
-        std::cout << "f9" << std::endl;
-        HandleFBOs();
-        std::cout << "f19" << std::endl;
+    void Render(Scene& scene) override { 
+        HandleFBOs(); 
+        ibl = DayNightSystem::GetSkyboxFront();
         GeometryPass(scene);
-        std::cout << "f1119" << std::endl;
         LightingPass(scene);
         ForwardPass(scene);
         // 
@@ -26,7 +25,7 @@ public:
         // saída final
         GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
         //auto& light = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun); GEngine->renderer->GetTextureRendered = light.depthMap;
-        //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(1);
+        //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(2);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

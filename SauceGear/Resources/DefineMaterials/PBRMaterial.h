@@ -12,11 +12,11 @@ public:
     }
 
     // Parâmetros comuns PBR
-    void DefineParameters() override {
-        nativeParams["Albedo"]   .fallback = glm::vec3(1.0f);
-        nativeParams["Metallic"] .fallback = 0.0f;
-        nativeParams["Roughness"].fallback = 0.5f;
-        nativeParams["AO"]       .fallback = 1.0f; 
+    void DefineParameters() override { 
+        AddFallParam(1, "Albedo", glm::vec3(0.5f, 0.0f, 1.0f));
+        AddFallParam(2, "Metallic", 1.0f);
+        AddFallParam(3, "Roughness", 0.1f);
+        //AddFallParam(3, "AO", 1.0f);
     }
 
     // garante samplers padronizados na ordem que o shader espera (opcional) // ex: define binding indices conhecidos (mas nosso ApplyToShader já usa TEX units dinamicamente) // Ex: tempo de animação para emissive blinking

@@ -7,11 +7,11 @@
 
 class PrimitiveMesh {
 public:
-    static Mesh* CreateCube(MaterialInstance* material = nullptr);
-    static Mesh* CreateInverseCube(MaterialInstance* material = nullptr);
-    static Mesh* CreateSphere(MaterialInstance* material = nullptr, unsigned int segments = 32, unsigned int rings = 16, float radius = 1.0f);
-    static Mesh* CreatePlane(MaterialInstance* material = nullptr);
-    static Mesh* CreateCylinder(MaterialInstance* material = nullptr, unsigned int segments = 32, float height = 1.0f, float radius = 0.5f, bool capped = true);
+    static Mesh* CreateCube(shared_ptr<MaterialInstance> material = nullptr);
+    static Mesh* CreateInverseCube(shared_ptr<MaterialInstance> material = nullptr);
+    static Mesh* CreateSphere(shared_ptr<MaterialInstance> material = nullptr, unsigned int segments = 32, unsigned int rings = 16, float radius = 1.0f);
+    static Mesh* CreatePlane(shared_ptr<MaterialInstance> material = nullptr);
+    static Mesh* CreateCylinder(shared_ptr<MaterialInstance> material = nullptr, unsigned int segments = 32, float height = 1.0f, float radius = 0.5f, bool capped = true);
 
     static Mesh* CreateSphere2RenderingLight(unsigned int xSegments = 32, unsigned int ySegments = 32);
 private:
@@ -23,10 +23,10 @@ private:
     static std::unique_ptr<Mesh> sphereMesh;
     static std::unique_ptr<Mesh> cylinderMesh;
 
-    static Mesh Cube(MaterialInstance* material = nullptr);
-    static Mesh CubeInverse(MaterialInstance* material = nullptr);
-    static Mesh Sphere(unsigned int segments = 32, unsigned int rings = 16, float radius = 1.0f, MaterialInstance* material = nullptr);
-    static Mesh Cylinder(unsigned int segments = 32, float height = 1.0f, float radius = 0.5f, bool capped = true, MaterialInstance* material = nullptr);
+    static Mesh Cube(shared_ptr<MaterialInstance> material = nullptr);
+    static Mesh CubeInverse(shared_ptr<MaterialInstance> material = nullptr);
+    static Mesh Sphere(unsigned int segments = 32, unsigned int rings = 16, float radius = 1.0f, shared_ptr<MaterialInstance> material = nullptr);
+    static Mesh Cylinder(unsigned int segments = 32, float height = 1.0f, float radius = 0.5f, bool capped = true, shared_ptr<MaterialInstance> material = nullptr);
 
     static const Mesh& CreateTorus(unsigned int segments = 32, unsigned int ringSegments = 24, float majorRadius = 1.0f, float minorRadius = 0.25f);
 

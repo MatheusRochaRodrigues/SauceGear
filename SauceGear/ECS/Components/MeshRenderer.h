@@ -26,9 +26,12 @@ struct MeshRenderer {
         if (!mesh) return;
         for (auto& sm : mesh->submeshes) { 
             if (!sm.material) {
-                std::cout << "[DEBUG] - material gerado em RebuildBatches" << std::endl;
-                //sm.material = std::make_shared<MaterialInstance>(std::make_shared<PBRMaterial>());
-                sm.material = (sm.material) ? sm.material : AssetDatabase::Load<MaterialInstance>("__default_material__");
+                std::cout << "[DEBUG] - material gerado em RebuildBatches" << std::endl; 
+                //sm.material = (sm.material) ? sm.material : AssetDatabase::Load<MaterialInstance>("__default_material__");   //sm.material = std::make_shared<MaterialInstance>(std::make_shared<PBRMaterial>());
+                static auto defaultMat = AssetDatabase::Load<MaterialInstance>("__default_material__", [] {
+                    return std::make_shared<MaterialInstance>(std::make_shared<PBRMaterial>());
+                });
+                sm.material = defaultMat;
             } 
             batches[sm.material].push_back(&sm);
         }
@@ -57,7 +60,7 @@ struct MeshRenderer {
         glBindVertexArray(0);
     }
 
-    void Draw(MaterialInstance* mat) {
+    /*void Draw(std::shared_ptr<MaterialInstance> mat) {
         if (!mesh) return;
         if (!mat) return;
         for (auto& sm : batches[mat]) { 
@@ -65,7 +68,7 @@ struct MeshRenderer {
             glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset)); 
         }
         glBindVertexArray(0);
-    }
+    }*/
 
     void Paint() {
         if (!mesh) return;
@@ -90,7 +93,7 @@ struct MeshRenderer {
         batches.clear();
         if (!mesh) return;
         for (auto& sm : mesh->submeshes) {
-            MaterialInstance* mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            auto mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
             batches[mat].push_back(&sm);
         }
         for (auto* child : mesh->children) if (child) RebuildBatchesChild(child);
@@ -113,7 +116,7 @@ struct MeshRenderer {
 private:
     void RebuildBatchesChild(Mesh* m) {
         for (auto& sm : m->submeshes) {
-            MaterialInstance* mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            auto mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
             batches[mat].push_back(&sm);
         }
         for (auto* c : m->children) if (c) RebuildBatchesChild(c);
@@ -121,7 +124,7 @@ private:
 
     void DrawChild(Mesh* m) {
         for (auto& sm : m->submeshes) {
-            MaterialInstance* mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
+            auto mat = sm.material; //Material* mat = sm.material ? sm.material : MaterialDefaults::Get();
             mat->Bind();
             glBindVertexArray(m->VAO);
             glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));

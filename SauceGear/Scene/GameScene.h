@@ -33,8 +33,7 @@ public:
             /*auto& trans = GetComponent<Transform>(entity);
             trans.position = { 0, 0, 0 }; 
             auto& renderer = AddComponent<MeshRenderer>(entity); 
-             */
-            std::cout << "printf cube" << std::endl;
+             */ 
 
             //auto* material = new Material();                    //auto* material = new Material(defaultShader);  
             //auto* tex = MaterialDefaults::TextureColor(250, 100, 0);
@@ -59,36 +58,34 @@ public:
 
         }   
 
-        //{
-        //    Entity pointLight = SceneBuilder::CreateGameObject("Sun");
-        //    auto& pTransform = AddComponent<Transform>(pointLight);
-        //    pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-        //    /*auto& redn = AddComponent<MeshRenderer>(pointLight);
-        //    redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-        //    pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-        //    pTransform.position = glm::vec3(0, -1, 0);
-        //    auto& pLight = AddComponent<LightComponent>(pointLight);
-        //    //pLight.type = ShadowType::Point;
-        //    pLight.SetTypeLight(ShadowType::Directional);
-        //    pLight.color = glm::vec3(1, 0, 1);
-        //    pLight.intensity = 1.0f;
-        //}
-        //{
-        //    Entity pointLight = SceneBuilder::CreateGameObject("Light2");
-        //    auto& pTransform = AddComponent<Transform>(pointLight);
-        //    pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-        //    /*auto& redn = AddComponent<MeshRenderer>(pointLight);
-        //    redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-        //    pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-        //    pTransform.position = glm::vec3(0, 0, 0);
-        //    auto& pLight = AddComponent<LightComponent>(pointLight);
-        //    //pLight.type = ShadowType::Point;
-        //    pLight.SetTypeLight(ShadowType::Point);
-        //    pLight.color = glm::vec3(0, 1, 0);
-        //    pLight.intensity = 1.0f;
-        //} 
-
-        std::cout << "DSADSA LIf cube" << std::endl;
+        {
+            Entity pointLight = SceneBuilder::CreateGameObject("Sun");
+            auto& pTransform = AddComponent<Transform>(pointLight);
+            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
+            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+            pTransform.position = glm::vec3(0, -1, 0);
+            auto& pLight = AddComponent<LightComponent>(pointLight);
+            //pLight.type = ShadowType::Point;
+            pLight.SetTypeLight(ShadowType::Directional);
+            pLight.color = glm::vec3(1, 0, 1);
+            pLight.intensity = 1.0f;
+        }
+        {
+            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
+            auto& pTransform = AddComponent<Transform>(pointLight);
+            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
+            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+            pTransform.position = glm::vec3(0, 0, 0);
+            auto& pLight = AddComponent<LightComponent>(pointLight);
+            //pLight.type = ShadowType::Point;
+            pLight.SetTypeLight(ShadowType::Point);
+            pLight.color = glm::vec3(0, 1, 0);
+            pLight.intensity = 1.0f;
+        }  
 
         // Render para um framebuffer
         //GLuint sceneFBO, sceneTexture;

@@ -199,8 +199,6 @@
     <ClInclude Include="Graphics\ComputeShader.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
-    <ClInclude Include="Resources\DataBase\AssetDatabaseEntry.h" />
-    <ClInclude Include="Resources\DataBase\AssetDatabaseEntry.cpp" />
     <ClInclude Include="Resources\DefineMaterials\Material.h" />
     <ClInclude Include="Resources\DefineMaterials\MaterialInstance.h" />
     <ClInclude Include="Resources\DefineMaterials\MaterialUtils.h" />

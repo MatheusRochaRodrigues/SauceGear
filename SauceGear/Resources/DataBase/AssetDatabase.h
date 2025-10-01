@@ -5,36 +5,16 @@
 #include <typeindex>
 #include <stdexcept>
 #include <iostream>
+ 
 
 class AssetDatabase {
 public:
-    // Retorna uma referência a um placeholder (shared_ptr vazio) para você preencher depois
-    template <typename T>
-    static std::shared_ptr<T>& RegisterPlaceholder(const std::string& key) {
-        auto it = assets.find(key);
-        if (it != assets.end()) {
-            if (it->second.type != std::type_index(typeid(T))) {
-                throw std::runtime_error("Erro: Asset existente tem tipo diferente do solicitado para " + key);
-            }
-            auto existing = it->second.ptr.lock();
-            if (existing) {
-                return *reinterpret_cast<std::shared_ptr<T>*>(&existing);
-            }
-        }
-
-        // Cria um shared_ptr vazio e registra
-        auto placeholder = std::make_shared<T>(nullptr);
-        assets[key] = { placeholder, std::type_index(typeid(T)) };
-        return *reinterpret_cast<std::shared_ptr<T>*>(&assets[key].ptr);
-    }
-
-    // Load clássico: retorna asset já criado ou cria com um construtor padrão T(path)
+    // Load clássico: retorna asset já criado ou cria com T(path)
     template <typename T>
     static std::shared_ptr<T> Load(const std::string& key) {
         auto it = assets.find(key);
-        if (it != assets.end()) {
-            auto existing = it->second.ptr.lock();
-            if (existing) {
+        if (it != assets.end()) { 
+            if (auto existing = it->second.ptr.lock()) {
                 if (it->second.type != std::type_index(typeid(T))) {
                     throw std::runtime_error("Erro: Tipo diferente do solicitado para " + key);
                 }
@@ -42,19 +22,18 @@ public:
             }
         }
 
-        // Cria um novo asset e registra
+        // Cria e registra
         auto newAsset = std::make_shared<T>(key);
         assets[key] = { newAsset, std::type_index(typeid(T)) };
         return newAsset;
     }
 
-    // Load com função de criação customizada (pode passar flags, diretórios etc)
+    // Load com função de criação customizada (quando precisa de flags, configs, etc.)
     template <typename T, typename Factory>
     static std::shared_ptr<T> Load(const std::string& key, Factory createFunc) {
         auto it = assets.find(key);
-        if (it != assets.end()) {
-            auto existing = it->second.ptr.lock();
-            if (existing) {
+        if (it != assets.end()) { 
+            if (auto existing = it->second.ptr.lock()) {
                 if (it->second.type != std::type_index(typeid(T))) {
                     throw std::runtime_error("Erro: Tipo diferente do solicitado para " + key);
                 }
@@ -62,12 +41,12 @@ public:
             }
         }
 
-        auto newAsset = createFunc(); // cria asset fora
+        auto newAsset = createFunc();
         assets[key] = { newAsset, std::type_index(typeid(T)) };
         return newAsset;
     }
 
-    // Unload remove do database; se ninguém mais referenciar, objeto será destruído
+    // Remove do database; se ninguém mais tiver referência, o asset morre
     template <typename T>
     static void Unload(const std::string& key) {
         auto it = assets.find(key);
@@ -78,16 +57,17 @@ public:
 
 private:
     struct AssetEntry {
-        std::weak_ptr<void> ptr;      // Não impede destruição
+        std::weak_ptr<void> ptr;   // não segura vida do objeto
         std::type_index type;
+
+        AssetEntry() : ptr(), type(typeid(void)) {} // default (necessário para unordered_map)
+        AssetEntry(std::weak_ptr<void> p, std::type_index t) : ptr(std::move(p)), type(t) { }
     };
 
-    static std::unordered_map<std::string, AssetEntry> assets;
+    inline static std::unordered_map<std::string, AssetEntry> assets{};
 };
 
-// Definição do static
-std::unordered_map<std::string, AssetDatabase::AssetEntry> AssetDatabase::assets;
-
+ 
 
 namespace AssetDatabaseUtils {
     inline std::string MakeMaterialKey(const std::string& modelName, const std::string& materialName) {
