@@ -15,6 +15,11 @@
 #include "AABBComponent.h"  
 #include "ComputeSyncComponent.h"  
 
+#include "SurfaceNetsComponent.h"  
+
+#include "DebugMeshComponent.h"  
+
+
 
 // Aqui você pode criar um alias útil:					
 using AllComponentTypes = std::tuple<Transform, Velocity>;

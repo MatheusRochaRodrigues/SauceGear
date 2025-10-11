@@ -168,6 +168,9 @@
     <ClCompile Include="Resources\DataBase\AssetDatabase.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\World\SurfaceNets\SurfaceNets.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -512,6 +515,48 @@
     <ClInclude Include="Resources\DefineMaterials\TextureCache.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="ECS\Components\SurfaceNetsComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\SurfaceNetsSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Octree\OctreeNode.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNets.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Noise.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\Octree\Octree.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\Voxel.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\NoiseGenerator\SphereSDF.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\DebugRender\DebugPointRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\DebugRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components\DebugMeshComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\DebugRender\DebugPointDrawer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
@@ -610,6 +655,23 @@
     <None Include="Resources\Shaders\Compute\extras\LerpCubemap.comp" />
     <None Include="Resources\Shaders\Compute\TestCube.comp" />
     <None Include="Resources\Shaders\Compute\extras\TestCube2.comp" />
+    <None Include="Resources\Shaders\DebugP\debug_point_circle.vs" />
+    <None Include="Resources\Shaders\DebugP\debug_point_circle.fs" />
+    <None Include="Resources\Shaders\DebugP\debug_line.vs" />
+    <None Include="Resources\Shaders\DebugP\debug_line.fs" />
+    <None Include="Resources\Shaders\DebugP\debug_point.fs" />
+    <None Include="Resources\Shaders\DebugP\debug_point.vs" />
+    <None Include="Resources\Shaders\DebugP\backup\debug_point_circle.fs" />
+    <None Include="Resources\Shaders\DebugP\backup\debug_point_circle.vs" />
+    <None Include="Resources\Shaders\DebugP\backup\debug_point.vs" />
+    <None Include="Resources\Shaders\DebugP\backup\debug_point.fs" />
+    <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />
+    <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="Geometry\World\SurfaceNets\Backups\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
+    <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
+    <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

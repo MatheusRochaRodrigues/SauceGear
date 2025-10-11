@@ -4,6 +4,8 @@
 #include "../ECS/Components/ComponentsHelper.h"
 #include <stdexcept> 
 #include "SceneBuilder.h"
+#include "../Geometry/World/SurfaceNets/Voxel.h"
+#include <memory>
 
 
 class GameScene : public SceneECS {
@@ -106,6 +108,74 @@ public:
         //});
         //  
         //LoadScene2(); 
+
+        //World
+         
+        //const float radius = 10.0f;
+
+        // Cria o SDF
+        //auto sdfVec = GeneratorMap::GenerateSphereSDF(dim, radius);
+         
+
+        // Prepara grid + buffer
+        //buffer.grid = std::make_unique<VoxelGrid>();           // precisa de <memory>
+        //buffer.grid->density = std::move(sdfVec);
+        //buffer.grid->density = std::move(sdfVec);
+         
+        GeneratorMap::DebugPrintSDF(GeneratorMap::GenerateSphereSDF(32, 10), 32 + 0);
+
+        // Gera mesh (retorna atual Mesh* se quiser)
+        //Mesh* mesh = SurfaceNetsCPU::Generate(*buffer->grid.get(), *params, *buffer); 
+
+        voxelSystem sys;
+        std::cout << "o - 7" << std::endl;
+        for(auto& mesh : sys.gnrtChunk()) {
+            auto& scene = GEngine->scene;
+            Entity xz = SceneBuilder::CreateModel(mesh);
+            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz);
+            pp.buffer = sys.buffer;
+            pp.params = sys.params;
+            //auto& aaaa = AddComponent<DebugMeshComponent>(xz); 
+            GeneratorMap::DebugPrintSDF(sys.grid.density, 32 + 0);
+
+        } 
+
+        DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+        DebugRenderer::AddPoint(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+
+        std::cout << "Corners 27" << std::endl;
+        return; 
+        {
+            //std::cout << "Corners 1" << std::endl;
+            //Mesh* mesh = SurfaceNetsGPU::Generate(*buffer->grid.get(), *params, *buffer, computeShader.ID);
+            //std::cout << "Corners 2" << std::endl;
+
+            //std::cout << "Vertices: " << buffer->positions.size() << "\n";
+            //std::cout << "Indices:  " << buffer->indices.size() << "\n";
+
+
+            //GeneratorMap::DebugPrintSDF(buffer->grid.get()->density, 32 + 0);
+
+            //Entity xz = SceneBuilder::CreateModel(mesh);
+            //auto& pp = AddComponent<SurfaceNetsComponent>(xz);
+            //pp.buffer = buffer;
+            //pp.params = params;
+            //auto& aaaa = AddComponent<DebugMeshComponent>(xz);
+
+            //DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+            //DebugRenderer::AddPoint(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+
+            ///*SurfaceNetsComponent snc;
+            //snc.buffer = buffer;
+            //snc.params = params;
+            //AddComponent<SurfaceNetsComponent>(xz, std::move(snc));*/
+
+
+            //auto& corner = buffer->debug_corners;
+            //std::cout << "Corners count: " << corner.size() << std::endl;
+            //if (!corner.empty()) { DebugRenderer::pts = std::vector<glm::vec3>(corner.begin(), corner.end()); }
+        }
+
     }
 
     // Código ECS equivalente ao renderScene()

@@ -147,6 +147,12 @@ public:
 
     //void SwitchToCamera(Camera* newCam) { GEngine->mainCamera = newCam; }
 
+    template<typename T>
+    Entity GetFirstEntityOfType() const {
+        return componentManager->GetFirstEntityOfType<T>();
+    }
+
+
 private:
     std::unique_ptr<ComponentManager> componentManager = std::make_unique<ComponentManager>(); 
     std::vector<std::unique_ptr<System>> systems;

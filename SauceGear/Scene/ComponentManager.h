@@ -154,6 +154,24 @@ public:
         return storages;
     }
 
+    template<typename T>
+    Entity GetFirstEntityOfType() const {
+        auto it = storages.find(std::type_index(typeid(T)));
+        if (it == storages.end()) {
+            throw std::runtime_error(std::string("Componente não registrado: ") + typeid(T).name());
+        }
+
+        auto* storage = static_cast<ComponentStorage<T>*>(it->second.get());
+        const auto& entities = storage->GetEntitySet();
+
+        if (entities.empty()) {
+            return INVALID_ENTITY;
+        }
+
+        return *entities.begin(); // retorna o primeiro (ordem indefinida, mas ok)
+    }
+
+
 private:
     std::unordered_map<std::type_index, std::unique_ptr<IComponentStorage>> storages;
 

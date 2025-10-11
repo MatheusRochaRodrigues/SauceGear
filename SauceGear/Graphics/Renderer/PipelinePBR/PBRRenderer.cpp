@@ -1,8 +1,11 @@
-#include "PBRRenderer.h"
+Ôªø#include "PBRRenderer.h"
 #include "../../ECS/Components/Transform.h"
 #include "../../ECS/Components/MeshRenderer.h"
 //#include "../../ECS/Components/Material.h"
 #include "../Graphics/FullscreenQuad.h"
+
+//#include "../../../Resources/DebugRender/Debug/DebugPointsRenderer.h"
+
 
 void PBRPipeline::Init() {  
     const unsigned int width = GEngine->window->GetWidth();
@@ -74,6 +77,7 @@ void PBRPipeline::Init() {
     // Shaders defaults
     shaders.skybox.use(); 
     shaders.skybox.setInt("environmentMap", 0); 
+     
 }
 
 void PBRPipeline::Shutdown() {
@@ -143,7 +147,7 @@ void PBRPipeline::LightingPass(Scene& scene) {
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // 1) AMBIENTE (IBL) ñ full screen
+    // 1) AMBIENTE (IBL) ‚Äì full screen
     glDisable(GL_BLEND);
     shaders.iblAmbientShader.use();
     shaders.iblAmbientShader.setVec3("viewPos", GEngine->mainCamera->GetPosition());
@@ -174,10 +178,10 @@ void PBRPipeline::LightingPass(Scene& scene) {
     pbrPointShader->setFloat("far_plane", 25); // adapte ao seu sistema 
     BindGBufferTo(pbrPointShader); //BindIBLTo(pbrPointShader);
 
-    // UBO de luzes j· est· bound no binding=1 (igual seu shader antigo)
+    // UBO de luzes j√° est√° bound no binding=1 (igual seu shader antigo)
     LightSystem::SetPointsToShader(pbrPointShader, 0); 
 
-    // inst‚ncias
+    // inst√¢ncias
     std::vector<LightInstanceData> instanceData;
     for (auto e : LightSystem::lightInActive.point) {
         auto& light = GEngine->scene->GetComponent<LightComponent>(e);
@@ -193,7 +197,7 @@ void PBRPipeline::LightingPass(Scene& scene) {
         instanceData.data(),
         instanceData.size() * sizeof(LightInstanceData),
         {
-            { 10, 3 },  // posiÁ„o (vec3)
+            { 10, 3 },  // posi√ß√£o (vec3)
             { 11, 1 },  // raio    (float)
             { 12, 1 }   // indice  (float)
         }
@@ -206,7 +210,7 @@ void PBRPipeline::LightingPass(Scene& scene) {
     glDisable(GL_CULL_FACE);  
     //DrawSkybox();
     glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);         // n„o escreve no depth 
+    glDepthMask(GL_TRUE);         // n√£o escreve no depth 
 }
 
 void PBRPipeline::DrawSkybox() { 
@@ -216,7 +220,7 @@ void PBRPipeline::DrawSkybox() {
     shaders.skybox.setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
     glActiveTexture(GL_TEXTURE0);
 
-    // Nunca chame StartCubemapJob() dentro do draw. FaÁa no Update
+    // Nunca chame StartCubemapJob() dentro do draw. Fa√ßa no Update
 
     // Bind seguro
     //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront().envCubemap); 
@@ -227,7 +231,7 @@ void PBRPipeline::DrawSkybox() {
 }
 
 void PBRPipeline::ForwardPass(Scene& scene) {
-    // (opcional) transparÍncias/partÌculas usando PBR forward com IBL:
+    // (opcional) transpar√™ncias/part√≠culas usando PBR forward com IBL:
     // copiar depth do gbuffer -> framebuffer se quiser ordenar contra opacos 
 
     //glEnable(GL_DEPTH_TEST);
@@ -247,7 +251,11 @@ void PBRPipeline::ForwardPass(Scene& scene) {
     auto view = camera->GetViewMatrix();
     auto proj = camera->GetProjectionMatrix(); 
 
+     
+    // ... desenhe transparentes com shader PBR forward e BindIBLTo()
+
+
     DrawSkybox();
 
-    // ... desenhe transparentes com shader PBR forward e BindIBLTo()
+
 }

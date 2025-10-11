@@ -8,6 +8,9 @@
 #include "../ECS/Systems/DayNightSystem.h"
 
 using Scene = SceneECS;
+ 
+// forward
+//struct DebugPointsRenderer;
 
 class PBRPipeline : public IRenderPipeline {
 public:
@@ -15,7 +18,7 @@ public:
      
     void Render(Scene& scene) override { 
         HandleFBOs(); 
-        ibl = DayNightSystem::GetSkyboxFront();
+        //ibl = DayNightSystem::GetSkyboxFront();
         GeometryPass(scene);
         LightingPass(scene);
         ForwardPass(scene);
@@ -31,8 +34,8 @@ public:
 
     void Shutdown() override;
 
-private:
     Framebuffer* framebuffer = nullptr; // final color + depth (default: true depth)
+private:
     Framebuffer* gBuffer = nullptr; // Position/Normal/Albedo/MetalRoughAO (+depth)
     Framebuffer* lightingBuffer = nullptr; // opcional se quiser acumular separado (aqui vou direto no framebuffer final)
 
@@ -60,4 +63,5 @@ private:
     std::string currentHDR = "Resources/Textures/hdr/tst/dikhololo_night_4k.hdr";
     //std::string currentHDR = "Resources/Textures/hdr/tst/Kloppenheim (1).hdr";
     std::string cacheDir = "Resources/Cache/IBL";
+     
 };

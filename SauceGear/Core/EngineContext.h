@@ -29,9 +29,7 @@ struct EngineContext
     //IRenderPipeline* pipeline = nullptr; // apenas ponteiro cru
 
     //SceneManager* sceneManager;
-     
-    // Ex: Input, Audio, Physics, ResourceManager...
-    // InputSystem* input = nullptr;
+      
 };
 
 // Singleton acessível globalmente (em versão simples)

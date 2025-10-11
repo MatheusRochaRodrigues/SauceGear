@@ -15,6 +15,10 @@ void SceneECS::initECS() {
     //componentManager->Register<PostProcessComponent>(); 
     componentManager->Register<AABBComponent>();
 
+    componentManager->Register<SurfaceNetsComponent>();
+    componentManager->Register<DebugMeshComponent>();
+
+
     ///----------Systems
     auto* transformSystem =      RegisterSystem <TransformSystem>();
     auto* cameraSystem =         RegisterSystem <CameraSystem>();
@@ -22,8 +26,12 @@ void SceneECS::initECS() {
     auto* dayNightSystem =       RegisterSystem <DayNightSystem>();
     auto* lightSystem  =         RegisterSystem <LightSystem> ();
     auto* globalUniformSystem =  RegisterSystem <GlobalUniformSystem>(); 
-    auto* renderSystem =         RegisterSystem <RenderSystem>(); 
+    auto* renderSystem =         RegisterSystem <RenderSystem>();
+
+    auto* debugRenderer =        RegisterSystem <DebugRenderer>();
+
     auto* postProcessSystem =    RegisterSystem <PostProcessSystem>(); 
+
 
     //auto* pickingSystem = RegisterSystem <PickingSystem>();
 

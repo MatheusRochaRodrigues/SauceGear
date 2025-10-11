@@ -190,6 +190,71 @@ public:
         glDrawElementsInstanced(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset), count);
         glBindVertexArray(0);
     }
+
+
+
+    // Novo construtor: recebe posições, normais e índices diretamente
+    Mesh(const std::vector<glm::vec3>& positions,
+        const std::vector<glm::vec3>& normals,
+        const std::vector<uint32_t>& inds)
+    {
+        UploadFromRaw(positions, normals, inds);
+    }
+
+    // Novo método para criar vertices e enviar para GPU
+    void UploadFromRaw(const std::vector<glm::vec3>& positions,
+        const std::vector<glm::vec3>& normals,
+        const std::vector<uint32_t>& inds,
+        std::shared_ptr<MaterialInstance> m = nullptr)
+    {
+        vertices.clear(); 
+        indices = inds; 
+
+        vertices.reserve(positions.size()); 
+        for (size_t i = 0; i < positions.size(); ++i) {
+            Vertex v{};
+            v.Position = positions[i];
+            v.Normal = (i < normals.size()) ? normals[i] : glm::vec3(0.0f);
+            v.TexCoords = glm::vec2(0.0f);  // opcional, sem uv
+            v.Tangent = glm::vec3(0.0f);
+            v.Bitangent = glm::vec3(0.0f);
+            vertices.push_back(v);
+        }
+        submeshes.push_back(SubMesh{ 0, static_cast<uint32_t>(inds.size()), m });
+        // setup da GPU
+        setupMesh();
+    }
+
+    template <typename VecType>
+    void UploadFromRaw(const std::vector<VecType>& positions,
+        const std::vector<VecType>& normals,
+        const std::vector<uint32_t>& inds,
+        std::shared_ptr<MaterialInstance> m = nullptr)
+    {
+        vertices.clear();
+        std::cout << "Corners 10" << std::endl;
+        indices = inds;
+        std::cout << "Corners 11" << std::endl;
+
+        vertices.reserve(positions.size());
+        std::cout << "Corners 12" << std::endl;
+
+        for (size_t i = 0; i < positions.size(); ++i) {
+            Vertex v{};
+            // extrair apenas xyz, mesmo se for vec4
+            v.Position = glm::vec3(positions[i]);
+            v.Normal = (i < normals.size()) ? glm::vec3(normals[i]) : glm::vec3(0.0f);
+            v.TexCoords = glm::vec2(0.0f);
+            v.Tangent = glm::vec3(0.0f);
+            v.Bitangent = glm::vec3(0.0f);
+            vertices.push_back(v);
+        }
+
+        std::cout << "Corners 13" << std::endl;
+        submeshes.push_back(SubMesh{ 0, (uint32_t)inds.size(), m });
+        setupMesh();
+    }
+
          
 private:
     // render data 
