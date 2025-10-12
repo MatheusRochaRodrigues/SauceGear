@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cassert>
 
+#define sysv SysVoxel::getInstance()
+
 class SurfaceNetsGPU {
 public:
     struct SurfaceNetsGPUBuffer {
@@ -38,8 +40,7 @@ public:
             } 
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         }
-    }
-
+    } 
 
     static GLuint CreateSSBO(GLsizeiptr size, const void* data = nullptr, GLenum usage = GL_DYNAMIC_COPY) {
         GLuint id;
@@ -50,14 +51,14 @@ public:
         return id;
     } 
 
-    static Mesh* Generate(const VoxelGrid& sdf, const SurfaceNetsParams& params, SurfaceNetsBuffer& out, GLuint computeProgram, glm::vec3 uOffset,  GLuint ssboSDF = 0 ) {
-        const int uDim = params.cellDimension;      // número de pontos (ex: 33)
-        const float uVoxelSize = params.voxelSize;
-        const float uWorldScale = params.worldSize;
+    static std::unique_ptr<Mesh> Generate(const ChunkBuffer& buff, glm::vec3 uOffset, GLuint computeProgram,  GLuint ssboSDF = 0 ) {
+        const int   uDim        = sysv.get_voxelGrid();      // número de pontos (ex: 33)
+        const float uVoxelSize  = sysv.get_voxelSize();
+        const float uWorldScale = sysv.get_chunkSize();
         const size_t voxelCount = size_t(uDim) * uDim * uDim;   //arraySize
          
-        std::cout << voxelCount << " d " << sdf.density.size() << std::endl;
-        assert(voxelCount == sdf.density.size());
+        std::cout << voxelCount << " d " << buff.density.size() << std::endl;
+        assert(voxelCount == buff.density.size());
 
         // --- 5. Bind & set uniforms ---
         glUseProgram(computeProgram); 
@@ -69,7 +70,7 @@ public:
 
          
         // --- 1. SSBO: SDF input ---
-        if(ssboSDF == 0) ssboSDF = CreateSSBO((sizeof(float) * voxelCount) + 1, sdf.density.data(), GL_STATIC_DRAW);
+        if(ssboSDF == 0) ssboSDF = CreateSSBO((sizeof(float) * voxelCount) + 1, buff.density.data(), GL_STATIC_DRAW);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboSDF);
 
         // --- 2. SSBO: Outputs ---
@@ -125,18 +126,18 @@ public:
         std::cout << "SurfaceNetsGPU -> vertices: " << vertexCount << "  indices: " << indexCount << "\n";
 
         // --- 8. Ler dados resultantes ---
-        out.positions.resize(vertexCount);
-        out.normals.resize(vertexCount);
-        out.indices.resize(indexCount);
-
+        std::vector<glm::vec4>  positions;  positions.resize(vertexCount);
+        std::vector<glm::vec4>  normals;    normals.resize(vertexCount);       // not normalized (normalize on GPU if desired)         
+        std::vector<uint32_t>   indices;    indices.resize(indexCount);
+         
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPositions);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * vertexCount, out.positions.data());
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * vertexCount, positions.data());
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboNormals);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * vertexCount, out.normals.data());
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * vertexCount, normals.data());
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboIndices);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t)  * indexCount , out.indices.data());
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t)  * indexCount , indices.data());
 
         // --- 9. Cleanup (opcional, ou mantenha se quiser reusar) ---
         glDeleteBuffers(1, &ssboSDF);
@@ -147,8 +148,8 @@ public:
         glDeleteBuffers(1, &ssboCounters); 
          
         // --- Create Mesh ---
-        Mesh* mesh = new Mesh(); 
-        mesh->UploadFromRaw(out.positions, out.normals, out.indices); 
+        auto mesh = std::make_unique<Mesh>();
+        mesh->UploadFromRaw(positions, normals, indices);  //mesh->UploadFromRaw(positions, normals, indices); 
         return mesh;
     }
 };

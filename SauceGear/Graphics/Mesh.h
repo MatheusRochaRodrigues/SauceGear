@@ -36,8 +36,8 @@ struct SubMesh {
 };
 
 class Mesh {
-public:
-    string name;         //name mesh
+public: 
+    string name;
     // mesh Data
     vector<Vertex>        vertices;
     std::vector<uint32_t> indices;
@@ -232,13 +232,8 @@ public:
         std::shared_ptr<MaterialInstance> m = nullptr)
     {
         vertices.clear();
-        std::cout << "Corners 10" << std::endl;
-        indices = inds;
-        std::cout << "Corners 11" << std::endl;
-
-        vertices.reserve(positions.size());
-        std::cout << "Corners 12" << std::endl;
-
+        vertices.reserve(positions.size()); 
+         
         for (size_t i = 0; i < positions.size(); ++i) {
             Vertex v{};
             // extrair apenas xyz, mesmo se for vec4
@@ -250,7 +245,8 @@ public:
             vertices.push_back(v);
         }
 
-        std::cout << "Corners 13" << std::endl;
+        indices = std::move(inds);
+
         submeshes.push_back(SubMesh{ 0, (uint32_t)inds.size(), m });
         setupMesh();
     }

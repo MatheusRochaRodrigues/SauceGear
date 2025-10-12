@@ -122,22 +122,24 @@ public:
         //buffer.grid->density = std::move(sdfVec);
         //buffer.grid->density = std::move(sdfVec);
          
-        GeneratorMap::DebugPrintSDF(GeneratorMap::GenerateSphereSDF(32, 10), 32 + 0);
+        //GeneratorMap::DebugPrintSDF(GeneratorMap::GenerateSphereSDF(32, 10), 32 + 0);
 
         // Gera mesh (retorna atual Mesh* se quiser)
         //Mesh* mesh = SurfaceNetsCPU::Generate(*buffer->grid.get(), *params, *buffer); 
 
         voxelSystem sys;
         std::cout << "o - 7" << std::endl;
-        for(auto& mesh : sys.gnrtChunk()) {
+        for(auto& ck : sys.gnrtChunk()) {
+            std::cout << "o - 00" << std::endl;
             auto& scene = GEngine->scene;
-            Entity xz = SceneBuilder::CreateModel(mesh);
-            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz);
-            pp.buffer = sys.buffer;
-            pp.params = sys.params;
-            //auto& aaaa = AddComponent<DebugMeshComponent>(xz); 
-            GeneratorMap::DebugPrintSDF(sys.grid.density, 32 + 0);
-
+            Entity xz = SceneBuilder::CreateModel(ck->mesh.get());
+            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck); 
+            std::cout << " op l 2 " << ck    << std::endl;
+            if (pp.chunk->mesh == nullptr) std::cout << " op l 3" << std::endl;
+            if (pp.chunk->buff == nullptr) std::cout << " op l 4" << std::endl;
+            if (pp.chunk == nullptr) std::cout << " op l " << std::endl;
+            GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
+            //auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
         } 
 
         DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);

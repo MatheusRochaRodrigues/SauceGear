@@ -168,9 +168,6 @@
     <ClCompile Include="Resources\DataBase\AssetDatabase.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Geometry\World\SurfaceNets\SurfaceNets.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -555,6 +552,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

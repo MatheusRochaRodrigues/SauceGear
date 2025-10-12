@@ -130,7 +130,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Geometry\World\SurfaceNets\SurfaceNets.cpp" />
     <ClCompile Include="Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
@@ -184,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
+    <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h" />
     <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h" />
     <ClInclude Include="ECS\Components\ComputeSyncComponent.h" />
