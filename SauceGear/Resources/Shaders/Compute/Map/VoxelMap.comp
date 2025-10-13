@@ -1,10 +1,10 @@
 #version 450
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
-uniform int uDim;
-uniform float uVoxelSize;
-uniform vec3 uOffset;           //   deslocamento
-uniform float uIsoLevel;
+uniform int uDim;              // tamanho da grid (ex: 64)
+uniform float uVoxelSize;      // tamanho do voxel (ex: 1.0)
+uniform vec3 uOffset;          // deslocamento mundial do chunk
+uniform float uIsoLevel;       // nível de isosuperfície
 
 // output SDF
 layout(std430, binding = 0) buffer SDF { float sdf[]; };
@@ -97,15 +97,20 @@ float worleyNoise(vec3 p) {
 
 void main() {
     ivec3 cell = ivec3(gl_GlobalInvocationID.xyz);
-    if(any(greaterThanEqual(cell, ivec3(uDim)))) return;
+    if (any(greaterThanEqual(cell, ivec3(uDim)))) return;
 
-    vec3 pos = vec3(cell) * uVoxelSize + uOffset;
+    // posição real do voxel no mundo
+    //vec3 pos = vec3(cell) * uVoxelSize + uOffset;
+    vec3 pos = (vec3(cell) - vec3(uDim - 1) * 0.5) * uVoxelSize + uOffset;
 
+    // terreno base
     // --- altura do terreno ---
-    float height = fractalPerlin(pos*0.05)*5.0; 
-    // --- cavernas / detalhes ---
-    float caves = worleyNoise(pos*0.1)*2.0 - 1.0;
+    float height = fractalPerlin(pos * 0.05) * 5.0;
 
+    // --- cavernas / detalhes ---
+    float caves = worleyNoise(pos * 0.1) * 2.0 - 1.0;
+
+    // SDF final
     // --- SDF: negativo dentro, 0 superfície, positivo fora ---
     float distToSurface = pos.y - height + caves - uIsoLevel;
 

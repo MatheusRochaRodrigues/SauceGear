@@ -149,7 +149,7 @@ public:
          
         // --- Create Mesh ---
         auto mesh = std::make_unique<Mesh>();
-        mesh->UploadFromRaw(positions, normals, indices);  //mesh->UploadFromRaw(positions, normals, indices); 
+        mesh->UploadFromRaw(positions, normals, indices);   
         return mesh;
     }
 };

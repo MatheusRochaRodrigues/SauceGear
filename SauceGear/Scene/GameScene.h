@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "SceneECS.h" 
 #include "../Graphics/Framebuffer.h" 
 #include "../ECS/Components/ComponentsHelper.h"
@@ -91,7 +91,7 @@ public:
 
         // Render para um framebuffer
         //GLuint sceneFBO, sceneTexture;
-        //Framebuffer::CreateFramebuffer(sceneFBO, sceneTexture); // você precisa implementar isso 
+        //Framebuffer::CreateFramebuffer(sceneFBO, sceneTexture); // vocÃª precisa implementar isso 
 
         // Depois da cena ter sido renderizada para sceneTexture
         //auto entity = CreateEntity();
@@ -130,15 +130,34 @@ public:
         voxelSystem sys;
         std::cout << "o - 7" << std::endl;
         for(auto& ck : sys.gnrtChunk()) {
+
+            /*std::cout << "mesh verts: " << ck->mesh->vertices.size()
+                << " indices: " << ck->mesh->indices.size()
+                << " submeshes: " << ck->mesh->submeshes.size() << std::endl;
+
+            if (!ck->mesh->vertices.empty())
+                std::cout << "first vertex pos: " << ck->mesh->vertices[0].Position.x << ","
+                << ck->mesh->vertices[0].Position.y << "," << ck->mesh->vertices[0].Position.z << std::endl;*/
+
+
             std::cout << "o - 00" << std::endl;
             auto& scene = GEngine->scene;
             Entity xz = SceneBuilder::CreateModel(ck->mesh.get());
             auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck); 
-            std::cout << " op l 2 " << ck    << std::endl;
-            if (pp.chunk->mesh == nullptr) std::cout << " op l 3" << std::endl;
+
+            /*std::cout << " op l 2 " << pp.chunk->mesh->indices.size() << std::endl;
+            std::cout << " op l 21 " << pp.chunk->mesh->vertices.size() << std::endl;
+            std::cout << " op l 21 " << pp.chunk->mesh->vertices[0].Position.y << std::endl;*/
+
+            /*if (pp.chunk->mesh == nullptr) std::cout << " op l 3" << std::endl;
             if (pp.chunk->buff == nullptr) std::cout << " op l 4" << std::endl;
-            if (pp.chunk == nullptr) std::cout << " op l " << std::endl;
-            GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
+            if (pp.chunk == nullptr) std::cout << " op l " << std::endl;*/
+
+            //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
+
+            auto& bb = scene->GetComponent<MeshRenderer>(xz);
+            //if (bb.mesh == nullptr) std::cout << "o - 11" << std::endl;
+            //else std::cout << "o - 33" << std::endl;
             //auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
         } 
 
@@ -180,7 +199,7 @@ public:
 
     }
 
-    // Código ECS equivalente ao renderScene()
+    // CÃ³digo ECS equivalente ao renderScene()
     void LoadScene2()
     {
         //Material* material = nullptr; // ou carregue o material desejado aqui
@@ -193,7 +212,7 @@ public:
         //    auto& trans = AddComponent<Transform>(room);
         //    trans.position = glm::vec3(0.0f);
         //    trans.scale = glm::vec3(5.0f);
-        //    trans.rotation = glm::vec3(0.0f); // sem rotação
+        //    trans.rotation = glm::vec3(0.0f); // sem rotaÃ§Ã£o
 
         //    auto& renderer = AddComponent<MeshRenderer>(room);
         //    renderer.model = PrimitiveMesh::CreateInverseCube(material);
@@ -204,7 +223,7 @@ public:
             auto& trans = AddComponent<Transform>(room);
             trans.position = glm::vec3(0.0f, -2, 0);
             trans.scale = glm::vec3(200.0f);
-            trans.rotation = glm::vec3(0.0f); // sem rotação  
+            trans.rotation = glm::vec3(0.0f); // sem rotaÃ§Ã£o  
             auto& renderer = AddComponent<MeshRenderer>(room, PrimitiveMesh::CreateCylinder());
         }
 
@@ -252,7 +271,7 @@ public:
             trans.position = glm::vec3(-1.5f, 2.0f, -3.0f);
             trans.scale = glm::vec3(0.75f);
 
-            // Rotação de 60 graus em torno do vetor (1, 0, 1)
+            // RotaÃ§Ã£o de 60 graus em torno do vetor (1, 0, 1)
             glm::vec3 axis = glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f));
             trans.rotation = glm::degrees(glm::eulerAngles(glm::angleAxis(glm::radians(60.0f), axis)));
              
@@ -307,7 +326,7 @@ public:
 
 
     //void Load() override {
-    //    // Criação de entidades, componentes, recursos 
+    //    // CriaÃ§Ã£o de entidades, componentes, recursos 
 
     //    /*Camera* camera = new Camera(
     //        glm::vec3(0.0f, 2.0f, 5.0f),
@@ -322,7 +341,7 @@ public:
     //    Entity cam1 = CreateEntity();
     //    Transform t = { glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f) };
     //    AddComponent<Transform>(cam1, t );
-    //    AddComponent<CameraComponent>(cam1, new Camera(), true); // é a principal
+    //    AddComponent<CameraComponent>(cam1, new Camera(), true); // Ã© a principal
 
     //    /*Entity cam2 = scene->CreateEntity();
     //    scene->AddComponent<Transform>(cam2, Transform(glm::vec3(10, 2, 0)));

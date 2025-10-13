@@ -191,8 +191,7 @@ public:
         glBindVertexArray(0);
     }
 
-
-
+     
     // Novo construtor: recebe posições, normais e índices diretamente
     Mesh(const std::vector<glm::vec3>& positions,
         const std::vector<glm::vec3>& normals,

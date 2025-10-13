@@ -48,9 +48,9 @@ struct SysVoxel {
     void    set_voxelGrid(int s) { voxelGrid = s + 1; }
     void    set_chunkSize(int s) { chunkSize = s; }
 
-    int     get_voxelGrid()  { return voxelGrid; }
-    float   get_chunkSize()  { return chunkSize; }
-    float   get_voxelSize() { return chunkSize / float(voxelGrid); }
+    int     get_voxelGrid()  { return voxelGrid; }  // nº de pontos por eixo
+    float   get_chunkSize()  { return chunkSize; }  // tamanho total do chunk em unidades de mundo
+    float   get_voxelSize()  { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
        
     //for keep default singleton
     static SysVoxel& getInstance() {       //getVoxelGrid
