@@ -1,12 +1,12 @@
 #version 450 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
-uniform int uDim;
-uniform float uVoxelSize;
+uniform int uDim; // dimensão do grid (número de voxels)
+uniform float uVoxelSize;   // tamanho do voxel definido pelo CPU
 uniform int uPass; // 1 = criar vertices, 2 = criar tris
+
 // Adiciona deslocamento global e escala total
-uniform vec3 uOffset;       // posição global do chunk no mundo
-uniform float uWorldScale;  // escala global (1.0 = normal)
+uniform vec3 uOffset;       // posição global do chunk no mundo 
 
 
 // SDF input
@@ -185,9 +185,9 @@ void make_all_quads(ivec3 cell, float cornerSDF[8], uint baseStride) {
 // --- Main ---
 void main() {
     ivec3 cell = ivec3(gl_GlobalInvocationID.xyz);
-
-    // only iterate valid cells (cells are uDim-1 in each axis)
-    if (cell.x >= uDim - 1 || cell.y >= uDim - 1 || cell.z >= uDim - 1) return;
+     
+    //   uDim(Voxels) == uDimCells + 1   =>   uDim - 1 == uDimCells   // only iterate valid cells (cells are uDim-1 in each axis)
+    if (cell.x >= uDim - 1 || cell.y >= uDim - 1 || cell.z >= uDim - 1) return; 
 
     float cornerVal[8];
     int numNeg = 0;

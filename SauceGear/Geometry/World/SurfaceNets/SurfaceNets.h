@@ -43,14 +43,15 @@ struct Vec3Equal {
 
 struct SysVoxel {
     float isoLevel = 0.0f;         // isoLevel - nível de isosuperfície 
-    glm::vec3 numChunksPerAxis = glm::vec3(4); // quantos chunks criar em cada eixo
+    glm::vec3 numChunksPerAxis = glm::vec3(2); // quantos chunks criar em cada eixo
 
-    void    set_voxelGrid(int s) { voxelGrid = s + 1; }
+    void    set_cellGrid(int s)  { cellGrid  = s; }     //set_voxelGrid(int s) { cellGrid  = s; }
     void    set_chunkSize(int s) { chunkSize = s; }
 
-    int     get_voxelGrid()  { return voxelGrid; }  // nº de pontos por eixo
+    int     get_cellGrid()   { return cellGrid; }  // número de células
+    int     get_voxelGrid()  { return cellGrid + 1; }  // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
     float   get_chunkSize()  { return chunkSize; }  // tamanho total do chunk em unidades de mundo
-    float   get_voxelSize()  { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
+    float   get_voxelSize()  { return chunkSize / float(cellGrid); } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
        
     //for keep default singleton
     static SysVoxel& getInstance() {       //getVoxelGrid
@@ -61,16 +62,16 @@ struct SysVoxel {
     SysVoxel& operator=(const SysVoxel&) = delete;
 
 private:
-    int   voxelGrid = 32;    //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
+    int   cellGrid = 32;    //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
     float chunkSize = 32;        // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
 
-    constexpr SysVoxel() { voxelGrid++; }
+    constexpr SysVoxel() {}
     ~SysVoxel() {} // (opcional) destrutor privado
 }; 
 
 
 struct ChunkBuffer { //Chunk
-    std::vector<float>      density;    //sdf
+    std::vector<float>      densityMap;    //sdf
 
     //std::vector<glm::vec4>  positions;                                                            
     //std::vector<glm::vec4>  normals;     // not normalized (normalize on GPU if desired)         
@@ -103,21 +104,21 @@ struct Chunk {
 
     Chunk() { 
         buff = std::make_unique<ChunkBuffer>();  
-        resizeDensity(); 
+        resizeDensityMap();
     }
 
-    void resizeDensity(){ // (Re)aloca o vetor se o tamanho mudou
+    void resizeDensityMap(){ // (Re)aloca o vetor se o tamanho mudou
         uint32_t dim = SysVoxel::getInstance().get_voxelGrid(); 
         size_t total = size_t(dim) * dim * dim;
-        if (buff->density.size() != total) buff->density.resize(total, 1);
+        if (buff->densityMap.size() != total) buff->densityMap.resize(total, 1);
     }
 
     int idx(int x, int y, int z) const { 
         uint32_t dim = SysVoxel::getInstance().get_voxelGrid();
         return (z * dim + y) * dim + x;         // (z * sy + y) * sx + x; 
     }            
-    float get(int x, int y, int z) const       { return buff->density[idx(x, y, z)]; }
-    void  set(int x, int y, int z, float v)    { buff->density[idx(x, y, z)] = v; }
+    float get(int x, int y, int z) const       { return buff->densityMap[idx(x, y, z)]; }
+    void  set(int x, int y, int z, float v)    { buff->densityMap[idx(x, y, z)] = v; }
 };  
 
 

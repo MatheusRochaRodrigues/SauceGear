@@ -24,18 +24,23 @@ public:
             //1 - deslocamento (em coordenadas de mundo)
             glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize();
             //2 - respeitar diretamente o tamanho do voxel e da grid
-            //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_voxelGrid() - 1) * sysv.get_voxelSize(); // Use (voxelGrid - 1) porque o número de células é 1 a menos que o número de pontos (grid = numCells + 1).
+                //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_voxelGrid() - 1) * sysv.get_voxelSize(); // Use (voxelGrid - 1) porque o número de células é 1 a menos que o número de pontos (grid = numCells + 1).
              
-            Chunk* voxel = new Chunk();
-            voxel->coord = offset;
+            auto* voxel = new Chunk();
+            voxel->coord = offset; 
 
             auto& vBuff = *voxel->buff.get();
+             
+            // gera SDF no GPU          //CUIDADO BUSQUE ATUALIZAR TODAS SUAS ESTRUTURAS POR SI SO SEMPRE QUE A DIMENSAO FOR ALTERADA
+            generator->Generate(offset, vBuff); // dim=64, voxelSize=1.0
 
-            std::cout << "p 2" << std::endl;
-             //CUIDADO BUSQUE ATUALIZAR TODAS SUAS ESTRUTURAS POR SI SO SEMPRE QUE A DIMENSAO FOR ALTERADA
-            //generator->Generate(offset, vBuff); // dim=64, voxelSize=1.0
+            size_t dim = sysv.get_voxelGrid();
+            size_t expected = dim * dim * dim;
+            std::cout << "dim = " << dim << " expected = " << expected
+                << " buff.density.size() = " << vBuff.densityMap.size() << std::endl;
 
-            vBuff.density = GeneratorMap::GenerateSphereSDF(sysv.get_voxelGrid(), 10);
+
+            //vBuff.densityMap = GeneratorMap::GenerateSphereSDF(sysv.get_cellGrid(), 10);
 
             std::cout << "p 3" << std::endl;
             

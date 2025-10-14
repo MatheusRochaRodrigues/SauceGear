@@ -51,26 +51,48 @@ public:
         return id;
     } 
 
+
+    static void CheckIndices(const std::vector<glm::vec4>& positions, const std::vector<uint32_t>& indices) {
+        size_t numVertices = positions.size();
+        bool hasError = false;
+
+        for (size_t i = 0; i < indices.size(); ++i) {
+            uint32_t idx = indices[i];
+            if (idx >= numVertices) {
+                std::cerr << "ERRO: índice fora do alcance! "
+                    << "indices[" << i << "] = " << idx
+                    << ", mas numVertices = " << numVertices << std::endl;
+                hasError = true;
+            }
+        }
+
+        if (!hasError) {
+            std::cout << "Todos os índices estão dentro do alcance do vetor de vértices." << std::endl;
+        }
+    }
+
+
+
+
     static std::unique_ptr<Mesh> Generate(const ChunkBuffer& buff, glm::vec3 uOffset, GLuint computeProgram,  GLuint ssboSDF = 0 ) {
-        const int   uDim        = sysv.get_voxelGrid();      // número de pontos (ex: 33)
-        const float uVoxelSize  = sysv.get_voxelSize();
-        const float uWorldScale = sysv.get_chunkSize();
-        const size_t voxelCount = size_t(uDim) * uDim * uDim;   //arraySize
-         
-        std::cout << voxelCount << " d " << buff.density.size() << std::endl;
-        assert(voxelCount == buff.density.size());
+        const int   DimCells   = sysv.get_cellGrid();      
+        const float VoxelSize  = sysv.get_voxelSize();      // número de pontos (ex: 33)
+        const float WorldScale = sysv.get_chunkSize();
+
+        const int DimVoxel = sysv.get_voxelGrid();
+        const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;   //arraySize 
+        assert(voxelCount == buff.densityMap.size());
 
         // --- 5. Bind & set uniforms ---
         glUseProgram(computeProgram); 
 
-        glUniform1i(glGetUniformLocation (computeProgram, "uDim"), uDim);
-        glUniform1f(glGetUniformLocation (computeProgram, "uVoxelSize"), uVoxelSize);
-        glUniform1f(glGetUniformLocation (computeProgram, "uWorldScale"), uWorldScale);
+        glUniform1i(glGetUniformLocation (computeProgram, "uDim"), DimVoxel);
+        glUniform1f(glGetUniformLocation (computeProgram, "uVoxelSize"), VoxelSize); 
         glUniform3fv(glGetUniformLocation(computeProgram, "uOffset"), 1, glm::value_ptr(uOffset));
 
          
         // --- 1. SSBO: SDF input ---
-        if(ssboSDF == 0) ssboSDF = CreateSSBO((sizeof(float) * voxelCount) + 1, buff.density.data(), GL_STATIC_DRAW);
+        if(ssboSDF == 0) ssboSDF = CreateSSBO((sizeof(float) * voxelCount), buff.densityMap.data(), GL_STATIC_DRAW);    //+1
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboSDF);
 
         // --- 2. SSBO: Outputs ---
@@ -99,9 +121,9 @@ public:
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, ssboCounters); 
 
         // --- 6. Dispatch compute ---
-        GLuint gx = (uDim + 7) / 8;
-        GLuint gy = (uDim + 7) / 8;
-        GLuint gz = (uDim + 7) / 8;
+        GLuint gx = (DimCells + 7) / 8;
+        GLuint gy = (DimCells + 7) / 8;
+        GLuint gz = (DimCells + 7) / 8;
 
         // ------------------------
         // --- PASS 1: vertices ---
@@ -146,7 +168,10 @@ public:
         glDeleteBuffers(1, &ssboIndices);
         glDeleteBuffers(1, &ssboStrideToIndex);
         glDeleteBuffers(1, &ssboCounters); 
-         
+
+        // verifica se algum índice está fora do alcance
+        CheckIndices(positions, indices);
+
         // --- Create Mesh ---
         auto mesh = std::make_unique<Mesh>();
         mesh->UploadFromRaw(positions, normals, indices);   

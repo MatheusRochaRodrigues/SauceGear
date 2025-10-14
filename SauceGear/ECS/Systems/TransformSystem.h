@@ -122,9 +122,13 @@ public:
     }
 
     void Update(float deltaTime) override {
-        // roda só se existir algum dirty
-        if (!HasDirty(*GEngine->scene)) return;
+        try {
+            // roda só se existir algum dirty
+            if (!HasDirty(*GEngine->scene)) return; 
+            TransformSys::UpdateAllTransforms(*GEngine->scene);
 
-        TransformSys::UpdateAllTransforms(*GEngine->scene);
+        } catch (const std::exception& e) {
+            std::cerr << "[EXCEÇÃO - DebugRenderer] " << e.what() << "\n";
+        }
     }
 };
