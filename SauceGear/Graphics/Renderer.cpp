@@ -36,6 +36,20 @@ void Renderer::RenderSceneWithShader(Shader* shaderOverride) {
         meshRenderer.mesh->Draw(); 
     }
 }
+
+void Renderer::RenderSceneWithShader2(Shader* shaderOverride) {
+    auto entities = GEngine->scene->GetEntitiesWith<Transform, MeshRenderer>();
+
+    for (Entity e : entities) {
+        auto& transform = GEngine->scene->GetComponent<Transform>(e);
+        auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e);
+
+        shaderOverride->use();
+        shaderOverride->setMat4("model", transform.GetMatrix());
+
+        meshRenderer.mesh->Draw();
+    }
+}
  
 
 //Use glDepthFunc(GL_LEQUAL) para desenhar atrás de tudo

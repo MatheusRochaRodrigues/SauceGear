@@ -43,6 +43,19 @@ public:
         }
     }
 
+    void setFloatArray(const std::string& name, const float* values, int count) const {
+        GLint loc = glGetUniformLocation(ID, name.c_str());
+        if (loc != -1)
+            glUniform1fv(loc, count, values);
+    
+        //Obsolete
+        /*for (size_t i = 0; i < cascadeDistances.size(); ++i) {
+            shader->setFloat("cascadePlaneDistances[" + std::to_string(i) + "]", cascadeDistances[i]);
+        }*/
+    }
+
+
+
     // ---- Textures ----
     void setTexture2D(const std::string& n, GLuint tex, GLenum unit) const {
         glActiveTexture(GL_TEXTURE0 + unit);

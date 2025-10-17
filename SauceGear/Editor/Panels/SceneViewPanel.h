@@ -87,7 +87,7 @@ struct SceneViewPanel : IPanel {
             glm::mat4 worldMat = tc.GetMatrix(); // GetMatrix() retorna model/worldMatrix
 
             ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
-                currentGizmoMode, ImGuizmo::LOCAL, glm::value_ptr(worldMat));
+                currentGizmoMode, ImGuizmo::WORLD, glm::value_ptr(worldMat)); //LOCAL
 
             if (ImGuizmo::IsUsing()) {
                 //ApplyGizmoTransform(scene, selected, worldMat); 

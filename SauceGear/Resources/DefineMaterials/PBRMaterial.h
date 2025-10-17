@@ -14,8 +14,8 @@ public:
     // Parâmetros comuns PBR
     void DefineParameters() override { 
         AddFallParam(1, "Albedo", glm::vec3(0.5f, 0.0f, 1.0f));
-        AddFallParam(2, "Metallic", 1.0f);
-        AddFallParam(3, "Roughness", 0.1f);
+        AddFallParam(2, "Metallic", 0.2f);
+        AddFallParam(3, "Roughness", 0.9f);
         //AddFallParam(3, "AO", 1.0f);
     }
 

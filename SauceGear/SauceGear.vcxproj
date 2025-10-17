@@ -130,6 +130,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ECS\Systems\Lighting\CascadeSun.cpp" />
+    <ClCompile Include="ECS\Systems\Lighting\LightDirectional.cpp" />
+    <ClCompile Include="ECS\Systems\Lighting\LightPoint.cpp" />
+    <ClCompile Include="ECS\Systems\Lighting\LightSystem.cpp" />
+    <ClCompile Include="ECS\Systems\Lighting\ShadowPool.cpp" />
     <ClCompile Include="Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
@@ -164,7 +169,6 @@
     <ClCompile Include="Resources\DataBase\AssetDatabase.h" />
     <ClCompile Include="Resources\Primitive.cpp" />
     <ClCompile Include="Scene\SceneBuilder.h" />
-    <ClCompile Include="ECS\Systems\LightSystem.cpp" />
     <ClCompile Include="ECS\Systems\PostProcessSystem.cpp" />
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\EngineContext.cpp" />
@@ -183,6 +187,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
+    <ClInclude Include="ECS\Components\LightComponent.h" />
+    <ClInclude Include="ECS\Systems\Lighting\CascadeSun.h" />
+    <ClInclude Include="ECS\Systems\Lighting\LightDirectional.h" />
+    <ClInclude Include="ECS\Systems\Lighting\LightPoint.h" />
+    <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
+    <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h" />
     <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h" />
@@ -276,8 +286,6 @@
     <ClInclude Include="ECS\Components\CameraComponent.h" />
     <ClInclude Include="ECS\Systems\CameraSystem.h" />
     <ClInclude Include="Scene\SceneManager.h" />
-    <ClInclude Include="ECS\Systems\LightSystem.h" />
-    <ClInclude Include="ECS\Components\LightComponent.h" />
     <ClInclude Include="Core\InputSystem.h" />
     <ClInclude Include="Scene\ComponentManager.h" />
     <ClInclude Include="ECS\Components\ComponentsHelper.h" />
@@ -314,7 +322,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
+    <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
+    <None Include="Resources\Shaders\debugQuad.vs" />
+    <None Include="Resources\Shaders\debugQuadDepth.fs" />
     <None Include="Geometry\World\SurfaceNets\Backups\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
     <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />
@@ -408,6 +422,8 @@
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
+    <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
+    <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

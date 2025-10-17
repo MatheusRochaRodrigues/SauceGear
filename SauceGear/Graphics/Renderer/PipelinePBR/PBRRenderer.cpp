@@ -161,12 +161,10 @@ void PBRPipeline::LightingPass(Scene& scene) {
     glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
      
     // 1) Luz direcional (fullscreen)
-    if (LightSystem::SetSunToShader(&shaders.dirLight) != 0) {
-        shaders.dirLight.use(); 
-        BindGBufferTo(&shaders.dirLight);
-        BindIBLTo(&shaders.dirLight);
+    if (LightSystem::SetSunToShader(&shaders.dirLight)) {  //LightSystem::set_uShadowData(shaders.dirLight, 10); 
+        BindGBufferTo(&shaders.dirLight);       //BindIBLTo(&shaders.dirLight); 
         // uniforms comuns (camPos para especular ao usar view-dependent BRDF)
-        shaders.dirLight.setVec3("camPos", GEngine->mainCamera->GetPosition());
+        shaders.dirLight.setVec3("camPos", GEngine->mainCamera->GetPosition()); 
         RenderQuad();
     } 
      
@@ -255,7 +253,101 @@ void PBRPipeline::ForwardPass(Scene& scene) {
     // ... desenhe transparentes com shader PBR forward e BindIBLTo()
 
 
+    //AQUI Q ESTOU USANDO ATUALMENTE
     DrawSkybox();
 
+    RenderDebugSun();
+}
 
+static
+Mesh* CreateTestSphere(int segments = 16, int rings = 16, float radius = 1.0f) {
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<uint32_t> indices;
+
+    for (int y = 0; y <= rings; ++y) {
+        float v = float(y) / float(rings);
+        float phi = v * glm::pi<float>();
+
+        for (int x = 0; x <= segments; ++x) {
+            float u = float(x) / float(segments);
+            float theta = u * 2.0f * glm::pi<float>();
+
+            float sinPhi = sin(phi);
+            float cosPhi = cos(phi);
+            float sinTheta = sin(theta);
+            float cosTheta = cos(theta);
+
+            glm::vec3 pos;
+            pos.x = radius * sinPhi * cosTheta;
+            pos.y = radius * cosPhi;
+            pos.z = radius * sinPhi * sinTheta;
+
+            positions.push_back(pos);
+            normals.push_back(glm::normalize(pos));
+        }
+    }
+
+    for (int y = 0; y < rings; ++y) {
+        for (int x = 0; x < segments; ++x) {
+            uint32_t a = y * (segments + 1) + x;
+            uint32_t b = (y + 1) * (segments + 1) + x;
+            uint32_t c = (y + 1) * (segments + 1) + (x + 1);
+            uint32_t d = y * (segments + 1) + (x + 1);
+
+            indices.push_back(a);
+            indices.push_back(b);
+            indices.push_back(d);
+
+            indices.push_back(b);
+            indices.push_back(c);
+            indices.push_back(d);
+        }
+    }
+
+    Mesh* sphere = new Mesh();
+    sphere->UploadFromRaw(positions, normals, indices);
+    return sphere;
+}
+
+void PBRPipeline::RenderDebugSun()
+{
+    // pega luz e transform do sol
+    if (LightSystem::currentSun == INVALID_ENTITY) return;
+
+    auto& sunTransform = GEngine->scene->GetComponent<Transform>(LightSystem::currentSun);
+    auto& sunLight = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun);
+
+    // direção e posição
+    glm::vec3 sunDir = sunTransform.GetForwardDirection();
+    glm::vec3 camPos = GEngine->mainCamera->GetPosition();
+    glm::vec3 sunPos = camPos + sunDir * 80.0f; // coloca “longe” da câmera
+
+    // cria mesh esfera se ainda não existir
+    if (!sphereMesh) sphereMesh = CreateTestSphere();
+
+    // cria shader se ainda não existir
+    static Shader* debugSunShader = nullptr;
+    if (!debugSunShader)
+        debugSunShader = new Shader("Envirolnment/Sun.vs", "Envirolnment/Sun.fs");
+
+    debugSunShader->use();
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), sunPos);
+    model = glm::scale(model, glm::vec3(20.0f)); // tamanho da esfera
+
+    debugSunShader->setMat4("model", model);
+    debugSunShader->setMat4("view", GEngine->mainCamera->GetViewMatrix());
+    debugSunShader->setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
+
+    debugSunShader->setVec3("color", glm::vec3(0.5f, 0, 0.5f));
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glDepthMask(GL_FALSE);
+     
+    sphereMesh->Draw(); 
+
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
 }

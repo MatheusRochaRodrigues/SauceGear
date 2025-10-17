@@ -12,10 +12,10 @@ enum class ShadowLOD {
     NONE
 };
 
-enum class LightType { Directional, Point, Spot };
+enum class ShadowType { Directional, Point, Spot }; 
 
 struct LightComponent {                             // base alignment       // aligned offset
-    LightType type = LightType::Point;            //4                     //0 
+    ShadowType type = ShadowType::Point;            //4                     //0 
     glm::vec3 position = glm::vec3(0.0f);           //16                    //16
     glm::vec3 color = glm::vec3(1.0f);              //16                    //32 
     float intensity = 1.0f;                         //4                     //48    
@@ -30,10 +30,10 @@ struct LightComponent {                             // base alignment       // a
                                                     //end                   //132
                                                     //multilpy of vec4(16)  //144 bytes
 
-    void SetTypeLight(LightType type) {
+    void SetTypeLight(ShadowType type) { 
         this->type = type;  
-        this->range = (type == LightType::Directional) ? 7.5f : 25.0f;
-        this->position = (type == LightType::Directional) ? glm::vec3(-2.0f, 4.0f, -1.0f) : glm::vec3(0.0f);
+        this->range = (type == ShadowType::Directional) ? 7.5f : 25.0f;
+        this->position = (type == ShadowType::Directional) ? glm::vec3(-2.0f, 4.0f, -1.0f) : glm::vec3(0.0f);
     }; 
 };
 

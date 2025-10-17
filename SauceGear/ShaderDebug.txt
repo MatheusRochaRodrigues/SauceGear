@@ -61,7 +61,7 @@ uniform int cascadeCount;
 
 uniform mat4 view;
 
-
+uniform float farPlane;
 
 // ==== Seleção do cascade pelo depth em view space ====
 int GetCascadeIndex(vec3 worldPos) {
@@ -87,20 +87,14 @@ float ShadowCalculationCascade(vec3 WorldPos, vec3 Normal, vec3 lightDir) {
 
     if (projCoords.z > 1.0) return 0.0;
 
-    float bias = max(0.0015 * (1.0 - dot(normalize(Normal), normalize(-lightDir))), 0.0005);
+    //float bias = max(0.0015 * (1.0 - dot(normalize(Normal), normalize(-lightDir))), 0.0005);
     
     // calculate bias (based on depth map resolution and slope)
-    //vec3 normal = normalize(Normal);
-    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    //const float biasModifier = 0.5f;
-    //if (layer == cascadeCount)
-    //{
-    //    bias *= 1 / (farPlane * biasModifier);
-    //}
-    //else
-    //{
-    //    bias *= 1 / (cascadePlaneDistances[layer] * biasModifier);
-    //}
+    vec3 normal = normalize(Normal);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    const float biasModifier = 0.5f;
+    if (layer == cascadeCount) bias *= 1 / (farPlane * biasModifier); 
+    else bias *= 1 / (cascadePlaneDistances[layer] * biasModifier); 
 
 
     // PCF
@@ -164,18 +158,12 @@ float ShadowCalculationCascade(vec3 WorldPos, vec3 Normal, vec3 lightDir) {
 
 in vec2 TexCoords;
 
-struct Light {
-    int   type;        
-    vec3  position;
+struct LightSun { 
+    vec3  direction;
     vec3  color;
-    float intensity;
-    float range;
-    float angle;
-    int   castS;
-    mat4  lightMatrix; 
-    int   indexMap;
+    float intensity;  
 }; 
-uniform Light light;   
+uniform LightSun light;   
 
 // G-Buffer
 uniform sampler2D gPosition;
@@ -206,7 +194,7 @@ void main()
     vec3 V = normalize(viewPos - WorldPos); 
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
-    vec3 L = normalize(-light.position); // direcional
+    vec3 L = normalize(light.direction); // direcional         //-light.direction
     vec3 H = normalize(V + L);   
 
     float NdotL = max(dot(N,L),0.0);
@@ -221,10 +209,7 @@ void main()
     vec3 kS = F; 
     vec3 kD = (1.0 - kS) * (1.0 - metallic);
 
-    float shadow = 0.0;  
-    if (light.castS != 0) {
-        shadow = ShadowCalculationCascade(WorldPos, N, L);
-    } 
+    float shadow = ShadowCalculationCascade(WorldPos, N, L);    
     
     vec3 radiance = light.color;
     vec3 Lo = (kD*albedo/PI + specular) * radiance * NdotL * (1.0 - shadow);

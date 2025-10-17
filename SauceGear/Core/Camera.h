@@ -1,12 +1,13 @@
 #ifndef CAMERA_H
-#define CAMERA_H
- 
+#define CAMERA_H 
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "EngineContext.h"
 #include "../Platform/Window.h"
 
+#include <stdbool.h>
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
@@ -104,9 +105,13 @@ public:
 
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime)
-    {
-        float velocity = MovementSpeed * deltaTime;
+    void ProcessKeyboard(Camera_Movement direction, float deltaTime, bool sprint = false)
+    { 
+        float currentSpeed = MovementSpeed;
+        if (sprint) currentSpeed *= 2.0f; // multiplica a velocidade quando shift é pressionado 
+
+        float velocity = currentSpeed * deltaTime;  //float velocity = MovementSpeed * deltaTime;
+         
         if (direction == FORWARD)
             Position += Front * velocity;
         if (direction == BACKWARD)

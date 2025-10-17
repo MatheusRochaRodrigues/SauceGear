@@ -170,7 +170,7 @@ public:
         glDeleteBuffers(1, &ssboCounters); 
 
         // verifica se algum índice está fora do alcance
-        CheckIndices(positions, indices);
+        //CheckIndices(positions, indices);
 
         // --- Create Mesh ---
         auto mesh = std::make_unique<Mesh>();

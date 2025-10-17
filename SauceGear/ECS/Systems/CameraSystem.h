@@ -27,11 +27,14 @@ public:
                 //camComp.camera->Pitch    = trans.rotation.x;
                 //camComp.camera->ProcessMouseMovement(0, 0); // atualiza vetores
 
-                // Movimento
-                if (Input::GetKey(KEY_W)) cam->ProcessKeyboard(FORWARD,  deltaTime);
-                if (Input::GetKey(KEY_S)) cam->ProcessKeyboard(BACKWARD, deltaTime);
-                if (Input::GetKey(KEY_A)) cam->ProcessKeyboard(LEFT,     deltaTime);
-                if (Input::GetKey(KEY_D)) cam->ProcessKeyboard(RIGHT,    deltaTime);
+                // Movimento 
+                bool sprint = Input::GetKey(KEY_LEFT_SHIFT); 
+                // Movimentos principais
+                if (Input::GetKey(KEY_W)) cam->ProcessKeyboard(FORWARD, deltaTime, sprint);
+                if (Input::GetKey(KEY_S)) cam->ProcessKeyboard(BACKWARD, deltaTime, sprint);
+                if (Input::GetKey(KEY_A)) cam->ProcessKeyboard(LEFT, deltaTime, sprint);
+                if (Input::GetKey(KEY_D)) cam->ProcessKeyboard(RIGHT, deltaTime, sprint);
+
 
                 //// Rotação com o mouse (Ex: se botão direito pressionado)
                 if (Input::GetMouseButton(MOUSE_BUTTON_RIGHT)) {

@@ -5,13 +5,21 @@
 //#include "../ECS/Systems/SystemHelper.h"  
 
 int main() { 
-    Application app;
-    app.Init();                    // apenas inicializa
+    try {
+        Application app;
+        app.Init();                    // apenas inicializa
 
-    EditorApp editor(&app);       // recebe ponteiro para reuso da app
-    editor.Run();                 // editor tem loop próprio (com ImGui)
+        EditorApp editor(&app);       // recebe ponteiro para reuso da app
+        editor.Run();                 // editor tem loop próprio (com ImGui)
 
-    app.Shutdown();               // encerra subsistemas no fim 
+        app.Shutdown();               // encerra subsistemas no fim 
+   
+    } catch (const std::exception& e) {
+        std::cerr << "[Error Main] " << e.what() << "\n"; 
+    } catch (...) {
+        std::cerr << "[Error Main2]  dfdsf \n";
+    }
+
     return 0;
 }
 

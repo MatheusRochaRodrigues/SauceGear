@@ -28,6 +28,8 @@ public:
         {
             stbi_set_flip_vertically_on_load(true);
             Entity entity = SceneBuilder::CreateModel("Resources/Models/backpack/backpack.obj");
+            auto& l = GetComponent<Transform>(entity);
+            l.position = glm::vec3(1,1,0);
             //stbi_set_flip_vertically_on_load(false);
             //Entity entity23 = SceneBuilder::CreateModel("Resources/Models/Cerberus_by_Andrew_Maximov/Cerberus_LP.FBX");
             //stbi_set_flip_vertically_on_load(true);
@@ -56,37 +58,37 @@ public:
             //auto& Floort = AddComponent<Transform>(Floor);
             //Floort.position = { 0, -4, 0 };
             //Floort.scale = { 10, 10, 10 }; 
-            //auto& Floort3 = AddComponent<MeshRenderer>(Floor, PrimitiveMesh::CreatePlane());
-
+            //auto& Floort3 = AddComponent<MeshRenderer>(Floor, PrimitiveMesh::CreatePlane()); 
         }   
 
         {
             Entity pointLight = SceneBuilder::CreateGameObject("Sun");
-            auto& pTransform = AddComponent<Transform>(pointLight);
-            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+            auto& pTransform = GetComponent<Transform>(pointLight);
+            //pTransform.rotation = glm::vec3(20.0f, 50, 20.0f);
+            pTransform.rotation = glm::vec3(21.0f, 0.0f, 1.0f);
             /*auto& redn = AddComponent<MeshRenderer>(pointLight);
             redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
             pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            pTransform.position = glm::vec3(0, -1, 0);
+            pTransform.position = glm::vec3(20.0f, 50, 20.0f);
             auto& pLight = AddComponent<LightComponent>(pointLight);
             //pLight.type = ShadowType::Point;
-            pLight.SetTypeLight(ShadowType::Directional);
+            pLight.SetTypeLight(LightType::Directional);
             pLight.color = glm::vec3(1, 0, 1);
             pLight.intensity = 1.0f;
         }
         {
-            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
-            auto& pTransform = AddComponent<Transform>(pointLight);
-            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
-            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            pTransform.position = glm::vec3(0, 0, 0);
-            auto& pLight = AddComponent<LightComponent>(pointLight);
-            //pLight.type = ShadowType::Point;
-            pLight.SetTypeLight(ShadowType::Point);
-            pLight.color = glm::vec3(0, 1, 0);
-            pLight.intensity = 1.0f;
+            //Entity pointLight = SceneBuilder::CreateGameObject("Light2");
+            //auto& pTransform = GetComponent<Transform>(pointLight);
+            //pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+            ///*auto& redn = AddComponent<MeshRenderer>(pointLight);
+            //redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+            //pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+            //pTransform.position = glm::vec3(0, 0, 0);
+            //auto& pLight = AddComponent<LightComponent>(pointLight);
+            ////pLight.type = ShadowType::Point;
+            //pLight.SetTypeLight(LightType::Point);
+            //pLight.color = glm::vec3(0, 1, 0);
+            //pLight.intensity = 1.0f;
         }  
 
         // Render para um framebuffer
@@ -129,41 +131,28 @@ public:
 
         voxelSystem sys;
         std::cout << "o - 7" << std::endl;
-        for(auto& ck : sys.gnrtChunk()) {
 
-            /*std::cout << "mesh verts: " << ck->mesh->vertices.size()
-                << " indices: " << ck->mesh->indices.size()
-                << " submeshes: " << ck->mesh->submeshes.size() << std::endl;
+        std::shared_ptr<MaterialInstance> material = std::make_shared<MaterialInstance>(std::make_shared<PBRMaterial>()); // ou carregue o material desejado aqui
+        material->SetFallbackColor("Albedo", glm::vec3(0, 1, 0));
+        material->SetFallbackFloat("Roughness", 1.0f);
+        material->SetFloat("Metallic", 0.0f);
 
-            if (!ck->mesh->vertices.empty())
-                std::cout << "first vertex pos: " << ck->mesh->vertices[0].Position.x << ","
-                << ck->mesh->vertices[0].Position.y << "," << ck->mesh->vertices[0].Position.z << std::endl;*/
-
+        for(auto& ck : sys.gnrtChunk()) {  
 
             std::cout << "o - 00" << std::endl;
             auto& scene = GEngine->scene;
-            Entity xz = SceneBuilder::CreateModel(ck->mesh.get());
+            Entity xz = SceneBuilder::CreateModel(ck->mesh.get(), material);
             auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck); 
-
-            /*std::cout << " op l 2 " << pp.chunk->mesh->indices.size() << std::endl;
-            std::cout << " op l 21 " << pp.chunk->mesh->vertices.size() << std::endl;
-            std::cout << " op l 21 " << pp.chunk->mesh->vertices[0].Position.y << std::endl;*/
-
-            /*if (pp.chunk->mesh == nullptr) std::cout << " op l 3" << std::endl;
-            if (pp.chunk->buff == nullptr) std::cout << " op l 4" << std::endl;
-            if (pp.chunk == nullptr) std::cout << " op l " << std::endl;*/
-
             //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
 
-            auto& bb = scene->GetComponent<MeshRenderer>(xz);
-            //if (bb.mesh == nullptr) std::cout << "o - 11" << std::endl;
-            //else std::cout << "o - 33" << std::endl;
+            auto& bb = scene->GetComponent<MeshRenderer>(xz); 
             //auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
         } 
 
         DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
         DebugRenderer::AddPoint(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
 
+        DebugRenderer::AddPoint(glm::vec3(0, 0, 0), glm::vec3(1.0f,0,0), 6.0f, DebugPointType::Circle, true);
         std::cout << "Corners 27" << std::endl;
         return; 
         {

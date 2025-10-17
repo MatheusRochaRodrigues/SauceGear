@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "SceneECS.h"
 #include "../Core/EngineContext.h"
 #include "../ECS/Systems/SystemHelper.h"
@@ -17,55 +17,56 @@ public:
         return entity;
     }
 
-    static Entity CreateModel(string url) { 
+    static Entity CreateModel(string url, std::shared_ptr<MaterialInstance> materialOverride = nullptr) {
         Mesh* mesh = ModelLoader::LoadModel(url);
-        if (mesh == nullptr) { 
-            std::cout << "mesh Vazia para a entidade" << std::endl;
-            return INVALID_ENTITY; 
+        if (mesh == nullptr) {
+            std::cout << "Mesh vazia para a entidade" << std::endl;
+            return INVALID_ENTITY;
         }
-        Entity i = InstantiateNode(mesh);
-        GEngine->scene->AddComponent<AABBComponent>(i); 
+        Entity i = InstantiateNode(mesh, INVALID_ENTITY, materialOverride);
+        GEngine->scene->AddComponent<AABBComponent>(i);
         return i;
     }
 
-    static Entity CreateModel(Mesh* mesh) { 
+    static Entity CreateModel(Mesh* mesh, std::shared_ptr<MaterialInstance> materialOverride = nullptr) {
         if (mesh == nullptr) {
-            std::cout << "mesh Vazia para a entidade" << std::endl;
+            std::cout << "Mesh vazia para a entidade" << std::endl;
             return INVALID_ENTITY;
-        }   
-        Entity i = InstantiateNode(mesh);                   //return InstantiateNode(mesh);
+        }
+        Entity i = InstantiateNode(mesh, INVALID_ENTITY, materialOverride);
         GEngine->scene->AddComponent<AABBComponent>(i);
         return i;
     }
 
 
+
 private:
 
-    static Entity InstantiateNode(Mesh* meshNode, Entity father = INVALID_ENTITY) {
-        std::cout << "mesh  d " << meshNode->name << std::endl;
+private:
+    static Entity InstantiateNode(Mesh* meshNode, Entity father = INVALID_ENTITY, std::shared_ptr<MaterialInstance> materialOverride = nullptr) {
         if (!meshNode) return INVALID_ENTITY;
 
         auto& scene = *GEngine->scene;
-        Entity e = scene.CreateEntity(); 
+        Entity e = scene.CreateEntity();
 
-        scene.AddComponent<NameComponent>(e).name = (!meshNode->name.empty()) ? meshNode->name : "GameObjectModel";  
-        // Aplica TRS carregado do FBX
-        auto& tr = scene.AddComponent<Transform>(e); 
+        scene.AddComponent<NameComponent>(e).name = (!meshNode->name.empty()) ? meshNode->name : "GameObjectModel";
+        auto& tr = scene.AddComponent<Transform>(e);
 
-        // Se essa mesh tem geometria, cria MeshFilter/MeshRenderer
         if (!meshNode->submeshes.empty() && !meshNode->vertices.empty()) {
-            //auto& mf = scene.AddComponent<MeshFilter>(e);
             auto& mr = scene.AddComponent<MeshRenderer>(e, meshNode);
-            //mf.meshes.push_back(meshNode);
-            //mr.SyncWithMesh(mf);
-            mr.RebuildBatches(); // agrupa por material
+            // ‚ö° aplica material customizado (se existir)
+            if (materialOverride) {
+                for (auto& sm : meshNode->submeshes) {
+                    sm.material = materialOverride;
+                }
+            }
+            mr.RebuildBatches();
         }
 
-        // Recurs„o para filhos
+        // Recurs√£o para filhos
         for (auto* child : meshNode->children)
-            InstantiateNode(child, e);
+            InstantiateNode(child, e, materialOverride);
 
-        // Vincula ao pai
         if (father != INVALID_ENTITY)
             scene.AddToParent(father, e);
 
@@ -74,7 +75,8 @@ private:
 
 
 
-    // Instancia a ·rvore de Mesh no ECS
+
+    // Instancia a √°rvore de Mesh no ECS
     // - 1 entidade por node (igual Unity).
     // - Se o node tiver geometria (submeshes > 0), recebe MeshFilter+MeshRenderer.
     static Entity InstantiateMeshTree(Mesh* root, Entity parent = INVALID_ENTITY, bool splitSubmeshesIntoChildren = false) {
@@ -87,7 +89,7 @@ private:
         scene.AddComponent<NameComponent>(e).name = (!root->name.empty()) ? root->name : "GameObjectModel";
         auto& tr = scene.AddComponent<Transform>(e);
 
-        // Transform identidade por padr„o (se quiser TRS do FBX, guardar no Mesh e setar aqui)
+        // Transform identidade por padr√£o (se quiser TRS do FBX, guardar no Mesh e setar aqui)
         /*tr.position = meshNode->localPosition;
         tr.rotationQuat = meshNode->localRotation;
         tr.scale = meshNode->localScale;*/
@@ -103,17 +105,17 @@ private:
 
 
             } else {
-                // opcional: 1 entidade-filho por submesh (normalmente N√O È necess·rio)
+                // opcional: 1 entidade-filho por submesh (normalmente N√ÉO √© necess√°rio)
                 for (size_t i = 0; i < root->submeshes.size(); ++i) {
                     Entity child = CreateGameObject("SubMesh " + std::to_string(i));
                     scene.AddToParent(e, child);
 
-                    // cria uma view (mesh ìleveî) apontando pro mesmo VAO/EBO, mas com um ˙nico SubMesh
+                    // cria uma view (mesh ‚Äúleve‚Äù) apontando pro mesmo VAO/EBO, mas com um √∫nico SubMesh
                     auto* view = new Mesh();
                     view->name = root->name + "_sm" + std::to_string(i);
                     view->directory = root->directory;
-                    view->VAO = root->VAO; // compartilha buffers (atenÁ„o ao lifetime!)
-                    view->vertices = root->vertices; // compartilha (ou deixe vazio; sÛ precisa do draw range)
+                    view->VAO = root->VAO; // compartilha buffers (aten√ß√£o ao lifetime!)
+                    view->vertices = root->vertices; // compartilha (ou deixe vazio; s√≥ precisa do draw range)
                     view->indices = root->indices;
                     view->submeshes.push_back(root->submeshes[i]);
 
@@ -126,7 +128,7 @@ private:
 
         }
 
-        // Recurs„o pros filhos
+        // Recurs√£o pros filhos
         for (auto* c : root->children) {
             if (!c) continue;
             Entity ce = InstantiateMeshTree(c, e, splitSubmeshesIntoChildren);

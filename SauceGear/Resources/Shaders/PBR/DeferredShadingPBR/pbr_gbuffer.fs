@@ -36,6 +36,7 @@ void main()
     // and the diffuse per-fragment color
     gAlbedo.rgb = texture(Albedo, TexCoords).rgb;
     // store specular intensity in gAlbedoSpec's alpha component 
-    gMRAO = vec4(1,  0.0f, 1.0f, 1.0f);
-    //gMRAO = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    //gMRAO = vec4(1,  texture(Metallic, TexCoords).r, texture(Roughness, TexCoords).r, 1.0f);
+    gMRAO = vec4(1,  0.0f, 0.0f, 1.0f);
+    //gMRAO = vec4(1,  0.0f, 1.0f, 1.0f);
 }

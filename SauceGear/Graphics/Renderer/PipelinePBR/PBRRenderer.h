@@ -1,11 +1,12 @@
 #pragma once
 #include "../IRenderPipeline.h"
-#include "../../ECS/Systems/LightSystem.h"
+#include "../../ECS/Systems/Lighting/LightSystem.h"
 #include "../../Framebuffer.h"
 #include "../../../Resources/Primitive.h"
 #include "IBLManager.h"
 #include "PBRShaders.h"
 #include "../ECS/Systems/DayNightSystem.h"
+#include "../Graphics/Renderer.h"
 
 using Scene = SceneECS;
  
@@ -26,6 +27,8 @@ public:
         // 3) Skybox (no final pra não interferir na iluminação) 
         //DrawSkybox(); 
         // saída final
+        //DebugDepthUtils::DrawDebugShadowLayerTex2D();
+
         GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
         //auto& light = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun); GEngine->renderer->GetTextureRendered = light.depthMap;
         //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(2);
@@ -64,4 +67,5 @@ private:
     //std::string currentHDR = "Resources/Textures/hdr/tst/Kloppenheim (1).hdr";
     std::string cacheDir = "Resources/Cache/IBL";
      
+    void RenderDebugSun();
 };

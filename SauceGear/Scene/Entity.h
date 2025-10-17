@@ -38,6 +38,12 @@ public:
         return std::vector<Entity>(activeEntities.begin(), activeEntities.end()); 
     }
 
+    // EntityManager.h
+    bool Exists(Entity e) const {
+        return activeEntities.find(e) != activeEntities.end(); // O(1) hash lookup
+    }
+
+
 private:
     std::queue<Entity> availableEntities;
     std::unordered_set<Entity> activeEntities; // entidades vivas/ativas

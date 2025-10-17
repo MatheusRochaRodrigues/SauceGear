@@ -22,6 +22,8 @@ public:
 
     void RenderSceneWithShader(Shader* overrideShader);
 
+    static void RenderSceneWithShader2(Shader* overrideShader);
+
     void Draw(const Mesh& mesh, const Shader& shader);
       
     void RenderSkybox();

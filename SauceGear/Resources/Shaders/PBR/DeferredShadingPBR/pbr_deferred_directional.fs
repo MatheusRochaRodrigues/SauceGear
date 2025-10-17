@@ -7,18 +7,12 @@
 
 in vec2 TexCoords;
 
-struct Light {
-    int   type;        
-    vec3  position;
+struct LightSun { 
+    vec3  direction;
     vec3  color;
-    float intensity;
-    float range;
-    float angle;
-    int   castS;
-    mat4  lightMatrix; 
-    int   indexMap;
+    float intensity;  
 }; 
-uniform Light light;   
+uniform LightSun light;   
 
 // G-Buffer
 uniform sampler2D gPosition;
@@ -49,7 +43,7 @@ void main()
     vec3 V = normalize(viewPos - WorldPos); 
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
-    vec3 L = normalize(-light.position); // direcional
+    vec3 L = normalize(light.direction); // direcional         //-light.direction
     vec3 H = normalize(V + L);   
 
     float NdotL = max(dot(N,L),0.0);
@@ -64,10 +58,7 @@ void main()
     vec3 kS = F; 
     vec3 kD = (1.0 - kS) * (1.0 - metallic);
 
-    float shadow = 0.0;  
-    if (light.castS != 0) {
-        shadow = ShadowCalculationCascade(WorldPos, N, L);
-    } 
+    float shadow = ShadowCalculationCascade(WorldPos, N, L);    
     
     vec3 radiance = light.color;
     vec3 Lo = (kD*albedo/PI + specular) * radiance * NdotL * (1.0 - shadow);

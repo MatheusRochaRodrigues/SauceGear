@@ -6,7 +6,7 @@
 //Effects
  
 //debugs
-#include "../Systems/LightSystem.h"
+#include "../Systems/Lighting/LightSystem.h"
 
 class PostProcessSystem : public System {
 public:

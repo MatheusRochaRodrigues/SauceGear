@@ -152,6 +152,10 @@ public:
         return componentManager->GetFirstEntityOfType<T>();
     }
 
+    bool EntityExists(Entity e) const {
+        return entityManager.Exists(e); // delega para o EntityManager
+    }
+
 
 private:
     std::unique_ptr<ComponentManager> componentManager = std::make_unique<ComponentManager>(); 

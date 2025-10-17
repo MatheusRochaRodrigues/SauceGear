@@ -22,7 +22,9 @@ public:
         for (int cz = 0; cz < numChunks.z; ++cz) for (int cy = 0; cy < numChunks.y; ++cy) for (int cx = 0; cx < numChunks.x; ++cx)
         { 
             //1 - deslocamento (em coordenadas de mundo)
-            glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize();
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize(); 
+            glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize() - glm::vec3(sysv.get_chunkSize() * 0.5f, 0, sysv.get_chunkSize() * 0.5f);
+             
             //2 - respeitar diretamente o tamanho do voxel e da grid
                 //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_voxelGrid() - 1) * sysv.get_voxelSize(); // Use (voxelGrid - 1) porque o número de células é 1 a menos que o número de pontos (grid = numCells + 1).
              

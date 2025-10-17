@@ -12,7 +12,7 @@ uniform int cascadeCount;
 
 uniform mat4 view;
 
-
+uniform float farPlane;
 
 // ==== Seleção do cascade pelo depth em view space ====
 int GetCascadeIndex(vec3 worldPos) {
@@ -38,20 +38,14 @@ float ShadowCalculationCascade(vec3 WorldPos, vec3 Normal, vec3 lightDir) {
 
     if (projCoords.z > 1.0) return 0.0;
 
-    float bias = max(0.0015 * (1.0 - dot(normalize(Normal), normalize(-lightDir))), 0.0005);
+    //float bias = max(0.0015 * (1.0 - dot(normalize(Normal), normalize(-lightDir))), 0.0005);
     
     // calculate bias (based on depth map resolution and slope)
-    //vec3 normal = normalize(Normal);
-    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    //const float biasModifier = 0.5f;
-    //if (layer == cascadeCount)
-    //{
-    //    bias *= 1 / (farPlane * biasModifier);
-    //}
-    //else
-    //{
-    //    bias *= 1 / (cascadePlaneDistances[layer] * biasModifier);
-    //}
+    vec3 normal = normalize(Normal);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    const float biasModifier = 0.5f;
+    if (layer == cascadeCount) bias *= 1 / (farPlane * biasModifier); 
+    else bias *= 1 / (cascadePlaneDistances[layer] * biasModifier); 
 
 
     // PCF

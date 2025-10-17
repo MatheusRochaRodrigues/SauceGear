@@ -129,9 +129,6 @@
     <ClCompile Include="Editor\Panels\IPanelHelper.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\LightSystem.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Resources\Primitive.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -166,6 +163,21 @@
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Resources\DataBase\AssetDatabase.h">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\Lighting\ShadowPool.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\Lighting\LightSystem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\Lighting\LightDirectional.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\Lighting\CascadeSun.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\Lighting\LightPoint.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -258,12 +270,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneManager.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Systems\LightSystem.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Components\LightComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Components\ComponentsHelper.h">
@@ -557,6 +563,24 @@
     <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="ECS\Systems\Lighting\LightSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components\LightComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\Lighting\LightPoint.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\Lighting\CascadeSun.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\Lighting\LightDirectional.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
@@ -672,6 +696,14 @@
     <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
     <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
+    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
+    <None Include="Resources\Shaders\debugQuad.vs" />
+    <None Include="Resources\Shaders\debugQuadDepth.fs" />
+    <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
+    <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
+    <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />
