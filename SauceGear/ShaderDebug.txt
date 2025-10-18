@@ -102,9 +102,7 @@ float ShadowCalculationCascade(vec3 WorldPos, vec3 Normal, vec3 lightDir) {
     vec2 texelSize = 1.0 / textureSize(cascadeShadowMap, 0).xy;
     for(int x=-1; x<=1; ++x) {
         for(int y=-1; y<=1; ++y) {
-            float pcfDepth = texture(cascadeShadowMap,
-                                     vec3(projCoords.xy + vec2(x,y)*texelSize,
-                                          layer)).r;
+            float pcfDepth = texture(cascadeShadowMap, vec3(projCoords.xy + vec2(x,y) * texelSize, layer)).r;
             shadow += (projCoords.z - bias > pcfDepth) ? 1.0 : 0.0;
         }
     }

@@ -72,7 +72,54 @@ public:
     }
 
 
+    static void getDebug(uint32_t voxelCount, GLuint computeProgram, GLuint gx, GLuint gy, GLuint gz) {
+        glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 3);
+        // === Buffers de debug ===
+        const size_t maxDebugPoints = voxelCount * 64; // cantos + edges
+        GLuint ssboDebugPos = CreateSSBO(sizeof(glm::vec4) * maxDebugPoints);
+        GLuint ssboDebugCol = CreateSSBO(sizeof(glm::vec4) * maxDebugPoints);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, ssboDebugPos);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, ssboDebugCol);
+         
+        GLuint ssboDebugCounter = CreateSSBO(sizeof(GLuint)); glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, ssboDebugCounter);
+        GLuint zero = 0; glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), &zero);
+         
+        glDispatchCompute(gx, gy, gz);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT);
 
+        // === Ler debug data ===
+        GLuint debugCount = 0;
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDebugCounter);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), &debugCount);
+
+        if (debugCount > maxDebugPoints) debugCount = maxDebugPoints;   //n entendi
+
+        std::vector<glm::vec4> dbgPositions(debugCount);
+        std::vector<glm::vec4> dbgColors(debugCount);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDebugPos);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * debugCount, dbgPositions.data());
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDebugCol);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * debugCount, dbgColors.data());
+
+        for (size_t i = 0; i < dbgPositions.size(); ++i) {
+            glm::vec3 pos = glm::vec3(dbgPositions[i]);
+            glm::vec3 col = glm::vec3(dbgColors[i]);
+            DebugRenderer::AddPoint(pos, col, 6.0f, DebugPointType::Square, true);
+        }
+
+        /*for (size_t i = 0; i + 1 < dbgPositions.size(); i += 2) {
+            glm::vec3 a =   glm::vec3(dbgPositions[i]);
+            glm::vec3 b =   glm::vec3(dbgPositions[i + 1]);
+            glm::vec3 col = glm::vec3(dbgColors[i]);
+            DebugRenderer::AddLine(a, b, col, true);
+        }*/
+
+        // === Opcional: deletar SSBOs depois se não for reaproveitar ===
+        glDeleteBuffers(1, &ssboDebugPos);
+        glDeleteBuffers(1, &ssboDebugCol);
+        glDeleteBuffers(1, &ssboDebugCounter);
+    }
 
     static std::unique_ptr<Mesh> Generate(const ChunkBuffer& buff, glm::vec3 uOffset, GLuint computeProgram,  GLuint ssboSDF = 0 ) {
         const int   DimCells   = sysv.get_cellGrid();      
@@ -160,6 +207,13 @@ public:
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboIndices);
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t)  * indexCount , indices.data());
+
+
+        
+        //Pass Extra - 3 Debug
+        getDebug(voxelCount,computeProgram, gx, gy ,gz);
+
+
 
         // --- 9. Cleanup (opcional, ou mantenha se quiser reusar) ---
         glDeleteBuffers(1, &ssboSDF);

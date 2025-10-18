@@ -323,9 +323,12 @@
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUBasic.comp" />
+    <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
+    <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
     <None Include="Resources\Shaders\debugQuad.vs" />
     <None Include="Resources\Shaders\debugQuadDepth.fs" />
-    <None Include="Geometry\World\SurfaceNets\Backups\SurfaceNetsGPU.comp" />
+    <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />

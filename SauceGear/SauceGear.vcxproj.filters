@@ -692,7 +692,7 @@
     <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
-    <None Include="Geometry\World\SurfaceNets\Backups\SurfaceNetsGPU.comp" />
+    <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
     <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
@@ -704,6 +704,9 @@
     <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
     <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUBasic.comp" />
+    <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
+    <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

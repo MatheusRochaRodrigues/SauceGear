@@ -146,7 +146,7 @@ public:
             //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
 
             auto& bb = scene->GetComponent<MeshRenderer>(xz); 
-            //auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
+            auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
         } 
 
         DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);

@@ -11,10 +11,9 @@
 class DebugRenderer : public System {
 public:
     DebugRenderer() {
-        Init(
-            new Shader("DebugP/debug_line.vs", "DebugP/debug_line.fs"),
-            new Shader("DebugP/debug_point_inst.vs", "DebugP/debug_point_inst.fs")
-            //new Shader("DebugP/debug_point.vs", "DebugP/debug_point.fs")
+        Init( 
+            new Shader("DebugP/dbgIntancing_line.vs", "DebugP/dbgIntancing_line.fs"),    //new Shader("DebugP/debug_line.vs", "DebugP/debug_line.fs")
+            new Shader("DebugP/debug_point_inst.vs", "DebugP/debug_point_inst.fs")      //new Shader("DebugP/debug_point.vs", "DebugP/debug_point.fs")
         );
         debugPoints = new DebugPointDrawer();
         debugPoints->Init(new Shader("DebugP/backup/debug_point_circle.vs", "DebugP/backup/debug_point_circle.fs"));
@@ -27,8 +26,8 @@ public:
     }
 
     // ================== Debug API ==================
-    static inline void AddLine(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color = glm::vec3(1.0f)) {
-        lineRenderer.AddLine(a, b, color);
+    static inline void AddLine(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color = glm::vec3(1.0f), bool persistent = false) {
+        lineRenderer.AddLine(a, b, color, persistent);
     }
 
     static inline void AddWireframe(Mesh* mesh, const glm::mat4& transform, const glm::vec3& color = glm::vec3(1.0f)) {
