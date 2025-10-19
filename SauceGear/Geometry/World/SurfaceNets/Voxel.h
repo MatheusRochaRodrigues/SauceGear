@@ -19,12 +19,15 @@ public:
         worldChunks.resize(int(numChunks.x * numChunks.y * numChunks.z)); // pré-aloca espaço suficien
          
         int index = 0;
-        for (int cz = 0; cz < numChunks.z; ++cz) for (int cy = 0; cy < numChunks.y; ++cy) for (int cx = 0; cx < numChunks.x; ++cx)
+        for (int cz = 0; cz < numChunks.z; cz++) for (int cy = 0; cy < numChunks.y; cy++) for (int cx = 0; cx < numChunks.x; cx++)
         { 
             //1 - deslocamento (em coordenadas de mundo)
             //glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize(); 
-            glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize() - glm::vec3(sysv.get_chunkSize() * 0.5f, 0, sysv.get_chunkSize() * 0.5f);
-             
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize() - glm::vec3(sysv.get_chunkSize() * 0.5f, 0, sysv.get_chunkSize() * 0.5f);
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * (sysv.get_chunkSize() - sysv.get_voxelSize());
+
+            glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_cellGrid() * sysv.get_voxelSize());
+
             //2 - respeitar diretamente o tamanho do voxel e da grid
                 //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_voxelGrid() - 1) * sysv.get_voxelSize(); // Use (voxelGrid - 1) porque o número de células é 1 a menos que o número de pontos (grid = numCells + 1).
              
@@ -32,7 +35,9 @@ public:
             voxel->coord = offset; 
 
             auto& vBuff = *voxel->buff.get();
-             
+
+            std::cout << "Chunk offset: " << offset.x << "," << offset.y << "," << offset.z << "\n";
+
             // gera SDF no GPU          //CUIDADO BUSQUE ATUALIZAR TODAS SUAS ESTRUTURAS POR SI SO SEMPRE QUE A DIMENSAO FOR ALTERADA
             generator->Generate(offset, vBuff); // dim=64, voxelSize=1.0
 

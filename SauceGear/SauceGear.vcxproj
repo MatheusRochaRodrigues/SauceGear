@@ -427,6 +427,7 @@
     <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
     <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
     <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
+    <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

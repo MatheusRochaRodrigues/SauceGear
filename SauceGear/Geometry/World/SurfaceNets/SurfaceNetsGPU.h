@@ -113,7 +113,34 @@ public:
             glm::vec3 b =   glm::vec3(dbgPositions[i + 1]);
             glm::vec3 col = glm::vec3(dbgColors[i]);
             DebugRenderer::AddLine(a, b, col, true);
-        }*/
+        }*/ 
+
+        
+        // função para transformar glm::vec3 em chave discreta
+        auto posToKey = [](const glm::vec3& p) {
+            return std::make_tuple(int(std::round(p.x)), int(std::round(p.y)), int(std::round(p.z)));
+            };
+
+
+        // criar set de pontos ocupados
+        std::unordered_set<std::tuple<int, int, int>, TupleHash> occupied;
+
+        // preencher com pontos do shader
+        for (auto& p : dbgPositions) {
+            occupied.insert(posToKey(glm::vec3(p)));
+        }
+
+        glm::vec3 numChunks = glm::vec3(sysv.get_voxelGrid());
+        for (int cz = 0; cz < numChunks.z; ++cz) for (int cy = 0; cy < numChunks.y; ++cy) for (int cx = 0; cx < numChunks.x; ++cx)
+        {
+            glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)sysv.get_voxelSize();
+            if (occupied.find(posToKey(offset)) == occupied.end())
+            {
+                // ponto não existe, adicionar como preto
+                DebugRenderer::AddPoint(offset, glm::vec3(0.0f), 6.0f, DebugPointType::Square, true);
+            }
+        }
+        
 
         // === Opcional: deletar SSBOs depois se não for reaproveitar ===
         glDeleteBuffers(1, &ssboDebugPos);
@@ -122,11 +149,11 @@ public:
     }
 
     static std::unique_ptr<Mesh> Generate(const ChunkBuffer& buff, glm::vec3 uOffset, GLuint computeProgram,  GLuint ssboSDF = 0 ) {
-        const int   DimCells   = sysv.get_cellGrid();      
-        const float VoxelSize  = sysv.get_voxelSize();      // número de pontos (ex: 33)
-        const float WorldScale = sysv.get_chunkSize();
+        const int   DimCells   = sysv.get_cellGrid();       // número de celulas (ex: 32)
+        const float VoxelSize  = sysv.get_voxelSize();      
+        //const float WorldScale = sysv.get_chunkSize();
 
-        const int DimVoxel = sysv.get_voxelGrid();
+        const int DimVoxel = sysv.get_voxelGrid();          // número de pontos  (ex: 33)
         const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;   //arraySize 
         assert(voxelCount == buff.densityMap.size());
 
@@ -231,4 +258,19 @@ public:
         mesh->UploadFromRaw(positions, normals, indices);   
         return mesh;
     }
+
+
+    // Functor de hash para tuple<int,int,int>
+    struct TupleHash {
+        size_t operator()(const std::tuple<int, int, int>& t) const noexcept {
+            auto [x, y, z] = t;
+            // Combina os 3 inteiros em um hash único
+            size_t h1 = std::hash<int>()(x);
+            size_t h2 = std::hash<int>()(y);
+            size_t h3 = std::hash<int>()(z);
+            return h1 ^ (h2 << 1) ^ (h3 << 2); // combinação simples e eficiente
+        }
+    };
+
+
 };

@@ -707,6 +707,7 @@
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUBasic.comp" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
+    <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

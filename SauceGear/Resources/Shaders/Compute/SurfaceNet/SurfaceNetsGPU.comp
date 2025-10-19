@@ -206,8 +206,9 @@ void main() {
     ivec3 cell = ivec3(gl_GlobalInvocationID.xyz);
      
     //   uDim(Voxels) == uDimCells + 1   =>   uDim - 1 == uDimCells   // only iterate valid cells (cells are uDim-1 in each axis)
-    if (cell.x >= uDim - 1 || cell.y >= uDim - 1 || cell.z >= uDim - 1) return; 
-    //if (cell.x > uDim - 1 || cell.y > uDim - 1 || cell.z > uDim - 1) return; 
+    //if (cell.x > uDim + 1  || cell.y > uDim + 1  || cell.z > uDim + 1) return; 
+    //if (cell.x >= uDim - 1 || cell.y >= uDim - 1 || cell.z >= uDim - 1) return; 
+    if (cell.x > uDim - 1 || cell.y > uDim - 1 || cell.z > uDim - 1) return; 
 
     float cornerVal[8];
     int numNeg = 0;

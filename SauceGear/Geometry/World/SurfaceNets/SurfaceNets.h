@@ -62,8 +62,8 @@ struct SysVoxel {
     SysVoxel& operator=(const SysVoxel&) = delete;
 
 private:
-    int   cellGrid = 32;    //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
-    float chunkSize = 32;        // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
+    int   cellGrid = 10; //32 //64     //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
+    float chunkSize = 10;           // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
 
     constexpr SysVoxel() {}
     ~SysVoxel() {} // (opcional) destrutor privado
