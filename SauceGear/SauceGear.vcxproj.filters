@@ -581,6 +581,9 @@
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">

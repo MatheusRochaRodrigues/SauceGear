@@ -194,6 +194,7 @@
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h" />
+    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h" />
     <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h" />
     <ClInclude Include="ECS\Components\ComputeSyncComponent.h" />
