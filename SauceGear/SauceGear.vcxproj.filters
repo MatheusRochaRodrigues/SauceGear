@@ -584,6 +584,21 @@
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\GPUJobQueue.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\Structs\ObjectPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPUBuffer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\WorldComputeThread.hpp">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\WPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">

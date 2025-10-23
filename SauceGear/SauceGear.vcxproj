@@ -193,9 +193,13 @@
     <ClInclude Include="ECS\Systems\Lighting\LightPoint.h" />
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
+    <ClInclude Include="Geometry\World\Structs\ObjectPool.h" />
+    <ClInclude Include="Geometry\World\SurfaceNets\GPUJobQueue.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h" />
+    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPUBuffer.h" />
+    <ClInclude Include="Geometry\World\SurfaceNets\WPool.h" />
     <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h" />
     <ClInclude Include="ECS\Components\ComputeSyncComponent.h" />
     <ClInclude Include="ECS\Components\SurfaceNetsComponent.h" />
@@ -320,6 +324,7 @@
     <ClInclude Include="ECS\Components\ScriptComponent.h" />
     <ClInclude Include="ECS\Components\Tags\TransparentTag.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\Voxel.h" />
+    <ClInclude Include="Geometry\World\WorldComputeThread.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />

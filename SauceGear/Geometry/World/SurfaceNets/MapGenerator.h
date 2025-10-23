@@ -45,6 +45,10 @@ public:
         // lê de volta para CPU
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, dim * dim * dim * sizeof(float), buff.densityMap.data());
+
+        //Teste
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
     ~GPUMapGenerator() {

@@ -17,7 +17,9 @@ public:
 
         std::vector<Chunk*> worldChunks;
         worldChunks.resize(int(numChunks.x * numChunks.y * numChunks.z)); // pré-aloca espaço suficien
-         
+        
+        //SurfaceNetsGPU::SurfaceNetsGPUBuffer cBuff;
+
         int index = 0;
         for (int cz = 0; cz < numChunks.z; cz++) for (int cy = 0; cy < numChunks.y; cy++) for (int cx = 0; cx < numChunks.x; cx++)
         { 
@@ -51,7 +53,7 @@ public:
 
             std::cout << "p 3" << std::endl;
             
-            voxel->mesh = SurfaceNetsGPU::Generate(vBuff, offset, computeShader->ID, 0);
+            voxel->mesh = SurfaceNetsGPU::Generate(vBuff, offset, computeShader->ID, cBuff, 0);
             worldChunks[index++] = voxel;  
         }
         std::cout << "p 5" << std::endl;

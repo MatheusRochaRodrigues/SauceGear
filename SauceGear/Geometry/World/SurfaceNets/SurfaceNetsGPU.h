@@ -1,5 +1,6 @@
 #include "SurfaceNets.h"
 #include "../Graphics/Mesh.h"
+#include "SurfaceNetsGPUBuffer.h"
 #include <glad/glad.h>
 #include <vector>
 #include <iostream>
@@ -9,19 +10,6 @@
 
 class SurfaceNetsGPU {
 public:
-    struct SurfaceNetsGPUBuffer {
-        GLuint ssboSDF = 0;
-        GLuint ssboPositions = 0;
-        GLuint ssboNormals = 0;
-        GLuint ssboIndices = 0;
-        GLuint ssboStrideToIndex = 0;
-        GLuint ssboCounters = 0;
-        size_t allocatedVoxels = 0; // para saber se precisa realocar
-
-        // Tamanhos atualmente alocados (em bytes)
-        size_t allocatedVoxels = 0; // quantidade atual alocada (para realocar só quando crescer)
-        bool inUse = false;
-    };  
 
     static GLuint CreateSSBO(GLsizeiptr size, const void* data = nullptr, GLenum usage = GL_DYNAMIC_COPY) {
         GLuint id;
@@ -32,7 +20,7 @@ public:
         return id;
     }
 
-    // Cria ou realoca SSBO conforme necessário
+    // Cria ou realoca SSBO conforme necessário             util: (re)aloca um SSBO para 'newCount' elementos
     static void EnsureSSBO(GLuint& ssbo, size_t currentCount, size_t newCount, size_t elementSize, GLenum usage = GL_DYNAMIC_COPY) {
         size_t newSize = newCount * elementSize;
         size_t oldSize = currentCount * elementSize;
