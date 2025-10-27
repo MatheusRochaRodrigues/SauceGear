@@ -11,38 +11,13 @@
 class SurfaceNetsGPU {
 public:
 
-    static GLuint CreateSSBO(GLsizeiptr size, const void* data = nullptr, GLenum usage = GL_DYNAMIC_COPY) {
-        GLuint id;
-        glGenBuffers(1, &id);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, usage);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-        return id;
-    }
-
-    // Cria ou realoca SSBO conforme necessário             util: (re)aloca um SSBO para 'newCount' elementos
-    static void EnsureSSBO(GLuint& ssbo, size_t currentCount, size_t newCount, size_t elementSize, GLenum usage = GL_DYNAMIC_COPY) {
-        size_t newSize = newCount * elementSize;
-        size_t oldSize = currentCount * elementSize;
-  
-        if (ssbo == 0) {
-            ssbo = CreateSSBO(newSize, nullptr, usage);  // criar novo buffer se ainda não existir 
-            return;
-        }
-        
-        if (newSize > oldSize) {
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-            glBufferData(GL_SHADER_STORAGE_BUFFER, newSize, nullptr, usage);
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-        }
-    }
       
     static std::unique_ptr<Mesh> Generate(
         const ChunkBuffer& buff,
         glm::vec3 uOffset,
         GLuint computeProgram,
         SurfaceNetsGPUBuffer& gpuBuff,
-        GLuint ssboSDF = 0 )
+        bool readySSBO_SDF = true )
     {
         const int   DimCells  = sysv.get_cellGrid();      // ex: 32
         const int   DimVoxel  = sysv.get_voxelGrid();     // ex: 33
@@ -51,7 +26,12 @@ public:
         const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;
         assert(voxelCount == buff.densityMap.size());
 
+        // Ensure capacity (GL thread). If not enough, grow.
+        //if (gpuBuff.allocatedVoxels < voxelCount) gpuBuff.ensureCapacity(voxelCount); 
+
+
         // Só realocar se necessário
+        /*
         if (gpuBuff.allocatedVoxels < voxelCount) {
             gpuBuff.allocatedVoxels = voxelCount;
 
@@ -63,6 +43,7 @@ public:
             EnsureSSBO(gpuBuff.ssboStrideToIndex,   0, voxelCount,      sizeof(uint32_t),   GL_DYNAMIC_COPY);
             EnsureSSBO(gpuBuff.ssboCounters,        0, 2,               sizeof(uint32_t),   GL_DYNAMIC_COPY);
         }
+        */
 
         glUseProgram(computeProgram);
         glUniform1i(glGetUniformLocation(computeProgram, "uDim"), DimVoxel);
@@ -71,15 +52,19 @@ public:
 
         // --- SDF input ---
         //if (ssboSDF == 0) ssboSDF = CreateSSBO(voxelCount * sizeof(float), buff.densityMap.data(), GL_DYNAMIC_DRAW);    //GL_STATIC_DRAW
-        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboSDF);
+        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboSDF); 
 
-
-        // --- Buffer SDF ---
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboSDF);
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(float), buff.densityMap.data());
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
-         
-
+        // --- Buffer SDF ---   
+        // Bind or upload SDF:
+        if (readySSBO_SDF) {
+            // Bind external SDF already prepared by caller
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
+        } else {
+            // upload buff.densityMap into gpuBuff.ssboSDF
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboSDF);
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(float), buff.densityMap.data());
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
+        }
 
 
         // --- Bind --- Outputs ---
@@ -100,7 +85,7 @@ public:
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 
-        // --- Reset stride table ---
+        // --- Reset stride table ---                Reset stride_to_index
         std::vector<uint32_t> initStride(voxelCount, 0xFFFFFFFFu);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboStrideToIndex);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(uint32_t), initStride.data());
@@ -148,6 +133,100 @@ public:
         mesh->UploadFromRaw(positions, normals, indices);
         return mesh;
     }
+
+
+
+
+    // Dispatch compute only (no readback). Must bind SSBOs appropriately and not readback.
+    static void DispatchOnly(const ChunkBuffer& buff, glm::vec3 uOffset, GLuint computeProgram, SurfaceNetsGPUBuffer& gpuBuff, bool sdfAlreadyOnGPU = true, GLuint externalSDF = 0) {
+        const int   DimCells = sysv.get_cellGrid();
+        const int   DimVoxel = sysv.get_voxelGrid();
+        const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;
+
+        // assume gpuBuff.ensureCapacity(voxelCount) was already called
+
+        glUseProgram(computeProgram);
+        glUniform1i(glGetUniformLocation(computeProgram, "uDim"), DimVoxel);
+        glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), sysv.get_voxelSize());
+        glUniform3fv(glGetUniformLocation(computeProgram, "uOffset"), 1, glm::value_ptr(uOffset));
+
+        // bind SDF
+        if (sdfAlreadyOnGPU && externalSDF != 0) {
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, externalSDF);
+        }
+        else {
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboSDF);
+            glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(float), buff.densityMap.data());
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
+        }
+
+        // Bind outputs
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, gpuBuff.ssboPositions);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, gpuBuff.ssboNormals);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, gpuBuff.ssboIndices);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, gpuBuff.ssboStrideToIndex);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, gpuBuff.ssboCounters);
+
+        // reset counters & stride
+        uint32_t zero[2] = { 0,0 };
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboCounters);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(zero), zero);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+        std::vector<uint32_t> initStride(voxelCount, 0xFFFFFFFFu);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboStrideToIndex);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(uint32_t), initStride.data());
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+        GLuint gx = (DimCells + 7) / 8;
+        GLuint gy = (DimCells + 7) / 8;
+        GLuint gz = (DimCells + 7) / 8;
+
+        // PASS 1
+        glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 1);
+        glDispatchCompute(gx, gy, gz);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+        // PASS 2
+        glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 2);
+        glDispatchCompute(gx, gy, gz);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+        // Don't read back here.
+    }
+
+    // Readback mesh from gpuBuff (call on GL thread after fence signaled).
+    static std::unique_ptr<Mesh> ReadbackMeshFromBuffer(SurfaceNetsGPUBuffer& gpuBuff, GLuint computeProgram) {
+        const int DimVoxel = sysv.get_voxelGrid();
+        const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboCounters);
+        uint32_t counts[2];
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(counts), counts);
+        uint32_t vertexCount = counts[0];
+        uint32_t indexCount = counts[1];
+
+        std::vector<glm::vec4> positions(vertexCount);
+        std::vector<glm::vec4> normals(vertexCount);
+        std::vector<uint32_t> indices(indexCount);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboPositions);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, vertexCount * sizeof(glm::vec4), positions.data());
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboNormals);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, vertexCount * sizeof(glm::vec4), normals.data());
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboIndices);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, indexCount * sizeof(uint32_t), indices.data());
+
+        auto mesh = std::make_unique<Mesh>();
+        mesh->UploadFromRaw(positions, normals, indices);
+        return mesh;
+    }
+
+
+
+
 
 
 

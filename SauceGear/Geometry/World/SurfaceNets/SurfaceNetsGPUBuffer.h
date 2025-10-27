@@ -17,49 +17,45 @@ struct SurfaceNetsGPUBuffer {
     // meta info para cleanup / LRU
     std::chrono::steady_clock::time_point lastUsed = std::chrono::steady_clock::now();
 
+    void EnsureSSBO(GLuint& ssbo, size_t size, size_t elementSize, GLenum usage = GL_DYNAMIC_COPY, const void* data = nullptr) {
+        size_t newSize = size * elementSize;
+        if (!ssbo) glGenBuffers(1, &ssbo);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, newSize, data, usage);
+    }
 
     // helper
-    void ensureCapacity(size_t voxelCount) {
-        if (allocatedVoxels >= voxelCount) return;
-        size_t newCount = std::max(voxelCount, allocatedVoxels * 2);
-        if (newCount < 1) newCount = voxelCount;
+    void ensureCapacity() {
+        int dim = sysv.get_voxelGrid();    //  pointsPerChunk
+        if (dim < 1) dim = 1; 
+        const size_t dim3 = size_t(dim) * dim * dim;     // voxelCount
+
+        if (allocatedVoxels >= dim3) return;       //size_t newCount = std::max(voxelCount, allocatedVoxels * 2);      estratégia de crescimento amortizado
+
         // aloca/realoca cada SSBO (note: chamadas GL precisam de contexto atual nesta thread)
-        if (!ssboSDF) glGenBuffers(1, &ssboSDF);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboSDF);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, newCount * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+         
+        EnsureSSBO(ssboSDF,             dim3,       sizeof(float),      GL_DYNAMIC_DRAW); //MapSDF
 
-        if (!ssboPositions) glGenBuffers(1, &ssboPositions);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboPositions);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, newCount * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
-
-        if (!ssboNormals) glGenBuffers(1, &ssboNormals);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboNormals);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, newCount * sizeof(glm::vec4), nullptr, GL_DYNAMIC_COPY);
-
-        if (!ssboIndices) glGenBuffers(1, &ssboIndices);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboIndices);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, newCount * 6u * sizeof(uint32_t), nullptr, GL_DYNAMIC_COPY);
-
-        if (!ssboStrideToIndex) glGenBuffers(1, &ssboStrideToIndex);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboStrideToIndex);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, newCount * sizeof(uint32_t), nullptr, GL_DYNAMIC_COPY);
-
-        if (!ssboCounters) glGenBuffers(1, &ssboCounters);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboCounters);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, 2 * sizeof(uint32_t), nullptr, GL_DYNAMIC_COPY);
+        EnsureSSBO(ssboPositions,       dim3,       sizeof(glm::vec4),  GL_DYNAMIC_COPY);
+        EnsureSSBO(ssboNormals,         dim3,       sizeof(glm::vec4),  GL_DYNAMIC_COPY);
+        EnsureSSBO(ssboIndices,         dim3 * 6u,  sizeof(uint32_t),   GL_DYNAMIC_COPY);
+        EnsureSSBO(ssboStrideToIndex,   dim3,       sizeof(uint32_t),   GL_DYNAMIC_COPY);
+        EnsureSSBO(ssboCounters,        2,          sizeof(uint32_t),   GL_DYNAMIC_COPY);  
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-        allocatedVoxels = newCount;
+        allocatedVoxels = dim3;
     }
 
     void destroy() {
-        if (ssboSDF) glDeleteBuffers(1, &ssboSDF);
-        if (ssboPositions) glDeleteBuffers(1, &ssboPositions);
-        if (ssboNormals) glDeleteBuffers(1, &ssboNormals);
-        if (ssboIndices) glDeleteBuffers(1, &ssboIndices);
-        if (ssboStrideToIndex) glDeleteBuffers(1, &ssboStrideToIndex);
-        if (ssboCounters) glDeleteBuffers(1, &ssboCounters);
-        *this = SurfaceNetsGPUBuffer();
+        if (ssboSDF) { glDeleteBuffers(1, &ssboSDF); ssboSDF = 0; }
+        if (ssboPositions) { glDeleteBuffers(1, &ssboPositions); ssboPositions = 0; }
+        if (ssboNormals) { glDeleteBuffers(1, &ssboNormals); ssboNormals = 0; }
+        if (ssboIndices) { glDeleteBuffers(1, &ssboIndices); ssboIndices = 0; }
+        if (ssboStrideToIndex) { glDeleteBuffers(1, &ssboStrideToIndex); ssboStrideToIndex = 0; }
+        if (ssboCounters) { glDeleteBuffers(1, &ssboCounters); ssboCounters = 0; }
+        allocatedVoxels = 0;
+        inUse = false;
+        lastUsed = std::chrono::steady_clock::now();
     }
 
 };
@@ -70,3 +66,67 @@ inline void ResetSurfaceBuffer(SurfaceNetsGPUBuffer* b) { /* no-op */ }
 
 // Convenience global pool (use DECLARE/DEFINE macros in your code)
 using SNBufferPool = ObjectPool<SurfaceNetsGPUBuffer>;
+
+
+
+
+
+
+/*
+
+
+    static std::unique_ptr<Mesh> Generate( )
+    {
+        const int   DimCells  = sysv.get_cellGrid();      // ex: 32
+        const int   DimVoxel  = sysv.get_voxelGrid();     // ex: 33
+        const float VoxelSize = sysv.get_voxelSize();
+
+        const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;
+        assert(voxelCount == buff.densityMap.size());
+
+        // Ensure capacity (GL thread). If not enough, grow.
+        //if (gpuBuff.allocatedVoxels < voxelCount) gpuBuff.ensureCapacity(voxelCount);
+
+
+        // Só realocar se necessário 
+        if (gpuBuff.allocatedVoxels < voxelCount) {
+            gpuBuff.allocatedVoxels = voxelCount;
+
+            //Size Info      maxVertices == voxelCount          /           maxIndices = voxelCount * 6u
+            EnsureSSBO(gpuBuff.ssboSDF,             0, voxelCount,      sizeof(float),      GL_DYNAMIC_DRAW);
+            EnsureSSBO(gpuBuff.ssboPositions,       0, voxelCount,      sizeof(glm::vec4),  GL_DYNAMIC_COPY);
+            EnsureSSBO(gpuBuff.ssboNormals,         0, voxelCount,      sizeof(glm::vec4),  GL_DYNAMIC_COPY);
+            EnsureSSBO(gpuBuff.ssboIndices,         0, voxelCount * 6u, sizeof(uint32_t),   GL_DYNAMIC_COPY);
+            EnsureSSBO(gpuBuff.ssboStrideToIndex,   0, voxelCount,      sizeof(uint32_t),   GL_DYNAMIC_COPY);
+            EnsureSSBO(gpuBuff.ssboCounters,        0, 2,               sizeof(uint32_t),   GL_DYNAMIC_COPY);
+        } 
+
+
+
+
+static GLuint CreateSSBO(GLsizeiptr size, const void* data = nullptr, GLenum usage = GL_DYNAMIC_COPY) {
+    GLuint id;
+    glGenBuffers(1, &id);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, usage);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    return id;
+}
+
+// Cria ou realoca SSBO conforme necessário             util: (re)aloca um SSBO para 'newCount' elementos
+static void EnsureSSBO(GLuint& ssbo, size_t currentCount, size_t newCount, size_t elementSize, GLenum usage = GL_DYNAMIC_COPY) {
+    size_t newSize = newCount * elementSize;
+    size_t oldSize = currentCount * elementSize;
+
+    if (ssbo == 0) {
+        ssbo = CreateSSBO(newSize, nullptr, usage);  // criar novo buffer se ainda não existir 
+        return;
+    }
+
+    if (newSize > oldSize) {
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, newSize, nullptr, usage);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    }
+}
+*/

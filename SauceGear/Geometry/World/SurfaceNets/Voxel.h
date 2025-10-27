@@ -4,6 +4,7 @@
 #include "../Graphics/ComputeShader.h" 
 #include "../Geometry/World/SurfaceNets/SurfaceNetsGPU.h"   
 #include "../Geometry/World/SurfaceNets/MapGenerator.h"    
+#include "GSurfPool.h"    
  
 class voxelSystem {
 public: 
@@ -12,6 +13,7 @@ public:
         computeShader = new ComputeShader   ("SurfaceNet/SurfaceNetsGPU.comp");   
     }
 
+    /*
     std::vector<Chunk*> gnrtChunk() {
         glm::vec3 numChunks = sysv.numChunksPerAxis; 
 
@@ -60,6 +62,66 @@ public:
 
         return worldChunks; // retorna o vetor já totalmente preenchido
     }
+    */
+
+
+    std::vector<Chunk*> gnrtChunk() {
+        glm::ivec3 numChunks = glm::ivec3(sysv.numChunksPerAxis);
+        std::vector<Chunk*> worldChunks;
+        worldChunks.reserve(numChunks.x * numChunks.y * numChunks.z);
+         
+        for (int cz = 0; cz < numChunks.z; ++cz) for (int cy = 0; cy < numChunks.y; ++cy) for (int cx = 0; cx < numChunks.x; ++cx) {
+            glm::vec3 offset = glm::vec3(cx, cy, cz) * float(sysv.get_cellGrid() * sysv.get_voxelSize());
+
+            auto* voxel = new Chunk();
+            voxel->coord = offset;
+            auto& vBuff = *voxel->buff.get();
+
+            // Acquire a GPU buffer from global pool
+            SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
+            // Make sure capacity is available (must run on GL context thread)
+            gpuBuf->ensureCapacity();
+
+            // 1) generate SDF on GPU and copy into gpuBuf.ssboSDF (leaveSdfOnGpu=true)
+            generator->Generate(offset, vBuff, *gpuBuf);
+
+            // 2) schedule the SurfaceNets GPU work asynchronously using ComputeSyncComponent::Request
+            GLuint computeProg = computeShader->ID;
+            // capture pointers by value
+            ComputeSyncComponent::Request([=]() {
+                // This lambda runs immediately on caller thread to enqueue GPU work, then sets a fence.
+                // We assume this is the GL context thread. If not, you must ensure GL context.
+                // Run SurfaceNetsGPU::Generate but WITHOUT synchronous CPU readback.
+                // To make it fully async we can:
+                //  - run compute that writes positions/normals/indices into gpuBuf
+                //  - place a fence
+                // For simplicity, we'll call Generate but it will do readback; instead, we can separate
+                // compute-dispatch and readback. Here we dispatch compute and leave readback to callback.
+
+                // bind program and uniforms (done inside Generate)
+                glUseProgram(computeProg);
+                // set uniforms handled inside Generate call below
+                // We'll call a variant that only dispatches compute and leaves GPU buffers filled:
+                // (I'll implement DispatchOnly below as static helper)
+                SurfaceNetsGPU::DispatchOnly(vBuff, offset, computeProg, *gpuBuf);
+                // After DispatchOnly executes, ComputeSyncComponent will create a fence and enqueue callback.
+                }, [=]() {
+                    // onComplete callback -> called when GPU is done (on main GL thread)
+                    // Readback mesh from gpuBuf and assign to voxel->mesh
+                    voxel->mesh = SurfaceNetsGPU::ReadbackMeshFromBuffer(*gpuBuf, computeProg);
+                    // mark and release pool buffer
+                    GlobalSurfaceNetsPool::Get().Release(gpuBuf);
+                    });
+
+                worldChunks.push_back(voxel);
+        }
+
+        return worldChunks;
+    }
+
+
+
+
 
 private:
     ComputeShader* computeShader;
