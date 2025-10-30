@@ -133,9 +133,9 @@ public:
         std::cout << "o - 7" << std::endl;
 
         std::shared_ptr<MaterialInstance> material = std::make_shared<MaterialInstance>(std::make_shared<PBRMaterial>()); // ou carregue o material desejado aqui
-        material->SetFallbackColor("Albedo", glm::vec3(0, 1, 0));
-        material->SetFallbackFloat("Roughness", 1.0f);
-        material->SetFloat("Metallic", 0.0f);
+        material->SetFallbackColor("Albedo", glm::vec3(0, 0.5f, 0.2f));
+        material->SetFallbackFloat("Roughness", 0.65f);
+        material->SetFloat("Metallic", 0.1f);
 
         std::cout << "AAAAA" << std::endl;
         for(auto& ck : sys.gnrtChunk()) {  

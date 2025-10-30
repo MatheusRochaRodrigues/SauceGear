@@ -43,7 +43,7 @@ struct Vec3Equal {
 
 struct SysVoxel {
     float isoLevel = 0.0f;         // isoLevel - nível de isosuperfície 
-    glm::vec3 numChunksPerAxis = glm::vec3(2.0f, 1.0f, 1.0f); // quantos chunks criar em cada eixo
+    glm::vec3 numChunksPerAxis = glm::vec3(5.0f, 2.0f, 5.0f); // quantos chunks criar em cada eixo
 
     void    set_cellGrid(int s)  { cellGrid  = s; }     //set_voxelGrid(int s) { cellGrid  = s; }
     void    set_chunkSize(int s) { chunkSize = s; }
@@ -62,8 +62,8 @@ struct SysVoxel {
     SysVoxel& operator=(const SysVoxel&) = delete;
 
 private:
-    int   cellGrid = 3; //32 //64     //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
-    float chunkSize = 3;           // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
+    int   cellGrid = 32; //32 //64     //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
+    float chunkSize = 24;           // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
 
     constexpr SysVoxel() {}
     ~SysVoxel() {} // (opcional) destrutor privado

@@ -55,7 +55,7 @@ float perlinNoise(vec3 p) {
 }
 
 // === Fractal Perlin contínuo ===
-/*
+
 float fractalPerlin(vec3 p) {
     p += uOffset * 0.01; // importante: desloca conforme posição real do chunk
     float sum = 0.0;
@@ -68,8 +68,8 @@ float fractalPerlin(vec3 p) {
     }
     return sum;
 }
-*/
 
+/*
 float fractalPerlin(vec3 p) {
     float sum = 0.0;
     float amp = 1.0;
@@ -82,6 +82,7 @@ float fractalPerlin(vec3 p) {
     }
     return sum;
 }
+*/
 
 
 // === Worley noise opcional (para cavernas) ===
@@ -110,8 +111,8 @@ void main() {
     float height = fractalPerlin(20.201 + pos * 0.05) * 5.0;
     float caves = 0.0; // opcional: worleyNoise(pos * 0.1) * 2.0 - 1.0;
 
-    //float distToSurface = pos.y - height + caves - 8;
-    float distToSurface = pos.y - height + caves - 0;
+    float distToSurface = pos.y - height + caves - 5;
+    //float distToSurface = pos.y - height + caves - 0;
 
     int idx = cell.x + cell.y * uDim + cell.z * uDim * uDim;
     sdf[idx] = distToSurface;

@@ -330,6 +330,7 @@
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUMainly.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUBasic.comp" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />

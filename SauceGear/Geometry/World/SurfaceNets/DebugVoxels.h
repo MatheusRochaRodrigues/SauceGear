@@ -180,6 +180,11 @@ struct DebugVoxels {
 
 
 
+    static void getDebugCentroid( std::vector<glm::vec4> positions ) {  
+        for (auto pos : positions) DebugRenderer::AddPoint(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(0.6f, 0.6f, 0.2f), 12.0f, DebugPointType::Circle, true); 
+    }
+
+
 
     // Functor de hash para tuple<int,int,int>
     struct TupleHash {

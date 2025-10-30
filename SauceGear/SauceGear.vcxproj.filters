@@ -731,6 +731,7 @@
     <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUMainly.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

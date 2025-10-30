@@ -52,6 +52,8 @@ public:
         glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), VoxelSize);
         glUniform3fv(glGetUniformLocation(computeProgram, "uOffset"), 1, glm::value_ptr(uOffset));
 
+        //glUniform1i(glGetUniformLocation(computeProgram, "uEvalMaxPlane"), (int)0);
+
         // --- SDF input ---
         //if (ssboSDF == 0) ssboSDF = CreateSSBO(voxelCount * sizeof(float), buff.densityMap.data(), GL_DYNAMIC_DRAW);    //GL_STATIC_DRAW
         //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboSDF); 
@@ -132,9 +134,11 @@ public:
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, indexCount * sizeof(uint32_t),      indices.data());
          
         // 2️⃣ desenha as linhas da grade
-        DebugVoxels::drawVoxelGrid(uOffset);
-        //getDebug(voxelCount, computeProgram, gx, gy, gz);
-        DebugVoxels::getDebug2(voxelCount, computeProgram, gx, gy, gz, gpuBuff, uOffset);
+        //DebugVoxels::drawVoxelGrid(uOffset);
+        //DebugVoxels::getDebug2(voxelCount, computeProgram, gx, gy, gz, gpuBuff, uOffset);
+        //DebugVoxels::getDebugCentroid(positions);
+         
+        //getDebug(voxelCount, computeProgram, gx, gy, gz); 
 
 
         if (positions.empty()) std::cout << "esta vazia positions" << std::endl;

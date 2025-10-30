@@ -85,8 +85,9 @@ public:
             //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_cellGrid() - 1) * sysv.get_voxelSize(); 
             
 
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * ((float)sysv.get_cellGrid() * sysv.get_voxelSize());
             //glm::vec3 offset = glm::vec3(cx, cy, cz) * (((float)sysv.get_cellGrid() - 1) * sysv.get_voxelSize());
-            glm::vec3 offset = glm::vec3(cx, cy, cz) * ((float)sysv.get_cellGrid() * sysv.get_voxelSize());
+            glm::vec3 offset = glm::vec3(cx, cy, cz) * ( ((float)sysv.get_cellGrid() * sysv.get_voxelSize()) - sysv.get_voxelSize());
 
 
 
