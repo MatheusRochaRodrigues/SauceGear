@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "SurfaceNetsGPUBuffer.h"
 #include "../Structs/ObjectPool.h"
 #include <functional>
@@ -45,11 +45,14 @@ public:
         }
         // mark inUse and set desired capacity; real GL reallocation must be done on GL context thread
         b->inUse = true;
+
         // store desired minimal voxels in allocatedVoxels temporarily if smaller; caller should call ensureCapacity on GL thread
-        if (b->allocatedVoxels < voxelCount) {
+        //if (b->allocatedVoxels < voxelCount) {
+            //b->allocatedVoxels = voxelCount;  // ✅ real fix
             // don't call GL from here; caller will call ensureCapacity before using
-            b->allocatedVoxels = b->allocatedVoxels; // no-op placeholder
-        }
+            //b->allocatedVoxels = b->allocatedVoxels; // no-op placeholder
+        //}
+
         b->lastUsed = std::chrono::steady_clock::now();
         return b;
     }
@@ -75,6 +78,6 @@ private:
 
 /*
 Nota: GlobalSurfaceNetsPool::Acquire retorna um buffer; 
-antes de usar voc� deve chamar gpuBuf->ensureCapacity(voxelCount) na thread com contexto GL(o c�digo abaixo faz isso).
+antes de usar você deve chamar gpuBuf->ensureCapacity(voxelCount) na thread com contexto GL(o código abaixo faz isso).
 Isso evita GL calls em threads sem contexto.
 */

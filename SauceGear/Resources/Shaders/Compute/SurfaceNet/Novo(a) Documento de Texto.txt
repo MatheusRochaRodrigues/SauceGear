@@ -1,0 +1,13 @@
+# Ler os 3 primeiros bytes do arquivo
+$bytes = [System.IO.File]::ReadAllBytes("SurfaceNetsGPU.comp")
+$bytes[0..2]
+
+
+
+
+
+
+//Remove o utf8 bytes de inicio, e o de cima apenas printa para verificar se funcionou
+
+
+[System.IO.File]::WriteAllText("SurfaceNetsGPU.comp", [System.IO.File]::ReadAllText("SurfaceNetsGPU.comp"), (New-Object System.Text.UTF8Encoding $false))

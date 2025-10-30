@@ -137,17 +137,20 @@ public:
         material->SetFallbackFloat("Roughness", 1.0f);
         material->SetFloat("Metallic", 0.0f);
 
+        std::cout << "AAAAA" << std::endl;
         for(auto& ck : sys.gnrtChunk()) {  
 
             std::cout << "o - 00" << std::endl;
+            std::cout << "ck " << ck->coord.x << " " << ck->coord.y << " " << ck->coord.z << std::endl;
             auto& scene = GEngine->scene;
             Entity xz = SceneBuilder::CreateModel(ck->mesh.get(), material);
             auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck); 
             //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
 
-            auto& bb = scene->GetComponent<MeshRenderer>(xz); 
-            auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
-        } 
+            //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
+            //auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
+        }
+        std::cout << "AAAAAee" << std::endl;
 
         DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
         DebugRenderer::AddPoint(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);

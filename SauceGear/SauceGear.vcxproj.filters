@@ -596,7 +596,10 @@
     <ClInclude Include="Geometry\World\WorldComputeThread.hpp">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\WPool.h">
+    <ClInclude Include="Geometry\World\SurfaceNets\GSurfPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\World\SurfaceNets\DebugVoxels.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -709,7 +712,7 @@
     <None Include="Resources\Shaders\DebugP\backup\debug_point.fs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp2" />
     <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
     <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
@@ -726,6 +729,8 @@
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUMainly.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

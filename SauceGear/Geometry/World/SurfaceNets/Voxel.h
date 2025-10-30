@@ -66,6 +66,73 @@ public:
 
 
     std::vector<Chunk*> gnrtChunk() {
+        glm::vec3 numChunks = sysv.numChunksPerAxis;
+
+        std::vector<Chunk*> worldChunks;
+        //worldChunks.resize(int(numChunks.x * numChunks.y * numChunks.z)); // pré-aloca espaço suficien
+
+        //SurfaceNetsGPU::SurfaceNetsGPUBuffer cBuff;
+
+        int index = 0;
+        for (int cz = 0; cz < numChunks.z; cz++) for (int cy = 0; cy < numChunks.y; cy++) for (int cx = 0; cx < numChunks.x; cx++)
+        {
+            std::cout << std::endl;
+            //1 - deslocamento (em coordenadas de mundo)
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize(); 
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * sysv.get_chunkSize() - glm::vec3(sysv.get_chunkSize() * 0.5f, 0, sysv.get_chunkSize() * 0.5f);
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * (sysv.get_chunkSize() - sysv.get_voxelSize());
+
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_cellGrid() - 1) * sysv.get_voxelSize(); 
+            
+
+            //glm::vec3 offset = glm::vec3(cx, cy, cz) * (((float)sysv.get_cellGrid() - 1) * sysv.get_voxelSize());
+            glm::vec3 offset = glm::vec3(cx, cy, cz) * ((float)sysv.get_cellGrid() * sysv.get_voxelSize());
+
+
+
+            //2 - respeitar diretamente o tamanho do voxel e da grid
+                //glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)(sysv.get_voxelGrid() - 1) * sysv.get_voxelSize(); // Use (voxelGrid - 1) porque o número de células é 1 a menos que o número de pontos (grid = numCells + 1).
+
+            auto* voxel = new Chunk();
+            voxel->coord = offset;
+
+            auto& vBuff = *voxel->buff.get();
+
+            std::cout << "Chunk offset: " << offset.x << "," << offset.y << "," << offset.z << "\n";
+              
+            // Acquire a GPU buffer from global pool
+            SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
+            // Make sure capacity is available (must run on GL context thread)
+            gpuBuf->ensureCapacity();
+
+            std::cout << " 1p " << gpuBuf->ssboSDF << std::endl;
+
+            // 1) generate SDF on GPU and copy into gpuBuf.ssboSDF (leaveSdfOnGpu=true)
+            generator->Generate(offset, vBuff, *gpuBuf); 
+
+            //vBuff.densityMap = GeneratorMap::GenerateSphereSDF(sysv.get_cellGrid(), 10);  
+            voxel->mesh = SurfaceNetsGPU::Generate(vBuff, offset, computeShader->ID, *gpuBuf, true);
+
+            GlobalSurfaceNetsPool::Get().Release(gpuBuf);
+
+            if (voxel->mesh == nullptr) continue; 
+
+            worldChunks.push_back(voxel);
+            //worldChunks[index++] = voxel;
+            std::cout << "Chunk " << cx << "," << cy << "," << cz << " minSDF=" << *std::min_element(vBuff.densityMap.begin(), vBuff.densityMap.end()) << std::endl;
+            std::cout << "Generating " << int(numChunks.x * numChunks.y * numChunks.z) << " chunks\n";
+            std::cout << "Chunk done: " << index << " vtx=" << voxel->mesh->vertices.size() << " idx=" << voxel->mesh->indices.size() << std::endl;
+              
+            //glMemoryBarrier(GL_ALL_BARRIER_BITS);  //glFinish(); // temporário — força GPU a terminar antes de continuar 
+        }
+        std::cout << "p 5" << std::endl;
+
+        return worldChunks; // retorna o vetor já totalmente preenchido
+    }
+
+
+    /*
+    std::vector<Chunk*> gnrtChunk() {
         glm::ivec3 numChunks = glm::ivec3(sysv.numChunksPerAxis);
         std::vector<Chunk*> worldChunks;
         worldChunks.reserve(numChunks.x * numChunks.y * numChunks.z);
@@ -81,6 +148,8 @@ public:
             SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
             // Make sure capacity is available (must run on GL context thread)
             gpuBuf->ensureCapacity();
+
+            std::cout << " 1p " << gpuBuf->ssboSDF << std::endl;
 
             // 1) generate SDF on GPU and copy into gpuBuf.ssboSDF (leaveSdfOnGpu=true)
             generator->Generate(offset, vBuff, *gpuBuf);
@@ -111,14 +180,14 @@ public:
                     voxel->mesh = SurfaceNetsGPU::ReadbackMeshFromBuffer(*gpuBuf, computeProg);
                     // mark and release pool buffer
                     GlobalSurfaceNetsPool::Get().Release(gpuBuf);
-                    });
+                });
 
                 worldChunks.push_back(voxel);
         }
 
         return worldChunks;
     }
-
+    */
 
 
 

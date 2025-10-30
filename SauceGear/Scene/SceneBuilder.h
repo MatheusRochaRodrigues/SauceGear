@@ -52,6 +52,7 @@ private:
         scene.AddComponent<NameComponent>(e).name = (!meshNode->name.empty()) ? meshNode->name : "GameObjectModel";
         auto& tr = scene.AddComponent<Transform>(e);
 
+        //          Versao que adiciona mesh renderere apenas se a mesh possuir vertice
         if (!meshNode->submeshes.empty() && !meshNode->vertices.empty()) {
             auto& mr = scene.AddComponent<MeshRenderer>(e, meshNode);
             // ⚡ aplica material customizado (se existir)
@@ -62,6 +63,24 @@ private:
             }
             mr.RebuildBatches();
         }
+        else {
+            std::cout << " mesh vazia logo sem mesh renderer " << std::endl;
+            auto& mr = scene.AddComponent<MeshRenderer>(e); 
+        }
+        
+
+        //          Versao que adiciona mesh rendererer em todos os casos
+        /*
+        auto& mr = scene.AddComponent<MeshRenderer>(e);
+        if (meshNode && !meshNode->submeshes.empty()) {
+            mr.SetMesh(meshNode);
+            if (materialOverride) {
+                for (auto& sm : meshNode->submeshes) sm.material = materialOverride;
+            }
+        }
+        */
+
+
 
         // Recursão para filhos
         for (auto* child : meshNode->children)

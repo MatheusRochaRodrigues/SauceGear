@@ -1,4 +1,4 @@
-#version 450 
+﻿#version 450 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
  
 uniform int uDim; // dimensão do grid (número de voxels)
@@ -208,10 +208,7 @@ void main() {
     //   uDim(Voxels) == uDimCells + 1   =>   uDim - 1 == uDimCells   // only iterate valid cells (cells are uDim-1 in each axis)
     //if (cell.x > uDim + 1  || cell.y > uDim + 1  || cell.z > uDim + 1) return; 
     //if (cell.x >= uDim - 1 || cell.y >= uDim - 1 || cell.z >= uDim - 1) return; 
-    
-    //if (cell.x > uDim - 1 || cell.y > uDim - 1 || cell.z > uDim - 1) return; 
-    if (cell.x >= uDim - 1 || cell.y >= uDim - 1 || cell.z >= uDim - 1) return;
-
+    if (cell.x > uDim - 1 || cell.y > uDim - 1 || cell.z > uDim - 1) return; 
 
     float cornerVal[8];
     int numNeg = 0;

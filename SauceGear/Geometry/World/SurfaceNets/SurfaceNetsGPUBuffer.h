@@ -17,6 +17,14 @@ struct SurfaceNetsGPUBuffer {
     // meta info para cleanup / LRU
     std::chrono::steady_clock::time_point lastUsed = std::chrono::steady_clock::now();
 
+    static GLuint CreateSSBO(size_t size, GLenum usage = GL_DYNAMIC_COPY, const void* data = nullptr) { 
+        GLuint ssbo;
+        glGenBuffers(1, &ssbo);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, usage);
+        return ssbo;
+    }
+
     void EnsureSSBO(GLuint& ssbo, size_t size, size_t elementSize, GLenum usage = GL_DYNAMIC_COPY, const void* data = nullptr) {
         size_t newSize = size * elementSize;
         if (!ssbo) glGenBuffers(1, &ssbo);

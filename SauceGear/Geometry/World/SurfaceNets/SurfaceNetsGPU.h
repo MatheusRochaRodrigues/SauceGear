@@ -1,3 +1,4 @@
+ï»¿#pragma once
 #include "SurfaceNets.h"
 #include "../Graphics/Mesh.h"
 #include "SurfaceNetsGPUBuffer.h"
@@ -6,12 +7,13 @@
 #include <iostream>
 #include <cassert>
 
-#define sysv SysVoxel::getInstance()
+#include "DebugVoxels.h"
+
+
+//#define sysv SysVoxel::getInstance()
 
 class SurfaceNetsGPU {
-public:
-
-      
+public: 
     static std::unique_ptr<Mesh> Generate(
         const ChunkBuffer& buff,
         glm::vec3 uOffset,
@@ -30,7 +32,7 @@ public:
         //if (gpuBuff.allocatedVoxels < voxelCount) gpuBuff.ensureCapacity(voxelCount); 
 
 
-        // Só realocar se necessário
+        // SÃ³ realocar se necessÃ¡rio
         /*
         if (gpuBuff.allocatedVoxels < voxelCount) {
             gpuBuff.allocatedVoxels = voxelCount;
@@ -97,6 +99,7 @@ public:
         GLuint gy = (DimCells + 7) / 8;
         GLuint gz = (DimCells + 7) / 8;
 
+
         // PASS 1 - vertices
         glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 1);
         glDispatchCompute(gx, gy, gz);
@@ -127,14 +130,27 @@ public:
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboIndices);
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, indexCount * sizeof(uint32_t),      indices.data());
+         
+        // 2ï¸âƒ£ desenha as linhas da grade
+        DebugVoxels::drawVoxelGrid(uOffset);
+        //getDebug(voxelCount, computeProgram, gx, gy, gz);
+        DebugVoxels::getDebug2(voxelCount, computeProgram, gx, gy, gz, gpuBuff, uOffset);
+
+
+        if (positions.empty()) std::cout << "esta vazia positions" << std::endl;
+        else std::cout << "nao esta vazia positions" << std::endl;
+
+        if (indices.empty()) std::cout << "esta vazia indices" << std::endl;
+        else std::cout << "nao esta vazia indices" << std::endl;
+
+        if (positions.empty() && indices.empty()) return nullptr;
+
 
         // --- Cria Mesh ---
         auto mesh = std::make_unique<Mesh>();
         mesh->UploadFromRaw(positions, normals, indices);
         return mesh;
-    }
-
-
+    } 
 
 
     // Dispatch compute only (no readback). Must bind SSBOs appropriately and not readback.
@@ -222,102 +238,7 @@ public:
         auto mesh = std::make_unique<Mesh>();
         mesh->UploadFromRaw(positions, normals, indices);
         return mesh;
-    }
-
-
-
-
-
-
-
-    // Functor de hash para tuple<int,int,int>
-    struct TupleHash {
-        size_t operator()(const std::tuple<int, int, int>& t) const noexcept {
-            auto [x, y, z] = t;
-            // Combina os 3 inteiros em um hash único
-            size_t h1 = std::hash<int>()(x);
-            size_t h2 = std::hash<int>()(y);
-            size_t h3 = std::hash<int>()(z);
-            return h1 ^ (h2 << 1) ^ (h3 << 2); // combinação simples e eficiente
-        }
-    };
-
-
-    static void getDebug(uint32_t voxelCount, GLuint computeProgram, GLuint gx, GLuint gy, GLuint gz) {
-        glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 3);
-        // === Buffers de debug ===
-        const size_t maxDebugPoints = voxelCount * 64; // cantos + edges
-        GLuint ssboDebugPos = CreateSSBO(sizeof(glm::vec4) * maxDebugPoints);
-        GLuint ssboDebugCol = CreateSSBO(sizeof(glm::vec4) * maxDebugPoints);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, ssboDebugPos);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 7, ssboDebugCol);
-
-        GLuint ssboDebugCounter = CreateSSBO(sizeof(GLuint)); glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, ssboDebugCounter);
-        GLuint zero = 0; glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), &zero);
-
-        glDispatchCompute(gx, gy, gz);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT);
-
-        // === Ler debug data ===
-        GLuint debugCount = 0;
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDebugCounter);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(GLuint), &debugCount);
-
-        if (debugCount > maxDebugPoints) debugCount = maxDebugPoints;   //n entendi
-
-        std::vector<glm::vec4> dbgPositions(debugCount);
-        std::vector<glm::vec4> dbgColors(debugCount);
-
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDebugPos);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * debugCount, dbgPositions.data());
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboDebugCol);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(glm::vec4) * debugCount, dbgColors.data());
-
-        for (size_t i = 0; i < dbgPositions.size(); ++i) {
-            glm::vec3 pos = glm::vec3(dbgPositions[i]);
-            glm::vec3 col = glm::vec3(dbgColors[i]);
-            DebugRenderer::AddPoint(pos, col, 6.0f, DebugPointType::Square, true);
-        }
-
-        /*for (size_t i = 0; i + 1 < dbgPositions.size(); i += 2) {
-            glm::vec3 a =   glm::vec3(dbgPositions[i]);
-            glm::vec3 b =   glm::vec3(dbgPositions[i + 1]);
-            glm::vec3 col = glm::vec3(dbgColors[i]);
-            DebugRenderer::AddLine(a, b, col, true);
-        }*/
-
-
-        // função para transformar glm::vec3 em chave discreta
-        auto posToKey = [](const glm::vec3& p) {
-            return std::make_tuple(int(std::round(p.x)), int(std::round(p.y)), int(std::round(p.z)));
-            };
-
-
-        // criar set de pontos ocupados
-        std::unordered_set<std::tuple<int, int, int>, TupleHash> occupied;
-
-        // preencher com pontos do shader
-        for (auto& p : dbgPositions) {
-            occupied.insert(posToKey(glm::vec3(p)));
-        }
-
-        glm::vec3 numChunks = glm::vec3(sysv.get_voxelGrid());
-        for (int cz = 0; cz < numChunks.z; ++cz) for (int cy = 0; cy < numChunks.y; ++cy) for (int cx = 0; cx < numChunks.x; ++cx)
-        {
-            glm::vec3 offset = glm::vec3(cx, cy, cz) * (float)sysv.get_voxelSize();
-            if (occupied.find(posToKey(offset)) == occupied.end())
-            {
-                // ponto não existe, adicionar como preto
-                DebugRenderer::AddPoint(offset, glm::vec3(0.0f), 6.0f, DebugPointType::Square, true);
-            }
-        }
-
-
-        // === Opcional: deletar SSBOs depois se não for reaproveitar ===
-        glDeleteBuffers(1, &ssboDebugPos);
-        glDeleteBuffers(1, &ssboDebugCol);
-        glDeleteBuffers(1, &ssboDebugCounter);
-    }
+    } 
 
 
     static void CheckIndices(const std::vector<glm::vec4>& positions, const std::vector<uint32_t>& indices) {
@@ -327,7 +248,7 @@ public:
         for (size_t i = 0; i < indices.size(); ++i) {
             uint32_t idx = indices[i];
             if (idx >= numVertices) {
-                std::cerr << "ERRO: índice fora do alcance! "
+                std::cerr << "ERRO: Ã­ndice fora do alcance! "
                     << "indices[" << i << "] = " << idx
                     << ", mas numVertices = " << numVertices << std::endl;
                 hasError = true;
@@ -335,7 +256,7 @@ public:
         }
 
         if (!hasError) {
-            std::cout << "Todos os índices estão dentro do alcance do vetor de vértices." << std::endl;
+            std::cout << "Todos os Ã­ndices estÃ£o dentro do alcance do vetor de vÃ©rtices." << std::endl;
         }
     }
 

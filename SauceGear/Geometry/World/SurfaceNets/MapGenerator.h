@@ -4,28 +4,13 @@
 
 class GPUMapGenerator {
 public:
-    ComputeShader compute;
-
-    GPUMapGenerator(const char* shaderFile) : compute(shaderFile) {   }
-
-    /*      Init(sysv.get_voxelGrid());
-    // inicializa o SSBO
-    void Init(int dim) {
-        // cria SSBO para SDF
-        if (ssbo == 0) glGenBuffers(1, &ssbo);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, dim * dim * dim * sizeof(float), nullptr, GL_DYNAMIC_COPY);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); 
-        size_ssbo = size_t(dim) * dim * dim;
-    }
-    */
+    ComputeShader compute; 
+    GPUMapGenerator(const char* shaderFile) : compute(shaderFile) {   } 
 
     void Generate(glm::vec3 worldOffset, ChunkBuffer& buff, SurfaceNetsGPUBuffer& destGpuBuf) { 
         int dim = sysv.get_voxelGrid();
         size_t dim3 = size_t(dim) * dim * dim;
 
-        //if (dim3 != size_ssbo) Init(dim);
 
         // redimensiona CPU buffer
         if (buff.densityMap.size() != dim3) buff.densityMap.resize(dim3, 1.0f);
@@ -36,6 +21,8 @@ public:
         glUniform1f(glGetUniformLocation(compute.ID, "uVoxelSize"), sysv.get_voxelSize());
         glUniform1f(glGetUniformLocation(compute.ID, "uIsoLevel"), sysv.isoLevel);
         glUniform3f(glGetUniformLocation(compute.ID, "uOffset"), worldOffset.x, worldOffset.y, worldOffset.z);
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, destGpuBuf.ssboSDF);
 
         // despacha compute shader
         GLuint gx = (dim + 7) / 8;
@@ -49,13 +36,40 @@ public:
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, dim3 * sizeof(float), buff.densityMap.data());
 
         //Teste 
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        //glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
 };
 
 
+
+
+
 //GLuint ssbo = 0; size_t size_ssbo = 0;
+ 
+/*      Init(sysv.get_voxelGrid());
+// inicializa o SSBO
+void Init(int dim) {
+    // cria SSBO para SDF
+    if (ssbo == 0) glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, dim * dim * dim * sizeof(float), nullptr, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    size_ssbo = size_t(dim) * dim * dim;
+}
+*/
+
+//if (dim3 != size_ssbo) Init(dim);
+
+/*
+~GPUMapGenerator() {
+    if (ssbo) glDeleteBuffers(1, &ssbo);
+}
+*/
+
+
+
 
 /*
 // do not read back to CPU; if destGpuBuf provided and has SSBO, we can copy GPU->GPU:
@@ -75,9 +89,3 @@ if (destGpuBuf) {
 }
 */
 
-
-/*
-~GPUMapGenerator() {
-    if (ssbo) glDeleteBuffers(1, &ssbo);
-}
-*/

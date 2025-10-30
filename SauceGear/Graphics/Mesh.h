@@ -80,8 +80,12 @@ public:
 
     //Drawing
     void DrawSubmesh(uint32_t subIndex) const {
+        if (VAO == 0 || indices.empty() || submeshes.empty()) return; 
         if (subIndex >= submeshes.size()) return;
-        const auto& sm = submeshes[subIndex];
+
+        const auto& sm = submeshes[subIndex]; 
+        if (sm.indexCount == 0) return;
+
         // bind VAO/VBO e draw elements
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
@@ -89,6 +93,7 @@ public:
     } 
 
     void Draw() const {       //AllSubmesh
+        if (VAO == 0 || indices.empty() || vertices.empty() || submeshes.empty() || submeshes.front().indexCount == 0) return;
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
@@ -96,9 +101,12 @@ public:
 
     //Render
     void Render() const {
+        if (VAO == 0 || indices.empty() || submeshes.empty()) return;
         // desenha todos os submeshes com seus materiais “default” (fallback)
         glBindVertexArray(VAO);
         for (const auto& sm : submeshes) {
+            if (sm.indexCount == 0) continue;
+
             if (sm.material) sm.material->Bind();
             glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
         }
@@ -106,8 +114,12 @@ public:
     }
 
     void RenderAll() const {
+        if (VAO == 0 || indices.empty() || submeshes.empty()) return;
+
         glBindVertexArray(VAO);
         for (auto& sm : submeshes) {
+            if (sm.indexCount == 0) continue;
+
             if (sm.material) sm.material->Bind();
             glDrawElements(GL_TRIANGLES, sm.indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm.indexOffset));
         }

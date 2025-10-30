@@ -4,23 +4,23 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 uniform int uDim;              // tamanho da grid (ex: 64)
 uniform float uVoxelSize;      // tamanho do voxel (ex: 1.0)
 uniform vec3 uOffset;          // deslocamento mundial do chunk
-uniform float uIsoLevel;       // nível de isosuperfície
+uniform float uIsoLevel;       // nÃ­vel de isosuperfÃ­cie
 
 // output SDF
 layout(std430, binding = 0) buffer SDF { float sdf[]; };
 
-// === Funções auxiliares ===
+// === FunÃ§Ãµes auxiliares ===
 float hash3(vec3 p) {
-    // Hash contínuo sem repetição
+    // Hash contÃ­nuo sem repetiÃ§Ã£o
     return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453123);
 }
 
 float fade(float t) { return t * t * t * (t * (t * 6 - 15) + 10); }
 float lerp(float a, float b, float t) { return a + t * (b - a); }
 
-// === Perlin sem permutação periódica ===
+// === Perlin sem permutaÃ§Ã£o periÃ³dica ===
 float grad3(vec3 p, vec3 ip) {
-    // Gera pseudo-gradiente contínuo baseado em hash
+    // Gera pseudo-gradiente contÃ­nuo baseado em hash
     vec3 rnd = vec3(
         hash3(ip + vec3(1,0,0)),
         hash3(ip + vec3(0,1,0)),
@@ -54,9 +54,10 @@ float perlinNoise(vec3 p) {
     return mix(nxy0, nxy1, f.z);
 }
 
-// === Fractal Perlin contínuo ===
+// === Fractal Perlin contÃ­nuo ===
+/*
 float fractalPerlin(vec3 p) {
-    p += uOffset * 0.01; // importante: desloca conforme posição real do chunk
+    p += uOffset * 0.01; // importante: desloca conforme posiÃ§Ã£o real do chunk
     float sum = 0.0;
     float amp = 1.0;
     float freq = 1.0;
@@ -67,6 +68,21 @@ float fractalPerlin(vec3 p) {
     }
     return sum;
 }
+*/
+
+float fractalPerlin(vec3 p) {
+    float sum = 0.0;
+    float amp = 1.0;
+    float freq = 1.0;
+    for (int i = 0; i < 5; i++) {
+        //sum += perlinNoise((p + uOffset * 0.01) * freq) * amp;
+        sum += perlinNoise((p + 1 * 0.01) * freq) * amp;
+        freq *= 2.0;
+        amp *= 0.5;
+    }
+    return sum;
+}
+
 
 // === Worley noise opcional (para cavernas) ===
 float worleyNoise(vec3 p) {
@@ -87,14 +103,41 @@ float worleyNoise(vec3 p) {
 void main() {
     ivec3 cell = ivec3(gl_GlobalInvocationID.xyz);
     if (any(greaterThanEqual(cell, ivec3(uDim)))) return;
-
+    
+    // posiÃ§Ã£o global real do voxel
     vec3 pos = vec3(cell) * uVoxelSize + uOffset;
 
     float height = fractalPerlin(20.201 + pos * 0.05) * 5.0;
     float caves = 0.0; // opcional: worleyNoise(pos * 0.1) * 2.0 - 1.0;
 
-    float distToSurface = pos.y - height + caves - 8;
+    //float distToSurface = pos.y - height + caves - 8;
+    float distToSurface = pos.y - height + caves - 0;
 
     int idx = cell.x + cell.y * uDim + cell.z * uDim * uDim;
     sdf[idx] = distToSurface;
 }
+
+
+
+//void main() {
+    //ivec3 cell = ivec3(gl_GlobalInvocationID.xyz);
+    //if (any(greaterThanEqual(cell, ivec3(uDim)))) return;
+
+    // posiÃ§Ã£o global real do voxel
+    //vec3 worldPos = vec3(cell) * uVoxelSize + uOffset;
+
+    // domÃ­nio contÃ­nuo de ruÃ­do (XZ)
+    //vec2 noiseCoord = worldPos.xz * uNoiseScale;
+
+    // amostra o ruÃ­do (convertendo para 3D com z fixo)
+    //float height = fractalPerlin(vec3(noiseCoord, 0.0)) * uTerrainHeight;
+
+    // (opcional) cavernas com Worley, se quiser adicionar
+    //float caves = 0.0;
+
+    // SDF final
+    //float distToSurface = worldPos.y - height + caves - uIsoLevel;
+
+    //int idx = cell.x + cell.y * uDim + cell.z * uDim * uDim;
+    //sdf[idx] = distToSurface;
+//}
