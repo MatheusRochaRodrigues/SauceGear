@@ -5,7 +5,8 @@
 #include "../Geometry/World/SurfaceNets/SurfaceNetsGPU.h"   
 #include "../Geometry/World/SurfaceNets/MapGenerator.h"    
 #include "GSurfPool.h"    
- 
+#include "../Geometry/WorldOctree/SurfaceNets/OctreeLOD.h"    
+
 class voxelSystem {
 public: 
     voxelSystem() { 
@@ -66,6 +67,15 @@ public:
 
 
     std::vector<Chunk*> gnrtChunk() {
+
+        //LODOctree octree(generator, computeShader, glm::vec3(0, 4, 0), 100);
+        LODOctree octree(generator, computeShader, glm::vec3(0,0,0), 100);
+        octree.UpdateLOD(glm::vec3(0, 0, 0));
+        auto allChunks = octree.CollectLeafChunks();
+
+        return allChunks;
+
+        /*
         glm::vec3 numChunks = sysv.numChunksPerAxis;
 
         std::vector<Chunk*> worldChunks;
@@ -109,7 +119,7 @@ public:
             std::cout << " 1p " << gpuBuf->ssboSDF << std::endl;
 
             // 1) generate SDF on GPU and copy into gpuBuf.ssboSDF (leaveSdfOnGpu=true)
-            generator->Generate(offset, vBuff, *gpuBuf); 
+            generator->Generate(offset, vBuff, *gpuBuf, sysv.get_voxelGrid(), sysv.get_voxelSize());
 
             //vBuff.densityMap = GeneratorMap::GenerateSphereSDF(sysv.get_cellGrid(), 10);  
             voxel->mesh = SurfaceNetsGPU::Generate(vBuff, offset, computeShader->ID, *gpuBuf, true);
@@ -129,6 +139,7 @@ public:
         std::cout << "p 5" << std::endl;
 
         return worldChunks; // retorna o vetor já totalmente preenchido
+        */
     }
 
 

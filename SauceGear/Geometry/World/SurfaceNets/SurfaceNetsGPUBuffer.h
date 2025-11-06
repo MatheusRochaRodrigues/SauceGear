@@ -33,8 +33,8 @@ struct SurfaceNetsGPUBuffer {
     }
 
     // helper
-    void ensureCapacity() {
-        int dim = sysv.get_voxelGrid();    //  pointsPerChunk
+    void ensureCapacity(int d = -1) {
+        int dim = (d == -1) ? sysv.get_voxelGrid() : d;    //  pointsPerChunk
         if (dim < 1) dim = 1; 
         const size_t dim3 = size_t(dim) * dim * dim;     // voxelCount
 

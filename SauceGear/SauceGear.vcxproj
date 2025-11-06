@@ -193,6 +193,8 @@
     <ClInclude Include="ECS\Systems\Lighting\LightPoint.h" />
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
+    <ClInclude Include="Geometry\WorldOctree\Back\OctreeLOD.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h" />
     <ClInclude Include="Geometry\World\Structs\ObjectPool.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\DebugVoxels.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\GPUJobQueue.h" />

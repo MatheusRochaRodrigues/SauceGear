@@ -143,12 +143,22 @@ public:
             std::cout << "o - 00" << std::endl;
             std::cout << "ck " << ck->coord.x << " " << ck->coord.y << " " << ck->coord.z << std::endl;
             auto& scene = GEngine->scene;
+            auto mesh = ck->mesh.get();
+
+            mesh->name =
+                "CK = " +
+                std::to_string(ck->coord.x) + ", " +
+                std::to_string(ck->coord.y) + ", " +
+                std::to_string(ck->coord.z) +
+                " - lod: " + std::to_string(ck->lod) +
+                "  { " + std::to_string(ck->dbg) + " }";
+
             Entity xz = SceneBuilder::CreateModel(ck->mesh.get(), material);
             auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck); 
             //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
 
             //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
-            //auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
+            auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
         }
         std::cout << "AAAAAee" << std::endl;
 

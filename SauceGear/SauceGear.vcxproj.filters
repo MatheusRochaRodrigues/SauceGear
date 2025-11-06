@@ -602,6 +602,12 @@
     <ClInclude Include="Geometry\World\SurfaceNets\DebugVoxels.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\Back\OctreeLOD.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">

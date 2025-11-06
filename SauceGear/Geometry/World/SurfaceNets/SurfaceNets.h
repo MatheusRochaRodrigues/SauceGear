@@ -62,7 +62,7 @@ struct SysVoxel {
     SysVoxel& operator=(const SysVoxel&) = delete;
 
 private:
-    int   cellGrid = 32; //32 //64     //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
+    int   cellGrid = 12; //32 //64     //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
     float chunkSize = 24;           // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
 
     constexpr SysVoxel() {}
@@ -102,14 +102,19 @@ struct Chunk {
     glm::vec3 coord; glm::ivec3     coordWorld;  
     int                             lod = 0;
 
-    Chunk() { 
+    float                             dbg = 0;
+
+    Chunk(size_t d = 0) {
         buff = std::make_unique<ChunkBuffer>();  
-        resizeDensityMap();
+        resizeDensityMap(d);
     }
 
-    void resizeDensityMap(){ // (Re)aloca o vetor se o tamanho mudou
-        uint32_t dim = SysVoxel::getInstance().get_voxelGrid(); 
-        size_t total = size_t(dim) * dim * dim;
+    void resizeDensityMap(size_t d = 0){ // (Re)aloca o vetor se o tamanho mudou
+        size_t total = d;
+        if (d == 0) {
+            uint32_t dim = SysVoxel::getInstance().get_voxelGrid();
+            total = size_t(dim) * dim * dim; 
+        }
         if (buff->densityMap.size() != total) buff->densityMap.resize(total, 1);
     }
 

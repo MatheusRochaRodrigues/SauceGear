@@ -19,142 +19,116 @@ public:
         glm::vec3 uOffset,
         GLuint computeProgram,
         SurfaceNetsGPUBuffer& gpuBuff,
-        bool readySSBO_SDF = true )
-    {
-        const int   DimCells  = sysv.get_cellGrid();      // ex: 32
-        const int   DimVoxel  = sysv.get_voxelGrid();     // ex: 33
-        const float VoxelSize = sysv.get_voxelSize();
-
-        const size_t voxelCount = size_t(DimVoxel) * DimVoxel * DimVoxel;
-        assert(voxelCount == buff.densityMap.size());
-
-        // Ensure capacity (GL thread). If not enough, grow.
-        //if (gpuBuff.allocatedVoxels < voxelCount) gpuBuff.ensureCapacity(voxelCount); 
-
-
-        // Só realocar se necessário
-        /*
-        if (gpuBuff.allocatedVoxels < voxelCount) {
-            gpuBuff.allocatedVoxels = voxelCount;
-
-            //Size Info      maxVertices == voxelCount          /           maxIndices = voxelCount * 6u
-            EnsureSSBO(gpuBuff.ssboSDF,             0, voxelCount,      sizeof(float),      GL_DYNAMIC_DRAW);
-            EnsureSSBO(gpuBuff.ssboPositions,       0, voxelCount,      sizeof(glm::vec4),  GL_DYNAMIC_COPY);
-            EnsureSSBO(gpuBuff.ssboNormals,         0, voxelCount,      sizeof(glm::vec4),  GL_DYNAMIC_COPY);
-            EnsureSSBO(gpuBuff.ssboIndices,         0, voxelCount * 6u, sizeof(uint32_t),   GL_DYNAMIC_COPY);
-            EnsureSSBO(gpuBuff.ssboStrideToIndex,   0, voxelCount,      sizeof(uint32_t),   GL_DYNAMIC_COPY);
-            EnsureSSBO(gpuBuff.ssboCounters,        0, 2,               sizeof(uint32_t),   GL_DYNAMIC_COPY);
-        }
-        */
+        bool readySSBO_SDF = true,
+        int GridVoxelPerAxis = 33,   // LOD-aware
+        float voxelSize = 1.0f
+    ) {
+        const size_t voxelCount = size_t(GridVoxelPerAxis) * GridVoxelPerAxis * GridVoxelPerAxis;
+        assert(buff.densityMap.size() == voxelCount && "Density map size mismatch!");
 
         glUseProgram(computeProgram);
-        glUniform1i(glGetUniformLocation(computeProgram, "uDim"), DimVoxel);
-        glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), VoxelSize);
+
+        // Passa uniforms para shader
+        glUniform1i(glGetUniformLocation(computeProgram, "uDim"), GridVoxelPerAxis);
+        glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), voxelSize);
         glUniform3fv(glGetUniformLocation(computeProgram, "uOffset"), 1, glm::value_ptr(uOffset));
 
-        //glUniform1i(glGetUniformLocation(computeProgram, "uEvalMaxPlane"), (int)0);
-
-        // --- SDF input ---
-        //if (ssboSDF == 0) ssboSDF = CreateSSBO(voxelCount * sizeof(float), buff.densityMap.data(), GL_DYNAMIC_DRAW);    //GL_STATIC_DRAW
-        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssboSDF); 
-
-        // --- Buffer SDF ---   
-        // Bind or upload SDF:
-        if (readySSBO_SDF) {
-            // Bind external SDF already prepared by caller
-            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
-        } else {
-            // upload buff.densityMap into gpuBuff.ssboSDF
+        // Bind SDF
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
+        if (!readySSBO_SDF) {
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboSDF);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(float), buff.densityMap.data());
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
         }
 
-
-        // --- Bind --- Outputs ---
+        // Bind outputs
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, gpuBuff.ssboPositions);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, gpuBuff.ssboNormals);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, gpuBuff.ssboIndices);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, gpuBuff.ssboStrideToIndex);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, gpuBuff.ssboCounters);
-          
 
-        // --- Reset counters ---
-        //Bind
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboCounters); 
-        //Data Operation
-        uint32_t zero[2] = { 0, 0 };
-        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t) * 2, zero);   //sizeof(uint32_t) * 2 == sizeof(zero)
-        //Unbind
+        // Reset counters e stride table
+        uint32_t zero[2] = { 0,0 };
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboCounters);
+        glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(zero), zero);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-
-        // --- Reset stride table ---                Reset stride_to_index
         std::vector<uint32_t> initStride(voxelCount, 0xFFFFFFFFu);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboStrideToIndex);
         glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(uint32_t), initStride.data());
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+        // Dispatch compute: vertices e indices
+        GLuint gx = (GridVoxelPerAxis + 7) / 8;
+        GLuint gy = gx;
+        GLuint gz = gx;
 
-        // --- Dispatch compute ---
-        GLuint gx = (DimCells + 7) / 8;
-        GLuint gy = (DimCells + 7) / 8;
-        GLuint gz = (DimCells + 7) / 8;
-
-
-        // PASS 1 - vertices
+        // Pass 1: generate vertices
         glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 1);
         glDispatchCompute(gx, gy, gz);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        // PASS 2 - indices
+        // Pass 2: generate indices
         glUniform1i(glGetUniformLocation(computeProgram, "uPass"), 2);
         glDispatchCompute(gx, gy, gz);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-
-        // --- Ler resultados ---
+        // Ler contadores
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboCounters);
         uint32_t counts[2];
         glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(counts), counts);
-        uint32_t vertexCount    = counts[0];
-        uint32_t indexCount     = counts[1];
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
+        uint32_t vertexCount = counts[0];
+        uint32_t indexCount = counts[1];
+
+        //if (vertexCount == 0 || indexCount == 0) return nullptr;
+
+        // Ler buffers
         std::vector<glm::vec4> positions(vertexCount);
-        std::vector<glm::vec4> normals  (vertexCount);
-        std::vector<uint32_t>  indices  (indexCount);
+        std::vector<glm::vec4> normals(vertexCount);
+        std::vector<uint32_t>  indices(indexCount);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboPositions);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, vertexCount * sizeof(glm::vec4),    positions.data());
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, vertexCount * sizeof(glm::vec4), positions.data());
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboNormals);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, vertexCount * sizeof(glm::vec4),    normals.data());
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, vertexCount * sizeof(glm::vec4), normals.data());
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboIndices);
-        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, indexCount * sizeof(uint32_t),      indices.data());
-         
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, indexCount * sizeof(uint32_t), indices.data());
+
+
+
+
         // 2️⃣ desenha as linhas da grade
         //DebugVoxels::drawVoxelGrid(uOffset);
         //DebugVoxels::getDebug2(voxelCount, computeProgram, gx, gy, gz, gpuBuff, uOffset);
         //DebugVoxels::getDebugCentroid(positions);
-         
+
         //getDebug(voxelCount, computeProgram, gx, gy, gz); 
 
 
-        if (positions.empty()) std::cout << "esta vazia positions" << std::endl;
+        /*if (positions.empty()) std::cout << "esta vazia positions" << std::endl;
         else std::cout << "nao esta vazia positions" << std::endl;
 
         if (indices.empty()) std::cout << "esta vazia indices" << std::endl;
-        else std::cout << "nao esta vazia indices" << std::endl;
+        else std::cout << "nao esta vazia indices" << std::endl;*/
 
-        if (positions.empty() && indices.empty()) return nullptr;
+        if (vertexCount == 0 || indexCount == 0) return nullptr;
 
 
-        // --- Cria Mesh ---
+        std::cout << "possui indices" << std::endl;
+
+
+        // Cria Mesh
         auto mesh = std::make_unique<Mesh>();
         mesh->UploadFromRaw(positions, normals, indices);
+
         return mesh;
-    } 
+    }
+
 
 
     // Dispatch compute only (no readback). Must bind SSBOs appropriately and not readback.

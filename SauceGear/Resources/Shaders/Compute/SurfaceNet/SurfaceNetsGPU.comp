@@ -245,10 +245,7 @@ void main() {
         //uVoxelSize - converte do índice para metros (ou unidades de mundo).
         //uWorldScale - aplica escala global do mundo (caso queira mundos grandes/pequenos).
         //uOffset - move para posição global do chunk no mundo.
-        
         vec3 worldPos = (vec3(cell) + cpos) * uVoxelSize + uOffset; 
-        //worldPos = uOffset + cpos * uVoxelSize; //teste
-
         positions[outIndex] = vec4(worldPos, 1.0);
         
 
