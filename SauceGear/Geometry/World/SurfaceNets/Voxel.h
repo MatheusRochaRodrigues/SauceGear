@@ -64,16 +64,13 @@ public:
         return worldChunks; // retorna o vetor já totalmente preenchido
     }
     */
-
-
     std::vector<Chunk*> gnrtChunk() {
-
-        //LODOctree octree(generator, computeShader, glm::vec3(0, 4, 0), 100);
-        LODOctree octree(generator, computeShader, glm::vec3(0,0,0), 100);
-        octree.UpdateLOD(glm::vec3(0, 0, 0));
-        auto allChunks = octree.CollectLeafChunks();
-
-        return allChunks;
+        auto* octree = new LODOctree(generator, computeShader, glm::vec3(0, 0, 0), 200);
+        //octree->UpdateAndGenerate(glm::vec3(0, 0, 0));
+        octree->UpdateLOD(glm::vec3(0, 0, 0));
+        auto allChunks = octree->CollectLeafChunks();
+        // guarde ponteiro do octree em algum lugar para liberar depois
+        return allChunks; 
 
         /*
         glm::vec3 numChunks = sysv.numChunksPerAxis;

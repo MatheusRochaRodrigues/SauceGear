@@ -8,6 +8,11 @@
 #include "../Geometry/World/SurfaceNets/MapGenerator.h"    
 #include "../Geometry/World/SurfaceNets/GSurfPool.h"    
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>   // (opcional, se usar ponteiros para GPU)
+#include <glm/common.hpp>         // (para compMax, compMin, etc.)
+
+
 // Octree Node
 struct OctreeNode {
     glm::vec3 position;
@@ -22,34 +27,24 @@ struct OctreeNode {
     float dbg = 0;
 };
 
-/*
-float dist = glm::length(cam - node->center);
-float targetDepth = std::clamp((int)(dist / step), 0, maxDepth);
-
-float lodStep = 100.0f; // distância entre LODs
-lodManager.updateLOD(cameraPos, lodStep);
-*/
+struct LODSettings {
+    float baseChunkSize = 25.f ;      // Tamanho físico de um chunk LOD 0
+    int maxDepth = 4;                // Quantos níveis de LOD existem
+    float shellRadius = 15.f;        // Raio da região de detalhe máximo
+    float detailFactor = 1.0f;       // Escala de densidade (1 = padrão, <1 = mais detalhe, >1 = menos)
+};
 
 // Octree LOD
 class LODOctree {
 public:
     OctreeNode* root;
     GPUMapGenerator* generator;
-    ComputeShader* computeShader;  
-    int maxDepth;   // it's same that maxLOD
-    //float lodDistance[4] = { 100.f, 50.f, 25.f, 12.5f };
-    //float lodDistance[4] = { 12.5f, 25.f, 50.f, 100.f };
-    //float lodDistance[4] = { 25/2, 50/2, 100/2, 200/2 }; // distância máxima antes de subdividir
-    
-    //float lodDistance[4] = { 25, 50, 100, 200 }; // distância máxima antes de subdividir
+    ComputeShader* computeShader;
+    int maxDepth;   // it's same that maxLOD 
 
-    float lodDistance[4] = { 15, 30, 50, 80 }; // distância máxima antes de subdividir
-    //float lodDistance[4] = { 10, 20, 30, 100 }; // distância máxima antes de subdividir
+    LODSettings settings;
+    float lodDistance[4] = { 15, 30, 50, 80 }; // distância máxima antes de subdividir 
 
-    //float lodDistance[4] = { 30, 60, 120, 240 };
-    
-    //float lodDistance[4] = { 200, 100, 50, 25 }; // distância máxima antes de subdividir
-     
     LODOctree(GPUMapGenerator* gen, ComputeShader* compute, glm::vec3 worldCenter, float worldSize, int maxDepth = 3) {
         computeShader = compute;
         generator = gen;
@@ -59,13 +54,51 @@ public:
         std::vector<float> lodRatio = { 0.1f, 0.25f, 0.5f, 1.0f }; // relativo ao tamanho
         for (int i = 0; i <= maxDepth; i++) lodDistance[i] = worldSize * lodRatio[i];
 
-
-        /*for (int i = 0; i <= maxDepth; i++)
-            lodDistance[i] = root->size * powf(0.5f, i) * 3.5f;*/
-        //lodDistance[i] = root->size * powf(0.5f, i) * 2.5f;
     }
 
-    void UpdateLOD(const glm::vec3& camPos) {
+    int ComputeLODLevel(const glm::vec3& cameraPos, const glm::vec3& nodeCenter, const LODSettings& settings)
+    {
+        float dist = glm::compMax(glm::abs(cameraPos - nodeCenter)); // norma infinito
+        float normalized = dist / (2.0f * settings.shellRadius * settings.detailFactor);
+        float lod = std::log2(std::max(1.0f, normalized));
+        return glm::clamp((int)std::ceil(lod), 0, settings.maxDepth - 1);
+    }
+
+    void UpdateLOD(const glm::vec3& cameraPos)
+    {
+        std::queue<OctreeNode*> q;
+        q.push(root);
+
+        while (!q.empty()) {
+            OctreeNode* node = q.front(); q.pop();
+
+            int targetLOD = ComputeLODLevel(cameraPos, node->position, settings);
+
+            if (node->lodLevel > targetLOD && node->lodLevel > 0) {
+                // Muito perto -> subdividir
+                if (!node->subdivided) Subdivide(node);
+            }
+            else if (node->lodLevel < targetLOD) {
+                // Muito longe -> mesclar
+                if (node->subdivided) Merge(node);
+            }
+
+            if (node->subdivided) {
+                for (int i = 0; i < 8; i++) q.push(node->children[i]);
+            }
+
+        }
+
+        std::cout << "\n=== LOD UPDATE START ===" << std::endl;
+        std::cout << "Camera: (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")\n";
+        PrintOctree(root);
+        std::cout << "=== LOD UPDATE END ===\n" << std::endl;
+
+        // ---- Passo 2: Gera chunks apenas nas folhas ----
+        GenerateLeafChunks(root);
+    }
+
+    void UpdateLOD2(const glm::vec3& camPos) {
         std::cout << "    " << std::endl;
         // ---- Passo 1: Atualiza estrutura da árvore ----
         std::queue<OctreeNode*> q;
@@ -81,13 +114,13 @@ public:
             std::cout << "node pos" << node->position.x << " " << node->position.y << " " << node->position.z << std::endl;
             std::cout << "node size" << node->size << std::endl;
             std::cout << "dist " << dist << std::endl;
-             
+
 
             // Subdivide se está perto e ainda não no LOD máximo
             if (node->lodLevel > 0 && dist < lodDistance[node->lodLevel]) {    //maxLOD == 0    maxDepth decrement until 0 increasing lod details   
                 if (!node->subdivided)
-                    Subdivide(node); 
-            
+                    Subdivide(node);
+
                 std::cout << "subdivided" << std::endl;
             }
             else {
@@ -151,7 +184,7 @@ public:
 
         // Folha -> gerar mesh
         GenerateChunk(node);
-    } 
+    }
 
     // Coleta todos os chunks folha (sem gerar nada novo)
     std::vector<Chunk*> CollectLeafChunks() {
@@ -217,7 +250,7 @@ private:
         if (!node) return;
 
         // LOD-aware: calcula número de voxels e voxelSize
-        int GridVoxelPerAxis = std::max(8,  sysv.get_cellGrid() >> node->lodLevel ); // shift right reduz com LOD        // mínimo 2
+        int GridVoxelPerAxis = std::max(8, sysv.get_cellGrid() >> node->lodLevel); // shift right reduz com LOD        // mínimo 2
 
         //int GridVoxelPerAxis = std::max(2,  sysv.get_cellGrid() >> (maxLOD - node->lodLevel)  ); // shift right reduz com LOD        // mínimo 2
         //float voxelSize = node->size / float(sysv.get_cellGrid() - 1);
@@ -241,7 +274,7 @@ private:
 
         // cria ou redimensiona chunk
         if (!node->chunk) node->chunk = std::make_unique<Chunk>(GridVoxelPerAxis);
-        auto& chunk = *node->chunk; 
+        auto& chunk = *node->chunk;
 
         // offset do canto mínimo do node 
         glm::vec3 offset = node->position - glm::vec3(node->size * 0.5f);
@@ -279,7 +312,7 @@ private:
 
 
 /*
-for (int i = 0; i < 8; i++) 
+for (int i = 0; i < 8; i++)
     glm::vec3 offset(
         (i & 1 ? 0.25f : -0.25f) * node->size,
         (i & 2 ? 0.25f : -0.25f) * node->size,
