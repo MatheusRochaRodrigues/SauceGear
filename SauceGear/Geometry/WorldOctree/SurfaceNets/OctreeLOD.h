@@ -28,10 +28,10 @@ struct OctreeNode {
 };
 
 struct LODSettings {
-    float baseChunkSize = 25.f ;      // Tamanho físico de um chunk LOD 0
-    int maxDepth = 4;                // Quantos níveis de LOD existem
-    float shellRadius = 15.f;        // Raio da região de detalhe máximo  LOD0
-    float detailFactor = 2.0f;       // Escala de densidade (1 = padrão, <1 = mais detalhe, >1 = menos) (ajuste de sensibilidade)
+    int   maxDepth = 5;              // Níveis máximos de LOD (0 = mais detalhado)
+    float shellRadius = 100.0f;    // Raio base de subdivisão (define "camada")
+    float detailFactor = 1.0f;     // Fator de detalhe (1.0 = padrão)
+    float baseChunkSize = 20.0f;   // Tamanho real do chunk no LOD 0
 };
 
 // Octree LOD

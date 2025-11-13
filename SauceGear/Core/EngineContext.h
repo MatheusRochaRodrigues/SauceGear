@@ -8,7 +8,7 @@ class Window;
 class Time;
 class InputSystem;
 class Camera;   // para o GetMainCamera
-class SceneManager;
+//class SceneManager;
 
 
 struct EngineContext

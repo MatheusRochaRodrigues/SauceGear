@@ -1,12 +1,13 @@
-#include "Application.h" 
-#include "../Platform/Window.h"           //TEMP ATE SEPARA ENGINE E FOR OPCIONAL 
-#include "EngineContext.h"                //TEMP ATE SEPARA ENGINE E FOR OPCIONAL 
-#include "../Scene/GameScene.h"   
-#include "../ECS/Components/CameraComponent.h"   
-#include "../ECS/Systems/SystemHelper.h"   
-#include "../Graphics/Renderer.h"         //TEMP ATE SEPARA ENGINE E FOR OPCIONAL    
-#include "../Core/Time.h"   
-#include "../Core/InputSystem.h" 
+#include "Application.h"  
+#include "../Core/InputSystem.h"   // for InputSystem
+#include "../Core/Time.h"          // for Time
+#include "../Graphics/Renderer.h"  // for Renderer
+#include "../Platform/Window.h"    // for Window
+#include "../Scene/GameScene.h"    // for GameScene
+#include "EngineContext.h"         // for EngineContext, GEngine
+#include "GLFW/glfw3.h"            // for glfwTerminate, glfwWindowShouldClose
+#include "../Graphics/Shader.h"                // for Shader
+#include "stb/stb_image.h"         // for stbi_set_flip_vertically_on_load
 
  
 int Application::Init() {

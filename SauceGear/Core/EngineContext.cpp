@@ -1,14 +1,7 @@
 #include "EngineContext.h"
 
-#include "../Scene/SceneECS.h"
-#include "../Graphics/Renderer.h"
-#include "../Platform/Window.h"
-#include "Time.h"
-#include "InputSystem.h"   
-#include "../Scene/SceneManager.h"
-
-#include "../Scene/GameScene.h"   
-#include "../ECS/Systems/SystemHelper.h"   
+#include "../Scene/SceneECS.h" 
+#include "../ECS/Components/CameraComponent.h"    // for CameraComponent
 
 EngineContext* GEngine = nullptr;
 
