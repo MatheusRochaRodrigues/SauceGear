@@ -65,7 +65,7 @@ public:
     }
     */
     std::vector<Chunk*> gnrtChunk() {
-        auto* octree = new LODOctree(generator, computeShader, glm::vec3(0, 0, 0), 200);
+        auto* octree = new LODOctree(generator, computeShader, glm::vec3(0, 0, 0));
         //octree->UpdateAndGenerate(glm::vec3(0, 0, 0));
         octree->UpdateLOD(glm::vec3(0, 0, 0));
         auto allChunks = octree->CollectLeafChunks();

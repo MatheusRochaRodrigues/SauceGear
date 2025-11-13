@@ -6,7 +6,7 @@
 #include <vector>  
 #include <glad/glad.h> 
 
-
+/*
 class { 
     // === Cache binário simples ===
     // cada .bin tem um header leve e, para cubemap, grava todas faces/mips em sequência. 
@@ -161,3 +161,5 @@ class {
 
 
 };
+
+*/

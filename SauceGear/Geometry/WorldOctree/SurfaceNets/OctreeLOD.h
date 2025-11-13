@@ -30,8 +30,8 @@ struct OctreeNode {
 struct LODSettings {
     float baseChunkSize = 25.f ;      // Tamanho físico de um chunk LOD 0
     int maxDepth = 4;                // Quantos níveis de LOD existem
-    float shellRadius = 15.f;        // Raio da região de detalhe máximo
-    float detailFactor = 1.0f;       // Escala de densidade (1 = padrão, <1 = mais detalhe, >1 = menos)
+    float shellRadius = 15.f;        // Raio da região de detalhe máximo  LOD0
+    float detailFactor = 2.0f;       // Escala de densidade (1 = padrão, <1 = mais detalhe, >1 = menos) (ajuste de sensibilidade)
 };
 
 // Octree LOD
@@ -43,25 +43,40 @@ public:
     int maxDepth;   // it's same that maxLOD 
 
     LODSettings settings;
-    float lodDistance[4] = { 15, 30, 50, 80 }; // distância máxima antes de subdividir 
+    //float lodDistance[4] = { 15, 30, 50, 80 }; // distância máxima antes de subdividir 
+    std::vector<float> lodDistance;
 
-    LODOctree(GPUMapGenerator* gen, ComputeShader* compute, glm::vec3 worldCenter, float worldSize, int maxDepth = 3) {
-        computeShader = compute;
-        generator = gen;
-        root = new OctreeNode{ worldCenter, worldSize, maxDepth };  //0
+    // Construtor: derive root size a partir de baseChunkSize e maxDepth
+    LODOctree(GPUMapGenerator* gen, ComputeShader* compute, const glm::vec3& worldCenter )
+        : generator(gen), computeShader(compute) 
+    {
+        maxDepth = settings.maxDepth;
+        float worldSize = settings.baseChunkSize * std::pow(2.0f, float(maxDepth)); // garante grade
+        root = new OctreeNode{ worldCenter, worldSize, maxDepth, false, nullptr };
 
-
-        std::vector<float> lodRatio = { 0.1f, 0.25f, 0.5f, 1.0f }; // relativo ao tamanho
-        for (int i = 0; i <= maxDepth; i++) lodDistance[i] = worldSize * lodRatio[i];
-
+        // aloca dynamic lodDistance
+        lodDistance.resize(maxDepth + 1);
+        for (int i = 0; i <= maxDepth; ++i) {
+            lodDistance[i] = settings.shellRadius * std::pow(2.0f, float(i)); // shellRadius * 2^i
+        }
     }
 
-    int ComputeLODLevel(const glm::vec3& cameraPos, const glm::vec3& nodeCenter, const LODSettings& settings)
-    {
-        float dist = glm::compMax(glm::abs(cameraPos - nodeCenter)); // norma infinito
-        float normalized = dist / (2.0f * settings.shellRadius * settings.detailFactor);
-        float lod = std::log2(std::max(1.0f, normalized));
-        return glm::clamp((int)std::ceil(lod), 0, settings.maxDepth - 1);
+    // ComputeLODLevel: retorna 0..maxDepth. Use floor para cascas discretas por potência de 2
+    int ComputeLODLevel(const glm::vec3& cameraPos, const glm::vec3& nodeCenter) const {
+        // usar compMax para alinhar com cubos (chebyshev norm) ou glm::length para esfera
+        float dist = glm::compMax(glm::abs(cameraPos - nodeCenter));
+        // Apply detailFactor (smaller => more detail far away)
+        float adjusted = dist / settings.detailFactor;
+
+        if (adjusted <= settings.shellRadius) return 0; // dentro do shell base -> LOD 0
+
+        // calc quantos "dobramentos" do shellRadius estamos
+        float ratio = adjusted / settings.shellRadius;
+        // lod = floor(log2(ratio))
+        int lod = (int)std::floor(std::log2(ratio));
+        if (lod < 0) lod = 0;
+        if (lod > settings.maxDepth) lod = settings.maxDepth;
+        return lod;
     }
 
     void UpdateLOD(const glm::vec3& cameraPos)
@@ -72,7 +87,7 @@ public:
         while (!q.empty()) {
             OctreeNode* node = q.front(); q.pop();
 
-            int targetLOD = ComputeLODLevel(cameraPos, node->position, settings);
+            int targetLOD = ComputeLODLevel(cameraPos, node->position);
 
             if (node->lodLevel > targetLOD && node->lodLevel > 0) {
                 // Muito perto -> subdividir

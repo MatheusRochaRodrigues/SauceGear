@@ -7,6 +7,9 @@
 #include <iostream>
 #include <cassert>
 
+#include "../ECS/Systems/DebugRenderer.h"
+
+
 //#define sysv SysVoxel::getInstance()
 
 struct DebugVoxels {
