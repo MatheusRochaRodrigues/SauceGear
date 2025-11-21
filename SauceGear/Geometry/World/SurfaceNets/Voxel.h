@@ -5,7 +5,7 @@
 #include "../Geometry/World/SurfaceNets/SurfaceNetsGPU.h"   
 #include "../Geometry/World/SurfaceNets/MapGenerator.h"    
 #include "GSurfPool.h"    
-#include "../Geometry/WorldOctree/SurfaceNets/OctreeLOD.h"    
+#include "../Geometry/WorldOctree/SurfaceNets/WorldSys.h"    
 
 class voxelSystem {
 public: 
@@ -65,12 +65,11 @@ public:
     }
     */
     std::vector<Chunk*> gnrtChunk() {
-        auto* octree = new LODOctree(generator, computeShader, glm::vec3(0, 0, 0));
-        //octree->UpdateAndGenerate(glm::vec3(0, 0, 0));
-        octree->UpdateLOD(glm::vec3(0, 0, 0));
-        auto allChunks = octree->CollectLeafChunks();
-        // guarde ponteiro do octree em algum lugar para liberar depois
-        return allChunks; 
+        auto* world = new WorldLODSystem(generator, computeShader);
+
+        world->Update(glm::vec3(0, 0, 0));
+        auto allChunks = world->CollectLeafChunks();
+        return allChunks;
 
         /*
         glm::vec3 numChunks = sysv.numChunksPerAxis;

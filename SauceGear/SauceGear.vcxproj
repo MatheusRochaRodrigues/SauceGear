@@ -187,6 +187,7 @@
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Core\Time.cpp" />
+    <ClCompile Include="Utils\PerlinNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
@@ -197,7 +198,17 @@
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
     <ClInclude Include="Geometry\WorldOctree\Back\OctreeLOD.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\Planet.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\SignedDistanceField.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\Terrain.h" />
+    <ClInclude Include="Geometry\WorldOctree\SDF\TerrainSDF.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\LODController.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\Map.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\WorldSys.h" />
     <ClInclude Include="Geometry\World\Structs\ObjectPool.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\DebugVoxels.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\GPUJobQueue.h" />
@@ -245,6 +256,8 @@
     <ClInclude Include="ECS\Systems\PhysicsSystem.h" />
     <ClInclude Include="ECS\Components\AABBComponent.h" />
     <ClInclude Include="ECS\Systems\BoundsSystem.h" />
+    <ClInclude Include="Utils\Noise.h" />
+    <ClInclude Include="Utils\PerlinNoise.h" />
     <ClInclude Include="Utils\utilsAABB.h" />
     <ClInclude Include="Scripts\MyScript.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h" />

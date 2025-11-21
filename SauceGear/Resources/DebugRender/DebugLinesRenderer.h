@@ -2,6 +2,7 @@
 #include "../../Graphics/Mesh.h"
 #include "../../Graphics/Shader.h"
 #include "../ECS/System.h"
+#include "../Core/Camera.h"
 #include <glm/glm.hpp>
 #include <vector>
 #include <unordered_map>

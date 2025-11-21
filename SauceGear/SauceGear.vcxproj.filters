@@ -608,6 +608,12 @@
     <ClInclude Include="Geometry\WorldOctree\Back\OctreeLOD.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\LODController.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\WorldSys.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
