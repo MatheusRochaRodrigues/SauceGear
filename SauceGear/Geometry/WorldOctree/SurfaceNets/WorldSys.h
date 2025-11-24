@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <vector>
-#include "LODController.h"
+#include "OctreeSys.h"
 #include "OctreeLOD.h" 
 
 struct ChunkRequest {
@@ -9,20 +9,21 @@ struct ChunkRequest {
     float grid;          // voxel size (chunkSize << lod)
 };
 
-class WorldLODSystem {
+class WorldSys {
 public:
-    LODController settingsLod;
+    OctreeSys settingsLod;
     OctreeLOD* octree = nullptr;
+    //algum scheduler cmptChunkScheduler;
 
-    WorldLODSystem(GPUMapGenerator* gn, ComputeShader* cs) : generator(gn), computeShader(cs){
+    WorldSys(GPUMapGenerator* gn, ComputeShader* cs) : generator(gn), computeShader(cs){
         octree = new OctreeLOD({ 0,0,0 }, 50.0f, &settingsLod);   //2048.0f
     }
 
-    ~WorldLODSystem() { delete octree; }
+    ~WorldSys() { delete octree; }
 
     void Update(const glm::vec3& p) {
         settingsLod.set_camera(p);
-        octree->update();
+        octree->Update();
 
         // ---- Passo 2: Gera chunks apenas nas folhas ----
         GenerateLeafChunks(octree->root);
@@ -30,7 +31,7 @@ public:
 
     void GenerateLeafChunks(OctreeNode* node) {
         if (!node) return; 
-        if (node->hasChildren) { //subdivided
+        if (node->subdivided) { //hasChildren
             for (int i = 0; i < 8; i++)
                 GenerateLeafChunks(node->children[i]);
             return;
@@ -56,7 +57,7 @@ public:
         while (!q.empty()) {
             OctreeNode* node = q.front(); q.pop();
 
-            if (node->hasChildren) {
+            if (node->subdivided) {
                 for (int i = 0; i < 8; i++)
                     q.push(node->children[i]);
                 continue;
@@ -130,7 +131,7 @@ private:
     void collect_recursive(OctreeNode* n, std::vector<ChunkRequest>& out) {
         if (!n) return;
 
-        if (!n->hasChildren) {
+        if (!n->subdivided) {
             float grid = settingsLod.lod_grid_size(n->lod);
             out.push_back({ n->center, n->lod, grid });
             return;

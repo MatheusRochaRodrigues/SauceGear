@@ -205,7 +205,7 @@
     <ClInclude Include="Geometry\WorldOctree\SDF\SignedDistanceField.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\Terrain.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\TerrainSDF.h" />
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\LODController.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeSys.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\Map.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\WorldSys.h" />

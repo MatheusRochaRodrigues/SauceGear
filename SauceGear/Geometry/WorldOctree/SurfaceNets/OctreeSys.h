@@ -3,22 +3,21 @@
 #include <glm/gtx/component_wise.hpp>
 #include "../../World/SurfaceNets/SurfaceNets.h"
 
-class LODController {
+class OctreeSys {
 public:
     glm::vec3 camera = { 0,0,0 };
-    int lodCount = 4;           // ex: LOD0..LOD5
-    float _octreeScale = 1.0f;
+    //int lodCount = 4;           // ex: LOD0..LOD5
+
+    float octreeScale = 1.0f;
     int _shellSize = 2;          // tamanho dos shells
     int baseChunkSize = 16;     // tamanho de voxel do LOD0  
+     
+    int maxDepthLod = 0;  
+    int minChunkLod = 4;
 
-    float _automaticUpdateDistance = 64;
-    bool _automaticUpdate = true;
-
-    int minLod = 0;
-    int _lodLevelCount = 20;
-    int _maxChunkSize;
+    bool _automaticUpdate = true;   float _automaticUpdateDistance = 64;
     float _autoMeshCoolDown;
-    glm::vec3 _cameraPosition;
+
 
     inline void set_camera(const glm::vec3& pos) { camera = pos; }
 
@@ -48,7 +47,7 @@ public:
      
 private:  
     inline float lod_to_grid_size(const int lod) const {
-        return (1 << (long)(lod + 1)) * _octreeScale; // should be times octreescale?
+        return (1 << (long)(lod + 1)) * octreeScale; // should be times octreescale?
     } 
     inline glm::vec3 snap_to_grid(const glm::vec3& p, /*grid_size*/ float g) const { return glm::floor(p / g) * g; }
     inline bool is_in_lod_shell(int lod, glm::vec3 pos, glm::vec3 cam_pos) const {
