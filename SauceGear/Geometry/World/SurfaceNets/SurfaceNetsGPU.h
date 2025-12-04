@@ -24,6 +24,9 @@ public:
         float voxelSize = 1.0f
     ) {
         const size_t voxelCount = size_t(GridVoxelPerAxis) * GridVoxelPerAxis * GridVoxelPerAxis;
+
+        std::cout << " wqe " << buff.densityMap.size() << std::endl;
+
         assert(buff.densityMap.size() == voxelCount && "Density map size mismatch!");
 
         glUseProgram(computeProgram);
@@ -36,6 +39,7 @@ public:
         // Bind SDF
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
         if (!readySSBO_SDF) {
+            std::cout << " ck " << buff.densityMap[100] << std::endl;
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboSDF);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(float), buff.densityMap.data());
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
@@ -141,7 +145,7 @@ public:
 
         glUseProgram(computeProgram);
         glUniform1i(glGetUniformLocation(computeProgram, "uDim"), DimVoxel);
-        glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), sysv.get_voxelSize());
+        glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), sysv.get_voxelSize( /*tst*/ 0));
         glUniform3fv(glGetUniformLocation(computeProgram, "uOffset"), 1, glm::value_ptr(uOffset));
 
         // bind SDF

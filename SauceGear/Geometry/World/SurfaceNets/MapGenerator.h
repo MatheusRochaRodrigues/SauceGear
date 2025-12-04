@@ -22,7 +22,7 @@ public:
         glUseProgram(compute.ID);
         glUniform1i(glGetUniformLocation(compute.ID, "uDim"), dim);
         glUniform1f(glGetUniformLocation(compute.ID, "uVoxelSize"), vSize);
-        glUniform1f(glGetUniformLocation(compute.ID, "uIsoLevel"), sysv.isoLevel);
+        glUniform1f(glGetUniformLocation(compute.ID, "uIsoLevel"), 0);  //sysv.isoLevel
         glUniform3f(glGetUniformLocation(compute.ID, "uOffset"), worldOffset.x, worldOffset.y, worldOffset.z);
 
         // bind SSBO

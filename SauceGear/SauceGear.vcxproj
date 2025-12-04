@@ -197,7 +197,6 @@
     <ClInclude Include="ECS\Systems\Lighting\LightPoint.h" />
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
-    <ClInclude Include="Geometry\WorldOctree\Back\OctreeLOD.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h" />
@@ -205,8 +204,12 @@
     <ClInclude Include="Geometry\WorldOctree\SDF\SignedDistanceField.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\Terrain.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\TerrainSDF.h" />
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeSys.h" />
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\Map.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.cpp" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeDebug.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeNode.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SysVoxel.h" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SDF_Map.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\WorldSys.h" />
     <ClInclude Include="Geometry\World\Structs\ObjectPool.h" />
@@ -251,6 +254,7 @@
     <ClInclude Include="Resources\DefineMaterials\TextureCache.h" />
     <ClInclude Include="Resources\DebugRender\DebugPointDrawer.h" />
     <ClInclude Include="Scripts\ScriptABI.h" />
+    <ClInclude Include="Utils\Bounds.h" />
     <ClInclude Include="Utils\MathHelpers.h" />
     <ClInclude Include="ECS\Systems\PickingSystem.h" />
     <ClInclude Include="ECS\Systems\PhysicsSystem.h" />

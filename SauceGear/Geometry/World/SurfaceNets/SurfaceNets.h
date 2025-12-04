@@ -5,10 +5,9 @@
 #include <limits>
 #include <iostream>
 #include "../NoiseGenerator/SphereSDF.h" 
+#include "../Geometry/WorldOctree/SurfaceNets/SysVoxel.h" 
 #include <memory>
-#include <unordered_set> 
-
-#define sysv SysVoxel::getInstance()
+#include <unordered_set>  
 
 // forward
 struct Mesh;
@@ -39,36 +38,7 @@ struct Vec3Equal {
     bool operator()(const glm::vec3& a, const glm::vec3& b) const {
         return a.x == b.x && a.y == b.y && a.z == b.z;
     }
-}; 
-
-struct SysVoxel {
-    float isoLevel = 0.0f;         // isoLevel - nível de isosuperfície 
-    glm::vec3 numChunksPerAxis = glm::vec3(5.0f, 2.0f, 5.0f); // quantos chunks criar em cada eixo
-
-    void    set_cellGrid(int s)  { cellGrid  = s; }     //set_voxelGrid(int s) { cellGrid  = s; }
-    void    set_base0ChunkSize(int s) { chunkSizeBase_0 = s; }
-
-    int     get_cellGrid()   { return cellGrid; }  // número de células  //ex : 16
-    int     get_voxelGrid()  { return cellGrid + 1; }  // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
-    float   get_baseChunkSize()  { return chunkSizeBase_0; }  // tamanho total do chunk em unidades de mundo
-    //// chunkSizeBase_0 default = 16
-    float   get_voxelSize(unsigned int lod) { return chunkSizeBase_0 * (1 << lod); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
-       
-    //for keep default singleton
-    static SysVoxel& getInstance() {       //getVoxelGrid
-        static SysVoxel instance; // criado na primeira chamada
-        return instance;
-    } 
-    SysVoxel(const SysVoxel&) = delete;
-    SysVoxel& operator=(const SysVoxel&) = delete;
-
-private:
-    int   cellGrid  = 16;    //32 //64     //rsltCellsPerAxis  // número de voxels por eixo (_rsltPerAxis)  //int width_X = 32, height_Y = 32, dept_Z = 32; // cells count 
-    float chunkSizeBase_0 = 16;           // tamanho físico de cada voxel = _WrdBdSize / _rsltPerAxis    
-
-    constexpr SysVoxel() {}
-    ~SysVoxel() {} // (opcional) destrutor privado
-}; 
+};  
 
 
 struct ChunkBuffer { //Chunk
@@ -93,6 +63,8 @@ struct ChunkBuffer { //Chunk
         surface_points.clear();
         surface_strides.clear();
         stride_to_index.assign(array_size, NULL_VERTEX);
+
+        densityMap.assign(array_size, 1e6f);
     }
 };
 
@@ -103,13 +75,14 @@ struct Chunk {
     glm::vec3 coord; glm::ivec3     coordWorld;  
     int                             lod = 0;
 
-    float                             dbg = 0;
+    float                           dbg = 0;
 
     Chunk(size_t d = 0) {
         buff = std::make_unique<ChunkBuffer>();  
         resizeDensityMap(d);
     }
 
+    //Note that consider that d is size final total
     void resizeDensityMap(size_t d = 0){ // (Re)aloca o vetor se o tamanho mudou
         size_t total = d;
         if (d == 0) {

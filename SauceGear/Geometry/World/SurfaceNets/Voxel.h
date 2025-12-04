@@ -65,10 +65,11 @@ public:
     }
     */
     std::vector<Chunk*> gnrtChunk() {
-        auto* world = new WorldLODSystem(generator, computeShader);
+        auto* world = new WorldSys(generator, computeShader);
 
         world->Update(glm::vec3(0, 0, 0));
         auto allChunks = world->CollectLeafChunks();
+        std::cout << " fd " << allChunks.size() << std::endl;
         return allChunks;
 
         /*

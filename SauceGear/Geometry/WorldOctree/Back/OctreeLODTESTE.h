@@ -8,9 +8,6 @@
 #include <memory>
 #include "OctreeDebug.h"
 
-// NVIDIA  = 32 WARP
-// AMD     = 64 WAVEFRONT
-
 class OctreeLOD {
 public:
     OctreeNode* root = nullptr;
@@ -35,11 +32,13 @@ public:
             //verifica em qual shell está
             n->desiredLOD = octreeSys.lod_at(n->center);      // equivalent to the targetLOD 
             if (n->desiredLOD < 0) return;
-             
+
+
+            //std::cout << "Center " << n->center.x << " " << n->center.y << " " << n->center.z << std::endl;
+
             if (!n->isAlreadyPass) {  //cache interno do octree   
                 // --- SDF Distance ---
-                float sdf = map.sdf->sdfDistance(n->center);            
-                n->distSurf_SDF = sdf;
+                float sdf = map.sdf->sdfDistance(n->center);            n->distSurf_SDF = sdf;
                 bool notArrivedLod = (n->depthLOD > n->desiredLOD);
 
                 OctreeDebug::PrintSDF(n);
@@ -64,7 +63,8 @@ public:
                     std::cout << "end "  << std::endl;
                     n->isAlreadyPass = true;
                     materialize(n);
-                    OctreeDebug::PrintMaterialize(n);  
+                    OctreeDebug::PrintMaterialize(n); 
+
                     continue;
                 } 
             }
@@ -138,8 +138,8 @@ private:
             glm::vec3 p = n->center + dir[i] * el;
             int neighLOD = syso.lod_at(p);
 
-            b |= (n->depthLOD < neighLOD ? 1 : 0) << i;        // high-to-low transition      0 - 6
-            b |= (n->depthLOD > neighLOD ? 1 : 0) << (i + 8);  // low-to-high transition      8 - 14
+            b |= (n->depthLOD < neighLOD ? 1 : 0) << i;        // high→low      0 - 6
+            b |= (n->depthLOD > neighLOD ? 1 : 0) << (i + 8);  // low→high      8 - 14
         }
         return b;
     }   

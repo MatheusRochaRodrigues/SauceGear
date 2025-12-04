@@ -608,10 +608,7 @@
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\Back\OctreeLOD.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeSys.h">
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SysVoxel.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\WorldSys.h">
@@ -638,13 +635,28 @@
     <ClInclude Include="Geometry\WorldOctree\SDF\TerrainSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\Map.h">
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SDF_Map.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Utils\Noise.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Utils\PerlinNoise.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Bounds.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.cpp">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeNode.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeDebug.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

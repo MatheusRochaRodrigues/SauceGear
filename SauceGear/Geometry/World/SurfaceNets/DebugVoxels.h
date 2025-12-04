@@ -16,7 +16,7 @@ struct DebugVoxels {
     static void drawVoxelGrid(glm::vec3 uOffset)
     {
         const int DimVoxel = sysv.get_voxelGrid();
-        const float voxelSize = sysv.get_voxelSize();
+        const float voxelSize = sysv.get_voxelSize( 0 /*test*/);
 
         // Cor padrão da grade
         glm::vec3 color(0.3f, 0.25f, 0.25f); // cinza escuro
@@ -67,7 +67,7 @@ struct DebugVoxels {
         glm::vec3 uOffset)
     {
         const int DimVoxel = sysv.get_voxelGrid();
-        const float voxelSize = sysv.get_voxelSize();
+        const float voxelSize = sysv.get_voxelSize(0);  //teste
 
         // 1️⃣ Ler SDF
         std::vector<float> sdf(voxelCount);
@@ -145,7 +145,7 @@ struct DebugVoxels {
         glm::vec3 uOffset)
     {
         const int DimVoxel = sysv.get_voxelGrid();
-        const float voxelSize = sysv.get_voxelSize();
+        const float voxelSize = sysv.get_voxelSize( /*tst*/ 0);
 
         // 1️⃣ Ler SDF
         std::vector<float> sdf(voxelCount);
