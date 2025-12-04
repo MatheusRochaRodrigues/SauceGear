@@ -52,7 +52,7 @@ public:
                 OctreeDebug::PrintSurfaceDecision(map.has_surface(*n, sdf, octreeSys.octreeScale));
 
                 //if exists zero-crossing of SDF into of the node  &&  if the current lod of the node have desired Lod based player position
-                if ( map.has_surface(*n, sdf, octreeSys.octreeScale) && notArrivedLod ) {
+                if ( map.has_surface( *n, sdf, octreeSys.octreeScale ) && notArrivedLod ) {
                     if (!n->subdivided) { subdivide(n); OctreeDebug::Subdiveded(); }
                     //for (auto* c : n->children) q.push(c);
                     n->isAlreadyPass = true;

@@ -23,6 +23,15 @@ struct OctreeNode {
     uint16_t                    bounds = 0;      // 12 bits (6 highs / 6 lows)
     uint8_t                     materialized = 0;   // 8 bits (cada child materialized)
 
+
+
+    // informações SDF
+    float sdfMin;
+    float sdfMax;
+    float sdfCenter;
+    bool evaluated = false;
+    bool hasSurface = false;
+
     inline float edge_length(float scale = 0) const {
         if (scale == 0) scale = syso.octreeScale;
         return (1 << depthLOD) * scale;
