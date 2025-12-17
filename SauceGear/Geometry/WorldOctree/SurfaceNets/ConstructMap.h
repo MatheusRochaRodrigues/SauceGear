@@ -38,7 +38,7 @@ public:
 
     float sampleSDF_LOD(const std::vector<OctreeNode*>& leaves, const glm::vec3& p) {
         for (auto* leaf : leaves)
-            if (leaf->contains(p)) return leaf->distSurf_SDF;    //não faz interpolação trilinear — ele pega diretamente o SDF do nó da octree.
+            if (leaf->contains(p)) return leaf->sdfCenter;    //não faz interpolação trilinear — ele pega diretamente o SDF do nó da octree.
 
         return std::numeric_limits<float>::max();  //return 1e6f; // fallback
     }

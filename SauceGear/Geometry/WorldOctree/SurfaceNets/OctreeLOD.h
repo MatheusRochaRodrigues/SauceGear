@@ -42,12 +42,7 @@ public:
                 n->distSurf_SDF = sdf;
                 bool notArrivedLod = (n->depthLOD > n->desiredLOD);
 
-                OctreeDebug::PrintSDF(n); 
-
-                //std::cout << "SDF " << sdf << std::endl;
-                //std::cout << "+--- notArrivedLod " << notArrivedLod << std::endl;
-                //std::cout << "desiredLOD " << n->desiredLOD << std::endl;
-
+                OctreeDebug::PrintSDF(n);   
                 OctreeDebug::PrintSurfaceDecision(map.has_surface(*n, sdf, octreeSys.BASE_CELL_SIZE));
 
                 //if exists zero-crossing of SDF into of the node  &&  if the current lod of the node have desired Lod based player position
@@ -97,15 +92,7 @@ public:
         OctreeDebug::PrintTree(root); 
         std::cout << std::endl;
     }
-
      
-    bool is_parent_enqueued(OctreeNode* n) { return n->father == nullptr ? false : n->father->isEnqueued; }
-    bool is_any_children_enqueued(OctreeNode* n) {
-        if (n->is_leaf()) return false;
-        for (const auto& child : n->children)  if (child->isEnqueued) return true;
-        return false;
-    }
-
 private:
     void evalSDF(OctreeNode& n) {
         Bounds b = n.getBounds();
@@ -174,6 +161,13 @@ private:
 
         n->subdivided = true;
     }   
+     
+    bool is_parent_enqueued(OctreeNode* n) { return n->father == nullptr ? false : n->father->isEnqueued; }
+    bool is_any_children_enqueued(OctreeNode* n) {
+        if (n->is_leaf()) return false;
+        for (const auto& child : n->children)  if (child->isEnqueued) return true;
+        return false;
+    }
 
     void removeChunk(OctreeNode* n) {
         if (is_any_children_enqueued(n) || is_parent_enqueued(n)) return; 

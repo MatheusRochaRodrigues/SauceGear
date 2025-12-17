@@ -11,6 +11,7 @@ public:
     SDF_Map() { sdf = new Terrain(); };  //Planet
 	~SDF_Map() = default;
 
+    //map.has_surface( *n, sdf, octreeSys.BASE_CELL_SIZE)
     bool has_surface(const OctreeNode& n, float value, float octreeScale)
     {
         // Para decidir se a superfície (SDF ~ 0) cruza este nó da octree,
