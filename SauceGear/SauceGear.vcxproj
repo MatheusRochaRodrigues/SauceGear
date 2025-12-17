@@ -197,6 +197,7 @@
     <ClInclude Include="ECS\Systems\Lighting\LightPoint.h" />
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
+    <ClInclude Include="ECS\Systems\OctreeWorldSystem.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h" />
@@ -462,6 +463,7 @@
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="ECS\Systems\Texto.txt" />
     <Text Include="Editor\Styles\styles1.txt" />
     <Text Include="Editor\Styles\styles2.txt" />
     <Text Include="Editor\Styles\styles3.txt" />
@@ -469,6 +471,8 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
+    <Text Include="Geometry\WorldOctree\SurfaceNets\OctreeLod.txt" />
+    <Text Include="Geometry\WorldOctree\SurfaceNets\Texto.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />

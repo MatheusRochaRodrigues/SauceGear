@@ -129,6 +129,11 @@ public:
         // Gera mesh (retorna atual Mesh* se quiser)
         //Mesh* mesh = SurfaceNetsCPU::Generate(*buffer->grid.get(), *params, *buffer); 
 
+
+
+
+        //return;
+
         voxelSystem sys;
         std::cout << "o - 7" << std::endl;
 

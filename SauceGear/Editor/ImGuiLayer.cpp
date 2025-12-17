@@ -16,7 +16,7 @@ void ImGuiLayer::Init(GLFWwindow* window) {
     //io.Fonts->AddFontFromFileTTF("fa-solid-900.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesDefault());  
  
     // Carregar fonte padrão (ex: Roboto, Arial, etc.)
-    io.Fonts->AddFontFromFileTTF("Assets/Fonts/SF_Cartoonist_Hand_Bold.ttf", 19.5);
+    io.Fonts->AddFontFromFileTTF("Assets/Fonts/RobotoSlab-ExtraBold.ttf", 19.5);
      
     // Intervalo da Private Use Area da Material Icons          Range dos ícones (Material Icons ficam nesse bloco Unicode)
     static const ImWchar icons_ranges[] = { ICON_MIN_MI, ICON_MAX_MI, 0 };

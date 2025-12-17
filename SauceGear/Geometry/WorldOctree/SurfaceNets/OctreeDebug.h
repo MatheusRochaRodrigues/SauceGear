@@ -6,7 +6,7 @@
 // ==========================
 // CONFIGURAÇÃO DE DEBUG
 // ==========================
-#define OCTREE_DEBUG 1            // 1 = ligado, 0 = desligado
+#define OCTREE_DEBUG 0            // 1 = ligado, 0 = desligado
 #define OCTREE_DEBUG_TREE 1       // imprimir árvore depois
 #define OCTREE_DEBUG_STEP 1       // printar passo a passo da Update()
 #define OCTREE_DEBUG_COLOR 1      // cores ANSI ligadas
@@ -120,7 +120,7 @@ public:
         std::cout << " LOD=" << n->depthLOD
             << " desired=" << n->desiredLOD
             << " center=(" << n->center.x << "," << n->center.y << "," << n->center.z << ")";
-        if (n->chunk) std::cout << C_RED << " [CHUNK]" << C_RESET;
+        if (n->isChunk()) std::cout << C_RED << " [CHUNK]" << C_RESET;
 
         if (n->materialized == 0xFF)
             std::cout << " <MAT>";

@@ -30,7 +30,9 @@ void SceneECS::initECS() {
 
     auto* debugRenderer =        RegisterSystem <DebugRenderer>();
 
-    auto* postProcessSystem =    RegisterSystem <PostProcessSystem>(); 
+    auto* postProcessSystem =    RegisterSystem <PostProcessSystem>();
+
+    auto* octreeWorldSystem = RegisterSystem <OctreeWorldSystem>();
 
 
     //auto* pickingSystem = RegisterSystem <PickingSystem>();

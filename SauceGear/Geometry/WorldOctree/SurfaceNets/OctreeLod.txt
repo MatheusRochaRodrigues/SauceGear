@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include <array>
 #include <queue>
 #include <glm/glm.hpp>
@@ -32,7 +32,7 @@ public:
             std::cout << std::endl << std::endl;
             OctreeDebug::PrintNodeHeader(n);
 
-            //verifica em qual shell estÃ¡
+            //verifica em qual shell está
             n->desiredLOD = octreeSys.lod_at(n->center);      // equivalent to the targetLOD 
             if (n->desiredLOD < 0) return;
              
@@ -42,45 +42,57 @@ public:
                 n->distSurf_SDF = sdf;
                 bool notArrivedLod = (n->depthLOD > n->desiredLOD);
 
-                OctreeDebug::PrintSDF(n); 
+                OctreeDebug::PrintSDF(n);
+
 
                 //std::cout << "SDF " << sdf << std::endl;
-                //std::cout << "+--- notArrivedLod " << notArrivedLod << std::endl;
+                std::cout << "+--- notArrivedLod " << notArrivedLod << std::endl;
                 //std::cout << "desiredLOD " << n->desiredLOD << std::endl;
 
-                OctreeDebug::PrintSurfaceDecision(map.has_surface(*n, sdf, octreeSys.BASE_CELL_SIZE));
+                OctreeDebug::PrintSurfaceDecision(map.has_surface(*n, sdf, octreeSys.octreeScale));
 
                 //if exists zero-crossing of SDF into of the node  &&  if the current lod of the node have desired Lod based player position
-                if ( map.has_surface( *n, sdf, octreeSys.BASE_CELL_SIZE) && notArrivedLod && (n->depthLOD > syso.maxDepthLod) ) {
-                    subdivide(n);     OctreeDebug::Subdiveded();  
-
-                    for (auto* c : n->children) q.push(c);
-                    n->isAlreadyPass = true; 
+                if ( map.has_surface( *n, sdf, octreeSys.octreeScale ) && notArrivedLod ) {
+                    if (!n->subdivided) { subdivide(n); OctreeDebug::Subdiveded(); }
+                    //for (auto* c : n->children) q.push(c);
+                    n->isAlreadyPass = true;
+                    //continue;
                 }
 
                 // if we don't subdivide further, we mark it as a fully realized subtree
-                //if ( n->is_leaf() && (notArrivedLod || n->depthLOD == octreeSys.maxDepthLod /*0 = default*/) ) {
-                //    std::cout << "end "  << std::endl;
-                //    n->isAlreadyPass = true; 
-                //    //OctreeDebug::PrintMaterialize(n);  
-                //    continue;
-                //} 
+                if ( n->is_leaf() && (notArrivedLod || n->depthLOD == octreeSys.maxDepthLod /*0 = default*/) ) {
+                    std::cout << "end "  << std::endl;
+                    n->isAlreadyPass = true;
+                    materialize(n);
+                    OctreeDebug::PrintMaterialize(n);  
+                    continue;
+                } 
             }
-            //std::cout << "+---isChunk() " << n->isChunk() << std::endl; 
-            if ( n->isChunk() && !n->is_leaf() && (n->chunk == nullptr || (n->bounds != computeBounds(n))) ) {  
+            std::cout << "+---isChunk() " << n->isChunk() << std::endl;
+
+            if (n->isChunk() && !n->is_leaf() && (n->chunk == nullptr || (n->bounds != computeBounds(n)))) { 
+                //std::cout << "chunk " << std::endl;
                 OctreeDebug::PrintChunkQueued(); 
                 QueueChunk(n); 
-            } 
+            }
+             
+            //talvez
+            // sempre processar nós da octree enquanto houver filhos
+            /*if (!is_leaf()) {
+                for (auto& child : *_children)
+                    child->build(terrain);
+            }*/
 
-            //if ( !n->is_leaf() && (!n->isChunk() && (n->chunk == nullptr))
-            //    && ( /*if is above of min lod of chunks*/ n->depthLOD > sysv.get_MinChunkLod()) )  
-            //{
-            //        for (auto* c : n->children) q.push(c);
-            //}
-
+            if (
+                !n->is_leaf() && (!n->isChunk() && (n->chunk == nullptr))
+                && (!is_materialized(n) || /*if is above of min lod of chunks*/ n->depthLOD > sysv.get_MinChunkLod())
+                )  {
+                    for (auto* c : n->children) q.push(c);
+            }
 
             //falta por delete
-            //if (!is_chunk(terrain)) delete_chunk(); 
+            //if (!is_chunk(terrain)) delete_chunk();
+
 
             /*
             // each chunk is 2^(minChunkLod), ex: 2^4 = 16*16*16 voxels
@@ -107,25 +119,6 @@ public:
     }
 
 private:
-    void evalSDF(OctreeNode& n) {
-        Bounds b = n.getBounds();
-
-        n.sdfMin = +FLT_MAX;
-        n.sdfMax = -FLT_MAX;
-
-        // 8 cantos do chunk
-        for (int i = 0; i < 8; i++) {
-            glm::vec3 p = b.corner(i);
-            float d = map.sdf->sdfDistance(p);
-
-            n.sdfMin = std::min(n.sdfMin, d);
-            n.sdfMax = std::max(n.sdfMax, d);
-        }
-
-        n.hasSurface = (n.sdfMin <= 0 && n.sdfMax >= 0);
-        n.evaluated = true;
-    }
-
     void QueueChunk(OctreeNode* n) {
         if (n->isEnqueued) return;
         n->isEnqueued = true;
@@ -153,25 +146,43 @@ private:
     }   
      
     void subdivide(OctreeNode* n) {
-        if (n->subdivided) return; 
+        if (n->depthLOD <= syso.maxDepthLod || n->subdivided) return; 
         
-        int   childLOD      = n->depthLOD - 1;                                  //float half     = n->size * 0.5f;
-        float childOffset   = n->edge_length() * 0.25f /*(0.5f * 0.5f)*/;    
+        int   childLOD      = n->depthLOD - 1;                                  //float half          = n->size * 0.5f;
+        float childOffset   = n->edge_length() * 0.5f;    //* 0.25f
 
-        for (int i = 0; i < 8; i++) {  
+        for (int i = 0; i < 8; i++) { 
+            /*  Append
+            for (int i = 0; i < 8; i++)
+                glm::vec3 offset(
+                    (i & 1 ? 0.25f : -0.25f) * node->size,
+                    (i & 2 ? 0.25f : -0.25f) * node->size,
+                    (i & 4 ? 0.25f : -0.25f) * node->size
+                );
+
+                Child 0 (i=0, bits=000): (-0.5, -0.5, -0.5)
+                Child 1 (i=1, bits=001): (+0.5, -0.5, -0.5)
+                Child 2 (i=2, bits=010): (-0.5, +0.5, -0.5)
+                Child 3 (i=3, bits=011): (+0.5, +0.5, -0.5)
+                Child 4 (i=4, bits=100): (-0.5, -0.5, +0.5)
+                Child 5 (i=5, bits=101): (+0.5, -0.5, +0.5)
+                Child 6 (i=6, bits=110): (-0.5, +0.5, +0.5)
+                Child 7 (i=7, bits=111): (+0.5, +0.5, +0.5) 
+            */
+
             glm::vec3 offs = {
-                (i & 1) ? +childOffset : -childOffset,
-                (i & 2) ? +childOffset : -childOffset,
-                (i & 4) ? +childOffset : -childOffset
-            }; 
+                (i & 1) ? +childOffset * 0.5f : -childOffset * 0.5f,
+                (i & 2) ? +childOffset * 0.5f : -childOffset * 0.5f,
+                (i & 4) ? +childOffset * 0.5f : -childOffset * 0.5f
+            };
 
             n->children[i] = new OctreeNode{
                 n->center + offs,
                 childLOD
-            }; 
+            };
+
             n->children[i]->father = n;
         } 
-
         n->subdivided = true;
     }   
 
@@ -182,36 +193,43 @@ private:
         //n->chunk = nullptr; 
         n->chunk.reset();
 
-    } 
+    }
 
+    bool is_materialized(OctreeNode* n) { return n->materialized == 0xFF; }
+     
+    void materialize(OctreeNode* n) {
+        if (is_materialized(n)) return;
+
+        if (!n->subdivided) n->materialized = 0xFF;
+        else {
+            uint8_t mask = 0;
+            for (int i = 0; i < 8; i++) {
+                if (is_materialized(n->children[i]))
+                    mask |= (1 << i);
+            }
+            n->materialized = mask;
+        }
+        // propagate to parent if fully materialized
+        if (is_materialized(n) && n->father) materialize(n->father);
+    } 
+      
     void destroy(OctreeNode* n) {
         if (!n) return;
         if (n->subdivided) for (auto* c : n->children) destroy(c);
         delete n;
     }
-     
+    void merge(OctreeNode* n) {
+        for (auto*& c : n->children) {
+            destroy(c);
+            c = nullptr;
+        }
+        n->subdivided = false;
+    }
 };
 
 
 
 
-/*  Append
-for (int i = 0; i < 8; i++)
-    glm::vec3 offset(
-        (i & 1 ? 0.25f : -0.25f) * node->size,
-        (i & 2 ? 0.25f : -0.25f) * node->size,
-        (i & 4 ? 0.25f : -0.25f) * node->size
-    );
-
-    Child 0 (i=0, bits=000): (-0.5, -0.5, -0.5)
-    Child 1 (i=1, bits=001): (+0.5, -0.5, -0.5)
-    Child 2 (i=2, bits=010): (-0.5, +0.5, -0.5)
-    Child 3 (i=3, bits=011): (+0.5, +0.5, -0.5)
-    Child 4 (i=4, bits=100): (-0.5, -0.5, +0.5)
-    Child 5 (i=5, bits=101): (+0.5, -0.5, +0.5)
-    Child 6 (i=6, bits=110): (-0.5, +0.5, +0.5)
-    Child 7 (i=7, bits=111): (+0.5, +0.5, +0.5)
-*/
 
 
 
@@ -234,14 +252,14 @@ void update_node() {
         // --- SDF Distance ---
         float sdf = map.sdf->sdfDistance(n->center);
 
-        // --- nÃ£o existe superfÃ­cie neste nÃ³ ---
+        // --- não existe superfície neste nó ---
         if (!map->has_surface(n->center, sdf)) {
             merge(n);
             delete_chunk(n);
             return;
         }
 
-        // --- decidir subdivisÃ£o ---
+        // --- decidir subdivisão ---
         if (n->size > octreeSys->lod_grid_size(desiredLOD)) {
             // subdividir
             if (!n->subdivided) subdivide(n);
@@ -251,7 +269,7 @@ void update_node() {
             return;
         }
     }
-    // --- Ã© folha -> deve ter chunk ---
+    // --- é folha -> deve ter chunk ---
     uint16_t newBound = compute_boundaries(n);
     if (!n->chunk || n->boundaries != newBound) {
         n->boundaries = newBound;
@@ -270,7 +288,7 @@ void update2() {
     while (!q.empty()) {
         OctreeNode* n = q.front(); q.pop();
 
-        //verifica em qual shell estÃ¡
+        //verifica em qual shell está
         int targetLOD = octreeSys->lod_at(n->center);
 
         if (targetLOD < n->lod) {

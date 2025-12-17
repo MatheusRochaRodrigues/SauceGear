@@ -20,6 +20,15 @@ struct Bounds {
         max = glm::max(mn, mx);
     }
 
+    glm::vec3 corner(int i) const {
+        return glm::vec3(
+            (i & 1) ? max.x : min.x,
+            (i & 2) ? max.y : min.y,
+            (i & 4) ? max.z : min.z
+        );
+    }
+
+
     // -------------------------------------------------------------
     // Basic getters
     // -------------------------------------------------------------

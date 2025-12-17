@@ -5,9 +5,10 @@
 
 struct OctreeNode {
     glm::vec3                   center;
-    int                         depthLOD = 0;           //  0 for the most detailed chuck
-    int                         desiredLOD = 0;     //  target Lod in current Shell 
-    Bounds                      b;
+    //glm::ivec3                  cell;               // coordenada inteira na grade base  
+
+    int                         depthLOD = 0;       //  0 for the most detailed chuck
+    int                         desiredLOD = 0;     //  target Lod in current Shell  
 
     bool                        subdivided = false;
     std::array<OctreeNode*, 8>  children = { nullptr };
@@ -16,14 +17,14 @@ struct OctreeNode {
 
     //Mesh 
     std::unique_ptr<Chunk>      chunk;
+    Bounds b;
 
     // ---------- cache Otimization ----------
-    bool                        isAlreadyPass = false;         // já processado (como no GDVoxel)
-    bool                        isEnqueued = false;   // se já está enfileirado para gerar mesh
-    uint16_t                    bounds = 0;      // 12 bits (6 highs / 6 lows)
-    uint8_t                     materialized = 0;   // 8 bits (cada child materialized)
-
-
+    bool                        isAlreadyPass = false;          // já processado (como no GDVoxel)
+    bool                        isEnqueued = false;             // se já está enfileirado para gerar mesh
+    uint16_t                    bounds = 0;                     // 12 bits (6 highs / 6 lows)
+    uint8_t                     materialized = 0;               // 8 bits (cada child materialized)
+      
 
     // informações SDF
     float sdfMin;
@@ -32,21 +33,19 @@ struct OctreeNode {
     bool evaluated = false;
     bool hasSurface = false;
 
-    inline float edge_length(float scale = 0) const {
-        if (scale == 0) scale = syso.octreeScale;
-        return (1 << depthLOD) * scale;
-    } //_size
 
-    inline Bounds getBounds(float scale = 0) const {
-        if (scale == 0) scale = syso.octreeScale;
-        auto halfEdge = glm::vec3(edge_length(scale) * 0.5f);
+    inline float edge_length() const {   return (1 << depthLOD) * syso.BASE_CELL_SIZE; }
+     
+    inline float cell_size() { return syso.BASE_CELL_SIZE * (1 << depthLOD); }
+
+    inline Bounds getBounds() const {
+        auto halfEdge = glm::vec3(edge_length() * 0.5f);
         return Bounds(center - halfEdge, center + halfEdge);
     }
 
     bool isChunk() { return (depthLOD == (desiredLOD + sysv.get_MinChunkLod())); }
     // Check if _children is null
-    bool is_leaf() const { return !subdivided; }
-
+    bool is_leaf() const { return !subdivided; } 
 
     //talvez
     bool contains(const glm::vec3& p) const
@@ -61,3 +60,8 @@ struct OctreeNode {
             p.z >= min.z && p.z <= max.z);
     }
 };
+
+
+
+//float variation = sdfMax - sdfMin;
+//float curvature = variation / node_size;

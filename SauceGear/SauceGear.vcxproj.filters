@@ -659,6 +659,9 @@
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeDebug.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="ECS\Systems\OctreeWorldSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
@@ -798,6 +801,9 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
+    <Text Include="Geometry\WorldOctree\SurfaceNets\Texto.txt" />
+    <Text Include="Geometry\WorldOctree\SurfaceNets\OctreeLod.txt" />
+    <Text Include="ECS\Systems\Texto.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />

@@ -11,4 +11,7 @@
 #include "ComputeSyncSystem.h"  
 #include "TransformSystem.h"
 
+#include "OctreeWorldSystem.h"
+
+
 #include "DebugRenderer.h"  

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "SceneECS.h"
 #include "../Core/EngineContext.h"
-#include "../ECS/Systems/SystemHelper.h"
+#include "../ECS/Components/ComponentsHelper.h"
 #include "../Resources/Model.h"  
 
 class SceneBuilder {       //GameObjectFactory

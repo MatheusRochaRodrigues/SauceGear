@@ -14,7 +14,7 @@ public:
     ConstructMap makeMap;
 
     WorldSys(GPUMapGenerator* gn, ComputeShader* cs) : generator(gn), computeShader(cs){
-        octree = new OctreeLOD({ 0,0,0 }, 4);   //2048.0f   //50
+        octree = new OctreeLOD({ 0,0,0 }, 5);   //2048.0f   //50
     }
 
     ~WorldSys() { delete octree; }
@@ -26,6 +26,7 @@ public:
 
         // ---- Passo 2: Gera chunks apenas nas folhas ----
         //GenerateLeafChunks(octree->root);
+        //return;
         while (!octree->cmptChunkScheduler.empty()) {
             std::cout << "AQ FOI" << std::endl;
             auto& node = octree->cmptChunkScheduler.front(); 
@@ -50,111 +51,56 @@ public:
     }
 
     bool UpdateChunk(OctreeNode* n) {  
-        auto map = makeMap.BuilderArraySDF(n, octree->root);
+        auto map = makeMap.buildDenseSDF(n);
+        //auto map = makeMap.buildSDFGrid(n, octree->root);
         //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
 
-        if (!n->chunk) n->chunk = std::make_unique<Chunk>();  
-        // --- cria / redimensiona chunk --- 
-        Chunk& chunk = *n->chunk;
-        n->b = n->getBounds();
+        if (!n->chunk) n->chunk = std::make_unique<Chunk>(); 
 
-
-        chunk.buff->densityMap = map;
+        // --- cria / redimensiona chunk ---  
+        Chunk& chunk = *n->chunk; chunk.lod = n->depthLOD;  chunk.buff->densityMap = map;
 
         // --- pega buffer GPU ---
         SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
-        gpuBuf->ensureCapacity(sysv.get_voxelGrid());   //sysv.get_cellGrid()
-
+        gpuBuf->ensureCapacity(sysv.get_voxelGrid());                               //sysv.get_cellGrid()
+         
         // --- Gera mesh ---
         chunk.mesh = SurfaceNetsGPU::Generate(
             *chunk.buff,
-            n->b.min,
+            n->getBounds().min,
             computeShader->ID,
             *gpuBuf,
             false,
-            sysv.get_voxelGrid(),    //get_cellGrid
-            n->edge_length(syso.octreeScale) /*voxelSize*/
+            sysv.get_voxelGrid(),        //get_cellGrid
+            n->edge_length() / sysv.get_cellGrid()      /*voxelSize*/
         );
 
-        GlobalSurfaceNetsPool::Get().Release(gpuBuf);
-
-        std::cout << std::endl << std::endl;
+        GlobalSurfaceNetsPool::Get().Release(gpuBuf);  
            
         return true;
     }
+     
 
+    std::vector<Chunk*> CollectChunks() {
+        std::vector<Chunk*> leafChunks;
+        std::queue<OctreeNode*> q;
+        q.push(octree->root);
 
+        while (!q.empty()) {
+            OctreeNode* node = q.front(); q.pop();
 
-    void GenerateChunk(OctreeNode* node)
-    {
-        if (!node) return;
-        std::cout << "AQ FOI 2" << std::endl;
+            if (node->subdivided) {
+                for (int i = 0; i < 8; i++) q.push(node->children[i]); 
+            }
 
-        const int grid = sysv.get_cellGrid();           // ex: 16
-        const int lod = node->depthLOD; //lod lodLevel
-
-        // --- voxel size aumenta exponencialmente ---
-        const float voxelSize = sysv.get_baseChunkSize() * float(1 << lod);
-
-        // --- snap-to-grid do GDVoxelTerrain ---
-        const float snapGrid = voxelSize * grid;
-        glm::vec3 offset = glm::floor(node->center / snapGrid) * snapGrid;
-
-        // --- cria / redimensiona chunk ---
-        if (!node->chunk) node->chunk = std::make_unique<Chunk>(grid);
-        Chunk& chunk = *node->chunk;
-
-        // --- pega buffer GPU ---
-        SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
-        gpuBuf->ensureCapacity(grid);
-
-        // --- Gera SDF ---
-        generator->Generate(
-            offset,
-            *chunk.buff,
-            *gpuBuf,
-            grid,
-            voxelSize
-        );
-
-        // --- Gera mesh ---
-        chunk.mesh = SurfaceNetsGPU::Generate(
-            *chunk.buff,
-            offset,
-            computeShader->ID,
-            *gpuBuf,
-            true,
-            grid,
-            voxelSize
-        );
-
-        GlobalSurfaceNetsPool::Get().Release(gpuBuf);
-
-        // --- Atualiza estado do chunk ---
-        chunk.coord = offset;
-        chunk.lod = lod;
-    }
-
-
-    // ---- Collect already-generated chunks ----
-    void GenerateLeafChunks(OctreeNode* node) {
-        if (!node) return;
-        if (node->subdivided) { //hasChildren
-            for (int i = 0; i < 8; i++)
-                GenerateLeafChunks(node->children[i]);
-            return;
+            // nó folha → adiciona se tiver mesh válida
+            if (node->chunk && node->chunk->mesh) {
+                leafChunks.push_back(node->chunk.get());
+            }
         }
-        // Folha -> gerar mesh
-        GenerateChunk(node);
-    }
-    // --------------------------------------------
-    // Collect chunk requests for meshing
-    // --------------------------------------------
-    /*void collect_chunks(std::vector<ChunkRequest>& out) {
-        out.clear();
-        collect_recursive(octree->root, out);
-    }*/
 
+        return leafChunks;
+    }
 
     // Coleta todos os chunks folha (sem gerar nada novo)
     std::vector<Chunk*> CollectLeafChunks() {
@@ -178,25 +124,77 @@ public:
         }
 
         return leafChunks;
-    }
-
-
-
-
-    /*void collect_recursive(OctreeNode* n, std::vector<ChunkRequest>& out) {
-        if (!n) return;
-
-        if (!n->subdivided) {
-            float grid = settingsLod.lod_grid_size(n->lod);
-            out.push_back({ n->center, n->lod, grid });
-            return;
-        }
-
-        for (auto* c : n->children)
-            collect_recursive(c, out);
-    }*/
+    } 
 
 private:
     GPUMapGenerator*    generator = nullptr;
     ComputeShader*      computeShader = nullptr; 
 };
+
+
+
+
+
+
+//void GenerateChunk(OctreeNode* node)
+//{
+//    if (!node) return;
+//    std::cout << "AQ FOI 2" << std::endl;
+//
+//    const int grid = sysv.get_cellGrid();           // ex: 16
+//    const int lod = node->depthLOD; //lod lodLevel
+//
+//    // --- voxel size aumenta exponencialmente ---
+//    const float voxelSize = sysv.get_baseChunkSize() * float(1 << lod);
+//
+//    // --- snap-to-grid do GDVoxelTerrain ---
+//    const float snapGrid = voxelSize * grid;
+//    glm::vec3 offset = glm::floor(node->center / snapGrid) * snapGrid;
+//
+//    // --- cria / redimensiona chunk ---
+//    if (!node->chunk) node->chunk = std::make_unique<Chunk>(grid);
+//    Chunk& chunk = *node->chunk;
+//
+//    // --- pega buffer GPU ---
+//    SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
+//    gpuBuf->ensureCapacity(grid);
+//
+//    // --- Gera SDF ---
+//    generator->Generate(
+//        offset,
+//        *chunk.buff,
+//        *gpuBuf,
+//        grid,
+//        voxelSize
+//    );
+//
+//    // --- Gera mesh ---
+//    chunk.mesh = SurfaceNetsGPU::Generate(
+//        *chunk.buff,
+//        offset,
+//        computeShader->ID,
+//        *gpuBuf,
+//        true,
+//        grid,
+//        voxelSize
+//    );
+//
+//    GlobalSurfaceNetsPool::Get().Release(gpuBuf);
+//
+//    // --- Atualiza estado do chunk ---
+//    chunk.coord = offset;
+//    chunk.lod = lod;
+//}
+//
+//
+//// ---- Collect already-generated chunks ----
+//void GenerateLeafChunks(OctreeNode* node) {
+//    if (!node) return;
+//    if (node->subdivided) { //hasChildren
+//        for (int i = 0; i < 8; i++)
+//            GenerateLeafChunks(node->children[i]);
+//        return;
+//    }
+//    // Folha -> gerar mesh
+//    GenerateChunk(node);
+//}

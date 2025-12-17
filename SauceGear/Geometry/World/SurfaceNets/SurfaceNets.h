@@ -76,6 +76,7 @@ struct Chunk {
     int                             lod = 0;
 
     float                           dbg = 0;
+    Entity                          entity = INVALID_ENTITY;
 
     Chunk(size_t d = 0) {
         buff = std::make_unique<ChunkBuffer>();  

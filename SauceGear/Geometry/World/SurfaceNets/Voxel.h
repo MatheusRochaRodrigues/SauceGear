@@ -67,8 +67,12 @@ public:
     std::vector<Chunk*> gnrtChunk() {
         auto* world = new WorldSys(generator, computeShader);
 
+
+        DebugRenderer::AddPoint(world->octree->root->getBounds().min, glm::vec3(0,0,1.0f), 15.0f, DebugPointType::Square, true);
+        DebugRenderer::AddPoint(world->octree->root->getBounds().max, glm::vec3(0,0,1.0f), 15.0f, DebugPointType::Square, true); 
+
         world->Update(glm::vec3(0, 0, 0));
-        auto allChunks = world->CollectLeafChunks();
+        auto allChunks = world->CollectChunks();
         std::cout << " fd " << allChunks.size() << std::endl;
         return allChunks;
 
