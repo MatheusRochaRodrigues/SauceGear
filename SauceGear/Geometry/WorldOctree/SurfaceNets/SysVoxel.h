@@ -23,11 +23,13 @@ struct SysVoxel {
 
     void    set_cellGrid(int s) { cellGrid = s; }     //set_voxelGrid(int s) { cellGrid  = s; }
     void    set_base0ChunkSize(int s) { baseChunkSize0 = s; }
-    int     get_cellGrid() { return cellGrid; }  // número de células  //ex : 16 
-    // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
-    int     get_voxelGrid() { return cellGrid + 1; /*resolution default = 17*/ }
+    int     get_Border() { return (int)border; /*resolution default = 17*/ }    //static_cast<int>()
 
-    float   get_baseChunkSize() { return baseChunkSize0; }  // tamanho total do chunk em unidades de mundo  
+    int     get_cellGrid()   { return cellGrid; }  // número de células  //ex : 16  
+    int     get_voxelGrid()  { return cellGrid + 1; /*resolution default = 17*/ } // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
+    int     get_BorderGrid() { return cellGrid + 2; /*resolution default = 17*/ }
+
+    int   get_baseChunkSize() { return baseChunkSize0; }  // tamanho total do chunk em unidades de mundo  
     
     float   get_voxelSize(unsigned int lod) { return baseChunkSize0 * (1 << lod); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
     //float   get_voxelSizeg(OctreeNode* n) { return n->edge_length() / get_voxelGrid(); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
@@ -38,9 +40,11 @@ struct SysVoxel {
 
 
 private:
-    int         cellGrid        = 16;           //  how many cells are in the grid                                           
-    int         baseChunkSize0  = 16;           //  size of chunk in LOD 0        
+    int         cellGrid        = 16/2;           //  how many cells are in the grid                                           
+    int         baseChunkSize0  = 16/2;           //  size of chunk in LOD 0        
     int         minChunkLod     = 2;    //4        //  min lod that a node can have to generate a chunk
+
+    bool border = true;
 
     //constexpr SysVoxel() {}
     SysVoxel() = default;

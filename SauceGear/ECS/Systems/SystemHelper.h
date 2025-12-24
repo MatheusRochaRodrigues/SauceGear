@@ -12,6 +12,8 @@
 #include "TransformSystem.h"
 
 #include "OctreeWorldSystem.h"
+#include "EndLoopSystem.h"
 
+#include "AABBSystem.h"  
 
 #include "DebugRenderer.h"  

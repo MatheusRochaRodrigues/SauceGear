@@ -3,7 +3,8 @@
 #include "../../Core/InputSystem.h"  
 #include "../../Core/Camera.h"  
 #include "../../Platform/Window.h"  
-#include "../Utils/utilsAABB.h"  
+#include "../Math/Ray.h"  
+#include "../Math/AABB.h"  
 #include "../../ECS/Components/ComponentsHelper.h"
 #include "../Scene/SceneECS.h"  
 
@@ -15,11 +16,14 @@ public:
         InputSystem* input = GEngine->input; // Ponte para o InputSystem 
         const unsigned int width = GEngine->window->GetWidth();
         const unsigned int height = GEngine->window->GetHeight();
-        // Substituindo IsMouseClicked pelo InputSystem
-        if (!input->IsMousePressed(MOUSE_BUTTON_LEFT)) 
-            return;
 
-        Ray ray = utilsAABB::ScreenPosToWorldRay(
+        //if (ImGuizmo::IsUsing() || ImGuizmo::IsOver())
+            //return;
+
+        // Substituindo IsMouseClicked pelo InputSystem
+        if (!input->IsMousePressed(MOUSE_BUTTON_LEFT))  return;
+
+        Ray ray = RayFactory::ScreenPosToWorldRay(
             input->GetMousePosition().x,
             input->GetMousePosition().y,
             width, height,
@@ -29,24 +33,29 @@ public:
         );
 
         float closestT = FLT_MAX;
-        Entity picked = INVALID_ENTITY;
+        Entity picked  = INVALID_ENTITY;
 
         for (Entity e : scene->GetEntitiesWith<MeshRenderer, Transform, AABBComponent>()) {
             auto& mesh = scene->GetComponent<MeshRenderer>(e);
             auto& trans = scene->GetComponent<Transform>(e);
-            auto& aabb = scene->GetComponent<AABBComponent>(e);
+            auto& bound = scene->GetComponent<AABBComponent>(e);
 
             float t;
-            if (utilsAABB::IntersectRayAABB(ray, aabb, t)) {
+            AABB aabb(bound.worldMin, bound.worldMax);
+
+            //std::cout << "IN ANALISE" << std::endl;
+            if (aabb.intersects(ray, t)) {
+                //std::cout << " NamePIcking " << scene->GetComponent<NameComponent>(e).name << std::endl;
                 if (t < closestT) {
+                    //std::cout << " Pick " << std::endl;
                     closestT = t;
                     picked = e;
                 }
             }
+            //std::cout << "out" << std::endl;
         }
 
-        if (picked != INVALID_ENTITY)
-            scene->SelectEntity(picked);
+        if (picked != INVALID_ENTITY) scene->SelectEntity(picked);
     }
 };
 
@@ -69,36 +78,4 @@ public:
 
 
 
-
-
-
-
-//void Update(float deltaTime) override {
-//    if (!IsMouseClicked()) return;
-//
-//    Ray ray = ScreenPosToWorldRay(
-//        GetMouseX(), GetMouseY(),
-//        GetScreenWidth(), GetScreenHeight(),
-//        view, projection, cameraPos
-//    );
-//
-//    float closestT = FLT_MAX;
-//    Entity picked = INVALID_ENTITY;
-//
-//    for (Entity e : scene->GetEntitiesWith<MeshComponent, Transform>()) {
-//        auto& mesh = scene->GetComponent<MeshComponent>(e);
-//        auto& trans = scene->GetComponent<Transform>(e);
-//        auto& aabb = scene->GetComponent<AABBComponent>(e);
-//
-//        float t;
-//        if (IntersectRayAABB(ray, aabb, t)) {
-//            if (t < closestT) {
-//                closestT = t;
-//                picked = e;
-//            }
-//        }
-//    }
-//
-//    if (picked != INVALID_ENTITY)
-//        scene->SelectEntity(picked);
-//}
+ 

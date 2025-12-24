@@ -26,6 +26,7 @@ public:
         const size_t voxelCount = size_t(GridVoxelPerAxis) * GridVoxelPerAxis * GridVoxelPerAxis;
 
         std::cout << " wqe " << buff.densityMap.size() << std::endl;
+        std::cout << " wqe2 " << voxelCount << std::endl;
 
         assert(buff.densityMap.size() == voxelCount && "Density map size mismatch!");
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utils/Bounds.h" 
+#include "../Math/AABB.h" 
 #include <glm/glm.hpp>
 #include "SysVoxel.h" 
 
@@ -12,12 +12,11 @@ struct OctreeNode {
 
     bool                        subdivided = false;
     std::array<OctreeNode*, 8>  children = { nullptr };
-    OctreeNode*                 father = nullptr;
-    float                       distSurf_SDF = 0;
+    OctreeNode*                 father = nullptr; 
 
     //Mesh 
     std::unique_ptr<Chunk>      chunk;
-    Bounds b;
+    AABB b; //bounds
 
     // ---------- cache Otimization ----------
     bool                        isAlreadyPass = false;          // já processado (como no GDVoxel)
@@ -38,9 +37,9 @@ struct OctreeNode {
      
     inline float cell_size() { return syso.BASE_CELL_SIZE * (1 << depthLOD); }
 
-    inline Bounds getBounds() const {
+    inline AABB getBounds() const {
         auto halfEdge = glm::vec3(edge_length() * 0.5f);
-        return Bounds(center - halfEdge, center + halfEdge);
+        return AABB(center - halfEdge, center + halfEdge);
     }
 
     bool isChunk() { return (depthLOD == (desiredLOD + sysv.get_MinChunkLod())); }
@@ -58,6 +57,16 @@ struct OctreeNode {
         return (p.x >= min.x && p.x <= max.x &&
             p.y >= min.y && p.y <= max.y &&
             p.z >= min.z && p.z <= max.z);
+    }
+
+    ivec3 World_to_GridChunk(vec3 p) {
+        int base = sysv.get_baseChunkSize();
+        return ivec3(glm::floor(p.x/base), glm::floor(p.y / base), glm::floor(p.z / base));
+    }
+
+    ivec3 snap_World_to_GridChunk(vec3 p) {
+        int base = sysv.get_baseChunkSize();
+        return ivec3(glm::floor(p.x / base), glm::floor(p.y / base), glm::floor(p.z / base)) * base;
     }
 };
 

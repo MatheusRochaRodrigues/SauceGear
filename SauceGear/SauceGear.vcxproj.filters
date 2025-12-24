@@ -443,16 +443,13 @@
     <ClInclude Include="ECS\Systems\BoundsSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\utilsAABB.h">
+    <ClInclude Include="Utils\AABBBuilder.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Systems\PhysicsSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Systems\PickingSystem.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\MathHelpers.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Scripts\ScriptABI.h">
@@ -531,9 +528,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNets.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Noise.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\Octree\Octree.h">
@@ -644,7 +638,7 @@
     <ClInclude Include="Utils\PerlinNoise.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Bounds.h">
+    <ClInclude Include="Math\AABB.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.cpp">
@@ -660,6 +654,27 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Systems\OctreeWorldSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Ray.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Sphere.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Plane.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Raycast.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Vertex.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\AABBSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\EndLoopSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -772,7 +787,7 @@
     <None Include="Resources\Shaders\DebugP\backup\debug_point.fs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp2" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp2" />
     <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
     <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
@@ -785,13 +800,16 @@
     <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
     <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUBasic.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUBasic.comp" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUMainly.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUMainly.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU_SCG.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU_SCG.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

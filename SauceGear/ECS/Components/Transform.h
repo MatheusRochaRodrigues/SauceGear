@@ -31,6 +31,7 @@ struct Transform {
     // flags
     bool localDirty = true;  // local changed (user edited)
     bool worldDirty = true;  // world/model dirty (need recompute)
+    bool transformChangedThisFrame = false; //signal
 
     REFLECT_CLASS(Transform) {
         REFLECT_HEADER("Global Transform (read-only)");

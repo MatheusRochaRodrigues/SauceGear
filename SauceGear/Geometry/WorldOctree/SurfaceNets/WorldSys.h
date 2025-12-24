@@ -55,24 +55,29 @@ public:
         //auto map = makeMap.buildSDFGrid(n, octree->root);
         //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
 
-        if (!n->chunk) n->chunk = std::make_unique<Chunk>(); 
+        if (!n->chunk) n->chunk = std::make_unique<Chunk>();  
 
         // --- cria / redimensiona chunk ---  
-        Chunk& chunk = *n->chunk; chunk.lod = n->depthLOD;  chunk.buff->densityMap = map;
+        Chunk& chunk = *n->chunk; 
+        chunk.lod = n->depthLOD;  
+        chunk.buff->densityMap = map; 
 
         // --- pega buffer GPU ---
         SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
-        gpuBuf->ensureCapacity(sysv.get_voxelGrid());                               //sysv.get_cellGrid()
+        gpuBuf->ensureCapacity(sysv.get_voxelGrid() + 1/*Border*/);           //sysv.get_cellGrid()
          
+        float voxelSize = n->edge_length() / sysv.get_cellGrid();
+        glm::vec3 offset = n->getBounds().min;  //n->getBounds().min - voxelSize;
+
         // --- Gera mesh ---
         chunk.mesh = SurfaceNetsGPU::Generate(
             *chunk.buff,
-            n->getBounds().min,
+            offset,
             computeShader->ID,
             *gpuBuf,
             false,
-            sysv.get_voxelGrid(),        //get_cellGrid
-            n->edge_length() / sysv.get_cellGrid()      /*voxelSize*/
+            sysv.get_voxelGrid() + sysv.get_Border()/*Border*/,        //get_cellGrid
+            voxelSize       
         );
 
         GlobalSurfaceNetsPool::Get().Release(gpuBuf);  

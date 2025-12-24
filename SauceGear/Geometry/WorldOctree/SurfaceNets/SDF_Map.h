@@ -27,10 +27,10 @@ public:
         // d_max = (3*(0.5)^3)^(1/3) ≈ 1.44225
         // Multiplicamos por 1.75 como fator de segurança / fudge factor
         // para garantir que nós próximos à superfície sejam subdivididos corretamente.
-        // 
-        const float surfaceNetThreshold = edgeLength * 1.44224957f * 1.75f;
+        
 
-        //const float surfaceNetThreshold = edgeLength * 0.8660254037 * 1.75f;
+        //const float surfaceNetThreshold = edgeLength * 1.44224957f * 1.75f; 
+        const float surfaceNetThreshold = edgeLength * 0.8660254037 * 1.75f;
 
 
         std::cout << "depthLOD " << n.depthLOD << std::endl;

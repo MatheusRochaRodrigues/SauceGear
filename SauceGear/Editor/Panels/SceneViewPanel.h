@@ -7,6 +7,8 @@
 #include "../../ECS/Systems/TransformSystem.h" 
 
 struct SceneViewPanel : IPanel {
+    bool gizmoActive;
+
     SceneViewPanel() { 
         iconTranslate = guiLoadTexture("assets/icons/Translate.png");
         iconRotate    = guiLoadTexture("assets/icons/Rotate.png");
@@ -47,6 +49,7 @@ struct SceneViewPanel : IPanel {
 
 
         if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
+            //Orientations
             if (ImGui::ImageButton("TranslateBtn", iconTranslate, ImVec2(24, 24)))
                 currentGizmoMode = ImGuizmo::TRANSLATE;
 
@@ -57,6 +60,31 @@ struct SceneViewPanel : IPanel {
             ImGui::SameLine();
             if (ImGui::ImageButton("TranslateBtn3", iconScale, ImVec2(24, 24)))
                 currentGizmoMode = ImGuizmo::SCALE;
+
+            //Space
+            ImGui::SameLine(); 
+            const char* spaceLabel = (currentGizmoSpace == ImGuizmo::WORLD) ? "WORLD" : "LOCAL";
+
+            if (ImGui::Button(spaceLabel, ImVec2(60, 24))) {
+                currentGizmoSpace =
+                    (currentGizmoSpace == ImGuizmo::WORLD)
+                    ? ImGuizmo::LOCAL
+                    : ImGuizmo::WORLD;
+            }
+
+            ImGui::SameLine();
+            ImGui::Checkbox("Snap", &useSnap);
+
+            if (useSnap) {
+                if (currentGizmoMode == ImGuizmo::TRANSLATE)
+                    snapValues[0] = snapTranslate;
+                else if (currentGizmoMode == ImGuizmo::ROTATE)
+                    snapValues[0] = snapRotate;
+                else if (currentGizmoMode == ImGuizmo::SCALE)
+                    snapValues[0] = snapScale;
+            }
+
+
         }
         ImGui::End();
 
@@ -84,15 +112,36 @@ struct SceneViewPanel : IPanel {
 
             // IMPORTANTE: aqui usamos a matrix world do transform.
             // Certifique-se que você chamou TransformSystem::UpdateAllTransforms(scene) neste frame antes de desenhar gizmos.
-            glm::mat4 worldMat = tc.GetMatrix(); // GetMatrix() retorna model/worldMatrix
+            glm::mat4 objectWorld = tc.GetMatrix();
+            glm::mat4 pivotWorld = objectWorld;
+
+            bool usingAabbPivot =
+                scene.HasComponent<AABBComponent>(selected) &&
+                currentGizmoSpace == ImGuizmo::LOCAL;
+
+            if (usingAabbPivot) {
+                AABBComponent& aabb = scene.GetComponent<AABBComponent>(selected);
+                // centro LOCAL da malha
+                glm::vec3 localCenter = (aabb.localMin + aabb.localMax) * 0.5f;
+                // matriz do pivot (world)
+                pivotWorld = objectWorld * glm::translate(glm::mat4(1.0f), localCenter);
+            } 
+            // gizmo começa no pivot
+            glm::mat4 gizmoWorld = pivotWorld;
 
             ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
-                currentGizmoMode, ImGuizmo::WORLD, glm::value_ptr(worldMat)); //LOCAL
+                currentGizmoMode, currentGizmoSpace, glm::value_ptr(gizmoWorld)); //LOCAL
 
             if (ImGuizmo::IsUsing()) {
                 //ApplyGizmoTransform(scene, selected, worldMat); 
+                 
+                // delta em espaço WORLD
+                glm::mat4 delta = glm::inverse(pivotWorld) * gizmoWorld; 
+                // aplica no objeto REAL
+                glm::mat4 newWorld = objectWorld * delta;
+                  
                 // new world matrix gerada pelo gizmo
-                glm::mat4 newWorld = worldMat;
+                //glm::mat4 newWorld = objectWorld;
 
                 // se tiver parent -> converte para local
                 glm::mat4 parentWorld = glm::mat4(1.0f);
@@ -102,13 +151,9 @@ struct SceneViewPanel : IPanel {
                         parentWorld = scene.GetComponent<Transform>(h.parent).model;
                         tc.SetLocalFromWorldMatrix(newWorld, parentWorld);
                     }
-                    else {
-                        tc.SetLocalFromWorldMatrixAsRoot(newWorld);
-                    }
+                    else tc.SetLocalFromWorldMatrixAsRoot(newWorld); 
                 }
-                else {
-                    tc.SetLocalFromWorldMatrixAsRoot(newWorld);
-                }
+                else tc.SetLocalFromWorldMatrixAsRoot(newWorld); 
                  
                 // não precisa MarkDirty() porque os SetLocalFromWorldMatrix já fazem isso internamente
                 // só garante que o Update do TransformSystem vai recalcular na próxima passada
@@ -117,11 +162,10 @@ struct SceneViewPanel : IPanel {
                 // não precisa atualizar subtree manual aqui → deixa o sistema cuidar no próximo frame
                 // forçar atualização só da subtree editada
                 TransformSys::UpdateSubtree(scene, selected);
-            }
-             
+            } 
+            gizmoActive = ImGuizmo::IsOver() || ImGuizmo::IsUsing(); 
             //if (isSceneHovered && isSceneFocused)     // Manipula o transform da entidade com o gizmo, apenas se a janela de cena estiver focada
-        } 
-
+        }  
          
         const char* items[] = { "Scene", "Hierarchy", "Inspector", "Project" };
         static int current_item = 0;
@@ -178,6 +222,14 @@ private:
     ImTextureID iconRotate = NULL;
     ImTextureID iconScale = NULL;
     ImGuizmo::OPERATION currentGizmoMode = ImGuizmo::TRANSLATE;
+    ImGuizmo::MODE currentGizmoSpace = ImGuizmo::WORLD;
+
+    //snap list
+    bool useSnap = false;
+    float snapTranslate = 0.5f;
+    float snapRotate = 15.0f;
+    float snapScale = 0.1f; 
+    float snapValues[3];
 
     //ImTextureID LoadTexture(const std::string& path);       //LoadIconTexture
 };

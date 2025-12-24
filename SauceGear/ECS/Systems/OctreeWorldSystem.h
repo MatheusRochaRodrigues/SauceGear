@@ -30,7 +30,7 @@ public:
         int N = 17; // 17 por exemplo
         std::vector<float> grid(N * N * N);
 
-        Bounds region = chunk->getBounds();
+        AABB region = chunk->getBounds();
         glm::vec3 size = region.max - region.min;
         glm::vec3 minCorner = chunk->center - glm::vec3(size * 0.5f);
 
@@ -87,6 +87,7 @@ public:
     bool f = false;
 
     void Update(float deltaTime) override { 
+        return;
         try {
             // 1) pegar camera principal (se houver) e atualizar SysOctree::camera
             auto entities = GEngine->scene->GetEntitiesWith<CameraComponent, Transform>();

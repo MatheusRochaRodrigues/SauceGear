@@ -3,6 +3,7 @@
 #include "../Core/EngineContext.h"
 #include "../ECS/Components/ComponentsHelper.h"
 #include "../Resources/Model.h"  
+#include "../Utils/AABBBuilder.h"
 
 class SceneBuilder {       //GameObjectFactory
 public: 
@@ -24,7 +25,10 @@ public:
             return INVALID_ENTITY;
         }
         Entity i = InstantiateNode(mesh, INVALID_ENTITY, materialOverride);
-        GEngine->scene->AddComponent<AABBComponent>(i);
+
+        GEngine->scene->AddComponent<AABBComponent>(i); 
+        //AABBBuilder::aabbMesh(i);
+
         return i;
     }
 
@@ -34,7 +38,10 @@ public:
             return INVALID_ENTITY;
         }
         Entity i = InstantiateNode(mesh, INVALID_ENTITY, materialOverride);
+
         GEngine->scene->AddComponent<AABBComponent>(i);
+        //AABBBuilder::aabbMesh(i);
+
         return i;
     }
 

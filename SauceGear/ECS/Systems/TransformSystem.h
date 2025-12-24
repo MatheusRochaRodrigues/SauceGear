@@ -44,6 +44,8 @@ namespace TransformSys {
             Transform& t = scene.GetComponent<Transform>(e);
             if (!(t.localDirty || t.worldDirty)) continue;
 
+            t.transformChangedThisFrame = true;
+
             // root detection: se tem HierarchyComponent e parent != INVALID_ENTITY -> não é root
             bool isRoot = true;
             if (scene.HasComponent<HierarchyComponent>(e)) {

@@ -192,6 +192,8 @@
   <ItemGroup>
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
     <ClInclude Include="ECS\Components\LightComponent.h" />
+    <ClInclude Include="ECS\Systems\AABBSystem.h" />
+    <ClInclude Include="ECS\Systems\EndLoopSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\CascadeSun.h" />
     <ClInclude Include="ECS\Systems\Lighting\LightDirectional.h" />
     <ClInclude Include="ECS\Systems\Lighting\LightPoint.h" />
@@ -221,6 +223,11 @@
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPUBuffer.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\GSurfPool.h" />
+    <ClInclude Include="Graphics\Vertex.h" />
+    <ClInclude Include="Math\Plane.h" />
+    <ClInclude Include="Math\Ray.h" />
+    <ClInclude Include="Math\Sphere.h" />
+    <ClInclude Include="Physics\Raycast.h" />
     <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h" />
     <ClInclude Include="ECS\Components\ComputeSyncComponent.h" />
     <ClInclude Include="ECS\Components\SurfaceNetsComponent.h" />
@@ -245,7 +252,6 @@
     <ClInclude Include="Graphics\ComputeShader.h" />
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
-    <ClInclude Include="Math\Noise.h" />
     <ClInclude Include="Geometry\Octree\Octree.h" />
     <ClInclude Include="Resources\DebugRender\DebugPointRenderer.h" />
     <ClInclude Include="Resources\DefineMaterials\Material.h" />
@@ -255,15 +261,14 @@
     <ClInclude Include="Resources\DefineMaterials\TextureCache.h" />
     <ClInclude Include="Resources\DebugRender\DebugPointDrawer.h" />
     <ClInclude Include="Scripts\ScriptABI.h" />
-    <ClInclude Include="Utils\Bounds.h" />
-    <ClInclude Include="Utils\MathHelpers.h" />
+    <ClInclude Include="Math\AABB.h" />
     <ClInclude Include="ECS\Systems\PickingSystem.h" />
     <ClInclude Include="ECS\Systems\PhysicsSystem.h" />
     <ClInclude Include="ECS\Components\AABBComponent.h" />
     <ClInclude Include="ECS\Systems\BoundsSystem.h" />
     <ClInclude Include="Utils\Noise.h" />
     <ClInclude Include="Utils\PerlinNoise.h" />
-    <ClInclude Include="Utils\utilsAABB.h" />
+    <ClInclude Include="Utils\AABBBuilder.h" />
     <ClInclude Include="Scripts\MyScript.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h" />
     <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h" />
@@ -354,8 +359,11 @@
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUMainly.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPUBasic.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUMainly.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUBasic.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU_SCG.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
     <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
     <None Include="Resources\Shaders\debugQuad.vs" />
@@ -454,13 +462,13 @@
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\ShadowMapCasc.vs" />
     <None Include="Resources\Shaders\Compute\TestCube.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp2" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp2" />
     <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
     <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
     <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU_SCG.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ECS\Systems\Texto.txt" />

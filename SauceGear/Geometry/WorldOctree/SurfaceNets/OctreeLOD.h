@@ -27,30 +27,30 @@ public:
         auto& octreeSys = syso.getInstance();
 
         while (!q.empty()) {
-            OctreeNode* n = q.front(); q.pop();
-
-            std::cout << std::endl << std::endl;
+            OctreeNode* n = q.front(); q.pop(); 
             OctreeDebug::PrintNodeHeader(n);
 
             //verifica em qual shell está
             n->desiredLOD = octreeSys.lod_at(n->center);      // equivalent to the targetLOD 
-            if (n->desiredLOD < 0) return;
+            if (n->desiredLOD < 0) continue;  //return
              
             if (!n->isAlreadyPass) {  //cache interno do octree   
                 // --- SDF Distance ---
-                float sdf = map.sdf->sdfDistance(n->center);            
-                n->distSurf_SDF = sdf;
-                bool notArrivedLod = (n->depthLOD > n->desiredLOD);
+                evalSDF(*n);
+                //bool shouldHasChunk = n->hasSurface && map.has_surface(*n, n->sdfCenter, octreeSys.BASE_CELL_SIZE);
+                bool shouldHasChunk = n->hasSurface;
 
                 OctreeDebug::PrintSDF(n);   
-                OctreeDebug::PrintSurfaceDecision(map.has_surface(*n, sdf, octreeSys.BASE_CELL_SIZE));
+                OctreeDebug::PrintSurfaceDecision(n->hasSurface);
 
+                bool notArrivedLod = (n->depthLOD > n->desiredLOD);
                 //if exists zero-crossing of SDF into of the node  &&  if the current lod of the node have desired Lod based player position
-                if ( map.has_surface( *n, sdf, octreeSys.BASE_CELL_SIZE) && notArrivedLod && (n->depthLOD > syso.maxDepthLod) ) {
-                    subdivide(n);     OctreeDebug::Subdiveded();  
-
-                    for (auto* c : n->children) q.push(c);
+                if ( shouldHasChunk && notArrivedLod && (n->depthLOD > syso.maxDepthLod) ) {
+                    subdivide(n);     OctreeDebug::Subdiveded();   
                     n->isAlreadyPass = true; 
+                }
+                if (!n->is_leaf()) {
+                    for (auto* c : n->children) q.push(c);
                 }
 
                 // if we don't subdivide further, we mark it as a fully realized subtree
@@ -95,7 +95,7 @@ public:
      
 private:
     void evalSDF(OctreeNode& n) {
-        Bounds b = n.getBounds();
+        AABB b = n.getBounds();
 
         n.sdfMin = +FLT_MAX;
         n.sdfMax = -FLT_MAX;
@@ -108,6 +108,8 @@ private:
             n.sdfMin = std::min(n.sdfMin, d);
             n.sdfMax = std::max(n.sdfMax, d);
         }
+
+        n.sdfCenter = map.sdf->sdfDistance(n.center);
 
         n.hasSurface = (n.sdfMin <= 0 && n.sdfMax >= 0);
         n.evaluated = true;
@@ -160,8 +162,8 @@ private:
         } 
 
         n->subdivided = true;
-    }   
-     
+    }
+
     bool is_parent_enqueued(OctreeNode* n) { return n->father == nullptr ? false : n->father->isEnqueued; }
     bool is_any_children_enqueued(OctreeNode* n) {
         if (n->is_leaf()) return false;

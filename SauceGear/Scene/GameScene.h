@@ -27,7 +27,11 @@ public:
 
         {
             stbi_set_flip_vertically_on_load(true);
+            std::cout << "cs 1" << std::endl;
+
             Entity entity = SceneBuilder::CreateModel("Resources/Models/backpack/backpack.obj");
+            std::cout << "cs 2" << std::endl;
+
             auto& l = GetComponent<Transform>(entity);
             l.position = glm::vec3(1,1,0);
             //stbi_set_flip_vertically_on_load(false);

@@ -13,32 +13,29 @@ void SceneECS::initECS() {
     componentManager->Register<HierarchyComponent>();
     componentManager->Register<NameComponent>();
     //componentManager->Register<PostProcessComponent>(); 
-    componentManager->Register<AABBComponent>();
-
+    componentManager->Register<AABBComponent>(); 
     componentManager->Register<SurfaceNetsComponent>();
     componentManager->Register<DebugMeshComponent>();
 
 
     ///----------Systems
-    auto* transformSystem =      RegisterSystem <TransformSystem>();
-    auto* cameraSystem =         RegisterSystem <CameraSystem>();
-    auto* computeSyncComponent = RegisterSystem <ComputeSyncSystem>();
-    auto* dayNightSystem =       RegisterSystem <DayNightSystem>();
-    auto* lightSystem  =         RegisterSystem <LightSystem> ();
-    auto* globalUniformSystem =  RegisterSystem <GlobalUniformSystem>(); 
-    auto* renderSystem =         RegisterSystem <RenderSystem>();
-
-    auto* debugRenderer =        RegisterSystem <DebugRenderer>();
-
-    auto* postProcessSystem =    RegisterSystem <PostProcessSystem>();
-
-    auto* octreeWorldSystem = RegisterSystem <OctreeWorldSystem>();
-
-
-    //auto* pickingSystem = RegisterSystem <PickingSystem>();
+    RegisterSystem <TransformSystem>();
+    RegisterSystem <AABBSystem>();
+    RegisterSystem <CameraSystem>();
+    RegisterSystem <ComputeSyncSystem>();
+    RegisterSystem <DayNightSystem>();
+    RegisterSystem <LightSystem> ();
+    RegisterSystem <GlobalUniformSystem>(); 
+    RegisterSystem <RenderSystem>(); 
+    RegisterSystem <DebugRenderer>(); 
+    RegisterSystem <PostProcessSystem>(); 
+    RegisterSystem <OctreeWorldSystem>();  
+    RegisterSystem <PickingSystem>();
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>(); 
+
+    RegisterSystem <EndLoopSystem>();
 }
 
 Entity SceneECS::CreateEntity() {

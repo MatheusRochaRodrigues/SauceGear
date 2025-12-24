@@ -10,6 +10,7 @@ class InputSystem;
 class Camera;   // para o GetMainCamera
 //class SceneManager;
 
+#define scn GEngine->scene
 
 struct EngineContext
 {

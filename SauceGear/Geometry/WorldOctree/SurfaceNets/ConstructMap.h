@@ -46,7 +46,7 @@ public:
     void getNodesAtDepth(
         OctreeNode* n,
         int targetLOD,
-        const Bounds& region,
+        const AABB& region,
         std::vector<OctreeNode*>& out)
     {
         // Se não intersecta, corta
@@ -73,7 +73,7 @@ public:
         int N = 17; // resolução do sample
         std::vector<float> sdf(N * N * N);
 
-        Bounds region = chunkNode->getBounds();
+        AABB region = chunkNode->getBounds();
         int targetLOD = chunkNode->depthLOD;
 
         std::vector<OctreeNode*> nodes;
@@ -96,27 +96,28 @@ public:
 
         return sdf;
     }
+     
+    SDF_Map map;
+    std::vector<float> buildDenseSDF(OctreeNode* chunk) { 
+        int cells = sysv.get_cellGrid();                                // 16
+        int N = cells + 1 + sysv.get_Border()/*1 if true else 0*/;      // 16 (cells) + 1(to voxels) + 1 (border) 
 
-
-    std::vector<float> buildDenseSDF(OctreeNode* chunk) {
-        SDF_Map map;
-
-        int N = 17; // 17 por exemplo
         std::vector<float> grid(N * N * N);
 
-        Bounds region = chunk->getBounds();
+        AABB region = chunk->getBounds();
         glm::vec3 size = region.max - region.min;
         glm::vec3 minCorner = chunk->center - glm::vec3(size * 0.5f);
 
+        float voxelSize = chunk->edge_length() / float(cells);
+
+        // ⚠️ desloca 1 voxel PARA FORA
+        //glm::vec3 origin = minCorner - voxelSize;
+        glm::vec3 origin = minCorner;
+
         for (int z = 0; z < N; z++)
             for (int y = 0; y < N; y++)
-                for (int x = 0; x < N; x++) {
-                    glm::vec3 p = minCorner + size * glm::vec3(
-                        float(x) / float(N - 1),
-                        float(y) / float(N - 1),
-                        float(z) / float(N - 1)
-                    );
-
+                for (int x = 0; x < N; x++) { 
+                    glm::vec3 p = origin + glm::vec3(x, y, z) * voxelSize;
                     grid[(z * N + y) * N + x] = map.sdf->sdfDistance(p);
                 }
 

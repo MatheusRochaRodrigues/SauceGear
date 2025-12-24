@@ -190,13 +190,12 @@ void maybe_make_quad(uint p1, uint p2, uint axis_b_stride, uint axis_c_stride, f
 }
 
 // build quads for the given cell stride (linear index)
-// Here we work by moving through cells.
 void make_all_quads(ivec3 cell, float cornerSDF[8], uint baseStride) {
     uint strideX = 1u;
     uint strideY = uint(uDim);
     uint strideZ = uint(uDim) * uint(uDim);
      
-    int maxCell = uDim - 1 - 1; //uDim - 1 to no border, but with border assume uDim - 2
+    int maxCell = uDim - 1;
 
     // matches CPU conditions (only create quads when neighbor indices in bounds)
 
