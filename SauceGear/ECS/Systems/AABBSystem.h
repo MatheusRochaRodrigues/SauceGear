@@ -14,9 +14,9 @@ public:
         SceneECS& scene = *GEngine->scene;
          
         for (Entity e : scene.GetEntitiesWith<AABBComponent, MeshRenderer, Transform>()) {  
-            Transform& t = scene.GetComponent<Transform>(e);
+            Transform& t        = scene.GetComponent<Transform>    (e);
             AABBComponent& aabb = scene.GetComponent<AABBComponent>(e);
-            MeshRenderer& mr = scene.GetComponent<MeshRenderer>(e);
+            MeshRenderer& mr    = scene.GetComponent<MeshRenderer> (e);
 
             if (aabb.dirtyLocal) {
                 if (!mr.mesh || mr.mesh->vertices.empty()) continue; //std::cout << "errado aq - AABB_SYSTEM " << std::endl; continue;
@@ -34,6 +34,7 @@ public:
                 UpdateWorldAABB(aabb, t.model);
                 aabb.dirty = false;
             }
+
         }  
     }
 

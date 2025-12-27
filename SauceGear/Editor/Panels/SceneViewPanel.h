@@ -6,17 +6,32 @@
 
 #include "../../ECS/Systems/TransformSystem.h" 
 
-struct SceneViewPanel : IPanel {
-    bool gizmoActive;
+#include "../Core/EditorState.h"
+#include "../../Core/InputSystem.h"  
+
+struct SceneViewPanel : IPanel { 
 
     SceneViewPanel() { 
         iconTranslate = guiLoadTexture("assets/icons/Translate.png");
         iconRotate    = guiLoadTexture("assets/icons/Rotate.png");
         iconScale     = guiLoadTexture("assets/icons/Scale.png");
-    }
+    } 
 
     void Draw(SceneECS& scene) override {
         ImGui::Begin("Scene");
+
+        EditorState& state = *GEngine->editorState;
+        InputSystem* input = GEngine->input;
+
+        // --------------------------------------------------
+        // 1. RESET DE INTENÇÕES
+        // --------------------------------------------------
+        cleanState();
+
+        // --------------------------------------------------
+        // 2. VIEWPORT SIZE / FRAMEBUFFER
+        // --------------------------------------------------
+
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
         //verify size buffer
         if (viewportSize.x != lastSize.x || viewportSize.y != lastSize.y) {
@@ -47,46 +62,35 @@ struct SceneViewPanel : IPanel {
             framebufferDirty = false; // libera no próximo frame 
         }
 
+        // --------------------------------------------------
+    // 3. ATUALIZA VIEWPORT STATE (ANTES DO GIZMO)
+    // --------------------------------------------------
+        //GetWindowPos() retorna o canto superior esquerdo de toda janela imgui aberta e nao da atual janela 
+        state.sceneViewportPos = {
+            ImGui::GetWindowPos().x,
+            ImGui::GetWindowPos().y
+        };
 
-        if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
-            //Orientations
-            if (ImGui::ImageButton("TranslateBtn", iconTranslate, ImVec2(24, 24)))
-                currentGizmoMode = ImGuizmo::TRANSLATE;
+        state.sceneViewportSize = {
+            viewportSize.x,
+            viewportSize.y
+        };
 
-            ImGui::SameLine();
-            if (ImGui::ImageButton("TranslateBtn2", iconRotate, ImVec2(24, 24)))
-                currentGizmoMode = ImGuizmo::ROTATE;
+        state.sceneViewportHovered = ImGui::IsWindowHovered();
+        state.sceneViewportFocused = ImGui::IsWindowFocused();
 
-            ImGui::SameLine();
-            if (ImGui::ImageButton("TranslateBtn3", iconScale, ImVec2(24, 24)))
-                currentGizmoMode = ImGuizmo::SCALE;
-
-            //Space
-            ImGui::SameLine(); 
-            const char* spaceLabel = (currentGizmoSpace == ImGuizmo::WORLD) ? "WORLD" : "LOCAL";
-
-            if (ImGui::Button(spaceLabel, ImVec2(60, 24))) {
-                currentGizmoSpace =
-                    (currentGizmoSpace == ImGuizmo::WORLD)
-                    ? ImGuizmo::LOCAL
-                    : ImGuizmo::WORLD;
-            }
-
-            ImGui::SameLine();
-            ImGui::Checkbox("Snap", &useSnap);
-
-            if (useSnap) {
-                if (currentGizmoMode == ImGuizmo::TRANSLATE)
-                    snapValues[0] = snapTranslate;
-                else if (currentGizmoMode == ImGuizmo::ROTATE)
-                    snapValues[0] = snapRotate;
-                else if (currentGizmoMode == ImGuizmo::SCALE)
-                    snapValues[0] = snapScale;
-            }
-
-
-        }
-        ImGui::End();
+        glm::vec2 mouse = input->GetMousePosition();
+        state.mouseScreen = mouse;
+        state.mouseViewport.x = mouse.x - state.sceneViewportPos.x;
+        // without flip Y
+        state.mouseViewport.y = mouse.y - state.sceneViewportPos.y; // flip de Y para IMGUI senao seria apenas -> mouse.y - state.sceneViewportPos.y
+        // with flip y
+        //state.mouseViewport.y = state.sceneViewportSize.y - (mouse.y - state.sceneViewportPos.y);
+         
+        // 4. TOOLBAR 
+        DrawToolbar();
+         
+        // 5. GIZMO 
 
         // Chama o BeginFrame do ImGuizmo
         ImGuizmo::BeginFrame();
@@ -131,17 +135,26 @@ struct SceneViewPanel : IPanel {
 
             ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
                 currentGizmoMode, currentGizmoSpace, glm::value_ptr(gizmoWorld)); //LOCAL
+             
 
-            if (ImGuizmo::IsUsing()) {
-                //ApplyGizmoTransform(scene, selected, worldMat); 
-                 
+            // --------------------------------------------------
+            // 6. ESTADO DO GIZMO + PICK
+            // --------------------------------------------------
+            state.gizmoUsing = ImGuizmo::IsUsing();
+            state.gizmoOver  = ImGuizmo::IsOver();
+
+            state.wantsPick =
+                state.sceneViewportHovered &&
+                !state.gizmoUsing &&
+                !state.gizmoOver &&
+                input->IsMousePressed(MOUSE_BUTTON_LEFT);
+
+
+            if (ImGuizmo::IsUsing()) {  
                 // delta em espaço WORLD
                 glm::mat4 delta = glm::inverse(pivotWorld) * gizmoWorld; 
                 // aplica no objeto REAL
-                glm::mat4 newWorld = objectWorld * delta;
-                  
-                // new world matrix gerada pelo gizmo
-                //glm::mat4 newWorld = objectWorld;
+                glm::mat4 newWorld = objectWorld * delta; 
 
                 // se tiver parent -> converte para local
                 glm::mat4 parentWorld = glm::mat4(1.0f);
@@ -162,8 +175,7 @@ struct SceneViewPanel : IPanel {
                 // não precisa atualizar subtree manual aqui → deixa o sistema cuidar no próximo frame
                 // forçar atualização só da subtree editada
                 TransformSys::UpdateSubtree(scene, selected);
-            } 
-            gizmoActive = ImGuizmo::IsOver() || ImGuizmo::IsUsing(); 
+            }  
             //if (isSceneHovered && isSceneFocused)     // Manipula o transform da entidade com o gizmo, apenas se a janela de cena estiver focada
         }  
          
@@ -193,10 +205,51 @@ struct SceneViewPanel : IPanel {
                 DrawProjectFiles();*/
         }
         ImGui::End();
-
          
         ImGui::End();
 
+    }
+
+    void DrawToolbar() {
+        if (ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize)) {
+            //Orientations
+            if (ImGui::ImageButton("TranslateBtn", iconTranslate, ImVec2(24, 24)))
+                currentGizmoMode = ImGuizmo::TRANSLATE;
+
+            ImGui::SameLine();
+            if (ImGui::ImageButton("TranslateBtn2", iconRotate, ImVec2(24, 24)))
+                currentGizmoMode = ImGuizmo::ROTATE;
+
+            ImGui::SameLine();
+            if (ImGui::ImageButton("TranslateBtn3", iconScale, ImVec2(24, 24)))
+                currentGizmoMode = ImGuizmo::SCALE;
+
+            //Space
+            ImGui::SameLine();
+            const char* spaceLabel = (currentGizmoSpace == ImGuizmo::WORLD) ? "WORLD" : "LOCAL";
+
+            if (ImGui::Button(spaceLabel, ImVec2(60, 24))) {
+                currentGizmoSpace =
+                    (currentGizmoSpace == ImGuizmo::WORLD)
+                    ? ImGuizmo::LOCAL
+                    : ImGuizmo::WORLD;
+            }
+
+            ImGui::SameLine();
+            ImGui::Checkbox("Snap", &useSnap);
+
+            if (useSnap) {
+                if (currentGizmoMode == ImGuizmo::TRANSLATE)
+                    snapValues[0] = snapTranslate;
+                else if (currentGizmoMode == ImGuizmo::ROTATE)
+                    snapValues[0] = snapRotate;
+                else if (currentGizmoMode == ImGuizmo::SCALE)
+                    snapValues[0] = snapScale;
+            }
+
+
+        }
+        ImGui::End();
     }
 
     void ApplyGizmoTransform(SceneECS& scene, Entity e, const glm::mat4& newWorld) {
@@ -210,9 +263,15 @@ struct SceneViewPanel : IPanel {
         t.SetLocalFromWorldMatrix(newWorld, parentWorld);
         TransformSys::UpdateSubtree(scene, e);
     }
-
-
+     
     const char* GetName() override { return "Scene"; }
+
+    void cleanState() {
+        EditorState& state = *GEngine->editorState;
+        state.wantsPick = true; //false
+        state.gizmoUsing = false;
+        state.gizmoOver = false; 
+    } 
 
 private:
     inline static ImVec2 lastSize = { 0, 0 };
@@ -236,3 +295,72 @@ private:
 
  
  
+
+
+
+
+
+//void saveState() {
+//    auto state = GEngine->editorState;
+//
+//    state->gizmoUsing = ImGuizmo::IsUsing();
+//    state->gizmoOver = ImGuizmo::IsOver();
+//
+//    state->sceneViewportPos = {
+//        ImGui::GetWindowPos().x,
+//        ImGui::GetWindowPos().y
+//    };
+//
+//    state->sceneViewportSize = {
+//        ImGui::GetContentRegionAvail().x,
+//        ImGui::GetContentRegionAvail().y
+//    };
+//
+//    state->sceneViewportHovered = ImGui::IsWindowHovered();
+//    state->sceneViewportFocused = ImGui::IsWindowFocused();
+//
+//
+//    InputSystem* input = GEngine->input; // Ponte para o InputSystem   
+//    state->wantsPick = state->sceneViewportHovered && !state->gizmoUsing && !state->gizmoOver
+//        && input->IsMousePressed(MOUSE_BUTTON_LEFT);
+//
+//
+//    //Legacy de picking input sobre oc odigo acima 
+//    /*
+//    if (ImGuizmo::IsUsing() || ImGuizmo::IsOver()) return;
+//    // Substituindo IsMouseClicked pelo InputSystem
+//    if (!input->IsMousePressed(MOUSE_BUTTON_LEFT))  return;
+//    */
+//
+//    glm::vec2 mouse = input->GetMousePosition();
+//    state->mouseScreen = mouse;
+//    state->mouseViewport = {
+//        mouse.x - state->sceneViewportPos.x,
+//        state->sceneViewportSize.y - (mouse.y - state->sceneViewportPos.y)
+//    };
+//
+//
+//
+//    //alternativamente para picking
+//    //sendo uma forma mais explicita de descrever oq acontece em mouseViewport
+//
+//    /*
+//    glm::vec2 sceneViewportPos = state->sceneViewportPos;
+//    glm::vec2 sceneViewportSize = state->sceneViewportSize;
+//
+//
+//    glm::vec2 mouse = input->GetMousePosition();
+//
+//    float localX = mouse.x - sceneViewportPos.x;
+//    float localY = mouse.y - sceneViewportPos.y;
+//
+//    // fora da viewport → não picka
+//    if (localX < 0 || localY < 0 ||
+//        localX > sceneViewportSize.x ||
+//        localY > sceneViewportSize.y)
+//        return;
+//
+//    // inverte Y (ImGui vs OpenGL)
+//    localY = sceneViewportSize.y - localY;
+//    */
+//}

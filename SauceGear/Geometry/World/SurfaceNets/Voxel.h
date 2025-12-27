@@ -7,6 +7,8 @@
 #include "GSurfPool.h"    
 #include "../Geometry/WorldOctree/SurfaceNets/WorldSys.h"    
 
+#include"../ECS/Systems/DebugRenderer.h"
+
 class voxelSystem {
 public: 
     voxelSystem() { 
@@ -64,12 +66,20 @@ public:
         return worldChunks; // retorna o vetor já totalmente preenchido
     }
     */
-    std::vector<Chunk*> gnrtChunk() {
+    std::vector<std::pair<Chunk*, OctreeNode*>> gnrtChunk() {
         auto* world = new WorldSys(generator, computeShader);
 
 
-        DebugRenderer::AddPoint(world->octree->root->getBounds().min, glm::vec3(0,0,1.0f), 15.0f, DebugPointType::Square, true);
-        DebugRenderer::AddPoint(world->octree->root->getBounds().max, glm::vec3(0,0,1.0f), 15.0f, DebugPointType::Square, true); 
+        DebugRenderer::Point(world->octree->root->getBounds().min, glm::vec3(0,0,1.0f), 15.0f, DebugPointType::Circle, true);
+        DebugRenderer::Point(world->octree->root->getBounds().max, glm::vec3(0,0,1.0f), 15.0f, DebugPointType::Square, true); 
+
+        DebugRenderer::Cube(
+            world->octree->root->getBounds().min,
+            world->octree->root->getBounds().max,
+            glm::vec3(0, 1, 0),
+            true   // Unity-style: redesenha todo frame
+        );
+
 
         world->Update(glm::vec3(0, 0, 0));
         auto allChunks = world->CollectChunks();

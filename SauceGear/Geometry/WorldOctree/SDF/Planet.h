@@ -6,7 +6,7 @@ using namespace glm;
 class Planet : public SignedDistanceField {
 public:
     vec3 center;
-    float radius = 6;       //5
+    float radius = 3;       //5
     Planet() { center = vec3(0); };
 
     // ======== SDF ========
@@ -21,12 +21,13 @@ public:
 
     //Para deixar irregular, você soma ruído
     float sdfDistance(const vec3& p) const override {
-        float base = length(p) - radius;
+        float base = length(p - center) - radius;
 
         glm::vec3 scaled = p * 0.01f;           // escala espacial do ruído
-        float n = noise.fbm(scaled) * 40.0;            // usa fbm(glm::vec3)        //opcional o  * 40.0
+        float n = noise.fbm(scaled) * 10/*40.0*/;            // usa fbm(glm::vec3)        //opcional o  * 40.0
          
-        return base + 0; //n
+
+        return base + 0 /*0*/; //n
     }
 
     /*

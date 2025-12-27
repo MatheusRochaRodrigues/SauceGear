@@ -20,10 +20,20 @@ public:
     void Render(Scene& scene) override { 
         HandleFBOs(); 
         //ibl = DayNightSystem::GetSkyboxFront();
-        GeometryPass(scene);
+
+        // 1? _ GBUFFER + STENCIL
+        GeometryPass(scene); 
+
+        // 2? _ DEFERRED LIGHTING
         LightingPass(scene);
+
+        // 3? _ OUTLINE PASS
+
+
+        // 4? _ FORWARD / DEBUG / SKYBOX
         ForwardPass(scene);
-        // 
+         
+
         // 3) Skybox (no final pra não interferir na iluminação) 
         //DrawSkybox(); 
         // saída final
@@ -39,7 +49,7 @@ public:
 
     Framebuffer* framebuffer = nullptr; // final color + depth (default: true depth)
 private:
-    Framebuffer* gBuffer = nullptr; // Position/Normal/Albedo/MetalRoughAO (+depth)
+    Framebuffer* gBuffer = nullptr; // Position/Normal/Albedo/MetalRoughAO (+depth)                 gBufferFBO
     Framebuffer* lightingBuffer = nullptr; // opcional se quiser acumular separado (aqui vou direto no framebuffer final)
 
     Mesh* sphereMesh = nullptr;

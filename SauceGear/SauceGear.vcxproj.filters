@@ -183,6 +183,9 @@
     <ClCompile Include="Utils\PerlinNoise.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="DebugRender\DebugLinesRenderer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -539,19 +542,16 @@
     <ClInclude Include="Geometry\World\NoiseGenerator\SphereSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DebugRender\DebugPointRenderer.h">
+    <ClInclude Include="DebugRender\DebugPointRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Systems\DebugRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h">
+    <ClInclude Include="DebugRender\DebugLinesRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Components\DebugMeshComponent.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Resources\DebugRender\DebugPointDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h">
@@ -675,6 +675,30 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Systems\EndLoopSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender\Debug\NewFolder1\DebugLinesRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender\Debug\NewFolder1\DebugPointDrawer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender\WireframeCache.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender\DebugWireframeRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender\DebugDraw.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\EditorState.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components\OutlineComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\OutlineSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -810,6 +834,14 @@
     <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU_SCG.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="DebugRender\Shader\debug_line.fs" />
+    <None Include="DebugRender\Shader\debug_line.vs" />
+    <None Include="DebugRender\Shader\debug_wire.fs" />
+    <None Include="DebugRender\Shader\debug_wire.vs" />
+    <None Include="DebugRender\Shader\debug_point.fs" />
+    <None Include="DebugRender\Shader\debug_point.vs" />
+    <None Include="Resources\Shaders\Outline\outline.fs" />
+    <None Include="Resources\Shaders\Outline\outline.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

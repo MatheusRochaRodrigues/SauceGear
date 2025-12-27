@@ -200,6 +200,8 @@ void make_all_quads(ivec3 cell, float cornerSDF[8], uint baseStride) {
 
     // matches CPU conditions (only create quads when neighbor indices in bounds)
 
+    //cornerSDF nao esta sendo usado - pode retirar
+
     // QUAD NO PLANO YZ  (normal apontando para X)
     if (cell.y > 0 && cell.z > 0 && cell.x < maxCell) maybe_make_quad(baseStride, baseStride + strideX, strideY, strideZ, cornerSDF);
     // QUAD NO PLANO XZ  (normal apontando para Y)

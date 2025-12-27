@@ -8,11 +8,15 @@
 struct MeshRenderer {
     Mesh* mesh = nullptr; 
     // WARNING ---- ISSO ASSUME Q É O UNICO DETENTOR DE MESH, LOGO SE O CONTEXTO FOR TROCARDO, MESH RENDERER SER DELETADO PELO SHARED_PTR
-    //std::shared_ptr<Mesh> mesh; // referência ao mesh da entidade
+    //std::shared_ptr<Mesh> mesh; // referência ao mesh da entidade 
+     
+    REFLECT_CLASS(MeshRenderer) {
+        REFLECT_HEADER("MeshRenderer");
+        REFLECT_FIELD(mesh);
+    }
 
     std::unordered_map<std::shared_ptr<MaterialInstance>, std::vector<SubMesh*>> batches; 
-     
-
+      
     MeshRenderer() = default; 
     MeshRenderer(Mesh* m) { SetMesh(m); }
 

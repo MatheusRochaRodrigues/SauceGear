@@ -2,11 +2,12 @@
 #include <array>
 #include <queue>
 #include <glm/glm.hpp>
+#include <memory>
+
+#include "OctreeDebug.h"
 #include "SysVoxel.h" 
 #include "SDF_Map.h" 
 #include "OctreeNode.h" 
-#include <memory>
-#include "OctreeDebug.h"
 
 // NVIDIA  = 32 WARP
 // AMD     = 64 WAVEFRONT

@@ -7,6 +7,7 @@
 #include "../Geometry/World/SurfaceNets/Voxel.h"
 #include <memory>
 
+#include"../ECS/Systems/DebugRenderer.h"
 
 class GameScene : public SceneECS {
 public:
@@ -147,7 +148,9 @@ public:
         material->SetFloat("Metallic", 0.1f);
 
         std::cout << "AAAAA" << std::endl;
-        for(auto& ck : sys.gnrtChunk()) {  
+        for(auto& ckt : sys.gnrtChunk()) {
+            Chunk* ck = ckt.first;
+            OctreeNode* node = ckt.second;
 
             std::cout << "o - 00" << std::endl;
             std::cout << "ck " << ck->coord.x << " " << ck->coord.y << " " << ck->coord.z << std::endl;
@@ -163,7 +166,7 @@ public:
                 "  { " + std::to_string(ck->dbg) + " }";
 
             Entity xz = SceneBuilder::CreateModel(ck->mesh.get(), material);
-            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck); 
+            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck, node); 
             //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
 
             //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
@@ -171,10 +174,10 @@ public:
         }
         std::cout << "AAAAAee" << std::endl;
 
-        DebugRenderer::AddPoint(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
-        DebugRenderer::AddPoint(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+        DebugRenderer::Point(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+        DebugRenderer::Point(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+        DebugRenderer::Point(glm::vec3(0, 0, 0), glm::vec3(1.0f,0,0), 6.0f, DebugPointType::Circle, true);
 
-        DebugRenderer::AddPoint(glm::vec3(0, 0, 0), glm::vec3(1.0f,0,0), 6.0f, DebugPointType::Circle, true);
         std::cout << "Corners 27" << std::endl;
         return; 
         {

@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DebugRender\DebugLinesRenderer.cpp" />
     <ClCompile Include="ECS\Systems\Lighting\CascadeSun.cpp" />
     <ClCompile Include="ECS\Systems\Lighting\LightDirectional.cpp" />
     <ClCompile Include="ECS\Systems\Lighting\LightPoint.cpp" />
@@ -190,8 +191,10 @@
     <ClCompile Include="Utils\PerlinNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DebugRender\DebugDraw.h" />
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
     <ClInclude Include="ECS\Components\LightComponent.h" />
+    <ClInclude Include="ECS\Components\OutlineComponent.h" />
     <ClInclude Include="ECS\Systems\AABBSystem.h" />
     <ClInclude Include="ECS\Systems\EndLoopSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\CascadeSun.h" />
@@ -200,6 +203,8 @@
     <ClInclude Include="ECS\Systems\Lighting\LightSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h" />
     <ClInclude Include="ECS\Systems\OctreeWorldSystem.h" />
+    <ClInclude Include="Core\EditorState.h" />
+    <ClInclude Include="ECS\Systems\OutlineSystem.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h" />
@@ -228,7 +233,7 @@
     <ClInclude Include="Math\Ray.h" />
     <ClInclude Include="Math\Sphere.h" />
     <ClInclude Include="Physics\Raycast.h" />
-    <ClInclude Include="Resources\DebugRender\DebugLinesRenderer.h" />
+    <ClInclude Include="DebugRender\DebugLinesRenderer.h" />
     <ClInclude Include="ECS\Components\ComputeSyncComponent.h" />
     <ClInclude Include="ECS\Components\SurfaceNetsComponent.h" />
     <ClInclude Include="ECS\Reflection\Meta.h" />
@@ -253,13 +258,16 @@
     <ClInclude Include="Graphics\ShaderBase.h" />
     <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h" />
     <ClInclude Include="Geometry\Octree\Octree.h" />
-    <ClInclude Include="Resources\DebugRender\DebugPointRenderer.h" />
+    <ClInclude Include="DebugRender\DebugPointRenderer.h" />
+    <ClInclude Include="DebugRender\DebugWireframeRenderer.h" />
+    <ClInclude Include="DebugRender\Debug\NewFolder1\DebugLinesRenderer.h" />
+    <ClInclude Include="DebugRender\Debug\NewFolder1\DebugPointDrawer.h" />
+    <ClInclude Include="DebugRender\WireframeCache.h" />
     <ClInclude Include="Resources\DefineMaterials\Material.h" />
     <ClInclude Include="Resources\DefineMaterials\MaterialInstance.h" />
     <ClInclude Include="Resources\DefineMaterials\MaterialUtils.h" />
     <ClInclude Include="Resources\DefineMaterials\PBRMaterial.h" />
     <ClInclude Include="Resources\DefineMaterials\TextureCache.h" />
-    <ClInclude Include="Resources\DebugRender\DebugPointDrawer.h" />
     <ClInclude Include="Scripts\ScriptABI.h" />
     <ClInclude Include="Math\AABB.h" />
     <ClInclude Include="ECS\Systems\PickingSystem.h" />
@@ -357,6 +365,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
+    <None Include="DebugRender\Shader\debug_line.fs" />
+    <None Include="DebugRender\Shader\debug_line.vs" />
+    <None Include="DebugRender\Shader\debug_point.fs" />
+    <None Include="DebugRender\Shader\debug_point.vs" />
+    <None Include="DebugRender\Shader\debug_wire.fs" />
+    <None Include="DebugRender\Shader\debug_wire.vs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp" />
@@ -369,6 +383,8 @@
     <None Include="Resources\Shaders\debugQuad.vs" />
     <None Include="Resources\Shaders\debugQuadDepth.fs" />
     <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\Outline\outline.fs" />
+    <None Include="Resources\Shaders\Outline\outline.vs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />

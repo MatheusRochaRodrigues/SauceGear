@@ -54,7 +54,7 @@ public:
         //auto map = makeMap.buildSDFGrid(n, octree->root);
         //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
 
-        if (!n->chunk) n->chunk = std::make_unique<Chunk>();
+        if (!n->chunk) n->chunk = std::make_unique<Chunk>(sysv.get_voxelGrid());
         // --- cria / redimensiona chunk --- 
         Chunk& chunk = *n->chunk;
         n->b = n->getBounds();
@@ -88,18 +88,9 @@ public:
 
     void Update(float deltaTime) override { 
         return;
-        try {
-            // 1) pegar camera principal (se houver) e atualizar SysOctree::camera
-            auto entities = GEngine->scene->GetEntitiesWith<CameraComponent, Transform>();
-            for (Entity e : entities) {
-                auto& camComp = GEngine->scene->GetComponent<CameraComponent>(e);
-                auto& trans = GEngine->scene->GetComponent<Transform>(e);
-                if (camComp.isMain) {
-                    syso.set_camera(glm::vec3(0,0,0));
-                    break;
-                }
-            } 
 
+        try {  
+            syso.set_camera(glm::vec3(0,0,0));   
             // 2) Atualiza octree (decide subdivisões, enfileira chunks)
             octree->Update();
 
@@ -145,8 +136,7 @@ public:
             }
 
             // 4) Opcional: remoção de entidades cujos nós foram destruídos (garbage collect)
-            //CleanupDeadNodes();
-
+            //CleanupDeadNodes(); 
         }
         catch (const std::exception& e) {
             std::cerr << "[EXCEÇÃO - OctreeWorldSystem] " << e.what() << "\n";

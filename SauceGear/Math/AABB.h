@@ -102,6 +102,29 @@ struct AABB {                             //Bounds(generic) Type AABB
         return true;
     }
 
+    /*bool Intersects(const Ray& ray, float& tNear) const {
+        float tMin = 0.0f;
+        float tMax = FLT_MAX;
+
+        for (int i = 0; i < 3; i++) {
+            if (fabs(ray.direction[i]) < 1e-6f) {
+                if (ray.origin[i] < min[i] || ray.origin[i] > max[i])
+                    return false;
+            }
+            else {
+                float ood = 1.0f / ray.direction[i];
+                float t1 = (min[i] - ray.origin[i]) * ood;
+                float t2 = (max[i] - ray.origin[i]) * ood;
+                if (t1 > t2) std::swap(t1, t2);
+                tMin = std::max(tMin, t1);
+                tMax = std::min(tMax, t2);
+                if (tMin > tMax) return false;
+            }
+        } 
+        tNear = tMin;
+        return true;
+    }*/
+
 
     inline bool encloses(const AABB& other) const {
         return (min.x <= other.min.x && max.x >= other.max.x &&

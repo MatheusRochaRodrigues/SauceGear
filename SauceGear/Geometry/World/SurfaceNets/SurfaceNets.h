@@ -3,9 +3,7 @@
 #include <functional>
 #include <glm/glm.hpp>
 #include <limits>
-#include <iostream>
-#include "../NoiseGenerator/SphereSDF.h" 
-#include "../Geometry/WorldOctree/SurfaceNets/SysVoxel.h" 
+#include <iostream> 
 #include <memory>
 #include <unordered_set>  
 
@@ -57,9 +55,7 @@ struct ChunkBuffer { //Chunk
     std::unordered_set<glm::vec3, Vec3Hash, Vec3Equal> debug_corners;       //std::unordered_set<glm::ivec3, IVec3Hash> debug_corners;  //std::unordered_set<glm::ivec3> debug_corners;
 
     void reset(size_t array_size) {
-        //positions.clear();
-        //normals.clear();
-        //indices.clear();
+        //positions.clear(); //normals.clear(); //indices.clear();
         surface_points.clear();
         surface_strides.clear();
         stride_to_index.assign(array_size, NULL_VERTEX);
@@ -78,28 +74,33 @@ struct Chunk {
     float                           dbg = 0;
     Entity                          entity = INVALID_ENTITY;
 
-    Chunk(size_t d = 0) {
+    Chunk(size_t d) {
         buff = std::make_unique<ChunkBuffer>();  
         resizeDensityMap(d);
     }
 
     //Note that consider that d is size final total
-    void resizeDensityMap(size_t d = 0){ // (Re)aloca o vetor se o tamanho mudou
-        size_t total = d;
-        if (d == 0) {
-            uint32_t dim = SysVoxel::getInstance().get_voxelGrid();
-            total = size_t(dim) * dim * dim; 
-        }
+    void resizeDensityMap(size_t dim){ // (Re)aloca o vetor se o tamanho mudou
+        size_t total = size_t(dim) * dim * dim; 
         if (buff->densityMap.size() != total) buff->densityMap.resize(total, 1);
+        currentVoxelGrid = total;
     }
 
     int idx(int x, int y, int z) const { 
-        uint32_t dim = SysVoxel::getInstance().get_voxelGrid();
+        uint32_t dim = currentVoxelGrid;
         return (z * dim + y) * dim + x;         // (z * sy + y) * sx + x; 
     }            
     float get(int x, int y, int z) const       { return buff->densityMap[idx(x, y, z)]; }
     void  set(int x, int y, int z, float v)    { buff->densityMap[idx(x, y, z)] = v; }
+
+private:
+    uint32_t currentVoxelGrid;  //Dim
 };  
+
+
+
+
+
 
 
 //namespace SurfaceNetsGPU {

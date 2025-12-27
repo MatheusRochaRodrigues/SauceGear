@@ -1,62 +1,71 @@
-#pragma once
+ï»¿#pragma once
 #include "../../Core/EngineContext.h"  
 #include "../../Core/InputSystem.h"  
-#include "../../Core/Camera.h"  
-#include "../../Platform/Window.h"  
+#include "../../Core/Camera.h"   
 #include "../Math/Ray.h"  
 #include "../Math/AABB.h"  
 #include "../../ECS/Components/ComponentsHelper.h"
 #include "../Scene/SceneECS.h"  
 
-//Ele percorre todas entidades com mesh + transform + AABB, testa interseção, e seleciona a mais próxima.
+#include "../ECS/Systems/DebugRenderer.h"
+
+//Warning - EDitor Acomplacao
+#include "../Core/EditorState.h"
+
+//Ele percorre todas entidades com mesh + transform + AABB, testa interseÃ§Ã£o, e seleciona a mais prÃ³xima.
 class PickingSystem : public System {
 public:  
     void Update(float deltaTime) override { 
         auto& scene = GEngine->scene;
         InputSystem* input = GEngine->input; // Ponte para o InputSystem 
-        const unsigned int width = GEngine->window->GetWidth();
-        const unsigned int height = GEngine->window->GetHeight();
+        auto& state = *GEngine->editorState;
 
-        //if (ImGuizmo::IsUsing() || ImGuizmo::IsOver())
-            //return;
-
-        // Substituindo IsMouseClicked pelo InputSystem
-        if (!input->IsMousePressed(MOUSE_BUTTON_LEFT))  return;
+        //---------- logicMouse() {  
+        if (!state.wantsPick) return;  
 
         Ray ray = RayFactory::ScreenPosToWorldRay(
-            input->GetMousePosition().x,
-            input->GetMousePosition().y,
-            width, height,
-            GEngine->mainCamera->GetViewMatrix(), 
-            GEngine->mainCamera->GetProjectionMatrix(), 
-            GEngine->mainCamera->GetPosition()
-        );
+            state.mouseViewport.x,
+            state.mouseViewport.y,
+            state.sceneViewportSize.x,
+            state.sceneViewportSize.y,
+            GEngine->mainCamera->GetViewMatrix(),
+            GEngine->mainCamera->GetProjectionMatrix()
+        ); 
+
+        //DebugRenderer::Line( ray.origin, ray.at(50), glm::vec3(1, 0, 1), true );
 
         float closestT = FLT_MAX;
         Entity picked  = INVALID_ENTITY;
 
-        for (Entity e : scene->GetEntitiesWith<MeshRenderer, Transform, AABBComponent>()) {
-            auto& mesh = scene->GetComponent<MeshRenderer>(e);
+        for (Entity e : scene->GetEntitiesWith<Transform, AABBComponent>()) { 
             auto& trans = scene->GetComponent<Transform>(e);
             auto& bound = scene->GetComponent<AABBComponent>(e);
 
             float t;
             AABB aabb(bound.worldMin, bound.worldMax);
-
-            //std::cout << "IN ANALISE" << std::endl;
-            if (aabb.intersects(ray, t)) {
-                //std::cout << " NamePIcking " << scene->GetComponent<NameComponent>(e).name << std::endl;
-                if (t < closestT) {
-                    //std::cout << " Pick " << std::endl;
+             
+            if (aabb.intersects(ray, t)) { 
+                if (t < closestT) { 
                     closestT = t;
                     picked = e;
                 }
-            }
-            //std::cout << "out" << std::endl;
-        }
-
+            } 
+        } 
         if (picked != INVALID_ENTITY) scene->SelectEntity(picked);
+
+        //Debug
+        //Entity e = scene->GetSelectedEntity(); 
+        //if (e != INVALID_ENTITY) {
+        //    auto aabb = scene->GetComponent<AABBComponent>(e);
+        //    DebugRenderer::Cube(
+        //        aabb.worldMin,
+        //        aabb.worldMax,
+        //        glm::vec3(1,1,0),
+        //        true   // Unity-style: redesenha todo frame
+        //    );
+        //}
     }
+     
 };
 
 

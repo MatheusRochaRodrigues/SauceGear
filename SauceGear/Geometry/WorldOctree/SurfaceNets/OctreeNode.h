@@ -1,7 +1,11 @@
 #pragma once
-#include "../Math/AABB.h" 
 #include <glm/glm.hpp>
 #include "SysVoxel.h" 
+#include <array>
+#include "../Math/AABB.h" 
+//#include "../Geometry/World/SurfaceNets/SurfaceNets.h" 
+
+struct Chunk; // forward, já que usa unique_ptr
 
 struct OctreeNode {
     glm::vec3                   center;
@@ -59,14 +63,14 @@ struct OctreeNode {
             p.z >= min.z && p.z <= max.z);
     }
 
-    ivec3 World_to_GridChunk(vec3 p) {
+    glm::ivec3 World_to_GridChunk(glm::vec3 p) {
         int base = sysv.get_baseChunkSize();
-        return ivec3(glm::floor(p.x/base), glm::floor(p.y / base), glm::floor(p.z / base));
+        return glm::ivec3(glm::floor(p.x/base), glm::floor(p.y / base), glm::floor(p.z / base));
     }
 
-    ivec3 snap_World_to_GridChunk(vec3 p) {
+    glm::ivec3 snap_World_to_GridChunk(glm::vec3 p) {
         int base = sysv.get_baseChunkSize();
-        return ivec3(glm::floor(p.x / base), glm::floor(p.y / base), glm::floor(p.z / base)) * base;
+        return glm::ivec3(glm::floor(p.x / base), glm::floor(p.y / base), glm::floor(p.z / base)) * base;
     }
 };
 

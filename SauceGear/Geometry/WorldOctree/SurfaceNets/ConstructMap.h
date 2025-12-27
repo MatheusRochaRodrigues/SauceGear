@@ -3,13 +3,11 @@
 #include <queue>
 #include <memory>
 #include <glm/glm.hpp> 
-#include "OctreeLOD.h" 
-#include "../Graphics/ComputeShader.h" 
 #include <limits> // Required for std::numeric_limits
+#include "OctreeLOD.h"  
   
 class ConstructMap {
-public:    
-
+public:     
     //N = 17 amostras → 16 voxels de espaço cúbico
     glm::vec3 voxel_position(int x, int y, int z, glm::vec3 minCorner, glm::vec3 size) const {
         float resolution = (float)sysv.getInstance().get_cellGrid();
@@ -26,7 +24,7 @@ public:
 
         for (int y = 0; y < dim; ++y) {
             for (int x = 0; x < dim; ++x) {
-                float v = sdf[GeneratorMap::linearize3(dim, x, y, z)];
+                float v = sdf[linearize3(dim, x, y, z)];
                 if (v < 0) std::cout << "##";  // dentro da esfera
                 else if (v < 1.0f) std::cout << ".."; // superfície
                 else std::cout << "  "; // fora
@@ -110,9 +108,10 @@ public:
 
         float voxelSize = chunk->edge_length() / float(cells);
 
-        // ⚠️ desloca 1 voxel PARA FORA
-        //glm::vec3 origin = minCorner - voxelSize;
-        glm::vec3 origin = minCorner;
+        // ⚠️ desloca 1 voxel PARA FORA 
+        glm::vec3 origin;
+        if(sysv.get_Border() == 2) origin = minCorner - voxelSize;
+        else origin = minCorner;    //default
 
         for (int z = 0; z < N; z++)
             for (int y = 0; y < N; y++)
@@ -123,8 +122,13 @@ public:
 
         return grid;
     }
-
      
+
+    // Indexação 3D → 1D (linear) // helper linearize function - assumes row-major x + y*nx + z*nx*ny
+    static inline size_t linearize3(size_t dim, uint32_t x, uint32_t y, uint32_t z) { return x + y * dim + z * dim * dim; }
+    static inline size_t linearize3(size_t cellDimension, glm::vec3 d) {
+        return size_t(d.x) + size_t(d.y) * cellDimension + size_t(d.z) * cellDimension * cellDimension;    //x + y * sizeX + z * sizeX * sizeY;
+    }
 };
 
 

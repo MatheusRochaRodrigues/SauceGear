@@ -1,6 +1,6 @@
-#pragma once
-#include "../Graphics/Mesh.h"
+#pragma once 
 #include "../Structs/ObjectPool.h"
+#include "../Geometry/WorldOctree/SurfaceNets/SysVoxel.h"
 
 struct SurfaceNetsGPUBuffer {
     GLuint ssboSDF = 0;

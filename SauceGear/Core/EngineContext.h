@@ -9,6 +9,7 @@ class Time;
 class InputSystem;
 class Camera;   // para o GetMainCamera
 //class SceneManager;
+class EditorState;
 
 #define scn GEngine->scene
 
@@ -20,7 +21,9 @@ struct EngineContext
     Window* window = nullptr;
     Time* time = nullptr;
     InputSystem* input = nullptr;  // sistema de input dedicado
-      
+
+    EditorState* editorState;
+
     void SetActiveCamera(Camera* cam) {
         mainCamera = cam;
     }
@@ -30,7 +33,6 @@ struct EngineContext
     //IRenderPipeline* pipeline = nullptr; // apenas ponteiro cru
 
     //SceneManager* sceneManager;
-      
 };
 
 // Singleton acessível globalmente (em versão simples)

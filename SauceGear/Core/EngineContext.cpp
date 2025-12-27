@@ -1,4 +1,5 @@
 #include "EngineContext.h"
+#include "EditorState.h" 
 
 #include "../Scene/SceneECS.h" 
 #include "../ECS/Components/CameraComponent.h"    // for CameraComponent

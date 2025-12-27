@@ -19,7 +19,7 @@ void PBRPipeline::Init() {
         {FramebufferTextureType::Normal},              // 1
         {FramebufferTextureType::Albedo},              // 2 (RGB = baseColor, A = ?)
         {FramebufferTextureType::MetallicRoughnessAO}, // 3 (R = metallic,G = roughness,B = ao, A = ?)
-        }, true);
+    }, true);
 
     lightingBuffer = nullptr; // opcional
 
@@ -118,9 +118,7 @@ void PBRPipeline::GeometryPass(Scene& scene) {
 
         for (auto& [material, meshes] : mr.batches) {
             material->Apply(s);               // deve setar albedo/metal/rough/ao e texturas
-            for (auto& sub : meshes) {
-                mr.DrawSubM(sub);
-            }
+            for (auto& sub : meshes) mr.DrawSubM(sub); 
         }
     } 
 
@@ -137,7 +135,7 @@ void PBRPipeline::BindGBufferTo(Shader* s) {
 void PBRPipeline::BindIBLTo(Shader* s) {
     glActiveTexture(GL_TEXTURE4); glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.irradiance);
     glActiveTexture(GL_TEXTURE5); glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.prefilter);
-    glActiveTexture(GL_TEXTURE6); glBindTexture(GL_TEXTURE_2D, ibl.brdfLUT);
+    glActiveTexture(GL_TEXTURE6); glBindTexture(GL_TEXTURE_2D,       ibl.brdfLUT);
 }
 
 void PBRPipeline::LightingPass(Scene& scene) { 

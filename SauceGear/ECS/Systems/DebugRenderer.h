@@ -1,118 +1,143 @@
 ﻿#pragma once
-#include "../Resources/DebugRender/DebugLinesRenderer.h"
-#include "../Resources/DebugRender/DebugPointRenderer.h" 
-#include "../Resources/DebugRender/DebugPointDrawer.h" 
+#include "../ECS/System.h"
+#include "../Scene/SceneECS.h"
+#include "../Graphics/Shader.h"
+#include "../Graphics/Renderer.h"
 
+#include "../DebugRender/DebugLinesRenderer.h"
+#include "../DebugRender/DebugWireframeRenderer.h"
+#include "../DebugRender/DebugPointRenderer.h"
 
-#include "../Core/EngineContext.h" 
-#include "../Graphics/Renderer.h" 
-#include "../Scene/SceneECS.h" 
+#include "../Geometry/WorldOctree/SurfaceNets/OctreeNode.h"
 
 class DebugRenderer : public System {
 public:
     DebugRenderer() {
-        Init( 
-            new Shader("DebugP/dbgIntancing_line.vs", "DebugP/dbgIntancing_line.fs"),    //new Shader("DebugP/debug_line.vs", "DebugP/debug_line.fs")
-            new Shader("DebugP/debug_point_inst.vs", "DebugP/debug_point_inst.fs")      //new Shader("DebugP/debug_point.vs", "DebugP/debug_point.fs")
-        );
-        debugPoints = new DebugPointDrawer();
-        debugPoints->Init(new Shader("DebugP/backup/debug_point_circle.vs", "DebugP/backup/debug_point_circle.fs"));
-    }
+        lineShader = new Shader("../../DebugRender/Shader/debug_line.vs", "../../DebugRender/Shader/debug_line.fs");
+        wireShader = new Shader("../../DebugRender/Shader/debug_wire.vs", "../../DebugRender/Shader/debug_wire.fs");
+        pointShader = new Shader("../../DebugRender/Shader/debug_point.vs", "../../DebugRender/Shader/debug_point.fs");
 
-
-    void Init(Shader* lineShader, Shader* pointShader) {
         lineRenderer.Init(lineShader);
+        DebugWireframeRenderer::Init(wireShader);
         pointRenderer.Init(pointShader);
     }
 
-    // ================== Debug API ==================
-    static inline void AddLine(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color = glm::vec3(1.0f), bool persistent = false) {
+    static void Line(const glm::vec3& a,
+        const glm::vec3& b,
+        const glm::vec3& color = glm::vec3(1,0,0),
+        bool persistent = false)
+    {
         lineRenderer.AddLine(a, b, color, persistent);
     }
 
-    static inline void AddWireframe(Mesh* mesh, const glm::mat4& transform, const glm::vec3& color = glm::vec3(1.0f)) {
-        lineRenderer.AddWireframe(mesh, transform, color);
+    static void Point(
+        const glm::vec3& pos,
+        const glm::vec3& color = glm::vec3(1, 1, 1),
+        float size = 6.0f,
+        DebugPointType type = DebugPointType::Square,
+        bool persistent = false)
+    {
+        pointRenderer.AddPoint(pos, color, size, type, persistent);
+    }
+     
+    static void Cube(
+        const glm::vec3& min,
+        const glm::vec3& max,
+        const glm::vec3& color = glm::vec3(1, 1, 1),
+        bool persistent = false)
+    {
+        glm::vec3 v[8] = {
+            {min.x, min.y, min.z},
+            {max.x, min.y, min.z},
+            {max.x, max.y, min.z},
+            {min.x, max.y, min.z},
+
+            {min.x, min.y, max.z},
+            {max.x, min.y, max.z},
+            {max.x, max.y, max.z},
+            {min.x, max.y, max.z}
+        };
+
+        // base
+        Line(v[0], v[1], color, persistent);
+        Line(v[1], v[2], color, persistent);
+        Line(v[2], v[3], color, persistent);
+        Line(v[3], v[0], color, persistent);
+
+        // topo
+        Line(v[4], v[5], color, persistent);
+        Line(v[5], v[6], color, persistent);
+        Line(v[6], v[7], color, persistent);
+        Line(v[7], v[4], color, persistent);
+
+        // colunas
+        Line(v[0], v[4], color, persistent);
+        Line(v[1], v[5], color, persistent);
+        Line(v[2], v[6], color, persistent);
+        Line(v[3], v[7], color, persistent);
     }
 
-    static inline void AddNormals(Mesh* mesh, const glm::mat4& transform, float length = 0.2f, const glm::vec3& color = glm::vec3(0, 1, 0)) {
-        lineRenderer.AddNormals(mesh, transform, length, color);
-    }
-
-    static inline void AddPoint(const glm::vec3& pos, const glm::vec3& color = glm::vec3(1.0f), float size = 8.0f, DebugPointType type = DebugPointType::Square, bool o = true) {
-        pointRenderer.AddPoint(pos, color, size, type, o);
-    }
-
-    // ================== System Update ==================
     void Update(float dt) override {
-        try { 
+        try {
             GEngine->renderer->frameScreen->Bind();
 
-            // --- Draw ECS components ---
             auto entities = GEngine->scene->GetEntitiesWith<DebugMeshComponent>();
-            for (auto& e : entities) {
-                auto& comp = GEngine->scene->GetComponent<DebugMeshComponent>(e);
-                if (comp.showWireframe) AddWireframe(GEngine->scene->GetComponent<MeshRenderer>(e).mesh, comp.transform, comp.color);
-                if (comp.showNormals)   AddNormals(GEngine->scene->GetComponent<MeshRenderer>(e).mesh, comp.transform);
+
+            for (auto e : entities) {
+                //estou obrigando nesse instante a qeum tem debug mesh component possuir esses components abaixo
+                auto& dbg = GEngine->scene->GetComponent<DebugMeshComponent>(e);
+                auto& mr = GEngine->scene->GetComponent<MeshRenderer>(e);
+                auto& tr = GEngine->scene->GetComponent<Transform>(e);
+
+                if (dbg.showWireframe)
+                    DebugWireframeRenderer::Draw(mr.mesh, tr.GetMatrix(), dbg.color);
+
+                if (dbg.showBox) { 
+                    if (e != INVALID_ENTITY) {
+                        if (!GEngine->scene->HasComponent<AABBComponent>(e)) continue;
+                        auto aabb = GEngine->scene->GetComponent<AABBComponent>(e);
+                        DebugRenderer::Cube( aabb.worldMin, aabb.worldMax, dbg.colorBox, false );
+                    }
+                }
+
+                if (!GEngine->scene->HasComponent<SurfaceNetsComponent>(e)) continue;
+                auto& sf = GEngine->scene->GetComponent<SurfaceNetsComponent>(e);
+                if(sf.showBoxOctree) {
+                    auto aabb = sf.node->getBounds(); 
+                    DebugRenderer::Cube(aabb.min, aabb.max, dbg.colorBox, false);
+                }
+                
             }
 
             lineRenderer.Update(dt);
             pointRenderer.Update(dt);
 
 
-            //Extra
-            /*auto camera = GEngine->mainCamera;
-            glm::mat4 mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix();
-            glEnable(GL_PROGRAM_POINT_SIZE);
-            debugPoints->UploadPoints(pts); 
-            debugPoints->Draw(mvp, debugPoints->debug_color, debugPoints->point_size);
-            glDisable(GL_PROGRAM_POINT_SIZE);*/
-
-        
-        
-            /*Scene& scene = *GEngine->scene; 
-            glEnable(GL_PROGRAM_POINT_SIZE);
-            if (DebugPointDrawer::show_debug_corners) {
-                auto camera = GEngine->mainCamera;
-                glm::mat4 mvp = camera->GetProjectionMatrix() * camera->GetViewMatrix();
-
-                auto entitie = scene.GetFirstEntityOfType<SurfaceNetsComponent>();  
-                auto& comp = scene.GetComponent<SurfaceNetsComponent>(entitie); 
-                auto& corner = comp.buffer->debug_corners;  
-                if (!corner.empty()) {
-                    std::vector<glm::vec3> contiguous(corner.begin(), corner.end());
-                    debugPoints->UploadPoints(contiguous);
-                    debugPoints->Draw(mvp, DebugPointDrawer::debug_color, DebugPointDrawer::point_size);
-                } 
-            }  
-            glDisable(GL_PROGRAM_POINT_SIZE);*/
-
-
-            //Final
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
         } catch (const std::exception& e) {
             std::cerr << "[EXCEÇÃO - DebugRenderer] " << e.what() << "\n";
         }
     }
 
-    static inline std::vector<glm::vec3> pts;
+    static inline glm::vec3 ColorByDepth(int depth) {
+        static const glm::vec3 palette[] = {
+            {1, 0, 0}, // depth 0 - vermelho
+            {0, 1, 0}, // depth 1 - verde
+            {0, 0, 1}, // depth 2 - azul
+            {1, 1, 0}, // depth 3 - amarelo
+            {1, 0, 1}, // depth 4 - magenta
+            {0, 1, 1}, // depth 5 - ciano
+        };
+
+        constexpr int count = sizeof(palette) / sizeof(palette[0]);
+        return palette[depth % count];
+    }
+
 private:
-    static inline DebugLineRenderer  lineRenderer;
+    static inline DebugLineRenderer lineRenderer;
     static inline DebugPointRenderer pointRenderer;
 
-
-    static inline DebugPointDrawer* debugPoints;
+    Shader* lineShader = nullptr;
+    Shader* wireShader = nullptr;
+    Shader* pointShader = nullptr;
 };
-
-
-
-//std::unordered_map<Entity, DebugMeshComponent> entityComponents;
-
-// ================== ECS Component ==================
-/*void AddEntityComponent(Entity e, DebugMeshComponent comp) {
-    entityComponents[e] = comp;
-}
-
-void RemoveEntityComponent(Entity e) {
-    entityComponents.erase(e);
-}*/

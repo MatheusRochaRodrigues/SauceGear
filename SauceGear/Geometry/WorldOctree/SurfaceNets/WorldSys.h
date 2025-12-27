@@ -1,6 +1,7 @@
 ﻿#pragma once 
 #include <vector>   
 #include "ConstructMap.h" 
+#include "../ECS/Systems/DebugRenderer.h"
 
 struct ChunkRequest {
     glm::vec3 position;  // centro do chunk
@@ -14,7 +15,7 @@ public:
     ConstructMap makeMap;
 
     WorldSys(GPUMapGenerator* gn, ComputeShader* cs) : generator(gn), computeShader(cs){
-        octree = new OctreeLOD({ 0,0,0 }, 5);   //2048.0f   //50
+        octree = new OctreeLOD({ 0,0,0 }, 6/*5*/);   //2048.0f   //50
     }
 
     ~WorldSys() { delete octree; }
@@ -41,7 +42,7 @@ public:
 
         for (int y = 0; y < dim; ++y) {
             for (int x = 0; x < dim; ++x) {
-                float v = sdf[GeneratorMap::linearize3(dim, x, y, z)];
+                float v = sdf[ConstructMap::linearize3(dim, x, y, z)];
                 if (v < 0) std::cout << "##";  // dentro da esfera
                 else if (v < 1.0f) std::cout << ".."; // superfície
                 else std::cout << "  "; // fora
@@ -55,7 +56,7 @@ public:
         //auto map = makeMap.buildSDFGrid(n, octree->root);
         //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
 
-        if (!n->chunk) n->chunk = std::make_unique<Chunk>();  
+        if (!n->chunk) n->chunk = std::make_unique<Chunk>(sysv.get_voxelGrid() + sysv.get_Border());
 
         // --- cria / redimensiona chunk ---  
         Chunk& chunk = *n->chunk; 
@@ -64,7 +65,7 @@ public:
 
         // --- pega buffer GPU ---
         SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
-        gpuBuf->ensureCapacity(sysv.get_voxelGrid() + 1/*Border*/);           //sysv.get_cellGrid()
+        gpuBuf->ensureCapacity(sysv.get_voxelGrid() + sysv.get_Border()/* 1 Border*/);              //sysv.get_cellGrid()
          
         float voxelSize = n->edge_length() / sysv.get_cellGrid();
         glm::vec3 offset = n->getBounds().min;  //n->getBounds().min - voxelSize;
@@ -76,7 +77,7 @@ public:
             computeShader->ID,
             *gpuBuf,
             false,
-            sysv.get_voxelGrid() + sysv.get_Border()/*Border*/,        //get_cellGrid
+            sysv.get_voxelGrid() + sysv.get_Border() /*Border*/,                //get_cellGrid
             voxelSize       
         );
 
@@ -86,8 +87,8 @@ public:
     }
      
 
-    std::vector<Chunk*> CollectChunks() {
-        std::vector<Chunk*> leafChunks;
+    std::vector<std::pair<Chunk*, OctreeNode*>> CollectChunks() {
+        std::vector< std::pair<Chunk*, OctreeNode*> > leafChunks;
         std::queue<OctreeNode*> q;
         q.push(octree->root);
 
@@ -100,7 +101,14 @@ public:
 
             // nó folha → adiciona se tiver mesh válida
             if (node->chunk && node->chunk->mesh) {
-                leafChunks.push_back(node->chunk.get());
+                leafChunks.push_back({ node->chunk.get(), node }); 
+
+                //DebugRenderer::Cube(
+                //    node->getBounds().min,
+                //    node->getBounds().max,
+                //    DebugRenderer::ColorByDepth(node->depthLOD),
+                //    true   // Unity-style: redesenha todo frame
+                //);
             }
         }
 

@@ -9,6 +9,7 @@
 #include "../Graphics/Shader.h"                // for Shader
 #include "stb/stb_image.h"         // for stbi_set_flip_vertically_on_load
 
+#include "EditorState.h"
  
 int Application::Init() {
     // cria janela GLFW
@@ -25,7 +26,7 @@ int Application::Init() {
     renderer->Init(scene);                                     // setup inicial do renderizador
     scene->initECS();
 
-    GEngine = new EngineContext{ scene, renderer, window, time, input };
+    GEngine = new EngineContext{ scene, renderer, window, time, input, new EditorState};
     GEngine->input->Initialize(GEngine->window);                 // conecta input ao contexto da janela 
     renderer->Initialize();                              // inicializa entidades/sistemas da cena                scene.Init();   
      
