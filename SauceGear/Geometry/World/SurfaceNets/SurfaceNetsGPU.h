@@ -146,7 +146,7 @@ public:
 
         glUseProgram(computeProgram);
         glUniform1i(glGetUniformLocation(computeProgram, "uDim"), DimVoxel);
-        glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), sysv.get_voxelSize( /*tst*/ 0));
+        //glUniform1f(glGetUniformLocation(computeProgram, "uVoxelSize"), sysv.get_voxelSize( /*tst*/ 0));
         glUniform3fv(glGetUniformLocation(computeProgram, "uOffset"), 1, glm::value_ptr(uOffset));
 
         // bind SDF

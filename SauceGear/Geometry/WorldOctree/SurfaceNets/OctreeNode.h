@@ -37,9 +37,9 @@ struct OctreeNode {
     bool hasSurface = false;
 
 
-    inline float edge_length() const {   return (1 << depthLOD) * syso.BASE_CELL_SIZE; }
+    inline float edge_length() const { return (1 << depthLOD) * syso.BASE_CELL_SIZE; }
      
-    inline float cell_size() { return syso.BASE_CELL_SIZE * (1 << depthLOD); }
+    inline float voxel_size() { return edge_length() / sysv.get_cellGrid(); }              //inline float cell_size() { return syso.BASE_CELL_SIZE * (1 << depthLOD); }
 
     inline AABB getBounds() const {
         auto halfEdge = glm::vec3(edge_length() * 0.5f);

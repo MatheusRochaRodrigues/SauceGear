@@ -15,7 +15,7 @@ public:
     ConstructMap makeMap;
 
     WorldSys(GPUMapGenerator* gn, ComputeShader* cs) : generator(gn), computeShader(cs){
-        octree = new OctreeLOD({ 0,0,0 }, 6/*5*/);   //2048.0f   //50
+        octree = new OctreeLOD({ 0,0,0 }, 8/*5*/);   //2048.0f   //50
     }
 
     ~WorldSys() { delete octree; }
@@ -52,23 +52,18 @@ public:
     }
 
     bool UpdateChunk(OctreeNode* n) {  
-        auto map = makeMap.buildDenseSDF(n);
-        //auto map = makeMap.buildSDFGrid(n, octree->root);
-        //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
+        int DIM = sysv.get_voxelGrid() + sysv.get_Border();
+        float voxelSize = n->voxel_size();                          //n->edge_length() / sysv.get_cellGrid()
+        glm::vec3 offset = n->getBounds().min;  //n->getBounds().min - voxelSize;
 
-        if (!n->chunk) n->chunk = std::make_unique<Chunk>(sysv.get_voxelGrid() + sysv.get_Border());
+        auto map = makeMap.buildDenseSDF(n, DIM, offset);         //auto map = makeMap.buildSDFGrid(n, octree->root); //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
 
-        // --- cria / redimensiona chunk ---  
-        Chunk& chunk = *n->chunk; 
-        chunk.lod = n->depthLOD;  
-        chunk.buff->densityMap = map; 
+        if (!n->chunk) n->chunk = std::make_unique<Chunk>(sysv.get_voxelGrid() + sysv.get_Border());  
+        Chunk& chunk = *n->chunk; chunk.lod = n->depthLOD; chunk.buff->densityMap = map;    // --- cria / redimensiona chunk ---  
 
         // --- pega buffer GPU ---
         SurfaceNetsGPUBuffer* gpuBuf = GlobalSurfaceNetsPool::Get().Acquire();
-        gpuBuf->ensureCapacity(sysv.get_voxelGrid() + sysv.get_Border()/* 1 Border*/);              //sysv.get_cellGrid()
-         
-        float voxelSize = n->edge_length() / sysv.get_cellGrid();
-        glm::vec3 offset = n->getBounds().min;  //n->getBounds().min - voxelSize;
+        gpuBuf->ensureCapacity(DIM);              //sysv.get_cellGrid() 
 
         // --- Gera mesh ---
         chunk.mesh = SurfaceNetsGPU::Generate(
@@ -77,12 +72,11 @@ public:
             computeShader->ID,
             *gpuBuf,
             false,
-            sysv.get_voxelGrid() + sysv.get_Border() /*Border*/,                //get_cellGrid
+            DIM,                //get_cellGrid
             voxelSize       
         );
 
-        GlobalSurfaceNetsPool::Get().Release(gpuBuf);  
-           
+        GlobalSurfaceNetsPool::Get().Release(gpuBuf);   
         return true;
     }
      

@@ -96,9 +96,9 @@ public:
     }
      
     SDF_Map map;
-    std::vector<float> buildDenseSDF(OctreeNode* chunk) { 
-        int cells = sysv.get_cellGrid();                                // 16
-        int N = cells + 1 + sysv.get_Border()/*1 if true else 0*/;      // 16 (cells) + 1(to voxels) + 1 (border) 
+    std::vector<float> buildDenseSDF(OctreeNode* chunk, int N, glm::vec3 origin) {
+        //int cells = sysv.get_cellGrid();                                  // 16
+        //int N = cells + 1 + sysv.get_Border()/*1 if true else 0*/;          // 16 (cells) + 1(to voxels) + 1 (border) 
 
         std::vector<float> grid(N * N * N);
 
@@ -106,20 +106,19 @@ public:
         glm::vec3 size = region.max - region.min;
         glm::vec3 minCorner = chunk->center - glm::vec3(size * 0.5f);
 
-        float voxelSize = chunk->edge_length() / float(cells);
+        float voxelSize = chunk->voxel_size();                              // chunk->edge_length() / float(cells);
 
         // ⚠️ desloca 1 voxel PARA FORA 
-        glm::vec3 origin;
+        /*glm::vec3 origin;
         if(sysv.get_Border() == 2) origin = minCorner - voxelSize;
-        else origin = minCorner;    //default
+        else origin = minCorner;*/    //default
 
         for (int z = 0; z < N; z++)
             for (int y = 0; y < N; y++)
                 for (int x = 0; x < N; x++) { 
                     glm::vec3 p = origin + glm::vec3(x, y, z) * voxelSize;
                     grid[(z * N + y) * N + x] = map.sdf->sdfDistance(p);
-                }
-
+                } 
         return grid;
     }
      

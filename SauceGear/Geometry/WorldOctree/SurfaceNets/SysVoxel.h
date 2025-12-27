@@ -9,9 +9,7 @@
 #define sysv SysVoxel::getInstance()
 #define syso SysOctree::getInstance()
 
-struct SysVoxel { 
-    glm::vec3 numChunksPerAxis = glm::vec3(5.0f, 2.0f, 5.0f); // quantos chunks criar em cada eixo  
-
+struct SysVoxel {   
     //for keep default singleton
     static SysVoxel& getInstance() {       //getVoxelGrid
         static SysVoxel instance; // criado na primeira chamada
@@ -23,26 +21,25 @@ struct SysVoxel {
 
     void    set_cellGrid(int s) { cellGrid = s; }     //set_voxelGrid(int s) { cellGrid  = s; }
     void    set_base0ChunkSize(int s) { baseChunkSize0 = s; }
-    int     get_Border() { return (int)border /* + 1 to border 2*/; /*resolution default = 17*/ }    //static_cast<int>()
+    int     get_Border()                { return (int)border /* + 1 to border 2*/; /*resolution default = 17*/ }    //static_cast<int>()
 
     int     get_cellGrid()   { return cellGrid; }  // número de células  //ex : 16  
     int     get_voxelGrid()  { return cellGrid + 1; /*resolution default = 17*/ } // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
-    int     get_BorderGrid() { return cellGrid + 2; /*resolution default = 17*/ }
 
-    int   get_baseChunkSize() { return baseChunkSize0; }  // tamanho total do chunk em unidades de mundo  
+    int     get_baseChunkSize() { return baseChunkSize0; }  // tamanho total do chunk em unidades de mundo  
     
-    float   get_voxelSize(unsigned int lod) { return baseChunkSize0 * (1 << lod); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
+    //float   get_voxelSize(unsigned int lod) { return baseChunkSize0 * (1 << lod); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
     //float   get_voxelSizeg(OctreeNode* n) { return n->edge_length() / get_voxelGrid(); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
       
     float   lod_grid_size(int lod) const { return float(baseChunkSize0 << lod); }   // chunk_size * 2^lod
 
-    int   get_MinChunkLod() { return minChunkLod; } 
+    int     get_MinChunkLod() { return minChunkLod; } 
 
 
 private:
-    int         cellGrid        = 16/*/2*/;           //  how many cells are in the grid                                           
-    int         baseChunkSize0  = 16/*/2*/;           //  size of chunk in LOD 0        
-    int         minChunkLod     = 2;    //4        //  min lod that a node can have to generate a chunk
+    int         cellGrid        = 16 /*/2*/;            //  how many cells are in the grid                                           
+    int         baseChunkSize0  = 16 /*/2*/;            //  size of chunk in LOD 0        
+    int         minChunkLod     = 4;    //4             //  min lod that a node can have to generate a chunk
 
     bool border = true;
 
@@ -54,10 +51,11 @@ private:
 
 class SysOctree {
 public:
-    glm::vec3   camera = { 0, 0, 0 };
-    const float BASE_CELL_SIZE = 1.0f;      // menor célula possível            octreeScale
-    int         shellSize = 2;              // tamanho dos shells 
-    int         maxDepthLod = 0;
+    const float BASE_CELL_SIZE  = 1.0f;      // menor célula possível            octreeScale
+
+    glm::vec3   camera          = { 0, 0, 0 }; 
+    int         shellSize       = 2;              // tamanho dos shells 
+    int         maxDepthLod     = 0;
 
     bool        automaticUpdate = true;
     float       automaticUpdateDistance = 64;
@@ -71,10 +69,7 @@ public:
     SysOctree(const SysOctree&) = delete;
     SysOctree& operator=(const SysOctree&) = delete;
      
-    inline void set_camera(const glm::vec3& pos) { camera = pos; }
-
-    inline float   get_baseChunkSize2() { return BASE_CELL_SIZE; }  // tamanho total do chunk em unidades de mundo  
-
+    inline void set_camera(const glm::vec3& pos) { camera = pos; }  
      
     inline float lod_to_grid_size(const int lod) const {
         return (1 << (long)(lod + 1)) * BASE_CELL_SIZE; // should be times octreescale?
@@ -94,8 +89,8 @@ public:
 
     // ----- LOD Query ----- 
     inline int lod_at(const glm::vec3& worldPos) const {   
-        glm::vec3 pos = worldPos / BASE_CELL_SIZE;
-        glm::vec3 cam = camera / BASE_CELL_SIZE;
+        glm::vec3 pos = worldPos / 16.0f    /*BASE_CELL_SIZE*/;
+        glm::vec3 cam = camera   / 16.0f    /*BASE_CELL_SIZE*/;
 
         //NEW: use logarithm + adjustment.
         glm::vec3 delta = glm::abs(pos - cam) / (2.0f * shellSize);
@@ -119,6 +114,26 @@ private:
     SysOctree() = default;
     ~SysOctree() {} // (opcional) destrutor privado
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
