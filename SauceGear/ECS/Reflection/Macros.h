@@ -43,3 +43,34 @@
         T* obj = static_cast<T*>(instance); \
         BODY \
     };
+
+
+
+
+
+#define REFLECT_VECTOR(FIELD, ELEMENT_TYPE)                               \
+{                                                                         \
+    FieldInfo f;                                                          \
+    f.name = #FIELD;                                                      \
+    f.kind = FieldKind::Vector;                                           \
+    f.type = typeid(std::vector<ELEMENT_TYPE>);                           \
+    f.elementType = typeid(ELEMENT_TYPE);                                 \
+    f.offset = offsetof(__CurrentClass, FIELD);                           \
+                                                                          \
+    f.getSize = [](void* fieldPtr) -> size_t {                             \
+        auto& v = *static_cast<std::vector<ELEMENT_TYPE>*>(fieldPtr);     \
+        return v.size();                                                  \
+    };                                                                    \
+                                                                          \
+    f.getElement = [](void* fieldPtr, size_t i) -> void* {                \
+        auto& v = *static_cast<std::vector<ELEMENT_TYPE>*>(fieldPtr);     \
+        return &v[i];                                                     \
+    };                                                                    \
+                                                                          \
+    f.resize = [](void* fieldPtr, size_t sz) {                             \
+        auto& v = *static_cast<std::vector<ELEMENT_TYPE>*>(fieldPtr);     \
+        v.resize(sz);                                                     \
+    };                                                                    \
+                                                                          \
+    GetTypeInfo().fields.push_back(f);                                    \
+}

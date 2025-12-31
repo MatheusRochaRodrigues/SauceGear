@@ -186,6 +186,180 @@
     <ClCompile Include="DebugRender\DebugLinesRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\FontRenderer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\FontAtlasBuilder.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\Contour.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\contour-combiners.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\convergent-curve-ordering.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\DistanceMapping.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\edge-coloring.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\EdgeHolder.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\edge-segments.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\edge-selectors.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\equation-solver.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\export-svg.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\MSDFErrorCorrection.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\msdf-error-correction.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\msdfgen.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\Projection.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\rasterization.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\render-sdf.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\save-bmp.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\save-fl32.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\save-rgba.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\save-tiff.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\Scanline.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\sdf-error-estimation.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\Shape.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\core\shape-description.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\ext\import-font.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\ext\import-svg.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\ext\resolve-shape-geometry.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\Includes\msdfgen\ext\save-png.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\Contour.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\contour-combiners.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\convergent-curve-ordering.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\DistanceMapping.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\edge-coloring.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\EdgeHolder.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\edge-segments.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\edge-selectors.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\equation-solver.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\export-svg.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\MSDFErrorCorrection.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\msdf-error-correction.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\msdfgen.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\Projection.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\rasterization.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\render-sdf.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\save-bmp.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\save-fl32.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\save-rgba.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\save-tiff.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\Scanline.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\sdf-error-estimation.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\Shape.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\core\shape-description.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\ext\import-font.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\ext\import-svg.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\ext\resolve-shape-geometry.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\msdfgen\ext\save-png.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -701,6 +875,30 @@
     <ClInclude Include="ECS\Systems\OutlineSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\MakeMap.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components\TextComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Systems\TextRenderSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\FontRenderer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Font.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\FontAtlasBuilder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\FontManager.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\msdfgen\msdfgen-config.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\PBR\background.fs">
@@ -842,6 +1040,12 @@
     <None Include="DebugRender\Shader\debug_point.vs" />
     <None Include="Resources\Shaders\Outline\outline.fs" />
     <None Include="Resources\Shaders\Outline\outline.vs" />
+    <None Include="Resources\Shaders\GUI\TextRender.fs" />
+    <None Include="Resources\Shaders\GUI\TextRender.vs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextRender.fs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextRender.vs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextMSDF.fs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextMSDF.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />
@@ -859,5 +1063,10 @@
     <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />
     <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />
     <Font Include="Assets\Fonts\ProggyTiny.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Libraries\Lib\assimp-vc143-mtd.lib" />
+    <Library Include="Libraries\Lib\freetype.lib" />
+    <Library Include="Libraries\Lib\glfw3.lib" />
   </ItemGroup>
 </Project>

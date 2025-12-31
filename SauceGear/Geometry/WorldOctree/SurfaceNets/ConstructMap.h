@@ -116,7 +116,11 @@ public:
         for (int z = 0; z < N; z++)
             for (int y = 0; y < N; y++)
                 for (int x = 0; x < N; x++) { 
+
+                    //glm::vec3 p = region.min + (glm::vec3(x, y, z) / float(N - 1)) * size;
+
                     glm::vec3 p = origin + glm::vec3(x, y, z) * voxelSize;
+
                     grid[(z * N + y) * N + x] = map.sdf->sdfDistance(p);
                 } 
         return grid;

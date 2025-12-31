@@ -24,98 +24,57 @@ public:
     ~OctreeLOD() { destroy(root); }  
 
     void Update() {
-        std::queue<OctreeNode*> q;  q.push(root);
-        auto& octreeSys = syso.getInstance();
+        std::queue<OctreeNode*> q;          q.push(root); 
 
         while (!q.empty()) {
-            OctreeNode* n = q.front(); q.pop(); 
-            OctreeDebug::PrintNodeHeader(n);
+            OctreeNode* n = q.front();          q.pop();                                        
+            OctreeDebug::PrintNodeHeader(n); 
 
             //verifica em qual shell está
-            n->desiredLOD = octreeSys.lod_at(n->center);      // equivalent to the targetLOD 
-            if (n->desiredLOD < 0) continue;  //return
+            n->targetLOD = syso.lod_at(n->center);              // equivalent to the targetLOD 
+            if (n->targetLOD < 0) continue;   
              
-            if (!n->isAlreadyPass) {  //cache interno do octree   
-                // --- SDF Distance ---
-                evalSDF(*n);
-                //bool shouldHasChunk = n->hasSurface && map.has_surface(*n, n->sdfCenter, octreeSys.BASE_CELL_SIZE);
-                bool shouldHasChunk = n->hasSurface;
+            if (!n->isEvaluated) {                              //cache interno do octree   
+                // --- SDF Distance --- 
+                n->sdfCenter = map.sdf->sdfDistance(n->center);
+                bool hasSurface = map.has_surface(*n, n->sdfCenter, syso.BASE_CELL_SIZE);  
+                bool notArrivedLod = (n->depthLOD > n->targetLOD);                             
+                                                                    OctreeDebug::PrintSDF(n);                       
+                                                                    OctreeDebug::PrintSurfaceDecision(hasSurface);
 
-                OctreeDebug::PrintSDF(n);   
-                OctreeDebug::PrintSurfaceDecision(n->hasSurface);
-
-                bool notArrivedLod = (n->depthLOD > n->desiredLOD);
                 //if exists zero-crossing of SDF into of the node  &&  if the current lod of the node have desired Lod based player position
-                if ( shouldHasChunk && notArrivedLod && (n->depthLOD > syso.maxDepthLod) ) {
-                    subdivide(n);     OctreeDebug::Subdiveded();   
-                    n->isAlreadyPass = true; 
-                }
-                if (!n->is_leaf()) {
-                    for (auto* c : n->children) q.push(c);
+                if ( hasSurface && notArrivedLod && (n->depthLOD > syso.maxDepthLod)) {
+                    subdivide(n);                                   OctreeDebug::Subdiveded();   
+                    n->isEvaluated = true; 
                 }
 
                 // if we don't subdivide further, we mark it as a fully realized subtree
-                //if ( n->is_leaf() && (notArrivedLod || n->depthLOD == octreeSys.maxDepthLod /*0 = default*/) ) {
-                //    std::cout << "end "  << std::endl;
-                //    n->isAlreadyPass = true; 
-                //    //OctreeDebug::PrintMaterialize(n);  
-                //    continue;
-                //} 
-            }
-            //std::cout << "+---isChunk() " << n->isChunk() << std::endl; 
-            if ( n->isChunk() && !n->is_leaf() && (n->chunk == nullptr || (n->bounds != computeBounds(n))) ) {  
-                OctreeDebug::PrintChunkQueued(); 
-                QueueChunk(n); 
+                if (!n->subdivided && ( notArrivedLod || n->depthLOD == syso.maxDepthLod)) {
+                    n->isEvaluated = true;
+                    materialize(n);                                 OctreeDebug::PrintMaterialize(n);
+                    continue;
+                }  
             } 
 
-            //if ( !n->is_leaf() && (!n->isChunk() && (n->chunk == nullptr))
-            //    && ( /*if is above of min lod of chunks*/ n->depthLOD > sysv.get_MinChunkLod()) )  
-            //{
-            //        for (auto* c : n->children) q.push(c);
-            //}
-
-
-            //falta por delete
-            //if (!is_chunk(terrain)) delete_chunk(); 
-
-            /*
-            // each chunk is 2^(minChunkLod), ex: 2^4 = 16*16*16 voxels
-            uint16_t newBounds = computeBounds(n);
-            if (isChunk && !is_leaf() && (n->chunk == nullptr || (n->bounds != newBounds))) {
-                n->boundaries = newBound;        //mark_materialized(n);
-
-                queue_update(terrain);  //queue_chunk_update(n);
+            bool shouldMakeChunk = (n->chunk == nullptr || (n->bounds != computeBounds(n)));
+            if ( n->isChunk() && !n->is_leaf() && shouldMakeChunk) {
+                QueueChunk(n);                                      OctreeDebug::PrintChunkQueued();
+            } 
+                
+            bool thisNodeIsTrulyChunk = n->isChunk() && (n->chunk != nullptr); 
+            //Um nó está materialized quando Ele ou todos os filhos já têm SDF válido, Não precisam mais ser avaliados / subdivididos  -  Ou seja : “Esse pedaço do espaço já está totalmente resolvido.”
+            // aqui subdividimos se o algum filho ainda nao foi materializado ou a atual profundidade da octree nao consegue abranger todos os chunks que necessitam de ser construidos
+            bool needSubdivide = (!isMaterialized(n) || n->depthLOD > sysv.get_MinChunkLod()); 
+            if (n->subdivided && !thisNodeIsTrulyChunk && needSubdivide) {
+                for (auto* c : n->children) q.push(c);
             }
-            */
-        } 
 
-        std::cout << std::endl << std::endl << std::endl;
-        OctreeDebug::PrintTree(root); 
-        std::cout << std::endl;
+            //falta por delete    //if (!is_chunk(terrain)) delete_chunk();  
+        }    
+        std::cout << std::endl << std::endl << std::endl;           OctreeDebug::PrintTree(root);     std::cout << std::endl;
     }
      
-private:
-    void evalSDF(OctreeNode& n) {
-        AABB b = n.getBounds();
-
-        n.sdfMin = +FLT_MAX;
-        n.sdfMax = -FLT_MAX;
-
-        // 8 cantos do chunk
-        for (int i = 0; i < 8; i++) {
-            glm::vec3 p = b.corner(i);
-            float d = map.sdf->sdfDistance(p);
-
-            n.sdfMin = std::min(n.sdfMin, d);
-            n.sdfMax = std::max(n.sdfMax, d);
-        }
-
-        n.sdfCenter = map.sdf->sdfDistance(n.center);
-
-        n.hasSurface = (n.sdfMin <= 0 && n.sdfMax >= 0);
-        n.evaluated = true;
-    }
-
+private:  
     void QueueChunk(OctreeNode* n) {
         if (n->isEnqueued) return;
         n->isEnqueued = true;
@@ -165,7 +124,27 @@ private:
         n->subdivided = true;
     }
 
+    inline bool isMaterialized(const OctreeNode* n) { return n->materialized == 0xFF; }
+
+    void materialize(OctreeNode* n) {
+        if (isMaterialized(n)) return;
+        if (!n->subdivided) n->materialized = 0xFF; 
+
+        else {
+            uint8_t mask = 0;
+            for (int i = 0; i < 8; i++) 
+                if (isMaterialized(n->children[i]))
+                    mask |= (1 << i); 
+
+            n->materialized = mask;
+        }
+
+        if (isMaterialized(n) && n->father) materialize(n->father);
+    }
+
+
     bool is_parent_enqueued(OctreeNode* n) { return n->father == nullptr ? false : n->father->isEnqueued; }
+
     bool is_any_children_enqueued(OctreeNode* n) {
         if (n->is_leaf()) return false;
         for (const auto& child : n->children)  if (child->isEnqueued) return true;
@@ -174,19 +153,18 @@ private:
 
     void removeChunk(OctreeNode* n) {
         if (is_any_children_enqueued(n) || is_parent_enqueued(n)) return; 
-        //if (n->chunk != nullptr) _chunk->queue_free(); 
-        
+        //if (n->chunk != nullptr) _chunk->queue_free();  
         //n->chunk = nullptr; 
-        n->chunk.reset();
-
+        n->chunk.reset(); 
     } 
 
     void destroy(OctreeNode* n) {
         if (!n) return;
         if (n->subdivided) for (auto* c : n->children) destroy(c);
         delete n;
-    }
-     
+    } 
+
+
 };
 
 

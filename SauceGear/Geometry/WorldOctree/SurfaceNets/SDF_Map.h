@@ -29,19 +29,44 @@ public:
         // para garantir que nós próximos à superfície sejam subdivididos corretamente.
         
 
-        //const float surfaceNetThreshold = edgeLength * 1.44224957f * 1.75f; 
-        const float surfaceNetThreshold = edgeLength * 0.8660254037 * 1.75f;
+        const float surfaceNetThreshold = edgeLength * 1.44224957f * 1.75f; 
+        //const float surfaceNetThreshold = edgeLength * 0.8660254037 * 1.75f;
 
 
-        std::cout << "depthLOD " << n.depthLOD << std::endl;
+        /*std::cout << "depthLOD " << n.depthLOD << std::endl;
         std::cout << "edgeLength " << (1 << n.depthLOD) << std::endl;
         std::cout << "surfaceNetThreshold " << surfaceNetThreshold << std::endl;
         std::cout << "value " << value << std::endl;
-        std::cout << "hs surf " << (std::abs(value) < surfaceNetThreshold) << std::endl;
+        std::cout << "hs surf " << (std::abs(value) < surfaceNetThreshold) << std::endl;*/
+
 
         // 3. Se o valor absoluto do SDF do centro do nó é menor que o limite,
         // assumimos que a superfície cruza este nó.
         return std::abs(value) < surfaceNetThreshold;
+    }
+
+
+
+
+
+    bool evalSDF(OctreeNode& n) {
+        AABB b = n.getBounds();
+
+        float sdfMin = +FLT_MAX;
+        float sdfMax = -FLT_MAX;
+
+        // 8 cantos do chunk
+        for (int i = 0; i < 8; i++) {
+            glm::vec3 p = b.corner(i);
+            float d = sdf->sdfDistance(p);
+
+            sdfMin = std::min(sdfMin, d);
+            sdfMax = std::max(sdfMax, d);
+        }
+
+        n.sdfCenter = sdf->sdfDistance(n.center); 
+        n.isEvaluated = true;
+        return (sdfMin <= 0 && sdfMax >= 0);    //hasSurface
     }
 
     bool has_surface(float s[8]) {

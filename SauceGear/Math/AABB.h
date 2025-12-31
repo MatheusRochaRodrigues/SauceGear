@@ -64,6 +64,14 @@ struct AABB {                             //Bounds(generic) Type AABB
                 min.z <= other.max.z && max.z >= other.min.z);
     }
 
+    inline bool iIntersectsU(const glm::vec3 min, const glm::vec3 max) const {
+        // Separating Axis Theorem for AABB
+        if (max.x < this->min.x || min.x > this->max.x) return false;
+        if (max.y < this->min.y || min.y > this->max.y) return false;
+        if (max.z < this->min.z || min.z > this->max.z) return false;
+        return true;
+    }
+
     inline bool intersects(const glm::vec3 min, const glm::vec3 max, const glm::vec3 otherMin, const glm::vec3 otherMax) const {
         // Separating Axis Theorem for AABB
         if (max.x < otherMin.x || min.x > otherMax.x) return false;
@@ -82,7 +90,7 @@ struct AABB {                             //Bounds(generic) Type AABB
 
      
     //Teste rápido para saber se o raio “atingiu” a entidade via AABB.
-    bool intersects(const Ray& ray, float& tNear) const {
+    bool intersect(const Ray& ray, float& tNear) const {            //intersects
         float tFar = FLT_MAX;
         tNear = 0.0f;
 

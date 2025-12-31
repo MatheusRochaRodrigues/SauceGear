@@ -16,6 +16,7 @@ void SceneECS::initECS() {
     componentManager->Register<AABBComponent>(); 
     componentManager->Register<SurfaceNetsComponent>();
     componentManager->Register<DebugMeshComponent>();
+    componentManager->Register<TextComponent>();
 
 
     ///----------Systems
@@ -31,6 +32,7 @@ void SceneECS::initECS() {
     RegisterSystem <PostProcessSystem>(); 
     RegisterSystem <OctreeWorldSystem>();  
     RegisterSystem <PickingSystem>();
+    RegisterSystem <TextRenderSystem>();
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>(); 

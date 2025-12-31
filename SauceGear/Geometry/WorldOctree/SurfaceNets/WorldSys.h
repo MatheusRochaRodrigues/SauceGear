@@ -1,6 +1,7 @@
 ﻿#pragma once 
 #include <vector>   
 #include "ConstructMap.h" 
+#include "MakeMap.h" 
 #include "../ECS/Systems/DebugRenderer.h"
 
 struct ChunkRequest {
@@ -15,7 +16,7 @@ public:
     ConstructMap makeMap;
 
     WorldSys(GPUMapGenerator* gn, ComputeShader* cs) : generator(gn), computeShader(cs){
-        octree = new OctreeLOD({ 0,0,0 }, 8/*5*/);   //2048.0f   //50
+        octree = new OctreeLOD({ 0,0,0 }, 6 /*6*/);   //2048.0f   //50
     }
 
     ~WorldSys() { delete octree; }
@@ -51,12 +52,15 @@ public:
         }
     }
 
+    MakeMap mmap;
     bool UpdateChunk(OctreeNode* n) {  
         int DIM = sysv.get_voxelGrid() + sysv.get_Border();
         float voxelSize = n->voxel_size();                          //n->edge_length() / sysv.get_cellGrid()
         glm::vec3 offset = n->getBounds().min;  //n->getBounds().min - voxelSize;
 
-        auto map = makeMap.buildDenseSDF(n, DIM, offset);         //auto map = makeMap.buildSDFGrid(n, octree->root); //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
+        //auto map = makeMap.buildDenseSDF(n, DIM, offset);         //auto map = makeMap.buildSDFGrid(n, octree->root); //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
+        auto map = mmap.OcBuilderArraySDF(n, octree->root);         //auto map = makeMap.buildSDFGrid(n, octree->root); //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
+        
 
         if (!n->chunk) n->chunk = std::make_unique<Chunk>(sysv.get_voxelGrid() + sysv.get_Border());  
         Chunk& chunk = *n->chunk; chunk.lod = n->depthLOD; chunk.buff->densityMap = map;    // --- cria / redimensiona chunk ---  

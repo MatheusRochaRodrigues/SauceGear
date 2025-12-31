@@ -104,10 +104,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;MSDFGEN_USE_FREETYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Libraries\msdfgen;$(ProjectDir)Libraries\msdfgen\core;$(ProjectDir)Libraries\msdfgen\ext;$(ProjectDir)Libraries;$(ProjectDir)Libraries\Includes\freetype\include;$(ProjectDir)Libraries\Includes\msdfgen\include;$(ProjectDir)Libraries\Includes\msdfgen\core;$(ProjectDir)Libraries\Includes\msdfgen\ext;$(ProjectDir)Libraries\Includes\freetype\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/experimental:exportCompileCommands
 
  %(AdditionalOptions)</AdditionalOptions>
@@ -115,7 +115,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,6 +126,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)Libraries\msdfgen;$(ProjectDir)Libraries\msdfgen\core;$(ProjectDir)Libraries\msdfgen\ext;$(ProjectDir)Libraries;$(ProjectDir)Libraries\Includes\freetype\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,6 +157,8 @@
     <ClCompile Include="Game\GameMain.cpp" />
     <ClCompile Include="Graphics\Framebuffer.cpp" />
     <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp" />
+    <ClCompile Include="GUI\FontAtlasBuilder.cpp" />
+    <ClCompile Include="GUI\FontRenderer.cpp" />
     <ClCompile Include="ImGui\GraphEditor.cpp" />
     <ClCompile Include="ImGui\ImCurveEdit.cpp" />
     <ClCompile Include="ImGui\ImGradient.cpp" />
@@ -170,6 +173,32 @@
     <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="Editor\Panels\IPanelHelper.h" />
     <ClCompile Include="Graphics\Renderer\PipelinePBR\PBRRenderer.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\contour-combiners.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\Contour.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\convergent-curve-ordering.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\DistanceMapping.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\edge-coloring.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\edge-segments.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\edge-selectors.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\EdgeHolder.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\equation-solver.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\export-svg.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\msdf-error-correction.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\MSDFErrorCorrection.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\msdfgen.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\Projection.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\rasterization.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\render-sdf.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\save-bmp.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\save-fl32.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\save-rgba.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\save-tiff.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\Scanline.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\sdf-error-estimation.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\shape-description.cpp" />
+    <ClCompile Include="Libraries\msdfgen\core\Shape.cpp" />
+    <ClCompile Include="Libraries\msdfgen\ext\import-font.cpp" />
+    <ClCompile Include="Libraries\msdfgen\ext\save-png.cpp" />
     <ClCompile Include="Resources\DataBase\AssetDatabase.h" />
     <ClCompile Include="Resources\Primitive.cpp" />
     <ClCompile Include="Scene\SceneBuilder.h" />
@@ -195,6 +224,7 @@
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
     <ClInclude Include="ECS\Components\LightComponent.h" />
     <ClInclude Include="ECS\Components\OutlineComponent.h" />
+    <ClInclude Include="ECS\Components\TextComponent.h" />
     <ClInclude Include="ECS\Systems\AABBSystem.h" />
     <ClInclude Include="ECS\Systems\EndLoopSystem.h" />
     <ClInclude Include="ECS\Systems\Lighting\CascadeSun.h" />
@@ -205,6 +235,7 @@
     <ClInclude Include="ECS\Systems\OctreeWorldSystem.h" />
     <ClInclude Include="Core\EditorState.h" />
     <ClInclude Include="ECS\Systems\OutlineSystem.h" />
+    <ClInclude Include="ECS\Systems\TextRenderSystem.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h" />
@@ -214,6 +245,7 @@
     <ClInclude Include="Geometry\WorldOctree\SDF\TerrainSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.cpp" />
+    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\MakeMap.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeDebug.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeNode.h" />
     <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SysVoxel.h" />
@@ -229,6 +261,11 @@
     <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPUBuffer.h" />
     <ClInclude Include="Geometry\World\SurfaceNets\GSurfPool.h" />
     <ClInclude Include="Graphics\Vertex.h" />
+    <ClInclude Include="GUI\Font.h" />
+    <ClInclude Include="GUI\FontAtlasBuilder.h" />
+    <ClInclude Include="GUI\FontManager.h" />
+    <ClInclude Include="GUI\FontRenderer.h" />
+    <ClInclude Include="Libraries\msdfgen\msdfgen-config.h" />
     <ClInclude Include="Math\Plane.h" />
     <ClInclude Include="Math\Ray.h" />
     <ClInclude Include="Math\Sphere.h" />
@@ -383,6 +420,10 @@
     <None Include="Resources\Shaders\debugQuad.vs" />
     <None Include="Resources\Shaders\debugQuadDepth.fs" />
     <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\GUI\AtlasTextMSDF.fs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextMSDF.vs" />
+    <None Include="Resources\Shaders\GUI\TextRender.fs" />
+    <None Include="Resources\Shaders\GUI\TextRender.vs" />
     <None Include="Resources\Shaders\Outline\outline.fs" />
     <None Include="Resources\Shaders\Outline\outline.vs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
@@ -485,6 +526,8 @@
     <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
     <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
     <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU_SCG.comp" />
+    <None Include="Resources\Shaders\GUI\AtlasTextRender.fs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextRender.vs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ECS\Systems\Texto.txt" />
@@ -502,6 +545,11 @@
     <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />
     <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />
     <Font Include="Assets\Fonts\ProggyTiny.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Libraries\Lib\assimp-vc143-mtd.lib" />
+    <Library Include="Libraries\Lib\freetype.lib" />
+    <Library Include="Libraries\Lib\glfw3.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,6 +19,7 @@
 
 #include "DebugMeshComponent.h"  
 
+#include "TextComponent.h"  
 
 
 // Aqui você pode criar um alias útil:					

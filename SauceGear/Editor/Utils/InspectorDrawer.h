@@ -148,7 +148,45 @@ namespace InspectorDrawer {
         case FieldKind::Space:
             ImGuiUtils::Space();
             break;
+
+        case FieldKind::Vector: {
+            char* base = static_cast<char*>(instance);
+            void* vecPtr = base + field.offset;
+
+            size_t count = field.getSize(vecPtr);
+
+            if (ImGui::TreeNode(field.name.c_str())) {
+
+                // Botão Add
+                if (ImGui::Button("+")) {
+                    field.resize(vecPtr, count + 1);
+                }
+
+                ImGui::SameLine();
+                if (ImGui::Button("-") && count > 0) {
+                    field.resize(vecPtr, count - 1);
+                }
+
+                for (size_t i = 0; i < count; ++i) {
+                    void* elem = field.getElement(vecPtr, i);
+
+                    std::string label = "##" + std::to_string(i);
+
+                    // reutiliza o mesmo drawer de tipo básico
+                    if (field.elementType == typeid(float))
+                        ImGuiUtils::DragFloat(label.c_str(), *static_cast<float*>(elem));
+                    else if (field.elementType == typeid(glm::vec3))
+                        ImGuiUtils::DragVec3Colored(label.c_str(), *static_cast<glm::vec3*>(elem));
+                }
+
+                ImGui::TreePop();
+            }
+            break;
         }
+
+        }
+
+
     }
 
 

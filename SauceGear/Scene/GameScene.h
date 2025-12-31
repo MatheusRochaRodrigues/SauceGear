@@ -8,11 +8,16 @@
 #include <memory>
 
 #include"../ECS/Systems/DebugRenderer.h"
+#include "../GUI/FontManager.h"
+
+ 
+#include <msdfgen.h>
+ 
 
 class GameScene : public SceneECS {
 public:
      
-    void Load() override {
+    void Load() override { 
         // --- Main Camera ---
         Entity cameraEntity = CreateEntity();
         auto& cameraTransform = AddComponent<Transform>(cameraEntity);   
@@ -166,7 +171,15 @@ public:
                 "  { " + std::to_string(ck->dbg) + " }";
 
             Entity xz = SceneBuilder::CreateModel(ck->mesh.get(), material);
-            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck, node); 
+            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck, node, node->center); 
+            for (auto& nc : node->children) pp.points.push_back(nc->center);
+
+            OctreeNode* aux = node->children[0];
+            while (aux->subdivided) aux = aux->children[0];  
+            aux = aux->father;
+            for (auto& nc : aux->children) pp.pointsDeep.push_back(nc->center);
+            pp.lod =  aux->depthLOD;
+
             //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
 
             //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
@@ -177,6 +190,69 @@ public:
         DebugRenderer::Point(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
         DebugRenderer::Point(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
         DebugRenderer::Point(glm::vec3(0, 0, 0), glm::vec3(1.0f,0,0), 6.0f, DebugPointType::Circle, true);
+
+
+        {
+            Entity e = scn->CreateEntity();
+
+            auto& tr = scn->AddComponent<Transform>(e);
+            tr.position = { 0.5f, 0.95f, 0 }; // topo centro (0..1)
+
+            auto& txt = scn->AddComponent<TextComponent>(e);
+            txt.text = "DEBUG SDF VIEW";
+              
+            txt.fontID = FontManager::Load("Assets/Fonts/ProggyClean.ttf", 48);      
+
+            txt.space = TextComponent::Space::Screen;
+            txt.units = TextComponent::Units::Relative;
+            txt.align = TextComponent::Align::Center;
+            txt.anchor = TextComponent::Anchor::TopCenter;
+
+            txt.color = { 1,1,0,1 };
+
+            txt.style.outlineThickness = 0.1f;
+            txt.style.outlineColor = { 0,0,0,1 };
+             
+        }
+
+        {
+            Entity e = scn->CreateEntity();
+
+            auto& tr = scn->AddComponent<Transform>(e);
+            tr.position = { 0.02f, 0.85f, 0 };
+
+            auto& txt = scn->AddComponent<TextComponent>(e);
+            txt.text =
+                "Voxel Debug\n"
+                "LOD: 3\n"
+                "Nodes: 128";
+
+            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 24);
+
+            txt.space = TextComponent::Space::Screen;
+            txt.units = TextComponent::Units::Relative;
+            txt.align = TextComponent::Align::Left;
+            txt.anchor = TextComponent::Anchor::TopLeft;
+
+            txt.style.shadowOffset = { 2, -2 };
+            txt.style.shadowColor = { 0,0,0,0.6f };
+
+
+        }
+
+        //auto e = scn->CreateEntity();
+        //auto& t = scn->AddComponent<TextComponent>(e);
+
+        //t.text = "(C) Gear Sauce";
+        //t.color = { 0.3f, 0.7f, 0.9f, 1.0f };
+        //t.scale = 0.5f;
+        //t.space = TextComponent::Space::Screen;
+        //t.align = TextComponent::Align::Left;
+        //t.fontID = FontManager::Load("fonts/Antonio-Bold.ttf", 48);
+
+        //auto& tr = scn->AddComponent<Transform>(e);
+        //tr.position = { 540.0f, 570.0f, 0.0f }; // igual LearnOpenGL
+
 
         std::cout << "Corners 27" << std::endl;
         return; 

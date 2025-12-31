@@ -44,7 +44,7 @@ public:
             float t;
             AABB aabb(bound.worldMin, bound.worldMax);
              
-            if (aabb.intersects(ray, t)) { 
+            if (aabb.intersect(ray, t)) { 
                 if (t < closestT) { 
                     closestT = t;
                     picked = e;

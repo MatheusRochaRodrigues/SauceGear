@@ -9,7 +9,9 @@
 enum class FieldKind {
     Value,    // campo normal
     Header,   // header visual
-    Space     // espaço vertical
+    Space,     // espaço vertical
+
+    Vector
 };
 
 struct FieldInfo {
@@ -18,6 +20,13 @@ struct FieldInfo {
     size_t offset = 0; 
 
     FieldKind kind = FieldKind::Value; // default é campo normal
+
+
+    std::type_index elementType{ typeid(void) }; // tipo interno (vector)
+    // Interface genérica para containers
+    size_t(*getSize)(void*) = nullptr;
+    void* (*getElement)(void*, size_t) = nullptr;
+    void   (*resize)(void*, size_t) = nullptr;
 };
 
 struct TypeInfo {

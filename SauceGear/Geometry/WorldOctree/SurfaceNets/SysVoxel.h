@@ -19,29 +19,19 @@ struct SysVoxel {
     SysVoxel& operator=(const SysVoxel&) = delete;
 
 
-    void    set_cellGrid(int s) { cellGrid = s; }     //set_voxelGrid(int s) { cellGrid  = s; }
-    void    set_base0ChunkSize(int s) { baseChunkSize0 = s; }
-    int     get_Border()                { return (int)border /* + 1 to border 2*/; /*resolution default = 17*/ }    //static_cast<int>()
+    void    set_cellGrid(int s) { cellGrid = s; }       //set_voxelGrid(int s) { cellGrid  = s; } 
+    int     get_Border()        { return (int)border    /* + 1 to border 2*/; /*resolution default = 17*/ }    //static_cast<int>()
 
-    int     get_cellGrid()   { return cellGrid; }  // número de células  //ex : 16  
-    int     get_voxelGrid()  { return cellGrid + 1; /*resolution default = 17*/ } // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
+    int     get_cellGrid()      { return cellGrid; }    // número de células  //ex : 16  
+    int     get_voxelGrid()     { return cellGrid + 1;  /*resolution default = 17*/ } // nº de pontos por eixo (por se tratar de cubo precisa de + 1 para o ofsset das arestas)
 
-    int     get_baseChunkSize() { return baseChunkSize0; }  // tamanho total do chunk em unidades de mundo  
-    
-    //float   get_voxelSize(unsigned int lod) { return baseChunkSize0 * (1 << lod); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
-    //float   get_voxelSizeg(OctreeNode* n) { return n->edge_length() / get_voxelGrid(); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
-      
-    float   lod_grid_size(int lod) const { return float(baseChunkSize0 << lod); }   // chunk_size * 2^lod
-
-    int     get_MinChunkLod() { return minChunkLod; } 
-
-
+    int     get_MinChunkLod()   { return minChunkLod; } 
+     
 private:
-    int         cellGrid        = 16 /*/2*/;            //  how many cells are in the grid                                           
-    int         baseChunkSize0  = 16 /*/2*/;            //  size of chunk in LOD 0        
-    int         minChunkLod     = 4;    //4             //  min lod that a node can have to generate a chunk
-
-    bool border = true;
+    int         cellGrid        = 16 /*16*/;            //  how many cells are in the grid           
+    int         minChunkLod     = 3;             //each chunk is 2^4 = 16*16*16 voxels         
+    //  min lod that a node can have to generate a chunk 
+    bool border = false;
 
     //constexpr SysVoxel() {}
     SysVoxel() = default;
@@ -50,7 +40,11 @@ private:
 
 
 class SysOctree {
-public:
+public:  
+    //float _octreeScale = 1.0f;
+    //int _size = 8;
+    //int _minChunkSize = 4; // 
+
     const float BASE_CELL_SIZE  = 1.0f;      // menor célula possível            octreeScale
 
     glm::vec3   camera          = { 0, 0, 0 }; 
@@ -133,7 +127,13 @@ private:
 
 
 
+/*
 
+    //float   get_voxelSize(unsigned int lod) { return baseChunkSize0 * (1 << lod); /*return chunkSize / float(cellGrid);*/ // } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
+    //float   get_voxelSizeg(OctreeNode* n) { return n->edge_length() / get_voxelGrid(); /*return chunkSize / float(cellGrid);*/ } // equivalente a { return chunkSize / float(voxelGrid - 1); }   //real size of each voxel  // tamanho real de cada voxel
+
+    //float   lod_grid_size(int lod) const { return float(baseChunkSize0 << lod); }   // chunk_size * 2^lod
+    // */
 
 
 

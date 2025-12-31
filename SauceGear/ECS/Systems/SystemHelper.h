@@ -17,3 +17,5 @@
 #include "AABBSystem.h"  
 
 #include "DebugRenderer.h"  
+
+#include "TextRenderSystem.h"  
