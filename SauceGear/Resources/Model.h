@@ -11,8 +11,7 @@
 
 #include "DefineMaterials/TextureCache.h"
 #include "DataBase/AssetDatabase.h"
-
-//using matCache = std::unordered_map<unsigned int, std::shared_ptr<MaterialInstance>>;         matCache materialCache;
+ 
 static std::vector<Texture> textures_loaded;
 
 class ModelLoader {
@@ -160,130 +159,7 @@ private:
         });
 
         return existing;
-    }
-
-
-
-    //static std::shared_ptr<MaterialInstance> CreateMaterialInstanceFrom(aiMaterial* aiMat, const std::string& directory) {
-    //    std::string matName = aiMat->GetName().C_Str();
-    //    auto mat = AssetDatabase::Load<MaterialInstance>(matName);
-
-    //    // Base do material: PBR ou outro material custom
-    //    auto baseMat = std::make_shared<PBRMaterial>(); 
-    //    auto instance = std::make_shared<MaterialInstance>(baseMat);
-
-    //    // Load textures / cores
-    //    aiColor3D color(1.f, 1.f, 1.f);
-    //    if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color))  
-    //        instance->SetFallbackColor("Albedo", glm::vec3(color.r, color.g, color.b));
-    //      
-    //    aiString texPath;
-    //    if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
-    //        std::string fullPath = directory + "/" + texPath.C_Str(); 
-    //        instance->SetTexture("Albedo", TextureCache::Get().Load(fullPath));
-    //    }
-
-    //    // fallback de metallic e roughness
-    //    instance->SetFallbackFloat("Metallic", 0.1f);
-    //    instance->SetFallbackFloat("Roughness", 0.5f);
-
-    //    return instance;
-    //}
-    
-    /*
-    static std::shared_ptr<MaterialInstance> CreateMaterialFrom(aiMaterial* aiMat, const std::string& directory) {
-        // 1. Criar o MaterialBase (ou uma subclasse se quiser special bindings)
-        auto baseMat = std::make_shared<MaterialBase>(ShaderManager::GetShader("PBR"));
-        baseMat->DefineParameters(); // define defaults (albedo, roughness, metallic, etc)
-
-        // 2. Criar a MaterialInstance a partir do base
-        auto instance = std::make_shared<MaterialInstance>(baseMat);
-
-        // 3. Carregar texturas do aiMaterial
-        auto LoadTexture = [&](aiTextureType type, const std::string& uniformName, const glm::vec3& fallbackColor) {
-            aiString str;
-            if (aiMat->GetTexture(type, 0, &str) == AI_SUCCESS) {
-                const std::string fullPath = directory + "/" + str.C_Str();
-                auto tex = std::make_shared<Texture>();
-                tex->LoadFromFile(fullPath.c_str());
-                instance->SetTexture(uniformName, tex);
-            }
-            else {
-                // fallback: cor
-                instance->SetFallbackColor(uniformName, fallbackColor);
-            }
-            };
-
-        // Albedo
-        aiColor3D diffuse(1.f, 1.f, 1.f);
-        aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-        LoadTexture(aiTextureType_DIFFUSE, "albedo", glm::vec3(diffuse.r, diffuse.g, diffuse.b));
-
-        // Roughness (float fallback)
-        float roughness = 0.5f;
-        instance->SetFallbackFloat("roughness", roughness);
-
-        // Metallic (float fallback)
-        float metallic = 0.1f;
-        instance->SetFallbackFloat("metallic", metallic);
-
-        // Normal map (fallback branco)
-        LoadTexture(aiTextureType_HEIGHT, "normal", glm::vec3(1.f, 1.f, 1.f));
-
-        return instance;
-    }
-    */
-
-
-    /*
-    static Material* CreateMaterialFrom(aiMaterial* aiMat, const std::string& directory) {
-        auto* material = new Material();
-
-        unsigned int unitTex = 0;
-        auto LoadSingleTexture = [&](aiTextureType type, const std::string& uniformName, Texture* fallback) {
-            aiString str;
-            if (aiMat->GetTexture(type, 0, &str) == AI_SUCCESS) {
-                const std::string fullPath = directory + "/" + str.C_Str();
-
-                // cache local simples por caminho
-                for (const auto& tex : textures_loaded) {
-                    if (tex.path == str.C_Str()) {
-                        material->textures[uniformName] = new Texture(tex) ;
-                        return;
-                    }
-                } 
-                auto* tex = new Texture();
-                tex->unit = unitTex++;
-                tex->LoadFromFile(fullPath.c_str());
-                tex->path = str.C_Str();
-                material->textures[uniformName] = tex;
-                textures_loaded.push_back(*tex);
-            }
-            else {
-                // fallback por cor difusa
-                aiColor3D color(1.f, 1.f, 1.f);
-                if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
-                    material->albedoColor = glm::vec3(color.r, color.g, color.b);
-                }
-                material->textures[uniformName] = { 
-                    MaterialDefaults::TextureColor(
-                    static_cast<uint8_t>(material->albedoColor.r * 255.0f),
-                    static_cast<uint8_t>(material->albedoColor.g * 255.0f),
-                    static_cast<uint8_t>(material->albedoColor.b * 255.0f)
-                ) };
-            }
-        };
-
-        LoadSingleTexture(aiTextureType_DIFFUSE, "Albedo", MaterialDefaults::WhiteTexture());
-        //LoadSingleTexture(aiTextureType_SPECULAR, "specularMap", MaterialDefaults::WhiteTexture());
-        LoadSingleTexture(aiTextureType_HEIGHT, "Normal", MaterialDefaults::WhiteTexture());
-        //LoadSingleTexture(aiTextureType_AMBIENT,  "heightMap",   MaterialDefaults::WhiteTexture());
-        material->floatParams["roughness"] = 0.5f;
-        material->floatParams["metallic"] = 0.1f;
-
-        return material;
-    }
-     */
+    } 
 };
 
 #endif

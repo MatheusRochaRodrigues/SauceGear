@@ -5,7 +5,7 @@ void SceneECS::initECS() {
     ///----------Components
     //auto* physics = scene.RegisterSystem<PhysicsSystem>();
     componentManager->Register<CameraComponent>();
-    componentManager->Register<Transform>();
+    componentManager->Register<TransformComponent>();
     //componentManager->Register<Material>(); 
     //componentManager->Register<MeshFilter>(); 
     componentManager->Register<MeshRenderer>();
@@ -28,11 +28,11 @@ void SceneECS::initECS() {
     RegisterSystem <LightSystem> ();
     RegisterSystem <GlobalUniformSystem>(); 
     RegisterSystem <RenderSystem>(); 
-    RegisterSystem <DebugRenderer>(); 
+    RegisterSystem <DebugRenderer>();
+    RegisterSystem <TextRenderSystem>();
     RegisterSystem <PostProcessSystem>(); 
     RegisterSystem <OctreeWorldSystem>();  
     RegisterSystem <PickingSystem>();
-    RegisterSystem <TextRenderSystem>();
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>(); 

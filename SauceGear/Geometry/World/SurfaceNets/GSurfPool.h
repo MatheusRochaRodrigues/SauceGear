@@ -35,7 +35,7 @@ public:
 
     // Acquire a buffer that can hold voxelCount; will call ensureCapacity on GL thread later
     SurfaceNetsGPUBuffer* Acquire() {
-        const int pointsPerChunk = sysv.get_voxelGrid();
+        const int pointsPerChunk = sysv.get_voxelGrid() + sysv.get_Border();
         const size_t voxelCount = size_t(pointsPerChunk) * pointsPerChunk * pointsPerChunk;
 
         SurfaceNetsGPUBuffer* b = pool.acquire();

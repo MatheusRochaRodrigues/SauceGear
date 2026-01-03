@@ -37,8 +37,8 @@ public:
         float closestT = FLT_MAX;
         Entity picked  = INVALID_ENTITY;
 
-        for (Entity e : scene->GetEntitiesWith<Transform, AABBComponent>()) { 
-            auto& trans = scene->GetComponent<Transform>(e);
+        for (Entity e : scene->GetEntitiesWith<TransformComponent, AABBComponent>()) { 
+            auto& trans = scene->GetComponent<TransformComponent>(e);
             auto& bound = scene->GetComponent<AABBComponent>(e);
 
             float t;

@@ -1,127 +1,180 @@
-#pragma once
+ï»¿#pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp> 
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <iostream>
 #include "../Reflection/Macros.h"
 
-struct TransformComponent {
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 rotation = glm::vec3(0.0f); // Euler
-    glm::vec3 scale = glm::vec3(1.0f);
+// NOTE:
+// - local*  = SOURCE OF TRUTH (editÃ¡vel)
+// - world*  = CACHE (somente leitura lÃ³gica)       // - NUNCA escrever world* diretamente
+// - model   = world matrix final
+ 
+struct TransformComponent { 
+    // WORLD (CACHE) 
+    glm::vec3 position{ 0.0f };         //readOnly
+    glm::quat rotation{ 1, 0, 0, 0 };   //readOnly
+    glm::vec3 scale{ 1.0f };            //readOnly
 
-    glm::vec3 localPosition = glm::vec3(0.0f);
-    glm::vec3 localRotation = glm::vec3(0.0f); // Euler
-    glm::vec3 localScale = glm::vec3(1.0f);
+    glm::mat4 model{ 1.0f };
+     
+    // LOCAL (SOURCE OF TRUTH) 
+    glm::vec3 localPosition{ 0.0f };
+    glm::quat localRotation{ 1, 0, 0, 0 };
+    glm::vec3 localScale{ 1.0f };
 
-    glm::mat4 model;
-    bool dirty = true;
-
-    /*REFLECT_CLASS(Transform) {
-        REFLECT_FIELD(Transform, position);
-        REFLECT_FIELD(Transform, rotation);
-        REFLECT_FIELD(Transform, scale);
-    }*/
-
+    glm::mat4 localMatrix{ 1.0f };
+     
+    // FLAGS 
+    bool localDirty = true;
+    bool worldDirty = true;
+    bool transformChangedThisFrame = false;
+     
+    // REFLECTION 
     REFLECT_CLASS(TransformComponent) {
-        REFLECT_HEADER("Global Transform");
+        REFLECT_HEADER("Global TransformComponent (read-only)");
         REFLECT_FIELD(position);
         REFLECT_FIELD(rotation);
         REFLECT_FIELD(scale);
 
         REFLECT_SPACE();
 
-        REFLECT_HEADER("Local Transform")
-            REFLECT_FIELD(localPosition);
+        REFLECT_HEADER("Local TransformComponent (editable)");
+        REFLECT_FIELD(localPosition);
         REFLECT_FIELD(localRotation);
         REFLECT_FIELD(localScale);
+
+        REFLECT_ON_EDITED(
+            obj->MarkLocalDirty();
+            obj->UpdateWorldAsRoot(); // ou via parent
+        );
+    }
+     
+    // LOCAL SETTERS 
+    void SetLocalPosition(const glm::vec3& pos) {
+        localPosition = pos;
+        std::cout << "movido" << std::endl;
+        MarkLocalDirty();
     }
 
-    TransformComponent() = default;
-
-    TransformComponent(glm::vec3 pos, glm::vec3 rot = glm::vec3(0.0f), glm::vec3 scl = glm::vec3(1.0f))
-        : position(pos), rotation(rot), scale(scl) {
+    void SetLocalRotation(const glm::quat& rot) {
+        localRotation = glm::normalize(rot);
+        MarkLocalDirty();
     }
 
-
-    /*glm::mat4 GetMatrix() const {
-        glm::mat4 model = glm::mat4(1.0f);
-
-        model = glm::translate(model, position);
-        model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-        model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-        model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
-        model = glm::scale(model, scale);
-
-        return model;
-    }*/
-
-    const glm::mat4& GetMatrix() {
-        if (dirty) {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, position);
-            model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-            model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-            model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
-            model = glm::scale(model, scale);
-            dirty = true;
-            // pode chamar o calculo do bolding box pro picking
-        }
-        return model;
+    void SetLocalScale(const glm::vec3& scl) {
+        localScale = scl;
+        MarkLocalDirty();
     }
 
-    glm::vec3 GetForwardDirection(const glm::vec3& rotationEuler) {
-        glm::vec3 direction;
-        //mais segguro de aplicar rotações yawPitchRoll dq rotate separada para cada eixo
-        glm::mat4 rotationMatrix = glm::yawPitchRoll(glm::radians(rotationEuler.y),
-            glm::radians(rotationEuler.x),
-            glm::radians(rotationEuler.z));
-        direction = glm::vec3(rotationMatrix * glm::vec4(0, 0, -1, 0)); // forward
-
-        return glm::normalize(direction);
+    void SetLocalTRS(const glm::vec3& pos,
+        const glm::quat& rot,
+        const glm::vec3& scl) {
+        localPosition = pos;
+        localRotation = glm::normalize(rot);
+        localScale = scl;
+        MarkLocalDirty();
+    }
+     
+    // WORLD SETTERS (SAFE) 
+    //  -NÃƒO escrevem cache     //  -Convertem world -> local 
+    void SetWorldPosition(const glm::vec3& worldPos,
+        const glm::mat4& parentWorld = glm::mat4(1.0f)) {
+        glm::vec4 lp = glm::inverse(parentWorld) * glm::vec4(worldPos, 1.0f);
+        localPosition = glm::vec3(lp);
+        MarkLocalDirty();
     }
 
-    glm::vec3 GetForwardDirection() {
-        glm::vec3& rotationEuler = rotation;
-        glm::vec3 direction;
-        //mais segguro de aplicar rotações yawPitchRoll dq rotate separada para cada eixo
-        glm::mat4 rotationMatrix = glm::yawPitchRoll(glm::radians(rotationEuler.y),
-            glm::radians(rotationEuler.x),
-            glm::radians(rotationEuler.z));
-        direction = glm::vec3(rotationMatrix * glm::vec4(0, 0, -1, 0)); // forward
+    void SetWorldRotation(const glm::quat& worldRot,
+        const glm::mat4& parentWorld = glm::mat4(1.0f)) {
+        glm::quat parentRot;
+        glm::vec3 skew, pos, scl;
+        glm::vec4 persp;
 
-        return glm::normalize(direction);
+        glm::decompose(parentWorld, scl, parentRot, pos, skew, persp);
+        parentRot = glm::normalize(parentRot);
+
+        localRotation = glm::normalize(glm::inverse(parentRot) * worldRot);
+        MarkLocalDirty();
     }
 
-    bool DecomposeTransform(const glm::mat4& transformMatrix) {
-        using namespace glm;
-        vec3 skew;
-        vec4 perspective;
-        quat orientation;
+    void SetWorldScale(const glm::vec3& worldScale,
+        const glm::mat4& parentWorld = glm::mat4(1.0f)) {
+        glm::vec3 parentScale;
+        glm::quat r;
+        glm::vec3 p, skew;
+        glm::vec4 persp;
 
-        bool success = decompose(transformMatrix, scale, orientation, position, skew, perspective);
-        if (!success) return false;
+        glm::decompose(parentWorld, parentScale, r, p, skew, persp);
+        localScale = worldScale / parentScale;
+        MarkLocalDirty();
+    }
+     
 
-        // Converter quat para Euler em graus, com consideração da ordem de rotação
-        rotation = degrees(eulerAngles(orientation));
-        // Optional: Restrict range to prevent issues with gimbal lock
-        rotation.y = glm::mod(rotation.y, 360.0f);  // Garantir que o eixo Y permaneça dentro do intervalo 0-360
-        return true;
+    //-----------------------------------------------
+    //--------------- UPDATE CORE -------------------
+    //-----------------------------------------------
+    void UpdateLocalMatrixIfNeeded() {
+        if (!localDirty) return;
+
+        localMatrix =
+            glm::translate(glm::mat4(1.0f), localPosition) *
+            glm::toMat4(localRotation) *
+            glm::scale(glm::mat4(1.0f), localScale);
+
+        localDirty = false;
+        worldDirty = true;
     }
 
-    /*bool DecomposeTransform(const glm::mat4& matrix) {
-        using namespace glm;
-        vec3 skew;
-        vec4 perspective;
+    void UpdateWorldFromParent(const glm::mat4& parentWorld) {
+        UpdateLocalMatrixIfNeeded();
 
-        if (!decompose(matrix, scale, rotation, position, skew, perspective))
+        if (!worldDirty) return;
+
+        model = parentWorld * localMatrix;
+        DecomposeMatrix(model, position, rotation, scale);
+
+        worldDirty = false;
+        transformChangedThisFrame = true;
+    }
+
+    void UpdateWorldAsRoot() {
+        UpdateLocalMatrixIfNeeded();
+
+        if (!worldDirty) return;
+
+        model = localMatrix;
+        DecomposeMatrix(model, position, rotation, scale);
+
+        worldDirty = false;
+        transformChangedThisFrame = true;
+    }
+    //------------------------------------------------------ 
+
+
+    // ACCESS 
+    const glm::mat4& GetMatrix() const { return model; }
+     
+    // DIRTY CONTROL 
+    void MarkLocalDirty() { localDirty = true; worldDirty = true;   } 
+    void MarkWorldDirty() { worldDirty = true;                      }
+     
+    // HELPERS 
+    static bool DecomposeMatrix(const glm::mat4& mat,
+        glm::vec3& pos,
+        glm::quat& rot,
+        glm::vec3& scl) {
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        if (!glm::decompose(mat, scl, rot, pos, skew, perspective))
             return false;
-
+        rot = glm::normalize(rot);
         return true;
-    }*/
+    }
 
-    void MarkDirty() { dirty = true; }
-
+    glm::vec3 GetForwardDirection() const {
+        return glm::normalize(rotation * glm::vec3(0, 0, -1));
+    }
 };
-
-

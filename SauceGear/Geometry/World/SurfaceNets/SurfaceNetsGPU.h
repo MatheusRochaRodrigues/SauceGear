@@ -25,8 +25,8 @@ public:
     ) {
         const size_t voxelCount = size_t(GridVoxelPerAxis) * GridVoxelPerAxis * GridVoxelPerAxis;
 
-        std::cout << " wqe " << buff.densityMap.size() << std::endl;
-        std::cout << " wqe2 " << voxelCount << std::endl;
+        //std::cout << " wqe " << buff.densityMap.size() << std::endl;
+        //std::cout << " wqe2 " << voxelCount << std::endl;
 
         assert(buff.densityMap.size() == voxelCount && "Density map size mismatch!");
 
@@ -40,7 +40,7 @@ public:
         // Bind SDF
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
         if (!readySSBO_SDF) {
-            std::cout << " ck " << buff.densityMap[100] << std::endl;
+            //std::cout << " ck " << buff.densityMap[100] << std::endl;
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, gpuBuff.ssboSDF);
             glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, voxelCount * sizeof(float), buff.densityMap.data());
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gpuBuff.ssboSDF);
@@ -124,7 +124,7 @@ public:
         if (vertexCount == 0 || indexCount == 0) return nullptr;
 
 
-        std::cout << "possui indices" << std::endl;
+        //std::cout << "possui indices" << std::endl;
 
 
         // Cria Mesh

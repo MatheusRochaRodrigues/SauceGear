@@ -23,6 +23,72 @@ public:
     } 
     ~OctreeLOD() { destroy(root); }  
 
+
+    inline static int ChildIndex(const OctreeNode* n, const glm::vec3& p) {
+        int idx = 0;
+        if (p.x >= n->center.x) idx |= 1;
+        if (p.y >= n->center.y) idx |= 2;
+        if (p.z >= n->center.z) idx |= 4;
+        return idx;
+    };
+
+    float SampleOctreeSDF(
+        const glm::vec3& worldPos,
+        int targetChunkLOD
+    ) const
+    {
+        const OctreeNode* node = root;
+
+        while (node->subdivided) {
+            if (node->depthLOD <= targetChunkLOD)
+                break;
+
+            int ci = ChildIndex(node, worldPos);
+            const OctreeNode* child = node->children[ci];
+
+            if (!child || !child->contains(worldPos))
+                break;
+
+            node = child;
+        }
+
+        // 🔑 SDF linearizado localmente
+        return node->sdfCenter
+            + glm::dot(node->sdfGradient, worldPos - node->center);
+    }
+
+
+
+    std::vector<float> BuildChunkSDF(
+        OctreeLOD* octree,
+        OctreeNode* node
+    ) {
+        int DIM = sysv.get_voxelGrid() + sysv.get_Border();
+        std::vector<float> sdf(DIM * DIM * DIM);
+
+        float voxelSize = node->voxel_size();
+        glm::vec3 origin = node->getBounds().min;
+
+        for (int z = 0; z < DIM; ++z)
+            for (int y = 0; y < DIM; ++y)
+                for (int x = 0; x < DIM; ++x) {
+
+                    glm::vec3 worldPos =
+                        origin + (glm::vec3(x, y, z) + 0.5f) * voxelSize;
+
+                    float d = octree->SampleOctreeSDF(worldPos, node->depthLOD);
+
+                    sdf[linearize3(DIM, glm::vec3(x, y, z))] = d;
+                }
+
+        return sdf;
+    }
+
+    static inline size_t linearize3(size_t cellDimension, glm::vec3 d) {
+        return size_t(d.x) + size_t(d.y) * cellDimension + size_t(d.z) * cellDimension * cellDimension;    //x + y * sizeX + z * sizeX * sizeY;
+    }
+
+
     void Update() {
         std::queue<OctreeNode*> q;          q.push(root); 
 
@@ -37,6 +103,22 @@ public:
             if (!n->isEvaluated) {                              //cache interno do octree   
                 // --- SDF Distance --- 
                 n->sdfCenter = map.sdf->sdfDistance(n->center);
+
+                const float eps = syso.BASE_CELL_SIZE * 0.5f;
+
+                n->sdfGradient = glm::normalize(glm::vec3(
+                    map.sdf->sdfDistance(n->center + glm::vec3(eps, 0, 0)) -
+                    map.sdf->sdfDistance(n->center - glm::vec3(eps, 0, 0)),
+
+                    map.sdf->sdfDistance(n->center + glm::vec3(0, eps, 0)) -
+                    map.sdf->sdfDistance(n->center - glm::vec3(0, eps, 0)),
+
+                    map.sdf->sdfDistance(n->center + glm::vec3(0, 0, eps)) -
+                    map.sdf->sdfDistance(n->center - glm::vec3(0, 0, eps))
+                ));
+
+
+
                 bool hasSurface = map.has_surface(*n, n->sdfCenter, syso.BASE_CELL_SIZE);  
                 bool notArrivedLod = (n->depthLOD > n->targetLOD);                             
                                                                     OctreeDebug::PrintSDF(n);                       

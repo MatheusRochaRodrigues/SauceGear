@@ -23,14 +23,12 @@ public:
 
     void Update(const glm::vec3& p) {
         syso.set_camera(p);
-        octree->Update ();
-        std::cout << "AQ FOI 1" << std::endl;
+        octree->Update (); 
 
         // ---- Passo 2: Gera chunks apenas nas folhas ----
         //GenerateLeafChunks(octree->root);
         //return;
-        while (!octree->cmptChunkScheduler.empty()) {
-            std::cout << "AQ FOI" << std::endl;
+        while (!octree->cmptChunkScheduler.empty()) { 
             auto& node = octree->cmptChunkScheduler.front(); 
             octree->cmptChunkScheduler.pop(); 
             UpdateChunk(node);
@@ -51,7 +49,8 @@ public:
             std::cout << "\n";
         }
     }
-
+     
+     
     MakeMap mmap;
     bool UpdateChunk(OctreeNode* n) {  
         int DIM = sysv.get_voxelGrid() + sysv.get_Border();
@@ -60,7 +59,9 @@ public:
 
         //auto map = makeMap.buildDenseSDF(n, DIM, offset);         //auto map = makeMap.buildSDFGrid(n, octree->root); //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
         auto map = mmap.OcBuilderArraySDF(n, octree->root);         //auto map = makeMap.buildSDFGrid(n, octree->root); //ck.resizeDensityMap(); // aloca grid denso (ex: 17x17x17)
-        
+         
+        //auto map = octree->BuildChunkSDF(octree, n);
+
 
         if (!n->chunk) n->chunk = std::make_unique<Chunk>(sysv.get_voxelGrid() + sysv.get_Border());  
         Chunk& chunk = *n->chunk; chunk.lod = n->depthLOD; chunk.buff->densityMap = map;    // --- cria / redimensiona chunk ---  

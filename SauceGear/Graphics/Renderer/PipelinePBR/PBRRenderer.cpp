@@ -1,5 +1,5 @@
 ﻿#include "PBRRenderer.h"
-#include "../../ECS/Components/Transform.h"
+#include "../../ECS/Components/TransformComponent.h"
 #include "../../ECS/Components/MeshRenderer.h"
 //#include "../../ECS/Components/Material.h"
 #include "../Graphics/FullscreenQuad.h"
@@ -106,13 +106,13 @@ void PBRPipeline::GeometryPass(Scene& scene) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     auto camera = GEngine->mainCamera;
-    auto entities = scene.GetEntitiesWith<Transform, MeshRenderer>();
+    auto entities = scene.GetEntitiesWith<TransformComponent, MeshRenderer>();
 
     Shader* s = &shaders.gbuffer;
     s->use(); 
      
     for (auto e : entities) {
-        auto& tr = scene.GetComponent<Transform>(e);
+        auto& tr = scene.GetComponent<TransformComponent>(e);
         auto& mr = scene.GetComponent<MeshRenderer>(e);
         s->setMat4("model", tr.GetMatrix());
 
@@ -181,7 +181,7 @@ void PBRPipeline::LightingPass(Scene& scene) {
     std::vector<LightInstanceData> instanceData;
     for (auto e : LightSystem::lightInActive.point) {
         auto& light = GEngine->scene->GetComponent<LightComponent>(e);
-        auto& trans = GEngine->scene->GetComponent<Transform>(e);  
+        auto& trans = GEngine->scene->GetComponent<TransformComponent>(e);  
         // then calculate radius of light volume/sphere
         const float maxBrightness = std::fmaxf(std::fmaxf(light.color.r, light.color.g), light.color.b); 
         //Atenuation inverse quadratic
@@ -313,7 +313,7 @@ void PBRPipeline::RenderDebugSun()
     // pega luz e transform do sol
     if (LightSystem::currentSun == INVALID_ENTITY) return;
 
-    auto& sunTransform = GEngine->scene->GetComponent<Transform>(LightSystem::currentSun);
+    auto& sunTransform = GEngine->scene->GetComponent<TransformComponent>(LightSystem::currentSun);
     auto& sunLight = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun);
 
     // direção e posição

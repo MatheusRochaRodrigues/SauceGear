@@ -18,9 +18,9 @@ public:
 
     static void Init();
     // Atualiza cascaded shadow maps do sol a partir do LightComponent (assume directional)
-    static void UpdateSunShadow(LightComponent& sun, Transform& transform);
+    static void UpdateSunShadow(LightComponent& sun, TransformComponent& transform);
 
-    static void GetLightSpaceMatrices(Transform& transform);   //std::vector<glm::mat4>
+    static void GetLightSpaceMatrices(TransformComponent& transform);   //std::vector<glm::mat4>
 
     static int GetCascadeCount() { return (int)cascadePlaneDistances.size(); }
 

@@ -7,13 +7,13 @@ class CameraSystem : public System {
 public:
     void Update(float deltaTime) override {
         try {
-            auto entities = GEngine->scene->GetEntitiesWith<CameraComponent, Transform>();
+            auto entities = GEngine->scene->GetEntitiesWith<CameraComponent, TransformComponent>();
 
             Entity mainCameraEntity = INVALID_ENTITY;
 
             for (Entity e : entities) {
                 auto& camComp = GEngine->scene->GetComponent<CameraComponent>(e);
-                auto& trans =   GEngine->scene->GetComponent<Transform>(e);
+                auto& trans =   GEngine->scene->GetComponent<TransformComponent>(e);
 
                 if (!camComp.camera) {
                     std::cerr << "[ERRO] CameraComponent com ponteiro nulo\n";

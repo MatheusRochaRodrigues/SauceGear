@@ -100,7 +100,7 @@ struct SceneViewPanel : IPanel {
         if (selected != INVALID_ENTITY) {
             //Presume-se que toda entidade selecionável tem um TransformComponent. 
             // ... código anterior ...
-            Transform& tc = scene.GetComponent<Transform>(selected);
+            TransformComponent& tc = scene.GetComponent<TransformComponent>(selected);
 
             //DESNECESSARIO
             // Atualiza antes do gizmo (garante que a matriz está correta)
@@ -129,19 +129,19 @@ struct SceneViewPanel : IPanel {
                 glm::vec3 localCenter = (aabb.localMin + aabb.localMax) * 0.5f;
                 // matriz do pivot (world)
                 pivotWorld = objectWorld * glm::translate(glm::mat4(1.0f), localCenter);
-            } 
+            }
             // gizmo começa no pivot
             glm::mat4 gizmoWorld = pivotWorld;
 
             ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(proj),
                 currentGizmoMode, currentGizmoSpace, glm::value_ptr(gizmoWorld)); //LOCAL
-             
+
 
             // --------------------------------------------------
             // 6. ESTADO DO GIZMO + PICK
             // --------------------------------------------------
             state.gizmoUsing = ImGuizmo::IsUsing();
-            state.gizmoOver  = ImGuizmo::IsOver();
+            state.gizmoOver = ImGuizmo::IsOver();
 
             state.wantsPick =
                 state.sceneViewportHovered &&
@@ -150,34 +150,37 @@ struct SceneViewPanel : IPanel {
                 input->IsMousePressed(MOUSE_BUTTON_LEFT);
 
 
-            if (ImGuizmo::IsUsing()) {  
+            if (ImGuizmo::IsUsing()) {
                 // delta em espaço WORLD
-                glm::mat4 delta = glm::inverse(pivotWorld) * gizmoWorld; 
-                // aplica no objeto REAL
-                glm::mat4 newWorld = objectWorld * delta; 
+                glm::mat4 delta = glm::inverse(pivotWorld) * gizmoWorld;
+                glm::mat4 newWorld = objectWorld * delta;
+                glm::mat4 parentWorld(1.0f);
 
-                // se tiver parent -> converte para local
-                glm::mat4 parentWorld = glm::mat4(1.0f);
                 if (scene.HasComponent<HierarchyComponent>(selected)) {
                     HierarchyComponent& h = scene.GetComponent<HierarchyComponent>(selected);
-                    if (h.parent != INVALID_ENTITY && scene.HasComponent<Transform>(h.parent)) {
-                        parentWorld = scene.GetComponent<Transform>(h.parent).model;
-                        tc.SetLocalFromWorldMatrix(newWorld, parentWorld);
+                    if (h.parent != INVALID_ENTITY &&
+                        scene.HasComponent<TransformComponent>(h.parent)) {
+                        parentWorld = scene.GetComponent<TransformComponent>(h.parent).model;
                     }
-                    else tc.SetLocalFromWorldMatrixAsRoot(newWorld); 
                 }
-                else tc.SetLocalFromWorldMatrixAsRoot(newWorld); 
-                 
-                // não precisa MarkDirty() porque os SetLocalFromWorldMatrix já fazem isso internamente
-                // só garante que o Update do TransformSystem vai recalcular na próxima passada
 
-                // atualiza subtree imediatamente (filhos precisam seguir)
-                // não precisa atualizar subtree manual aqui → deixa o sistema cuidar no próximo frame
-                // forçar atualização só da subtree editada
+                // CONVERTE WORLD -> LOCAL (Unity-like)
+                tc.SetWorldPosition(glm::vec3(newWorld[3]), parentWorld);
+
+                // rotação
+                glm::quat newRot;
+                glm::vec3 skew, pos, scl;
+                glm::vec4 persp;
+                glm::decompose(newWorld, scl, newRot, pos, skew, persp);
+                tc.SetWorldRotation(glm::normalize(newRot), parentWorld);
+
+                // escala
+                tc.SetWorldScale(scl, parentWorld);
+
+                // Atualiza só a subtree editada
                 TransformSys::UpdateSubtree(scene, selected);
-            }  
-            //if (isSceneHovered && isSceneFocused)     // Manipula o transform da entidade com o gizmo, apenas se a janela de cena estiver focada
-        }  
+            }
+        }
          
         const char* items[] = { "Scene", "Hierarchy", "Inspector", "Project" };
         static int current_item = 0;
@@ -250,19 +253,7 @@ struct SceneViewPanel : IPanel {
 
         }
         ImGui::End();
-    }
-
-    void ApplyGizmoTransform(SceneECS& scene, Entity e, const glm::mat4& newWorld) {
-        Transform& t = scene.GetComponent<Transform>(e);
-        glm::mat4 parentWorld = glm::mat4(1.0f);
-        if (scene.HasComponent<HierarchyComponent>(e)) {
-            auto& h = scene.GetComponent<HierarchyComponent>(e);
-            if (h.parent != INVALID_ENTITY && scene.HasComponent<Transform>(h.parent))
-                parentWorld = scene.GetComponent<Transform>(h.parent).model;
-        }
-        t.SetLocalFromWorldMatrix(newWorld, parentWorld);
-        TransformSys::UpdateSubtree(scene, e);
-    }
+    } 
      
     const char* GetName() override { return "Scene"; }
 

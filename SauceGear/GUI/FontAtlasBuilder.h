@@ -4,5 +4,5 @@
 
 class FontAtlasBuilder {
 public:
-    static Font* Build(const std::string& path, int pixelSize);
+    static Font* Build(const std::string& path, int pixelSize); 
 };

@@ -104,10 +104,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;MSDFGEN_USE_FREETYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Libraries\msdfgen;$(ProjectDir)Libraries\msdfgen\core;$(ProjectDir)Libraries\msdfgen\ext;$(ProjectDir)Libraries;$(ProjectDir)Libraries\Includes\freetype\include;$(ProjectDir)Libraries\Includes\msdfgen\include;$(ProjectDir)Libraries\Includes\msdfgen\core;$(ProjectDir)Libraries\Includes\msdfgen\ext;$(ProjectDir)Libraries\Includes\freetype\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Libraries;$(ProjectDir)Libraries\Includes\msdfgen\include;$(ProjectDir)Libraries\Includes\msdfgen\core;$(ProjectDir)Libraries\Includes\msdfgen\ext;$(ProjectDir)Libraries\Includes\freetype\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/experimental:exportCompileCommands
 
  %(AdditionalOptions)</AdditionalOptions>
@@ -126,7 +126,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Libraries\msdfgen;$(ProjectDir)Libraries\msdfgen\core;$(ProjectDir)Libraries\msdfgen\ext;$(ProjectDir)Libraries;$(ProjectDir)Libraries\Includes\freetype\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Libraries;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +140,7 @@
     <ClCompile Include="ECS\Systems\Lighting\LightPoint.cpp" />
     <ClCompile Include="ECS\Systems\Lighting\LightSystem.cpp" />
     <ClCompile Include="ECS\Systems\Lighting\ShadowPool.cpp" />
+    <ClCompile Include="ECS\Systems\TextRender\TextRenderSystem.cpp" />
     <ClCompile Include="Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
     <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp" />
@@ -173,32 +174,6 @@
     <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="Editor\Panels\IPanelHelper.h" />
     <ClCompile Include="Graphics\Renderer\PipelinePBR\PBRRenderer.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\contour-combiners.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\Contour.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\convergent-curve-ordering.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\DistanceMapping.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\edge-coloring.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\edge-segments.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\edge-selectors.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\EdgeHolder.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\equation-solver.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\export-svg.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\msdf-error-correction.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\MSDFErrorCorrection.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\msdfgen.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\Projection.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\rasterization.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\render-sdf.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\save-bmp.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\save-fl32.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\save-rgba.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\save-tiff.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\Scanline.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\sdf-error-estimation.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\shape-description.cpp" />
-    <ClCompile Include="Libraries\msdfgen\core\Shape.cpp" />
-    <ClCompile Include="Libraries\msdfgen\ext\import-font.cpp" />
-    <ClCompile Include="Libraries\msdfgen\ext\save-png.cpp" />
     <ClCompile Include="Resources\DataBase\AssetDatabase.h" />
     <ClCompile Include="Resources\Primitive.cpp" />
     <ClCompile Include="Scene\SceneBuilder.h" />
@@ -220,9 +195,11 @@
     <ClCompile Include="Utils\PerlinNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Backup\Transform.h" />
     <ClInclude Include="DebugRender\DebugDraw.h" />
     <ClInclude Include="ECS\Components\DebugMeshComponent.h" />
     <ClInclude Include="ECS\Components\LightComponent.h" />
+    <ClInclude Include="ECS\Components\MaterialComponent.h" />
     <ClInclude Include="ECS\Components\OutlineComponent.h" />
     <ClInclude Include="ECS\Components\TextComponent.h" />
     <ClInclude Include="ECS\Systems\AABBSystem.h" />
@@ -235,7 +212,8 @@
     <ClInclude Include="ECS\Systems\OctreeWorldSystem.h" />
     <ClInclude Include="Core\EditorState.h" />
     <ClInclude Include="ECS\Systems\OutlineSystem.h" />
-    <ClInclude Include="ECS\Systems\TextRenderSystem.h" />
+    <ClInclude Include="ECS\Systems\TextRender\TextRenderSystem.h" />
+    <ClInclude Include="GUI\ToLetter3D.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h" />
     <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h" />
@@ -265,7 +243,7 @@
     <ClInclude Include="GUI\FontAtlasBuilder.h" />
     <ClInclude Include="GUI\FontManager.h" />
     <ClInclude Include="GUI\FontRenderer.h" />
-    <ClInclude Include="Libraries\msdfgen\msdfgen-config.h" />
+    <ClInclude Include="GUI\ToLetter.h" />
     <ClInclude Include="Math\Plane.h" />
     <ClInclude Include="Math\Ray.h" />
     <ClInclude Include="Math\Sphere.h" />
@@ -308,7 +286,6 @@
     <ClInclude Include="Scripts\ScriptABI.h" />
     <ClInclude Include="Math\AABB.h" />
     <ClInclude Include="ECS\Systems\PickingSystem.h" />
-    <ClInclude Include="ECS\Systems\PhysicsSystem.h" />
     <ClInclude Include="ECS\Components\AABBComponent.h" />
     <ClInclude Include="ECS\Systems\BoundsSystem.h" />
     <ClInclude Include="Utils\Noise.h" />
@@ -370,7 +347,7 @@
     <ClInclude Include="ECS\Components\ComponentsHelper.h" />
     <ClInclude Include="ECS\Components\Material.h" />
     <ClInclude Include="ECS\Components\MeshRenderer.h" />
-    <ClInclude Include="ECS\Components\Transform.h" />
+    <ClInclude Include="ECS\Components\TransformComponent.h" />
     <ClInclude Include="ECS\Components\Velocity.h" />
     <ClInclude Include="ECS\PhysicsSystem.h" />
     <ClInclude Include="Core\Time.h" />
@@ -392,7 +369,6 @@
     <ClInclude Include="ECS\Systems\MoveSystem.h" />
     <ClInclude Include="ECS\Systems\RenderSystem.h" />
     <ClInclude Include="ECS\Systems\SystemHelper.h" />
-    <ClInclude Include="ECS\Components\TransformComponent.h" />
     <ClInclude Include="ECS\Systems\ScriptSystem .h" />
     <ClInclude Include="ECS\ScriptBehaviour.h" />
     <ClInclude Include="ECS\Components\ScriptComponent.h" />
@@ -420,8 +396,15 @@
     <None Include="Resources\Shaders\debugQuad.vs" />
     <None Include="Resources\Shaders\debugQuadDepth.fs" />
     <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Resources\Shaders\GLSL\AtlasTextSDF.vs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextSDF_Just2D.vs" />
     <None Include="Resources\Shaders\GUI\AtlasTextMSDF.fs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextMSDF.vs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextSDF.fs" />
+    <None Include="Resources\Shaders\GUI\AtlasTextSDF.vs" />
+    <None Include="Resources\Shaders\GUI\SimpleText.fs" />
+    <None Include="Resources\Shaders\GUI\SimpleText.vs" />
+    <None Include="Resources\Shaders\GUI\SimpleText3D.fs" />
+    <None Include="Resources\Shaders\GUI\SimpleText3D.vs" />
     <None Include="Resources\Shaders\GUI\TextRender.fs" />
     <None Include="Resources\Shaders\GUI\TextRender.vs" />
     <None Include="Resources\Shaders\Outline\outline.fs" />
@@ -429,6 +412,7 @@
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
     <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
+    <None Include="Resources\Shaders\solid.fs" />
     <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
     <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />

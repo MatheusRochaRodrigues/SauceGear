@@ -44,7 +44,7 @@ void LightSystem::Update(float dt) {
     // Atualiza o sol (cascades) se existir
     if (currentSun != INVALID_ENTITY) {
         // pegamos componente do sol
-        auto& transform = GEngine->scene->GetComponent<Transform>(currentSun);
+        auto& transform = GEngine->scene->GetComponent<TransformComponent>(currentSun);
         auto& light = GEngine->scene->GetComponent<LightComponent>(currentSun);
 
         if (light.castShadow && light.type == LightType::Directional) { 
@@ -61,7 +61,7 @@ void LightSystem::Update(float dt) {
     }
     else {
         // tenta encontrar um directional para ser sun (preserva comportamento anterior)
-        auto entities = GEngine->scene->GetEntitiesWith<LightComponent, Transform>();
+        auto entities = GEngine->scene->GetEntitiesWith<LightComponent, TransformComponent>();
         for (auto& ent : entities) {
             auto& lc = GEngine->scene->GetComponent<LightComponent>(ent);
             if (lc.type == LightType::Directional) {
@@ -74,7 +74,7 @@ void LightSystem::Update(float dt) {
     // Para cada luz selecionada (exceto o sol tratado acima) atualiza shadowmaps
     for (auto& e : selected) {
         if (e == currentSun) continue;
-        auto& transform = GEngine->scene->GetComponent<Transform>(e);
+        auto& transform = GEngine->scene->GetComponent<TransformComponent>(e);
         auto& l = GEngine->scene->GetComponent<LightComponent>(e);
 
         ShadowLOD lod = ComputeLOD(glm::distance(transform.position, posPlayer));
@@ -129,7 +129,7 @@ void LightSystem::HandleShadowMapReturn(const glm::vec3& playerPosition) {
             continue;
         }
 
-        auto& transform = GEngine->scene->GetComponent<Transform>(lightEntity);
+        auto& transform = GEngine->scene->GetComponent<TransformComponent>(lightEntity);
         auto& light = GEngine->scene->GetComponent<LightComponent>(lightEntity);
 
         ShadowLOD currentLod = ComputeLOD(glm::distance(transform.position, playerPosition));
@@ -189,13 +189,13 @@ LightGroups LightSystem::GroupLightsByType(const std::vector<Entity>& lights) {
 }
 
 std::vector<Entity> LightSystem::GetClosestLights(const glm::vec3& playerPos) {
-    auto all = GEngine->scene->GetEntitiesWith<LightComponent, Transform>();
+    auto all = GEngine->scene->GetEntitiesWith<LightComponent, TransformComponent>();
 
     std::vector<std::pair<float, Entity>> sorted;
     sorted.reserve(all.size());
 
     for (Entity e : all) {
-        const auto& transform = GEngine->scene->GetComponent<Transform>(e);
+        const auto& transform = GEngine->scene->GetComponent<TransformComponent>(e);
         float dist = glm::distance(playerPos, transform.position);
         sorted.emplace_back(dist, e);
     }
@@ -216,7 +216,7 @@ int LightSystem::SetSunToShader(Shader* shader) {
     if (currentSun == INVALID_ENTITY) return 0; 
     shader->use();
     auto& light = GEngine->scene->GetComponent<LightComponent>(currentSun);
-    auto& transform = GEngine->scene->GetComponent<Transform>(currentSun);
+    auto& transform = GEngine->scene->GetComponent<TransformComponent>(currentSun);
     
     shader->setFloat("farPlane", GEngine->mainCamera->farClip);
 
@@ -286,7 +286,7 @@ void LightSystem::SetLightsToSSBO() {
 
     ForEachLight(lightInActive, [&](Entity& lightEntity) {
         auto& light = GEngine->scene->GetComponent<LightComponent>(lightEntity);
-        auto& transform = GEngine->scene->GetComponent<Transform>(lightEntity);
+        auto& transform = GEngine->scene->GetComponent<TransformComponent>(lightEntity);
 
         glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 0, sizeof(int), &light.type);
         glBufferSubData(GL_UNIFORM_BUFFER, i * offBuff + 16, sizeof(glm::vec3), glm::value_ptr(transform.position));

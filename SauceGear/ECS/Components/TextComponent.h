@@ -3,20 +3,19 @@
 #include <glm/glm.hpp>
 #include <cstdint>
 #include "../GUI/FontRenderer.h"
+ 
+struct TextStyle {
+    float outlineThickness = 0.0f;
+    glm::vec4 outlineColor = { 0,0,0,1 };       
+
+    glm::vec2 shadowOffset = { 0,0 };
+    glm::vec4 shadowColor = { 0,0,0,0 };
+};
 
 struct TextLayoutCache {
     std::vector<GlyphInstance> glyphs;
     float width = 0.0f;
     float height = 0.0f;
-};
-
-
-struct TextStyle {
-    float outlineThickness = 0.0f;
-    glm::vec4 outlineColor = { 0,0,0,1 };
-
-    glm::vec2 shadowOffset = { 0,0 };
-    glm::vec4 shadowColor = { 0,0,0,0 };
 };
 
 struct TextComponent {
@@ -55,13 +54,12 @@ struct TextComponent {
         BottomCenter,
         BottomRight
     } anchor = Anchor::TopLeft;
-
-    TextStyle style;
-
+     
     bool billboard = true;    // world text
     bool depthTest = false;   // world text
 
     TextLayoutCache layout;
+    TextStyle style;
 
     void LoadFont(string s) {
 

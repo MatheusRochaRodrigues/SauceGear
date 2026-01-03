@@ -39,18 +39,7 @@ struct MeshRenderer {
             } 
             batches[sm.material].push_back(&sm);
         }
-    }
-
-    /*void Render(Shader* overrideShader = nullptr) {
-        if (!mesh) return;
-        for (size_t i = 0; i < mesh->GetSubMeshes().size(); ++i) {
-            auto& sub = mesh->GetSubMeshes()[i];
-            if (i < materials.size() && materials[i]) {
-                materials[i]->Apply(overrideShader);
-            }
-            mesh->DrawSubMesh(i);
-        }
-    }*/
+    } 
 
     void Draw() {
         if (!mesh) return;
@@ -62,17 +51,7 @@ struct MeshRenderer {
             }
         }
         glBindVertexArray(0);
-    }
-
-    /*void Draw(std::shared_ptr<MaterialInstance> mat) {
-        if (!mesh) return;
-        if (!mat) return;
-        for (auto& sm : batches[mat]) { 
-            glBindVertexArray(mesh->VAO);
-            glDrawElements(GL_TRIANGLES, sm->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(uint32_t) * sm->indexOffset)); 
-        }
-        glBindVertexArray(0);
-    }*/
+    } 
 
     void Paint() {
         if (!mesh) return;
@@ -135,37 +114,5 @@ private:
         }
         for (auto* c : m->children) if (c) DrawChild(c);
     }
-
-
-//OLD
-public:
-    /*
-    // Um material por submesh
-    std::vector<std::shared_ptr<MaterialInstance>> materials; 
-
-    // Prepara materiais a partir do MeshFilter (copia os defaults da Mesh caso existam)
-    void SyncWithMesh(const MeshFilter& filter) {
-        materials.clear();
-        if (!filter.mesh) return;
-        materials.resize(filter.mesh->submeshes.size(), nullptr);
-        for (size_t i = 0; i < materials.size(); ++i) {
-            auto smMat = filter.mesh->submeshes[i].material;
-            materials[i] = smMat ? smMat : MaterialDefaults::Get();
-        }
-    }
-
-    Material* GetMaterialForSubmesh(size_t i, const MeshFilter& filter) const {
-        if (i >= materials.size()) return MaterialDefaults::Get();
-        // se null, tenta o da mesh, se null, default
-        if (materials[i]) return materials[i];
-        if (filter.mesh && i < filter.mesh->submeshes.size() && filter.mesh->submeshes[i].material)
-            return filter.mesh->submeshes[i].material;
-        return MaterialDefaults::Get();
-    }
-
-    void SetMaterialForSubmesh(size_t i, Material* m) {
-        if (i >= materials.size()) return;
-        materials[i] = m ? m : MaterialDefaults::Get();
-    }
-    */
+     
 };

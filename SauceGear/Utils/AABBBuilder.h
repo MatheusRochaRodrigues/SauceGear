@@ -6,20 +6,20 @@
 
 #include "../Core/EngineContext.h"
 #include "../Scene/SceneECS.h" 
-#include "../ECS/Components/Transform.h"
+#include "../ECS/Components/TransformComponent.h"
 #include "../ECS/Components/MeshRenderer.h"
 
 class AABBBuilder {
 public:   
     static inline void aabbMesh(Entity e) {
-        if (!(scn->HasComponent<MeshRenderer>(e) && scn->HasComponent<Transform>(e))) return; 
+        if (!(scn->HasComponent<MeshRenderer>(e) && scn->HasComponent<TransformComponent>(e))) return; 
         auto& aabb = scn->AddComponent<AABBComponent>(e);
 
         if (scn->GetComponent<MeshRenderer>(e).mesh == nullptr) std::cout << "errado aq" << std::endl;
         auto local = ComputeLocalAABB(*scn->GetComponent<MeshRenderer>(e).mesh);
         aabb.setLocal(local.min, local.max);
 
-        //auto world = TransformAABB(local, scn->GetComponent<Transform>(e).model);
+        //auto world = TransformAABB(local, scn->GetComponent<TransformComponent>(e).model);
         //aabb.setWorld(world.min, world.max);
 
         // 2️⃣ World AABB NÃO aqui

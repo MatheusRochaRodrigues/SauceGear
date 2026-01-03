@@ -13,7 +13,19 @@ public:
         Entity entity = scene.CreateEntity();
         //Special Components
         scene.AddComponent<NameComponent>(entity).name = name;                      //AddComponent<NameComponent>(entity, name); 
-        scene.AddComponent<Transform>(entity);
+        scene.AddComponent<TransformComponent>(entity);
+
+        return entity;
+    }
+     
+    //Special Create tools GameOBJ 
+    static Entity CreateGUIText(string name = "Text") {
+        auto& scene = *GEngine->scene;
+        Entity entity = scene.CreateEntity();
+        //Special Components
+        scene.AddComponent<NameComponent>(entity).name = name;                      //AddComponent<NameComponent>(entity, name); 
+        scene.AddComponent<TransformComponent>(entity);
+        scene.AddComponent<TextComponent>(entity);
 
         return entity;
     }
@@ -57,7 +69,7 @@ private:
         Entity e = scene.CreateEntity();
 
         scene.AddComponent<NameComponent>(e).name = (!meshNode->name.empty()) ? meshNode->name : "GameObjectModel";
-        auto& tr = scene.AddComponent<Transform>(e);
+        auto& tr = scene.AddComponent<TransformComponent>(e);
 
         //          Versao que adiciona mesh renderere apenas se a mesh possuir vertice
         if (!meshNode->submeshes.empty() && !meshNode->vertices.empty()) {
@@ -113,9 +125,9 @@ private:
         Entity e = scene.CreateEntity();
 
         scene.AddComponent<NameComponent>(e).name = (!root->name.empty()) ? root->name : "GameObjectModel";
-        auto& tr = scene.AddComponent<Transform>(e);
+        auto& tr = scene.AddComponent<TransformComponent>(e);
 
-        // Transform identidade por padrão (se quiser TRS do FBX, guardar no Mesh e setar aqui)
+        // TransformComponent identidade por padrão (se quiser TRS do FBX, guardar no Mesh e setar aqui)
         /*tr.position = meshNode->localPosition;
         tr.rotationQuat = meshNode->localRotation;
         tr.scale = meshNode->localScale;*/

@@ -87,7 +87,7 @@ public:
                 //estou obrigando nesse instante a qeum tem debug mesh component possuir esses components abaixo
                 auto& dbg = GEngine->scene->GetComponent<DebugMeshComponent>(e);
                 auto& mr = GEngine->scene->GetComponent<MeshRenderer>(e);
-                auto& tr = GEngine->scene->GetComponent<Transform>(e);
+                auto& tr = GEngine->scene->GetComponent<TransformComponent>(e);
 
                 if (dbg.showWireframe)
                     DebugWireframeRenderer::Draw(mr.mesh, tr.GetMatrix(), dbg.color);
@@ -105,6 +105,7 @@ public:
                 if(sf.showBoxOctree) {
                     auto aabb = sf.node->getBounds(); 
                     DebugRenderer::Cube(aabb.min, aabb.max, dbg.colorBox, false);
+                    DebugDrawChunkGrid(sf.node);
                 }
                 
             }
@@ -118,6 +119,35 @@ public:
             std::cerr << "[EXCEÇÃO - DebugRenderer] " << e.what() << "\n";
         }
     }
+
+
+
+    void DebugDrawChunkGrid(OctreeNode* node) {
+        int N = sysv.get_voxelGrid(); // ex: 17
+        glm::vec3 min = node->getBounds().min;
+        glm::vec3 max = node->getBounds().max;
+        glm::vec3 size = max - min;
+
+        glm::vec3 cell = size / float(N - 1);
+
+        for (int z = 0; z < N - 1; z++)
+            for (int y = 0; y < N - 1; y++)
+                for (int x = 0; x < N - 1; x++) {
+
+                    glm::vec3 cmin = min + glm::vec3(x, y, z) * cell;
+                    glm::vec3 cmax = cmin + cell;
+
+                    DebugRenderer::Cube(
+                        cmin,
+                        cmax,
+                        glm::vec3(0.5f,0,0),
+                        false
+                    );
+                }
+    }
+
+
+
 
     static inline glm::vec3 ColorByDepth(int depth) {
         static const glm::vec3 palette[] = {

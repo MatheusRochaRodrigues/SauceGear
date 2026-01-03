@@ -30,6 +30,7 @@ struct OctreeNode {
        
     float sdfCenter; 
     bool isDirty = true;
+    glm::vec3 sdfGradient;
 
     inline glm::vec3 grid_origin() const {
         float size = edge_length();        return glm::floor(center / size) * size;

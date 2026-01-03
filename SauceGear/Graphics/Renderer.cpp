@@ -24,10 +24,10 @@ void Renderer::BeginFrame() {
 
 //DrawWithShader() - Usa um shader override (útil para render shadow map, GBuffer, etc). 
 void Renderer::RenderSceneWithShader(Shader* shaderOverride) {
-    auto entities = GEngine->scene->GetEntitiesWith<Transform, MeshRenderer>();
+    auto entities = GEngine->scene->GetEntitiesWith<TransformComponent, MeshRenderer>();
 
     for (Entity e : entities) {
-        auto& transform = GEngine->scene->GetComponent<Transform>(e);
+        auto& transform = GEngine->scene->GetComponent<TransformComponent>(e);
         auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e);
 
         shaderOverride->use();
@@ -38,10 +38,10 @@ void Renderer::RenderSceneWithShader(Shader* shaderOverride) {
 }
 
 void Renderer::RenderSceneWithShader2(Shader* shaderOverride) {
-    auto entities = GEngine->scene->GetEntitiesWith<Transform, MeshRenderer>();
+    auto entities = GEngine->scene->GetEntitiesWith<TransformComponent, MeshRenderer>();
 
     for (Entity e : entities) {
-        auto& transform = GEngine->scene->GetComponent<Transform>(e);
+        auto& transform = GEngine->scene->GetComponent<TransformComponent>(e);
         auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e);
 
         shaderOverride->use();

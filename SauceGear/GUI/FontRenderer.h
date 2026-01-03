@@ -1,49 +1,72 @@
-#pragma once
+﻿#pragma once
 #include "Font.h"
 #include <glm/glm.hpp>
 #include <unordered_map>
 #include <vector>
 
+/*------------------Definition Literally----------------------*/
+//struct GlyphInstance {
+//    // --- transform ---
+//    glm::vec2 pos;        // posição final (já com basePos)
+//    glm::vec2 size;       // tamanho final em pixels
+//
+//    // --- atlas ---
+//    glm::vec2 uvMin;
+//    glm::vec2 uvMax;
+//
+//    // --- fill ---
+//    glm::vec4 color;
+//
+//    // --- outline ---
+//    float outlineThickness;     // 0 = sem outline
+//    glm::vec4 outlineColor;
+//
+//    // --- shadow ---
+//    glm::vec2 shadowOffset;     // em pixels
+//    glm::vec4 shadowColor;
+//};
+
+
+//struct GlyphInstance {
+//    glm::vec4 Pos_Size;                 // x y       | w h
+//    glm::vec4 UV_MM;                    // min.xy    | max.zw
+//    glm::vec4 Color;                    // rgba
+//    //by Font
+//    glm::vec4 Outline_ThicknessRGB;     // thickness | rgb
+//    glm::vec4 ShadowA;                  // offset.xy | rg
+//    glm::vec2 ShadowB;                  // ba
+//};
+
 struct GlyphInstance {
-    // --- transform ---
-    glm::vec2 pos;        // posi��o final (j� com basePos)
-    glm::vec2 size;       // tamanho final em pixels
+    glm::vec3 Anchor;                   // posição REAL do texto no mundo (igual para todas as letras)
+    glm::vec2 Offset;                   // posição local da letra (x,y) dentro da frase
+    glm::vec2 Size;                     // w h
+    glm::vec4 UV_MM;                    // min.xy | max.zw
+    glm::vec4 Color;                    // rgba
 
-    // --- atlas ---
-    glm::vec2 uvMin;
-    glm::vec2 uvMax;
-
-    // --- fill ---
-    glm::vec4 color;
-
-    // --- outline ---
-    float outlineThickness;     // 0 = sem outline
-    glm::vec4 outlineColor;
-
-    // --- shadow ---
-    glm::vec2 shadowOffset;     // em pixels
-    glm::vec4 shadowColor;
+    // Font effects
+    glm::vec4 Outline_ThicknessRGB;     // thickness | rgb
+    glm::vec4 ShadowA;                  // offset.xy | rg
+    glm::vec2 ShadowB;                  // ba
 };
 
-
-struct TextBatch {
-    Font* font = nullptr;
-    std::vector<GlyphInstance> instances;
-};
-
-class Shader;
+ 
+class Shader; 
 
 class FontRenderer {
 public:
     static void SetShader(Shader* s);
     static void Init();
     static void Begin();
-    static void Submit(Font*, const GlyphInstance&);
-    static void Flush(const glm::mat4& mvp, bool depth);
+    static void Submit(Font* f, const GlyphInstance& g);
+    static void Flush(const glm::mat4& mvp, bool depthTest);
+
+    static void Flush3D( const glm::mat4& VP, const glm::vec3& camRight, const glm::vec3& camUp, bool depthTest );
 
 private:
     static GLuint vao, vboQuad, vboInstance;
-    static std::unordered_map<Font*, TextBatch> batches;
+    //static std::unordered_map<Font*, std::vector<GlyphInstance> > batches;
+    static inline std::unordered_map<Font*, std::vector<GlyphInstance> > batches;
     static Shader* shader;
 };
 

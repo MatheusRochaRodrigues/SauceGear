@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Transform.h"
+#include "TransformComponent.h"
 #include "MeshRenderer.h" 
 //#include "Material.h" 
 #include "Velocity.h" 
@@ -23,7 +23,7 @@
 
 
 // Aqui você pode criar um alias útil:					
-using AllComponentTypes = std::tuple<Transform, Velocity>;
+//using AllComponentTypes = std::tuple<TransformComponent, Velocity>;
 
 
 

@@ -20,7 +20,7 @@ static std::vector<glm::vec4> GetFrustumCornersWorldSpace(const glm::mat4& proj,
     return corners;
 }
 
-void CascadeSun::GetLightSpaceMatrices(Transform& transform)
+void CascadeSun::GetLightSpaceMatrices(TransformComponent& transform)
 {
     auto camera = GEngine->mainCamera;
     if (!camera) return;
@@ -137,7 +137,7 @@ void CascadeSun::Init() {
 
 
 
-void CascadeSun::UpdateSunShadow(LightComponent& sun, Transform& transform) {
+void CascadeSun::UpdateSunShadow(LightComponent& sun, TransformComponent& transform) {
     if (!initialized) Init();
 
     auto camera = GEngine->mainCamera;

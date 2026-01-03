@@ -5,7 +5,7 @@
 #include "../Math/AABB.h"
 #include "../Components/AABBComponent.h"
 #include "../Utils/AABBBuilder.h"
-#include "../Components/Transform.h"
+#include "../Components/TransformComponent.h"
 //UpdateAllAABBs
 
 class AABBSystem : public System {
@@ -13,8 +13,8 @@ public:
     void Update(float dt) override {
         SceneECS& scene = *GEngine->scene;
          
-        for (Entity e : scene.GetEntitiesWith<AABBComponent, MeshRenderer, Transform>()) {  
-            Transform& t        = scene.GetComponent<Transform>    (e);
+        for (Entity e : scene.GetEntitiesWith<AABBComponent, MeshRenderer, TransformComponent>()) {  
+            TransformComponent& t        = scene.GetComponent<TransformComponent>    (e);
             AABBComponent& aabb = scene.GetComponent<AABBComponent>(e);
             MeshRenderer& mr    = scene.GetComponent<MeshRenderer> (e);
 

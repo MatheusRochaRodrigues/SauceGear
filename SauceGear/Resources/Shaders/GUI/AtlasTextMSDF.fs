@@ -42,7 +42,6 @@ void main() {
 
     // -------- SHADOW --------
     vec3 msdfShadow = texture(uMSDF, fs.uv - fs.shadowOffset * 0.001).rgb;
-
     float sdShadow = median(msdfShadow.r, msdfShadow.g, msdfShadow.b);
     float shadowAlpha = smoothstep(0.5 - w, 0.5 + w, sdShadow) * fs.shadowColor.a;
 

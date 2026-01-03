@@ -110,7 +110,7 @@ public:
 
                 // Criar/atualizar entidade para esse chunk
                 Entity ent = GetOrCreateEntityForNode(node);
-                auto& trans = GEngine->scene->GetComponent<Transform>(ent);
+                auto& trans = GEngine->scene->GetComponent<TransformComponent>(ent);
                 auto& rend = GEngine->scene->GetComponent<MeshRenderer>(ent); // assume MeshRenderer existe
                 // coloca o transform no centro do chunk
                 trans.position = node->center;
@@ -153,7 +153,7 @@ private:
     // Se a sua Scene API tem uma forma melhor de criar MeshRenderer, troque este helper
     Entity CreateEntityForNode(OctreeNode* n) {
         Entity e = SceneBuilder::CreateGameObject("Chunk");
-        auto& t = GEngine->scene->AddComponent<Transform>(e);
+        auto& t = GEngine->scene->AddComponent<TransformComponent>(e);
         t.position = n->center;
         t.scale = glm::vec3(1.0f);
         GEngine->scene->AddComponent<MeshRenderer>(e); // cria renderer vazio

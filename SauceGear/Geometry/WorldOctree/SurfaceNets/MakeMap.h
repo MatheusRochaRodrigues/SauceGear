@@ -92,7 +92,7 @@ public:
     }
 
     std::vector<float> sample_sdf_grid(OctreeNode* node, const std::vector<OctreeNode*>& leaves) {
-        int N = sysv.get_voxelGrid(); // ex: 17
+        int N = sysv.get_voxelGrid() + sysv.get_Border(); // ex: 17
         std::vector<float> arraySDF(N * N * N); 
         glm::vec3 size = node->b.max - node->b.min;
 
@@ -127,6 +127,13 @@ public:
         return arraySDF;
     }
 
+    void getSDF_Array(OctreeNode* node) {
+        int N = sysv.get_voxelGrid();
+        auto idx = [&](int x, int y, int z) { return x + N * (y + N * z); };
+
+        std::vector<float> arraySDF(N * N * N);
+
+    }
 
     std::vector<float> OcBuilderArraySDF(OctreeNode* node, OctreeNode* root) {
         std::vector<OctreeNode*> leaves;

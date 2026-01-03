@@ -121,7 +121,7 @@ struct DayNightSystem : public System {
 
     void UpdateSun(float normalized) {
         if (LightSystem::currentSun == INVALID_ENTITY) return;
-        auto& sunT = GEngine->scene->GetComponent<Transform>(LightSystem::currentSun);
+        auto& sunT = GEngine->scene->GetComponent<TransformComponent>(LightSystem::currentSun);
         auto& sunL = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun);
 
         float sunAngle = glm::radians(-90.0f + 360.0f * normalized);

@@ -7,8 +7,8 @@
 // CONFIGURAÇÃO DE DEBUG
 // ==========================
 #define OCTREE_DEBUG 0            // 1 = ligado, 0 = desligado
-#define OCTREE_DEBUG_TREE 1       // imprimir árvore depois
-#define OCTREE_DEBUG_STEP 1       // printar passo a passo da Update()
+#define OCTREE_DEBUG_TREE 0       // imprimir árvore depois
+#define OCTREE_DEBUG_STEP 0       // printar passo a passo da Update()
 #define OCTREE_DEBUG_COLOR 1      // cores ANSI ligadas
 
 #if OCTREE_DEBUG_COLOR

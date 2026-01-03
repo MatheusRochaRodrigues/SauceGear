@@ -1,5 +1,5 @@
 #include "BlinnPhongRenderer.h" 
-#include "../../ECS/Components/Transform.h"
+#include "../../ECS/Components/TransformComponent.h"
 #include "../../ECS/Components/MeshRenderer.h"
 //#include "../../ECS/Components/Material.h"
 #include "../../ECS/Systems/Lighting/LightSystem.h"
@@ -21,10 +21,10 @@ void BlinnPhongPipeline::GeometryPass(SceneECS& scene) {
     glEnable(GL_DEPTH_TEST);  
 
     auto camera = GEngine->mainCamera;      //auto view = camera->GetViewMatrix(); //auto proj = camera->GetProjectionMatrix(); 
-    auto entities = GEngine->scene->GetEntitiesWith<Transform, MeshRenderer>();
+    auto entities = GEngine->scene->GetEntitiesWith<TransformComponent, MeshRenderer>();
 
     for (auto e : entities) {
-        auto& trans = GEngine->scene->GetComponent<Transform>(e);
+        auto& trans = GEngine->scene->GetComponent<TransformComponent>(e);
         auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e);
 
         Shader* shader = GEngine->renderer->GetGBufferShader;
@@ -85,7 +85,7 @@ void BlinnPhongPipeline::LightingPass(SceneECS& scene) {
     std::vector<LightInstanceData> instanceData;
     for (auto e : LightSystem::lightInActive.point) {
         auto& light = GEngine->scene->GetComponent<LightComponent>(e);
-        auto& trans = GEngine->scene->GetComponent<Transform>(e);
+        auto& trans = GEngine->scene->GetComponent<TransformComponent>(e);
 
         // update attenuation parameters and calculate radius
         const float constant = 1.0f; // note that we don't send this to the shader, we assume it is always 1.0 (in our case)
@@ -170,10 +170,10 @@ void BlinnPhongPipeline::ForwardPass(SceneECS& scene) {
     //auto view = camera->GetViewMatrix();
     //auto proj = camera->GetProjectionMatrix();
 
-    //auto entities = GEngine->scene->GetEntitiesWith<Transform, MeshRenderer, TransparentTag>();
+    //auto entities = GEngine->scene->GetEntitiesWith<TransformComponent, MeshRenderer, TransparentTag>();
 
     //for (auto e : entities) {
-    //    auto& trans = GEngine->scene->GetComponent<Transform>(e);
+    //    auto& trans = GEngine->scene->GetComponent<TransformComponent>(e);
     //    auto& meshR = GEngine->scene->GetComponent<MeshRenderer>(e);
     //    if (!meshR.model) continue;
 

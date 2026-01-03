@@ -4,7 +4,7 @@
 #include "../SceneECS.h"  
 #include "../System.h"
 #include "../Components/AABBComponent.h"
-#include "../Components/Transform.h"
+#include "../Components/TransformComponent.h"
 #include "../Components/MeshRenderer.h"
 #include "../utilsAABB.h"
 
@@ -12,7 +12,7 @@ class BoundsSystem : public System {
 public:  
     void Update(float dt) override {
         auto& scene = GEngine->scene;
-        for (Entity e : scene->GetEntitiesWith<MeshRenderer, Transform, AABBComponent>()) {
+        for (Entity e : scene->GetEntitiesWith<MeshRenderer, TransformComponent, AABBComponent>()) {
             auto& transform = scene->GetComponent<Transform>(e);
 
             if (!transform.dirty) continue; // só recalcula se o transform mudou
