@@ -1,6 +1,6 @@
 ﻿#include "ImGuiLayer.h"
-#include "../Core/EngineContext.h"  
-#include "../Graphics/Renderer.h" 
+#include "../Engine/Core/EngineContext.h"  
+#include "../Engine/Graphics/Renderer.h" 
  
 void ImGuiLayer::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();

@@ -1,9 +1,10 @@
 ﻿#pragma once
 #include "IPanel.h"
-#include "../ECS/Components/ComponentsHelper.h" 
-#include "../Graphics/Renderer.h"  
-#include "../../Scene/SceneBuilder.h"  
-#include "../../Core/KeyCodes.h"  
+#include "../../Engine/ECS/Components/ComponentsHelper.h" 
+#include "../../Engine/Graphics/Renderer.h"  
+#include "../../Engine/Scene/SceneBuilder.h"  
+#include "../../Engine/Core/KeyCodes.h"  
+#include "../../Engine/Resources/Primitives/Primitive.h"  
 
 struct HierarchyPanel : IPanel {  
     void ShowAddMenu(std::shared_ptr<MaterialInstance> defaultMaterial) {
@@ -43,7 +44,8 @@ struct HierarchyPanel : IPanel {
 
                 // Cube spawn direto
                 if (ImGui::MenuItem("Cube")) {
-                    SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(defaultMaterial));
+                            //AQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+                    //SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(defaultMaterial));
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -81,7 +83,8 @@ struct HierarchyPanel : IPanel {
                 ImGui::InputFloat("Radius", &radius);
 
                 if (ImGui::Button("Spawn Sphere")) {
-                    SceneBuilder::CreateModel(PrimitiveMesh::CreateSphere(defaultMaterial, segments, rings, radius));
+                    //AQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+                    //SceneBuilder::CreateModel(PrimitiveMesh::CreateSphere(defaultMaterial, segments, rings, radius));
                     showConfigWindow = false;
                 }
             }
@@ -96,8 +99,9 @@ struct HierarchyPanel : IPanel {
                 ImGui::InputFloat("Radius", &radius);
                 ImGui::Checkbox("Capped", &capped);
 
-                if (ImGui::Button("Spawn Cylinder")) {
-                    SceneBuilder::CreateModel(PrimitiveMesh::CreateCylinder(defaultMaterial, segments, height, radius, capped));
+                if (ImGui::Button("Spawn Cylinder")) { 
+                    //AQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+                    //SceneBuilder::CreateModel(PrimitiveMesh::CreateCylinder(defaultMaterial, segments, height, radius, capped));
                     showConfigWindow = false;
                 }
             }

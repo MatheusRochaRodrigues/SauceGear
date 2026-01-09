@@ -1,6 +1,6 @@
 #pragma once
-#include "../Core/EngineContext.h" 
-#include "../../Scene/SceneECS.h" 
+#include "../../Engine/Core/EngineContext.h" 
+#include "../../Engine/Scene/SceneECS.h" 
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include "IPanel.h"
-#include "../ECS/Components/ComponentsHelper.h" 
-#include "../Graphics/Renderer.h"  
+#include "../../Engine/ECS/Components/ComponentsHelper.h" 
+#include "../../Engine/Graphics/Renderer.h"  
 #include "Load.h"
 
-#include "../../ECS/Systems/TransformSystem.h" 
+#include "../../Engine/ECS/Systems/TransformSystem.h" 
 
-#include "../Core/EditorState.h"
-#include "../../Core/InputSystem.h"  
+#include "../../Engine/Core/EditorState.h"
+#include "../../Engine/Core/InputSystem.h"  
 
 struct SceneViewPanel : IPanel { 
 

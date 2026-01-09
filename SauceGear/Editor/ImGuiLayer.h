@@ -2,8 +2,8 @@
 
 //Engine Dependecies
 //#include "../Scene/SceneECS.h" 
-#include "../Scene/GameScene.h" 
-#include "../Platform/Window.h"
+#include "../Engine/Scene/GameScene.h" 
+#include "../Engine/Platform/Window.h"
  
 #define IMGUI_ENABLE_DOCKING // antes de incluir imgui.h
 //#include "imgui.h"

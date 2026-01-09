@@ -18,70 +18,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c">
+    <ClCompile Include="Engine\Graphics\Shader.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="Engine\Graphics\SkyboxRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="stb.cpp">
+    <ClCompile Include="Engine\Core\Application.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Shader.cpp">
+    <ClCompile Include="Engine\Scene\SceneECS.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\SkyboxRenderer.cpp">
+    <ClCompile Include="Engine\Graphics\Renderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Application.cpp">
+    <ClCompile Include="Engine\Core\Time.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneECS.cpp">
+    <ClCompile Include="Engine\Core\Log.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer.cpp">
+    <ClCompile Include="Engine\Core\EngineContext.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Time.cpp">
+    <ClCompile Include="Engine\Core\InputSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Logger.cpp">
+    <ClCompile Include="Engine\Graphics\Texture.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Core\EngineContext.cpp">
+    <ClCompile Include="Engine\Graphics\Framebuffer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Core\InputSystem.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Texture.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Framebuffer.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ECS\Systems\PostProcessSystem.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_glfw.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_opengl3.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
+    <ClCompile Include="Engine\ECS\Systems\PostProcessSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Editor\Panels\SceneViewPanel.h">
@@ -102,25 +72,7 @@
     <ClCompile Include="Editor\ImGuiLayer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\GraphEditor.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImCurveEdit.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImGradient.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImGuizmo.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImSequencer.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Game\GameMain.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorUI.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Editor\EditorMain.cpp">
@@ -129,70 +81,142 @@
     <ClCompile Include="Editor\Panels\IPanelHelper.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Resources\Primitive.cpp">
+    <ClCompile Include="Engine\Resources\Primitives\Primitive.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.cpp">
+    <ClCompile Include="Engine\Renderer\RendererBlinnPhong\BlinnPhongRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelinePBR\PBRRenderer.cpp">
+    <ClCompile Include="Engine\Renderer\RendererPBR\PBRPipeline.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneBuilder.h">
+    <ClCompile Include="Engine\Scene\SceneBuilder.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\DeferredPipeline.cpp">
+    <ClCompile Include="Engine\Renderer\RendererBlinnPhong\DeferredPipeline.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\ForwardPipeline.cpp">
+    <ClCompile Include="Engine\Renderer\RendererBlinnPhong\ForwardPipeline.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelineBlinnPhong\LightingPipeline.cpp">
+    <ClCompile Include="Engine\Renderer\RendererBlinnPhong\LightingPipeline.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Renderer\PipelinePBR\IBLManager.cpp">
+    <ClCompile Include="Engine\Renderer\RendererPBR\IBL\IBLManager.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\ShaderPreprocessor.h">
+    <ClCompile Include="Engine\Graphics\ShaderPreprocessor.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\ComputeShader.cpp">
+    <ClCompile Include="Engine\Graphics\ComputeShader.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Resources\DataBase\AssetDatabase.h">
+    <ClCompile Include="Engine\ECS\Systems\Lighting\ShadowPool.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\Lighting\ShadowPool.cpp">
+    <ClCompile Include="Engine\ECS\Systems\Lighting\LightSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\Lighting\LightSystem.cpp">
+    <ClCompile Include="Engine\ECS\Systems\Lighting\LightDirectional.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\Lighting\LightDirectional.cpp">
+    <ClCompile Include="Engine\ECS\Systems\Lighting\CascadeSun.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\Lighting\CascadeSun.cpp">
+    <ClCompile Include="Engine\ECS\Systems\Lighting\LightPoint.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\Lighting\LightPoint.cpp">
+    <ClCompile Include="Engine\Utils\PerlinNoise.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\PerlinNoise.cpp">
+    <ClCompile Include="Engine\DebugRender\DebugLinesRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="DebugRender\DebugLinesRenderer.cpp">
+    <ClCompile Include="Engine\GUI\FontRenderer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\FontRenderer.cpp">
+    <ClCompile Include="Engine\GUI\FontAtlasBuilder.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\FontAtlasBuilder.cpp">
+    <ClCompile Include="Engine\ECS\Systems\TextRender\TextRenderSystem.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\Systems\TextRender\TextRenderSystem.cpp">
+    <ClCompile Include="Engine\Materials\MaterialImporter.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Serializer\MaterialSerializer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="stb.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Resources\Loaders\ModelLoader.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Assets\AssetLoader.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Serializer\ModelSerializer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Instancing\MeshInstance.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Materials\MaterialLibrary.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\Shaders\ShaderLibrary.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Instancing\MaterialInstance.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Assets\ModelAsset.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\GraphEditor.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\ImCurveEdit.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\ImGradient.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_demo.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_draw.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_impl_glfw.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_impl_opengl3.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_tables.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_widgets.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\ImGuizmo.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\ImSequencer.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\SceneBuilder.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -200,133 +224,124 @@
     <ClInclude Include="Scene\Camera.h">
       <Filter>Arquivos de Origem</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Shader.h">
+    <ClInclude Include="Engine\Graphics\Shader.h">
       <Filter>Arquivos de Origem</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\SkyboxRenderer.h">
+    <ClInclude Include="Engine\Graphics\SkyboxRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Application.h">
+    <ClInclude Include="Engine\Core\Application.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\SceneECS.h">
+    <ClInclude Include="Engine\Scene\SceneECS.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer.h">
+    <ClInclude Include="Engine\Graphics\Renderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Time.h">
+    <ClInclude Include="Engine\Core\Time.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Logger.h">
+    <ClInclude Include="Engine\Core\Log.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\EngineContext.h">
+    <ClInclude Include="Engine\Core\EngineContext.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Platform\Window.h">
+    <ClInclude Include="Engine\Platform\Window.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\Entity.h">
+    <ClInclude Include="Engine\Scene\Entity.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\InputSystem.h">
+    <ClInclude Include="Engine\Core\InputSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\PhysicsSystem.h">
+    <ClInclude Include="Engine\ECS\PhysicsSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Mesh.h">
+    <ClInclude Include="Engine\Graphics\PrimitiveMesh.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\Model.h">
+    <ClInclude Include="Engine\Resources\Loaders\ModelLoader.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\System.h">
+    <ClInclude Include="Engine\ECS\System.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Texture.h">
+    <ClInclude Include="Engine\Graphics\Texture.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\RenderUtils.h">
+    <ClInclude Include="Engine\Graphics\RenderUtils.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\ComponentManager.h">
+    <ClInclude Include="Engine\Scene\ComponentManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\MoveSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\MoveSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\TransformComponent.h">
+    <ClInclude Include="Engine\ECS\Components\TransformComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\Velocity.h">
+    <ClInclude Include="Engine\ECS\Components\Velocity.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\MeshRenderer.h">
+    <ClInclude Include="Engine\ECS\Components\MeshRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\RenderSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\RenderSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="ECS\Components\Material.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\LightingUtils.h">
+    <ClInclude Include="Engine\ECS\Components\CameraComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\CameraComponent.h">
+    <ClInclude Include="Engine\ECS\Systems\CameraSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\CameraSystem.h">
+    <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\SceneManager.h">
+    <ClInclude Include="Engine\ECS\Components\ComponentsHelper.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\ComponentsHelper.h">
+    <ClInclude Include="Engine\ECS\Systems\SystemHelper.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\SystemHelper.h">
+    <ClInclude Include="Engine\Core\Camera.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Camera.h">
+    <ClInclude Include="Engine\Core\Input.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Input.h">
+    <ClInclude Include="Engine\Core\KeyCodes.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\KeyCodes.h">
+    <ClInclude Include="Engine\ECS\Components\PostProcessComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\PostProcessComponent.h">
+    <ClInclude Include="Engine\Graphics\Framebuffer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Framebuffer.h">
+    <ClInclude Include="Engine\ECS\Systems\PostProcessSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\PostProcessSystem.h">
+    <ClInclude Include="Engine\Graphics\FullscreenQuad.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\FullscreenQuad.h">
+    <ClInclude Include="Engine\ECS\Components\PostEffects\BlurEffectComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\PostEffects\BlurEffectComponent.h">
+    <ClInclude Include="Engine\ECS\Systems\GlobalUniformSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\GlobalUniformSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\ScriptSystem .h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\ScriptSystem .h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\ScriptBehaviour.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Components\NativeScriptComponent.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\PlayerCamera.h">
+    <ClInclude Include="Engine\ECS\Components\NativeScriptComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\EditorApp.h">
@@ -335,52 +350,52 @@
     <ClInclude Include="Editor\ImGuiLayer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
+    <ClInclude Include="Engine\ImGui\imconfig.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
+    <ClInclude Include="Engine\ImGui\imgui.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_glfw.h">
+    <ClInclude Include="Engine\ImGui\imgui_impl_glfw.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_opengl3.h">
+    <ClInclude Include="Engine\ImGui\imgui_impl_opengl3.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_opengl3_loader.h">
+    <ClInclude Include="Engine\ImGui\imgui_impl_opengl3_loader.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
+    <ClInclude Include="Engine\ImGui\imgui_internal.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
+    <ClInclude Include="Engine\ImGui\imstb_rectpack.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
+    <ClInclude Include="Engine\ImGui\imstb_textedit.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
+    <ClInclude Include="Engine\ImGui\imstb_truetype.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\GraphEditor.h">
+    <ClInclude Include="Engine\ImGui\GraphEditor.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImCurveEdit.h">
+    <ClInclude Include="Engine\ImGui\ImCurveEdit.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImGradient.h">
+    <ClInclude Include="Engine\ImGui\ImGradient.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImGuizmo.h">
+    <ClInclude Include="Engine\ImGui\ImGuizmo.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImSequencer.h">
+    <ClInclude Include="Engine\ImGui\ImSequencer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImZoomSlider.h">
+    <ClInclude Include="Engine\ImGui\ImZoomSlider.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\HierarchyComponent.h">
+    <ClInclude Include="Engine\ECS\Components\HierarchyComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Panels\IPanel.h">
@@ -389,509 +404,585 @@
     <ClInclude Include="Editor\Panels\Load.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\ScriptComponent.h">
+    <ClInclude Include="Engine\ECS\Components\ScriptComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Game\MoveScript.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\GameScene.h">
+    <ClInclude Include="Engine\Scene\GameScene.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\Tags\ForwardTag.h">
+    <ClInclude Include="Engine\ECS\Components\Tags\ForwardTag.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\Tags\TransparentTag.h">
+    <ClInclude Include="Engine\ECS\Components\Tags\TransparentTag.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="PostProcessEffect.h">
+    <ClInclude Include="Engine\Resources\Primitives\Primitive.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\Primitive.h">
+    <ClInclude Include="Engine\ECS\Components\MeshComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\MeshFilter.h">
+    <ClInclude Include="Engine\Renderer\RendererBlinnPhong\BlinnPhongRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\PipelineBlinnPhong\BlinnPhongRenderer.h">
+    <ClInclude Include="Engine\Renderer\RendererPBR\PBRPipeline.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRRenderer.h">
+    <ClInclude Include="Engine\Renderer\IRenderPipeline.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\IRenderPipeline.h">
+    <ClInclude Include="Engine\Assets\AssetManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\AssetManager.h">
+    <ClInclude Include="Engine\Renderer\RendererPBR\IBL\IBLManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\RenderHelper.h">
+    <ClInclude Include="Engine\Renderer\RendererBlinnPhong\Backup\PBRShaders.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\PipelinePBR\IBLManager.h">
+    <ClInclude Include="Engine\ECS\ScriptInspector.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\PipelinePBR\PBRShaders.h">
+    <ClInclude Include="Engine\Renderer\RendererPBR\IBL\PersistenceIBL.hpp">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\ScriptInspector.h">
+    <ClInclude Include="Engine\Scripts\MyScript.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Renderer\PipelinePBR\PersistenceIBL.hpp">
+    <ClInclude Include="Game\exec.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Scripts\MyScript.h">
+    <ClInclude Include="Engine\ECS\Components\AABBComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\exec.h">
+    <ClInclude Include="Engine\Utils\AABBBuilder.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\AABBComponent.h">
+    <ClInclude Include="Engine\ECS\Systems\PickingSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\BoundsSystem.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\AABBBuilder.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Systems\PickingSystem.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Scripts\ScriptABI.h">
+    <ClInclude Include="Engine\Scripts\ScriptABI.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Utils\ImGuiUtils.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\Drawers\TransformDrawer.h">
+    <ClInclude Include="Engine\ECS\Reflection\Meta.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\Drawers\MeshRendererDrawer.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Drawers\CameraDrawer.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Drawers\LightDrawer.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Reflection\Meta.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="ECS\Reflection\Macros.h">
+    <ClInclude Include="Engine\ECS\Reflection\Macros.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Utils\InspectorDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\Fonts\IconsFontAwesome5.h">
+    <ClInclude Include="Engine\ImGui\Fonts\IconsFontAwesome5.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Icons\MaterialIcons.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\DayNightSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\DayNightSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\ShaderBase.h">
+    <ClInclude Include="Engine\Graphics\ShaderBase.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\ComputeShader.h">
+    <ClInclude Include="Engine\Graphics\ComputeShader.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\ComputeSyncComponent.h">
+    <ClInclude Include="Engine\ECS\Components\ComputeSyncComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\ComputeSyncSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\ComputeSyncSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\TransformSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\TransformSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DefineMaterials\Material.h">
+    <ClInclude Include="Engine\Materials\MaterialBase.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DefineMaterials\MaterialInstance.h">
+    <ClInclude Include="Engine\Instancing\MaterialInstance.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DefineMaterials\MaterialUtils.h">
+    <ClInclude Include="Engine\Materials\MaterialUtils.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DefineMaterials\PBRMaterial.h">
+    <ClInclude Include="Engine\Materials\PBRMaterial.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\DefineMaterials\TextureCache.h">
+    <ClInclude Include="Engine\Materials\TextureCache.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\SurfaceNetsComponent.h">
+    <ClInclude Include="Engine\ECS\Components\SurfaceNetsComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\SurfaceNetsSystem.h">
+    <ClInclude Include="Engine\Geometry\Octree\OctreeNode.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\Octree\OctreeNode.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\SurfaceNets.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNets.h">
+    <ClInclude Include="Engine\Geometry\Octree\Octree.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\Octree\Octree.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\Voxel.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\Voxel.h">
+    <ClInclude Include="Engine\Geometry\World\NoiseGenerator\SphereSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\NoiseGenerator\SphereSDF.h">
+    <ClInclude Include="Engine\DebugRender\DebugPointRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\DebugPointRenderer.h">
+    <ClInclude Include="Engine\ECS\Systems\DebugRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\DebugRenderer.h">
+    <ClInclude Include="Engine\DebugRender\DebugLinesRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\DebugLinesRenderer.h">
+    <ClInclude Include="Engine\ECS\Components\DebugMeshComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\DebugMeshComponent.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\SurfaceNetsGPU.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPU.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\MapGenerator.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\MapGenerator.h">
+    <ClInclude Include="Engine\ECS\Systems\Lighting\LightSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\Lighting\LightSystem.h">
+    <ClInclude Include="Engine\ECS\Components\LightComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\LightComponent.h">
+    <ClInclude Include="Engine\ECS\Systems\Lighting\LightPoint.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\Lighting\LightPoint.h">
+    <ClInclude Include="Engine\ECS\Systems\Lighting\CascadeSun.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\Lighting\CascadeSun.h">
+    <ClInclude Include="Engine\ECS\Systems\Lighting\LightDirectional.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\Lighting\LightDirectional.h">
+    <ClInclude Include="Engine\ECS\Systems\Lighting\ShadowPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\Lighting\ShadowPool.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\GPUJobQueue.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\GPUJobQueue.h">
+    <ClInclude Include="Engine\Geometry\World\Structs\ObjectPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\Structs\ObjectPool.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\SurfaceNetsGPUBuffer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\SurfaceNetsGPUBuffer.h">
+    <ClInclude Include="Engine\Geometry\World\WorldComputeThread.hpp">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\WorldComputeThread.hpp">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\GSurfPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\GSurfPool.h">
+    <ClInclude Include="Engine\Geometry\World\SurfaceNets\DebugVoxels.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\World\SurfaceNets\DebugVoxels.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\OctreeLOD.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeLOD.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\SysVoxel.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SysVoxel.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\WorldSys.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\WorldSys.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\BasicTerrainSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\BasicTerrainSDF.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\CavesSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\CavesSDF.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\OperationsSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\OperationsSDF.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\Planet.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\Planet.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\SignedDistanceField.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\SignedDistanceField.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\Terrain.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\Terrain.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SDF\TerrainSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SDF\TerrainSDF.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\SDF_Map.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\SDF_Map.h">
+    <ClInclude Include="Engine\Utils\Noise.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Noise.h">
+    <ClInclude Include="Engine\Utils\PerlinNoise.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\PerlinNoise.h">
+    <ClInclude Include="Engine\Math\AABB.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Math\AABB.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\ConstructMap.cpp">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.cpp">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\ConstructMap.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\ConstructMap.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\OctreeNode.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeNode.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\OctreeDebug.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\OctreeDebug.h">
+    <ClInclude Include="Engine\ECS\Systems\OctreeWorldSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\OctreeWorldSystem.h">
+    <ClInclude Include="Engine\Math\Ray.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Math\Ray.h">
+    <ClInclude Include="Engine\Math\Sphere.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Math\Sphere.h">
+    <ClInclude Include="Engine\Math\Plane.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Math\Plane.h">
+    <ClInclude Include="Engine\Physics\Raycast.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\Raycast.h">
+    <ClInclude Include="Engine\Graphics\Vertex.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Vertex.h">
+    <ClInclude Include="Engine\ECS\Systems\AABBSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\AABBSystem.h">
+    <ClInclude Include="Engine\ECS\Systems\EndLoopSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\EndLoopSystem.h">
+    <ClInclude Include="Engine\DebugRender\Debug\NewFolder1\DebugLinesRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\Debug\NewFolder1\DebugLinesRenderer.h">
+    <ClInclude Include="Engine\DebugRender\Debug\NewFolder1\DebugPointDrawer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\Debug\NewFolder1\DebugPointDrawer.h">
+    <ClInclude Include="Engine\DebugRender\WireframeCache.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\WireframeCache.h">
+    <ClInclude Include="Engine\DebugRender\DebugWireframeRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\DebugWireframeRenderer.h">
+    <ClInclude Include="Engine\DebugRender\DebugDraw.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRender\DebugDraw.h">
+    <ClInclude Include="Engine\Core\EditorState.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Core\EditorState.h">
+    <ClInclude Include="Engine\ECS\Components\OutlineComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\OutlineComponent.h">
+    <ClInclude Include="Engine\ECS\Systems\OutlineSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\OutlineSystem.h">
+    <ClInclude Include="Engine\Geometry\WorldOctree\SurfaceNets\MakeMap.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry\WorldOctree\SurfaceNets\MakeMap.h">
+    <ClInclude Include="Engine\ECS\Components\TextComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\TextComponent.h">
+    <ClInclude Include="Engine\GUI\FontRenderer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\FontRenderer.h">
+    <ClInclude Include="Engine\GUI\Font.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\Font.h">
+    <ClInclude Include="Engine\GUI\FontAtlasBuilder.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\FontAtlasBuilder.h">
+    <ClInclude Include="Engine\GUI\FontManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\FontManager.h">
+    <ClInclude Include="Engine\ECS\Systems\TextRender\TextRenderSystem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Systems\TextRender\TextRenderSystem.h">
+    <ClInclude Include="Engine\GUI\ToLetter.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="GUI\ToLetter.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="GUI\ToLetter3D.h">
+    <ClInclude Include="Engine\GUI\ToLetter3D.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Backup\Transform.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\Components\MaterialComponent.h">
+    <ClInclude Include="Engine\ECS\Components\MaterialComponent.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Materials\MaterialBinder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\GeometryPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\ForwardPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\DeferredLightingPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\TransparentPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\SkyboxPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Bindings\GBufferBinder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Bindings\IBLBinder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\IBL\IBLSet.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\RenderPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\RenderGraph.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\MaterialAsset.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Materials\1\MaterialRegistry.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\AssetDatabase.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Serializer\MaterialSerializer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\IAsset.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\ShaderAsset.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\ModelAsset.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Serializer\ModelSerializer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\AssetLoader.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Serializer\ShaderSerializer.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Materials\MaterialLibrary.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Resources\Loaders\ModelNode.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Assets\MeshAsset.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Instancing\MeshInstance.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Instancing\ModelInstance.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RenderItem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RenderQueue.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\ShadowPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\Shaders\ShaderLibrary.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\PBR\background.fs">
+    <None Include="Engine\Resources\Shaders\PBR\background.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\background.vs">
+    <None Include="Engine\Resources\Shaders\PBR\background.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\cubemap.vs">
+    <None Include="Engine\Resources\Shaders\PBR\cubemap.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\IBL\equirectangular_to_cubemap.fs">
+    <None Include="Engine\Resources\Shaders\PBR\IBL\equirectangular_to_cubemap.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\Basic\Frag.fg">
+    <None Include="Engine\Resources\Shaders\Basic\Frag.fg">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\IBL\irradiance_convolution.fs">
+    <None Include="Engine\Resources\Shaders\PBR\IBL\irradiance_convolution.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\pbr.fs">
+    <None Include="Engine\Resources\Shaders\PBR\pbr.fs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\pbr.vs">
+    <None Include="Engine\Resources\Shaders\PBR\pbr.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\Basic\Vertex.vs">
+    <None Include="Engine\Resources\Shaders\Basic\Vertex.vs">
       <Filter>Arquivos de Origem</Filter>
     </None>
-    <None Include="Resources\Shaders\PBR\IBL\prefilter.fs" />
-    <None Include="Resources\Shaders\PBR\IBL\brdf.vs" />
-    <None Include="Resources\Shaders\PBR\IBL\brdf.fs" />
-    <None Include="Resources\Shaders\CellShading\BaseColor.vs" />
-    <None Include="Resources\Shaders\CellShading\BaseColor.fs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapD.vs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapD.fs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseLighting.fs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseLighting.vs" />
-    <None Include="Resources\Shaders\Debug\FrameBufferQuad.vs" />
-    <None Include="Resources\Shaders\Debug\FrameBufferQuad.fs" />
-    <None Include="Resources\Shaders\Debug\debug_quad_depth.fs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapP.vs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapP.fs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapP.gs" />
-    <None Include="Resources\Shaders\Shadows\Extras\ShadowPointPCFold.fs" />
-    <None Include="Resources\Shaders\Debug\debug_Cube_depth.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\IBL\prefilter.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\IBL\brdf.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\IBL\brdf.fs" />
+    <None Include="Engine\Resources\Shaders\CellShading\BaseColor.vs" />
+    <None Include="Engine\Resources\Shaders\CellShading\BaseColor.fs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapD.vs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapD.fs" />
+    <None Include="Engine\Resources\Shaders\BlinnPhong\BaseLighting.fs" />
+    <None Include="Engine\Resources\Shaders\BlinnPhong\BaseLighting.vs" />
+    <None Include="Engine\Resources\Shaders\Debug\FrameBufferQuad.vs" />
+    <None Include="Engine\Resources\Shaders\Debug\FrameBufferQuad.fs" />
+    <None Include="Engine\Resources\Shaders\Debug\debug_quad_depth.fs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapP.vs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapP.fs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapP.gs" />
+    <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowPointPCFold.fs" />
+    <None Include="Engine\Resources\Shaders\Debug\debug_Cube_depth.fs" />
     <None Include="debug_Cube_depth.vs" />
-    <None Include="Resources\Shaders\Basic\VertDefault.vs" />
-    <None Include="Resources\Shaders\CellShading\fragment.fs" />
-    <None Include="Resources\Shaders\Shadows\Extras\shadowPointPCF_oldComented.fs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.fs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseShadow.vs" />
-    <None Include="Resources\Shaders\PostProcess\postprocess.vs" />
-    <None Include="Resources\Shaders\PostProcess\postprocess.fs" />
-    <None Include="Resources\Shaders\PostProcess\tonemap.fs" />
-    <None Include="Resources\Shaders\PostProcess\post.vs" />
-    <None Include="Resources\Shaders\PostProcess\post.fs" />
-    <None Include="Resources\Shaders\PostProcess\BlackAndWhite.fs" />
-    <None Include="Resources\Shaders\BlinnPhong\BaseLightingBAKP.fs" />
+    <None Include="Engine\Resources\Shaders\Basic\VertDefault.vs" />
+    <None Include="Engine\Resources\Shaders\CellShading\fragment.fs" />
+    <None Include="Engine\Resources\Shaders\Shadows\Extras\shadowPointPCF_oldComented.fs" />
+    <None Include="Engine\Resources\Shaders\BlinnPhong\BaseShadow.fs" />
+    <None Include="Engine\Resources\Shaders\BlinnPhong\BaseShadow.vs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\postprocess.vs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\postprocess.fs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\tonemap.fs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\post.vs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\post.fs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\BlackAndWhite.fs" />
+    <None Include="Engine\Resources\Shaders\BlinnPhong\BaseLightingBAKP.fs" />
     <None Include="Backup\SSBO LIGHT\BaseLighting.fs" />
-    <None Include="Resources\Shaders\DeferredShading\gBuffer.vs" />
-    <None Include="Resources\Shaders\DeferredShading\gBuffer.fs" />
-    <None Include="Resources\Shaders\DeferredShading\DeferredShading.vs" />
-    <None Include="Resources\Shaders\DeferredShading\DeferredShading.fs" />
-    <None Include="Resources\Shaders\DeferredShading\gBufferLegacy.vs" />
-    <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.fs" />
-    <None Include="Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
-    <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.fs" />
-    <None Include="Resources\Shaders\DeferredShading\DeferredShadingSun.vs" />
-    <None Include="Resources\Shaders\PBR\skybox.vs" />
-    <None Include="Resources\Shaders\PBR\skybox.fs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\DeferredShading.fs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_light_volume.vs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_directional.fs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\fullscreen.vs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.fs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.vs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_ibl.fs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
-    <None Include="Resources\Shaders\PBR\IBL\cubemap.vs" />
-    <None Include="Resources\Shaders\Utils\utils.glsl" />
-    <None Include="Resources\Shaders\Utils\lighting.glsl" />
-    <None Include="Resources\Shaders\Utils\vertex.glsl" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapCasc.vs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapCasc.gs" />
-    <None Include="Resources\Shaders\Shadows\ShadowMapCasc.fs" />
-    <None Include="Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />
-    <None Include="Resources\Shaders\Utils\PBR.glsl" />
-    <None Include="Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
-    <None Include="Resources\Shaders\Utils\Shadows.glsl" />
-    <None Include="Resources\Shaders\Compute\LerpCubemap.comp" />
-    <None Include="Resources\Shaders\Compute\extras\LerpCubemap2.comp" />
-    <None Include="Resources\Shaders\Compute\extras\LerpCubemap3.comp" />
-    <None Include="Resources\Shaders\Compute\extras\LerpCubemap.comp" />
-    <None Include="Resources\Shaders\Compute\TestCube.comp" />
-    <None Include="Resources\Shaders\Compute\extras\TestCube2.comp" />
-    <None Include="Resources\Shaders\DebugP\debug_point_circle.vs" />
-    <None Include="Resources\Shaders\DebugP\debug_point_circle.fs" />
-    <None Include="Resources\Shaders\DebugP\debug_line.vs" />
-    <None Include="Resources\Shaders\DebugP\debug_line.fs" />
-    <None Include="Resources\Shaders\DebugP\debug_point.fs" />
-    <None Include="Resources\Shaders\DebugP\debug_point.vs" />
-    <None Include="Resources\Shaders\DebugP\backup\debug_point_circle.fs" />
-    <None Include="Resources\Shaders\DebugP\backup\debug_point_circle.vs" />
-    <None Include="Resources\Shaders\DebugP\backup\debug_point.vs" />
-    <None Include="Resources\Shaders\DebugP\backup\debug_point.fs" />
-    <None Include="Resources\Shaders\DebugP\debug_point_inst.vs" />
-    <None Include="Resources\Shaders\DebugP\debug_point_inst.fs" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp2" />
-    <None Include="Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
-    <None Include="Resources\Shaders\Utils\PerlinNoise.glsl" />
-    <None Include="Resources\Shaders\Utils\WorleyNoise.glsl" />
-    <None Include="Resources\Shaders\Compute\Map\VoxelMap.comp" />
-    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
-    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
-    <None Include="Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
-    <None Include="Resources\Shaders\debugQuad.vs" />
-    <None Include="Resources\Shaders\debugQuadDepth.fs" />
-    <None Include="Resources\Shaders\Envirolnment\Sun.vs" />
-    <None Include="Resources\Shaders\Envirolnment\Sun.fs" />
-    <None Include="Resources\Shaders\Compute\Map\VoxelMap1.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUBasic.comp" />
-    <None Include="Resources\Shaders\DebugP\dbgIntancing_line.fs" />
-    <None Include="Resources\Shaders\DebugP\dbgIntancing_line.vs" />
-    <None Include="Resources\Shaders\Compute\Map\VoxelMap2.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUMainly.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU_SCG.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU_SCG.comp" />
-    <None Include="Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
-    <None Include="DebugRender\Shader\debug_line.fs" />
-    <None Include="DebugRender\Shader\debug_line.vs" />
-    <None Include="DebugRender\Shader\debug_wire.fs" />
-    <None Include="DebugRender\Shader\debug_wire.vs" />
-    <None Include="DebugRender\Shader\debug_point.fs" />
-    <None Include="DebugRender\Shader\debug_point.vs" />
-    <None Include="Resources\Shaders\Outline\outline.fs" />
-    <None Include="Resources\Shaders\Outline\outline.vs" />
-    <None Include="Resources\Shaders\GUI\TextRender.fs" />
-    <None Include="Resources\Shaders\GUI\TextRender.vs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextRender.fs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextRender.vs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextMSDF.fs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextSDF.fs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextSDF.vs" />
-    <None Include="Resources\Shaders\solid.fs" />
-    <None Include="Resources\Shaders\GUI\SimpleText.fs" />
-    <None Include="Resources\Shaders\GUI\SimpleText.vs" />
-    <None Include="Resources\Shaders\GUI\SimpleText3D.fs" />
-    <None Include="Resources\Shaders\GUI\SimpleText3D.vs" />
-    <None Include="Resources\Shaders\GUI\AtlasTextSDF_Just2D.vs" />
-    <None Include="Resources\Shaders\GLSL\AtlasTextSDF.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\gBuffer.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\gBuffer.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\DeferredShading.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\DeferredShading.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\gBufferLegacy.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\DeferredShadingBackup.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\DeferredShadingBackup.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\DeferredShadingSun.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\DeferredShadingSun.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\skybox.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\skybox.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\DeferredShading.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_light_volume.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_directional.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\fullscreen.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_gbuffer.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_ibl.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_point.vs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\pbr_deferred_point.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\IBL\cubemap.vs" />
+    <None Include="Engine\Resources\Shaders\Utils\utils.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\lighting.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\vertex.glsl" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapCasc.vs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapCasc.gs" />
+    <None Include="Engine\Resources\Shaders\Shadows\ShadowMapCasc.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic_PBR.glsl" />
+    <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
+    <None Include="Engine\Resources\Shaders\Utils\Shadows.glsl" />
+    <None Include="Engine\Resources\Shaders\Compute\LerpCubemap.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\extras\LerpCubemap2.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\extras\LerpCubemap3.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\extras\LerpCubemap.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\TestCube.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\extras\TestCube2.comp" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_point_circle.vs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_point_circle.fs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_line.vs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_line.fs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_point.fs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_point.vs" />
+    <None Include="Engine\Resources\Shaders\DebugP\backup\debug_point_circle.fs" />
+    <None Include="Engine\Resources\Shaders\DebugP\backup\debug_point_circle.vs" />
+    <None Include="Engine\Resources\Shaders\DebugP\backup\debug_point.vs" />
+    <None Include="Engine\Resources\Shaders\DebugP\backup\debug_point.fs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_point_inst.vs" />
+    <None Include="Engine\Resources\Shaders\DebugP\debug_point_inst.fs" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp2" />
+    <None Include="Engine\Geometry\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Engine\Resources\Shaders\Utils\PerlinNoise.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\WorleyNoise.glsl" />
+    <None Include="Engine\Resources\Shaders\Compute\Map\VoxelMap.comp" />
+    <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
+    <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
+    <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
+    <None Include="Engine\Resources\Shaders\debugQuad.vs" />
+    <None Include="Engine\Resources\Shaders\debugQuadDepth.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\Sun.vs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\Sun.fs" />
+    <None Include="Engine\Resources\Shaders\Compute\Map\VoxelMap1.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUBasic.comp" />
+    <None Include="Engine\Resources\Shaders\DebugP\dbgIntancing_line.fs" />
+    <None Include="Engine\Resources\Shaders\DebugP\dbgIntancing_line.vs" />
+    <None Include="Engine\Resources\Shaders\Compute\Map\VoxelMap2.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUMainly.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU_SCG.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceMediumV.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU_SCG.comp" />
+    <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU.comp" />
+    <None Include="Engine\DebugRender\Shader\debug_line.fs" />
+    <None Include="Engine\DebugRender\Shader\debug_line.vs" />
+    <None Include="Engine\DebugRender\Shader\debug_wire.fs" />
+    <None Include="Engine\DebugRender\Shader\debug_wire.vs" />
+    <None Include="Engine\DebugRender\Shader\debug_point.fs" />
+    <None Include="Engine\DebugRender\Shader\debug_point.vs" />
+    <None Include="Engine\Resources\Shaders\Outline\outline.fs" />
+    <None Include="Engine\Resources\Shaders\Outline\outline.vs" />
+    <None Include="Engine\Resources\Shaders\GUI\TextRender.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\TextRender.vs" />
+    <None Include="Engine\Resources\Shaders\GUI\AtlasTextRender.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\AtlasTextRender.vs" />
+    <None Include="Engine\Resources\Shaders\GUI\AtlasTextMSDF.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\AtlasTextSDF.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\AtlasTextSDF.vs" />
+    <None Include="Engine\Resources\Shaders\solid.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\SimpleText.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\SimpleText.vs" />
+    <None Include="Engine\Resources\Shaders\GUI\SimpleText3D.fs" />
+    <None Include="Engine\Resources\Shaders\GUI\SimpleText3D.vs" />
+    <None Include="Engine\Resources\Shaders\GUI\AtlasTextSDF_Just2D.vs" />
+    <None Include="Engine\Resources\Shaders\GLSL\AtlasTextSDF.vs" />
+    <None Include="Resources\Shaders\Utils\brdf_ggx.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\math.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\pbr_eval.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\pbr_types.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\brdf_ggx.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\ExamplePBR.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\pbr_debug_apply.glsl" />
+    <None Include="assimp-vc143-mtd.dll" />
+    <None Include="freetype.dll" />
+    <None Include="imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />
@@ -901,18 +992,16 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
-    <Text Include="Geometry\WorldOctree\SurfaceNets\Texto.txt" />
-    <Text Include="Geometry\WorldOctree\SurfaceNets\OctreeLod.txt" />
-    <Text Include="ECS\Systems\Texto.txt" />
+    <Text Include="Engine\Geometry\WorldOctree\SurfaceNets\Texto.txt" />
+    <Text Include="Engine\Geometry\WorldOctree\SurfaceNets\OctreeLod.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\..\Downloads\MaterialIcons-Regular.ttf" />
     <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />
     <Font Include="Assets\Fonts\ProggyTiny.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="Libraries\Lib\assimp-vc143-mtd.lib" />
-    <Library Include="Libraries\Lib\freetype.lib" />
-    <Library Include="Libraries\Lib\glfw3.lib" />
+    <Library Include="External\Libraries\Lib\assimp-vc143-mtd.lib" />
+    <Library Include="External\Libraries\Lib\freetype.lib" />
+    <Library Include="External\Libraries\Lib\glfw3.lib" />
   </ItemGroup>
 </Project>

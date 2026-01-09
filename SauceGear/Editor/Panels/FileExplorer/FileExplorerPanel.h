@@ -1,8 +1,8 @@
 #pragma once
 #include <filesystem>
 #include "popup.h"
-#include "../../ECS/Components/ComponentsHelper.h" 
-#include "../../Graphics/Renderer.h"   
+#include "../../Engine/ECS/Components/ComponentsHelper.h" 
+#include "../../Engine/Graphics/Renderer.h"   
 #include "../Load.h"
 
 

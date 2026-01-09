@@ -1,7 +1,7 @@
 #include "EditorApp.h"
-#include "../Core/Application.h"
-#include "../Platform/Window.h"
-#include "../Scene/GameScene.h"
+#include "../Engine/Core/Application.h"
+#include "../Engine/Platform/Window.h"
+#include "../Engine/Scene/GameScene.h"
 
 
 void EditorApp::Run() {

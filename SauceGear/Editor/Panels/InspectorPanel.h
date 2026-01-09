@@ -1,7 +1,7 @@
 #pragma once
 #include "IPanel.h"
 #include "../Utils/InspectorDrawer.h"
-#include "../Scene/SceneECS.h"
+#include "../../Engine/Scene/SceneECS.h"
 #include <imgui.h>
 #include "../ImGui/Fonts/IconsFontAwesome5.h"
 
@@ -77,8 +77,15 @@ struct InspectorPanel : IPanel {
     const char* GetName() override { return "Inspector"; }
 };
 
-
-
+/*
+if (auto* mr = scene.TryGet<MeshRenderer>(entity)) {
+    for (auto& mat : mr->materials) {
+        for (auto& [name, def] : mat->asset->base->layout) {
+            DrawMaterialField(name, def, mat);
+        }
+    }
+}
+*/
 
 
 
