@@ -219,6 +219,12 @@
     <ClCompile Include="Engine\Scene\SceneBuilder.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Editor\Drawers\MaterialInspector.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Panels\DrawMeshRendererInspector.h">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -794,7 +800,7 @@
     <ClInclude Include="Engine\Materials\MaterialLibrary.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Resources\Loaders\ModelNode.h">
+    <ClInclude Include="Engine\Resources\Loaders\HierarchyNode.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Assets\MeshAsset.h">
@@ -816,6 +822,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Renderer\Shaders\ShaderLibrary.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Drawers\MaterialInspector.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -983,6 +992,7 @@
     <None Include="assimp-vc143-mtd.dll" />
     <None Include="freetype.dll" />
     <None Include="imgui.ini" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

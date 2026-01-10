@@ -1,15 +1,10 @@
 #pragma once
-#include <unordered_map>
 #include <vector>
+#include <memory>
 #include "../../Instancing/MaterialInstance.h"
 #include "../../Instancing/MeshInstance.h"
-#include "../../ECS/Components/MeshComponent.h" 
-#include "../../Materials/MaterialBinder.h" 
-
-//struct DrawBatch {
-//    MaterialBase* base;
-//    std::vector<Mesh*> meshes;
-//}; 
+#include "../../Materials/MaterialBinder.h"
+#include "../Reflection/Macros.h"
 
 enum class RenderPassType {
     Geometry,
@@ -18,38 +13,78 @@ enum class RenderPassType {
     Shadow
 };
 
-// MELHORAS, USE MODEL ISNTANCE PARA ORGANIZAR, FAZER BATCHING E MUITAS COISAS INCLUSIVE HIERARQUICA ENTRE AS MALHAS PARA EVITAR
-//  DRAW CALLS ABSURDOS E MINIMIZAR
+struct DrawBatch {
+    std::shared_ptr<MaterialInstance> material;
+    std::vector<uint32_t> submeshes;
+};
+
 struct MeshRenderer {
-    std::shared_ptr<MeshInstance> mesh; 
-    std::vector<std::shared_ptr<MaterialInstance>> materials;
+    std::shared_ptr<MeshInstance> mesh;
+    std::vector<std::shared_ptr<MaterialInstance>> materials; // indexado por materialIndex    std::unordered_map<std::shared_ptr<MaterialInstance>, std::vector<SubMesh*>> batches;
+    std::vector<DrawBatch> batches;
 
-    void Draw() {   //RenderPassType pass
-        auto* base = materials[0]->asset->base.get();
 
-        // if (!PipelineAccepts(base->domain, pass)) return;
+    REFLECT_CLASS(MeshRenderer) {
+        REFLECT_HEADER("MeshRenderer");  
 
-        base->shader->use();
+    }
 
-        MaterialBinder::Bind(
-            *materials[0],
-            *materials[0]->asset,
-            *base
-        );
+    void BuildBatches() {
+        batches.clear();
+        if (!mesh) return;
 
-        mesh->Draw(); // desenha todos submeshes
+        std::unordered_map<uint32_t, uint32_t> lut;
+
+        for (uint32_t i = 0; i < mesh->mesh->submeshes.size(); i++) {
+            const auto& sm = mesh->mesh->submeshes[i];
+            uint32_t matIndex = sm.indexMaterialAsset;
+
+            if (matIndex >= materials.size()) continue;
+            auto& mat = materials[matIndex];
+            if (!mat) continue;
+
+            auto it = lut.find(matIndex);
+            if (it == lut.end()) {
+                uint32_t batchIndex = static_cast<uint32_t>(batches.size());
+                lut[matIndex] = batchIndex;
+                batches.push_back({ mat, { i } });
+            }
+            else {
+                batches[it->second].submeshes.push_back(i);
+            }
+        }
+    }
+
+    void Draw() {
+        if (!mesh) return;
+
+        for (auto& batch : batches) {
+            auto* base = batch.material->asset->base.get();
+
+            base->shader->use();
+            MaterialBinder::Bind(
+                *batch.material,
+                *batch.material->asset,
+                *base
+            );
+
+            for (uint32_t sm : batch.submeshes)
+                mesh->DrawSubmesh(sm);
+        }
     }
 };
 
 
 
-/*
-void BuildFromMesh() {
-    materials.clear();
-    materials.reserve(mesh->submeshes.size());
+// if (!PipelineAccepts(base->domain, pass)) return;            //RenderPassType pass
+ 
 
-    for (auto& sm : mesh->submeshes) {
-        materials.push_back(sm.materialAsset->Instantiate());
-    }
-}
+
+/*
+ 
+struct Entry {
+    std::shared_ptr<MeshInstance> mesh;
+    uint32_t index = 0;                                         //std::vector<std::shared_ptr<MaterialInstance>> materials; // 1 por submesh
+};
+
 */

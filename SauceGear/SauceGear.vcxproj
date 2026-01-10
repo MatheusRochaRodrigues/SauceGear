@@ -135,6 +135,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Editor\Drawers\MaterialInspector.cpp" />
+    <ClCompile Include="Editor\Panels\DrawMeshRendererInspector.h" />
     <ClCompile Include="Engine\Assets\AssetLoader.cpp" />
     <ClCompile Include="Engine\Assets\ModelAsset.cpp" />
     <ClCompile Include="Engine\Instancing\MaterialInstance.cpp" />
@@ -204,6 +206,7 @@
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Editor\Drawers\MaterialInspector.h" />
     <ClInclude Include="Engine\Assets\AssetDatabase.h" />
     <ClInclude Include="Engine\Assets\AssetLoader.h" />
     <ClInclude Include="Engine\Assets\IAsset.h" />
@@ -276,7 +279,7 @@
     <ClInclude Include="Engine\GUI\ToLetter.h" />
     <ClInclude Include="Engine\Renderer\RenderItem.h" />
     <ClInclude Include="Engine\Renderer\RenderQueue.h" />
-    <ClInclude Include="Engine\Resources\Loaders\ModelNode.h" />
+    <ClInclude Include="Engine\Resources\Loaders\HierarchyNode.h" />
     <ClInclude Include="Engine\Serializer\MaterialSerializer.h" />
     <ClInclude Include="Engine\Math\Plane.h" />
     <ClInclude Include="Engine\Math\Ray.h" />
@@ -442,6 +445,7 @@
     <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.gs" />
     <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
     <None Include="Engine\Resources\Shaders\solid.fs" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR.glsl" />
     <None Include="freetype.dll" />
     <None Include="imgui.ini" />
     <None Include="Resources\Shaders\Utils\brdf_ggx.glsl" />

@@ -9,7 +9,9 @@
 struct SubMesh {
     uint32_t indexOffset = 0;
     uint32_t indexCount = 0;
-    std::shared_ptr<MaterialAsset> materialAsset;
+
+    uint32_t indexMaterialAsset;
+    //std::shared_ptr<MaterialAsset> materialAsset;
     std::string name;
 };
 
@@ -47,20 +49,6 @@ public:
 
     void Bind() const {
         glBindVertexArray(VAO);
-    }
-
-private:
-    // GPU
-    GLuint VAO = 0; GLuint VBO = 0; GLuint EBO = 0;
-
-    void BuildDefaultSubmesh() {
-        submeshes.clear();
-        if (indices.empty()) return;
-
-        SubMesh sm;
-        sm.indexOffset = 0;
-        sm.indexCount = static_cast<uint32_t>(indices.size());
-        submeshes.push_back(sm);
     }
 
     void UploadToGPU() {
@@ -102,6 +90,19 @@ private:
 
         glBindVertexArray(0);
     }
+private:
+    // GPU
+    GLuint VAO = 0; GLuint VBO = 0; GLuint EBO = 0;
+
+    void BuildDefaultSubmesh() {
+        submeshes.clear();
+        if (indices.empty()) return;
+
+        SubMesh sm;
+        sm.indexOffset = 0;
+        sm.indexCount = static_cast<uint32_t>(indices.size());
+        submeshes.push_back(sm);
+    } 
 
 
 public:

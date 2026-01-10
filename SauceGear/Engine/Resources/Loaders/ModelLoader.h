@@ -8,7 +8,7 @@
 #include "../../Assets/MaterialAsset.h"
 #include "../../Materials/PBRMaterial.h"
 #include "../../Assets/AssetDatabase.h"
-#include "ModelNode.h"
+#include "HierarchyNode.h"
 
 
 class ModelLoader {
@@ -23,14 +23,20 @@ private:
         const std::string& modelName
     );
     
-    static std::shared_ptr<MeshAsset> ProcessNodes(
+    static void ProcessNodes(
         aiNode* node,
         const aiScene* scene,
         const std::string& dir,
         ModelAsset* modelAsset
-    );
+    ); 
 
-    static std::shared_ptr<ModelNode> ProcessNode(aiNode* node);
+    static std::shared_ptr<HierarchyNode> ProcessNode(aiNode* node);
+
+    static uint32_t GetOrCreateMaterialIndex(
+        ModelAsset* model,
+        aiMaterial* aiMat,
+        const std::string& directory
+    );
 
     static std::shared_ptr<MaterialAsset> CreateMaterialAssetFromAssimp(
         aiMaterial* aiMat,

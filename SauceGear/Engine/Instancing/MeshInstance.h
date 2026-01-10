@@ -32,6 +32,14 @@ public:
             GL_UNSIGNED_INT,
             (void*)(sm.indexOffset * sizeof(uint32_t))
         );
+
+        /*glDrawElementsBaseVertex(
+            GL_TRIANGLES,
+            sm.indexCount,
+            GL_UNSIGNED_INT,
+            (void*)(sizeof(uint32_t) * sm.indexOffset),
+            0
+        );*/
     }
 
     void SetInstanceData( const void* data, size_t dataSize,

@@ -63,55 +63,103 @@ public:
         } 
 
         std::cout << "pos m" << std::endl;
-        return InstantiateNode(model->root, model, INVALID_ENTITY);
-    }
-     
+        return InstantiateNode(model, model->root, INVALID_ENTITY);
+    } 
 
      
     static Entity InstantiateNode(
-        const std::shared_ptr<ModelNode>& node,
         const std::shared_ptr<ModelAsset>& model,
+        const std::shared_ptr<HierarchyNode>& node,
         Entity parent
     ) {
         auto& scene = *GEngine->scene;
-
         Entity e = scene.CreateEntity();
 
         scene.AddComponent<NameComponent>(e).name = node->name;
 
         auto& tr = scene.AddComponent<TransformComponent>(e);
-        tr.SetLocalFromMatrix(node->localTransform);            //tr.local = node->localTransform;
+        tr.SetLocalFromMatrix(node->localTransform);
 
-        auto& mr = scene.AddComponent<MeshRenderer>(e);
+        if (!node->meshIndices.empty()) {
+            for (uint32_t meshIndex : node->meshIndices) {
+                auto& mr = scene.AddComponent<MeshRenderer>(e);
 
-        // um node pode ter N meshes
-        for (uint32_t meshIndex : node->meshIndices) { 
-            auto meshAsset = model->meshes[meshIndex]; 
-            mr.mesh = std::make_shared<MeshInstance>(meshAsset);        //mr.mesh = MeshInstanceCache::Get(meshAsset);
+                auto meshAsset = model->meshes[meshIndex];
+                mr.mesh = std::make_shared<MeshInstance>(meshAsset);
 
-            for (auto& sm : meshAsset->submeshes)
-                if (sm.materialAsset) {
-                    auto inst = sm.materialAsset->Instantiate();
-                    if (inst) mr.materials.push_back(inst);
-                } 
+                mr.materials.resize(model->materials.size());
+
+                for (const auto& sm : meshAsset->submeshes) {
+                    uint32_t matIndex = sm.indexMaterialAsset;
+
+                    if (matIndex < model->materials.size())
+                        mr.materials[matIndex] = MaterialAsset::Instantiate(model->materials[matIndex]);
+                }
+
+                mr.BuildBatches(); // custo pago UMA vez
+            }
         }
 
         if (parent != INVALID_ENTITY) scene.AddToParent(parent, e);
 
-        for (auto& c : node->children) InstantiateNode(c, model, e);
+        for (auto& child : node->children)
+            InstantiateNode(model, child, e);
 
         return e;
     }
-
-
+     
     Entity CreateCube();
-
 };
 
 
 
 
+/*
 
+static Entity InstantiateNode(
+        const std::shared_ptr<ModelAsset>& model,
+        const std::shared_ptr<HierarchyNode>& HNode,
+        Entity parent
+    ) {
+        auto& scene = *GEngine->scene;
+        Entity e = scene.CreateEntity();
+
+        scene.AddComponent<NameComponent>(e).name = HNode->name;
+
+        auto& tr = scene.AddComponent<TransformComponent>(e);
+        tr.SetLocalFromMatrix(HNode->localTransform);
+
+        // Apenas CRIA MeshRenderer se o node tiver meshes
+        if (!HNode->meshIndices.empty()) {
+            auto& mr = scene.AddComponent<MeshRenderer>(e);
+            //each index mesh == one mesh
+            for (uint32_t meshIndex : HNode->meshIndices) {
+                auto meshAsset = model->meshes[meshIndex];  // real mesh
+                if (!meshAsset) continue;
+
+                mr.mesh = std::make_shared<MeshInstance>(meshAsset);
+                //mr.materials.reserve(meshAsset->submeshes.size());
+
+                // 1 material por submesh (ordem IMPORTA)
+                for (const SubMesh& sm : meshAsset->submeshes) {
+                    uint32_t matIndex = sm.indexMaterialAsset;
+
+                    if (matIndex < model->materials.size())
+                        mr.materials[matIndex] = (matIndex, MaterialAsset::Instantiate(model->materials[matIndex]) );
+                    else
+                        mr.materials[matIndex] = (nullptr); // fallback seguro
+                }
+
+            }
+        }
+
+        if (parent != INVALID_ENTITY) scene.AddToParent(parent, e);
+        for (auto& cnode : HNode->children) InstantiateNode(model, cnode, e);
+
+        return e;
+    }
+
+*/
 
 
 

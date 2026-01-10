@@ -12,7 +12,8 @@
 */
 
 struct IAsset {
-    std::string path;
+    std::string path;   //id    /// ID lógico (key)
+    bool has_file;  //This variable tells us whether it's a logical or physical file.
     std::filesystem::file_time_type lastWrite;
 
     virtual ~IAsset() = default;

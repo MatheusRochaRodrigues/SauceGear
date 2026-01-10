@@ -32,7 +32,7 @@ std::shared_ptr<ModelAsset> ModelSerializer::Load(const std::string& path) {
             for (auto& sm : mesh->submeshes) {
                 if (j["materials"].contains(sm.name)) {
                     std::string matPath = j["materials"][sm.name];
-                    sm.materialAsset = LoadAsset<MaterialAsset>(matPath);
+                    //sm.materialAsset = LoadAsset<MaterialAsset>(matPath);
                 }
             }
         }

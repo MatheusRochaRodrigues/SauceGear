@@ -20,7 +20,15 @@ public:
 
         auto asset = loader();
         asset->path = path;
-        asset->lastWrite = std::filesystem::last_write_time(path);
+
+        if (std::filesystem::exists(path)) {
+            asset->has_file = true;
+            asset->lastWrite = std::filesystem::last_write_time(path);
+        }
+        else {
+            asset->has_file = false;
+        } 
+
         map[path] = asset;
 
         return asset;
@@ -29,12 +37,16 @@ public:
     static void Update() {
         auto& map = GetMap();
         for (auto& [path, asset] : map) {
+            if (!asset->has_file) continue;
+
             auto t = std::filesystem::last_write_time(path);
             if (t != asset->lastWrite) {
                 asset->Reload();
+                asset->lastWrite = t;
                 LOG_INFO("Asset hot-reloaded: {}", path);
             }
         }
+
     }
 
 private:

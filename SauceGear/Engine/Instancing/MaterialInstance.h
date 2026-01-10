@@ -25,7 +25,7 @@ public:
     std::shared_ptr<MaterialAsset> asset;
     std::unordered_map<std::string, Value> overrides;  //values
 
-    explicit MaterialInstance(std::shared_ptr<MaterialAsset> a);
+    explicit MaterialInstance(const std::shared_ptr<MaterialAsset>& b);
 
 };
 

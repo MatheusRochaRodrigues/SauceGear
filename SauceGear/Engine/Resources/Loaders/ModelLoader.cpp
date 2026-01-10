@@ -1,4 +1,4 @@
-#include "ModelLoader.h"
+﻿#include "ModelLoader.h"
 #include "../../Assets/AssetLoader.h"
 #include "../../Materials/MaterialLibrary.h"
 #include <cassert>
@@ -33,12 +33,11 @@ std::shared_ptr<ModelAsset> ModelLoader::Load(const std::string& path) {
     asset->path = path;
     //stem = to get name of the file withouth the last extension -> Example/model.fbx -> return "model"
     asset->name = std::filesystem::path(path).stem().string();
-
-    std::cout << "02" << std::endl;
-
+      
     // carrega TODAS as meshes primeiro
-    asset->meshes.resize(scene->mNumMeshes); 
     std::cout << "1" << std::endl;
+
+    asset->meshes.resize(scene->mNumMeshes);
     ProcessNodes(
         scene->mRootNode,                       //scene->mMeshes[i]
         scene,
@@ -53,30 +52,29 @@ std::shared_ptr<ModelAsset> ModelLoader::Load(const std::string& path) {
     return asset;
 }
 
-std::shared_ptr<MeshAsset> ModelLoader::ProcessNodes(
+void ModelLoader::ProcessNodes(
     aiNode* node,
     const aiScene* scene,
     const std::string& dir,
     ModelAsset* modelAsset
-) {
-    std::cout << "2" << std::endl;
-    auto mesh = std::make_shared<MeshAsset>();
-    mesh->name = node->mName.C_Str();
-
-    if (node->mNumMeshes > 0) {
-
-        std::vector<Vertex>   vertices;
-        std::vector<uint32_t> indices;
-        std::vector<SubMesh>  submeshes; 
+){  
+    if (node->mNumMeshes > 0) {  
 
         for (uint32_t i = 0; i < node->mNumMeshes; i++) {
-            std::cout << "3" << std::endl;
-            aiMesh* aiM = scene->mMeshes[node->mMeshes[i]];
-            const uint32_t baseVertex = (uint32_t)vertices.size();
-            const uint32_t indexOffset = (uint32_t)indices.size();
+            uint32_t meshIndex = node->mMeshes[i]; 
 
-            // VERTICES
-            std::cout << "4" << std::endl;
+            if (modelAsset->meshes[meshIndex]) continue; // já processado 
+
+            aiMesh* aiM = scene->mMeshes[meshIndex];
+            auto mesh = std::make_shared<MeshAsset>();
+            mesh->name = aiM->mName.C_Str();
+
+            std::vector<Vertex>   vertices;
+            std::vector<uint32_t> indices;
+            std::vector<SubMesh>  submeshes; 
+
+            //-------------------------------------------------Extraction----------------------------------------------------------
+            // VERTICES 
             for (uint32_t v = 0; v < aiM->mNumVertices; v++) {
                 Vertex vert{};
                 //Position
@@ -104,50 +102,76 @@ std::shared_ptr<MeshAsset> ModelLoader::ProcessNodes(
                 }
 
                 vertices.push_back(vert);
-            }
-            std::cout << "5" << std::endl;
+            } 
 
-            // INDICES
-            std::cout << "6" << std::endl;
+            // ---------- INDICES ---------- 
             for (uint32_t f = 0; f < aiM->mNumFaces; f++) {
                 const aiFace& face = aiM->mFaces[f];
                 for (uint32_t j = 0; j < face.mNumIndices; j++)
-                    indices.push_back(baseVertex + face.mIndices[j]);
-            }
-            std::cout << "7" << std::endl;
+                    indices.push_back(face.mIndices[j]);
+            } 
 
-            const uint32_t indexCount = (uint32_t)indices.size() - indexOffset;
+            // ---------- SUBMESH (1 material por aiMesh) ----------
+            SubMesh sm{};
+            sm.indexOffset = 0;
+            sm.indexCount = static_cast<uint32_t>(indices.size());
+            sm.name = aiM->mName.C_Str();
+             
+            sm.indexMaterialAsset =
+                GetOrCreateMaterialIndex(
+                    modelAsset,
+                    scene->mMaterials[aiM->mMaterialIndex],
+                    dir
+                );
 
-            SubMesh sm;
-            sm.indexOffset = indexOffset;
-            sm.indexCount = indexCount;
-            std::cout << "8" << std::endl;
-            sm.materialAsset =
+            /*sm.materialAsset =
                 CreateMaterialAssetFromAssimp(
                     scene->mMaterials[aiM->mMaterialIndex],
                     dir,
                     modelAsset->name
-                );
-            std::cout << "9" << std::endl;
+                );*/ 
 
             submeshes.push_back(sm);
-            std::cout << "10" << std::endl;
-        }
-        std::cout << "11" << std::endl;
-        // make reality - setupMesh()
-        mesh->vertices  = std::move(vertices);
-        mesh->indices   = std::move(indices);
-        mesh->submeshes = std::move(submeshes);
+             
+            // make reality - setupMesh()
+            mesh->vertices  = std::move(vertices);
+            mesh->indices   = std::move(indices);
+            mesh->submeshes = std::move(submeshes); 
+            mesh->UploadToGPU();
 
-        std::cout << "12" << std::endl;
-    
+            modelAsset->meshes[meshIndex] = mesh;  
+        } 
     }
+
     //traverse the children of this node
-    for (unsigned int i = 0; i < node->mNumChildren; ++i) 
-        modelAsset->meshes.push_back(ProcessNodes(node->mChildren[i], scene, dir, modelAsset));
-     
-    return mesh;
+    for (unsigned int i = 0; i < node->mNumChildren; ++i)
+        ProcessNodes(node->mChildren[i], scene, dir, modelAsset);       //modelAsset->meshes.push_back(ProcessNodes(node->mChildren[i], scene, dir, modelAsset));
 }  
+
+uint32_t ModelLoader::GetOrCreateMaterialIndex(
+    ModelAsset* model,
+    aiMaterial* aiMat,
+    const std::string& directory
+) {
+    std::string key = model->name + "::" + aiMat->GetName().C_Str();
+
+    // O(1) average
+    auto it = model->materialsLUT.find(key);
+    if (it != model->materialsLUT.end()) return it->second;
+
+    // cria novo material
+    auto material =
+        CreateMaterialAssetFromAssimp(aiMat, directory, model->name);
+
+    uint32_t index = static_cast<uint32_t>(model->materials.size());
+
+    model->materials.push_back(material);
+    model->materialsLUT.emplace(key, index);
+
+    return index;
+}
+
+
  
 std::shared_ptr<MaterialAsset>
 ModelLoader::CreateMaterialAssetFromAssimp(
@@ -188,8 +212,8 @@ ModelLoader::CreateMaterialAssetFromAssimp(
 } 
 
 
-std::shared_ptr<ModelNode> ModelLoader::ProcessNode(aiNode* node) {
-    auto out = std::make_shared<ModelNode>();
+std::shared_ptr<HierarchyNode> ModelLoader::ProcessNode(aiNode* node) {
+    auto out = std::make_shared<HierarchyNode>();
 
     out->name = node->mName.C_Str();
     out->localTransform = ConvertMatrix(node->mTransformation);
@@ -198,9 +222,7 @@ std::shared_ptr<ModelNode> ModelLoader::ProcessNode(aiNode* node) {
         out->meshIndices.push_back(node->mMeshes[i]);
 
     for (uint32_t i = 0; i < node->mNumChildren; i++)
-        out->children.push_back(
-            ProcessNode(node->mChildren[i])
-        );
+        out->children.push_back( ProcessNode(node->mChildren[i]) );
 
     return out;
 }
