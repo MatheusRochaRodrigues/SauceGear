@@ -71,7 +71,7 @@ struct MaterialInspector {
         ImGui::SameLine(140);
 
         ImGui::BeginGroup();
-
+         
         // Garantia: sempre Texture
         /*if (!std::holds_alternative<std::shared_ptr<Texture>>(v.data)) {
             v.data = TextureCache::Get().GetSolidColor({ 1,1,1,1 });
