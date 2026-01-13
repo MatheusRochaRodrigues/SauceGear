@@ -4,9 +4,10 @@
 #include "../Bindings/IBLBinder.h"  
 #include "../../../Graphics/FullscreenQuad.h"
 #include "../../../Resources/Primitives/Primitive.h"
-#include "../../../ECS/Systems/Lighting/LightSystem.h"
 #include "../../../Assets/MeshAsset.h"
 #include "../../../Instancing/MeshInstance.h"
+#include "../../LightPass/LightPass.h"
+#include "../../../Graphics/Renderer.h"
 
 using Scene = SceneECS;
 
@@ -42,7 +43,7 @@ public:
         pointLight->setInt("gNormal", 1);
         pointLight->setInt("gAlbedo", 2);
         pointLight->setInt("gMRAO", 3);
-        pointLight->setInt("pointShadows[0]", 7); // base TMU; LightSystem cuida dos offsets 
+        pointLight->setInt("pointShadows[0]", 7); // base TMU; LightPass cuida dos offsets 
 
 
         sphereMesh = std::make_shared<MeshInstance>(PrimitiveMesh::CreateSphere2RenderingLight());
@@ -78,7 +79,7 @@ public:
         glBlendFunc(GL_ONE, GL_ONE);
 
         //(fullscreen) RENDERIZAÇAO
-        if (LightSystem::SetSunToShader(dirLight)) {
+        if (LightPass::SetSunToShader(dirLight)) {
             GBufferBinder::Bind(gbuffer);
             dirLight->setVec3("camPos", GEngine->mainCamera->GetPosition());
             RenderQuad();
@@ -98,11 +99,11 @@ public:
         GBufferBinder::Bind(gbuffer); 
 
         // UBO de luzes já está bound no binding=1 (igual seu shader antigo)
-        LightSystem::SetPointsToShader(pointLight, 0);
+        LightPass::SetPointsToShader(pointLight, 0);
 
         // instâncias
         std::vector<LightInstanceData> instanceData;
-        for (auto e : LightSystem::lightInActive.point) {
+        for (auto e : LightPass::lightInActive.point) {
             auto& light = GEngine->scene->GetComponent<LightComponent>(e);
             auto& trans = GEngine->scene->GetComponent<TransformComponent>(e);
             // then calculate radius of light volume/sphere

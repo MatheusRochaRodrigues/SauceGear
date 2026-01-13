@@ -4,9 +4,7 @@
 #include "../../Graphics/Renderer.h"
 
 //Effects
- 
-//debugs
-#include "../Systems/Lighting/LightSystem.h"
+  
 
 class PostProcessSystem : public System {
 public:

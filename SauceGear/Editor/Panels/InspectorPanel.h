@@ -8,25 +8,56 @@
 #include "../Panels/DrawMeshRendererInspector.h"
 
 
-static void DrawMeshRendererInspector(MeshRenderer& renderer) { 
-    ImGui::Text("Mesh:");
-    if (renderer.mesh && renderer.mesh->mesh)
-        ImGui::TextDisabled(renderer.mesh->mesh->name.c_str());
-    else
-        ImGui::TextDisabled("None");
+static void DrawMeshRendererInspector(MeshRenderer& renderer) {
 
-    if (ImGui::TreeNode("Materials")) {
+    ImGui::Text("Mesh");
+    ImGui::SameLine(120);
+    ImGui::TextDisabled(
+        renderer.mesh && renderer.mesh->mesh
+        ? renderer.mesh->mesh->name.c_str()
+        : "None"
+    );
 
-        for (size_t i = 0; i < renderer.materials.size(); i++) {
-            auto& mat = renderer.materials[i];
-            if (!mat || !mat->asset || !mat->asset->base)
-                continue;
+    ImGui::Separator();
 
-            if (ImGui::TreeNode((void*)mat.get(), "Slot %zu", i)) {
-                MaterialInspector::Draw(*mat);
-                ImGui::TreePop();
-            }
-        }
+    ImGui::Text("Materials");
+    for (size_t i = 0; i < renderer.materials.size(); ++i) {
+        auto& mat = renderer.materials[i];
+
+        ImGui::PushID((int)i);
+
+        ImGui::Text("Slot %d", (int)i);
+        ImGui::SameLine(120);
+
+        if (mat)
+            ImGui::Button(mat->asset->name.c_str(), ImVec2(-1, 0));
+        else
+            ImGui::Button("None", ImVec2(-1, 0));
+
+        ImGui::PopID();
+    }
+}
+
+static void DrawMaterialBlock(MaterialInstance& inst) {
+
+    ImGuiTreeNodeFlags flags =
+        ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    std::string header = ICON_FA_PAINT_BRUSH;
+    header += " ";
+    header += inst.asset->name;
+
+    if (ImGui::TreeNodeEx(inst.asset.get(), flags, "%s", header.c_str())) {
+
+        ImGui::TextDisabled("Shader");
+        ImGui::SameLine(120);
+        ImGui::Text(inst.asset->base->shader->name.c_str());
+
+        ImGui::Separator();
+
+        MaterialInspector::Draw(inst);
 
         ImGui::TreePop();
     }
@@ -120,6 +151,22 @@ struct InspectorPanel : IPanel {
             ImGui::Separator();   // linha separadora
         }
 
+        // --- MATERIALS (Unity style) ---
+        if (scene.HasComponent<MeshRenderer>(selected)) {
+            auto& mr = scene.GetComponent<MeshRenderer>(selected);
+
+            for (auto& mat : mr.materials) {
+                if (!mat) continue;
+
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
+
+                DrawMaterialBlock(*mat);
+            }
+        }
+
+
         ImGui::End();
     }
 
@@ -141,5 +188,46 @@ Begin Window
  │   ├─ Unindent
  │   └─ TreePop
  └─ End Window
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+static void DrawMeshRendererInspector(MeshRenderer& renderer) {
+    ImGui::Text("Mesh:");
+    if (renderer.mesh && renderer.mesh->mesh)
+        ImGui::TextDisabled(renderer.mesh->mesh->name.c_str());
+    else
+        ImGui::TextDisabled("None");
+
+    if (ImGui::TreeNode("Materials")) {
+
+        for (size_t i = 0; i < renderer.materials.size(); i++) {
+            auto& mat = renderer.materials[i];
+            if (!mat || !mat->asset || !mat->asset->base)
+                continue;
+
+            if (ImGui::TreeNode((void*)mat.get(), "Slot %zu", i)) {
+                MaterialInspector::Draw(*mat);
+                ImGui::TreePop();
+            }
+        }
+
+        ImGui::TreePop();
+    }
+}
 
 */

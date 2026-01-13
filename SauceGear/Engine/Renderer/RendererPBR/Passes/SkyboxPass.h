@@ -1,9 +1,9 @@
 #pragma once
 #include "../../../Graphics/Framebuffer.h"    
 #include "../../../Graphics/FullscreenQuad.h"
-#include "../../../ECS/Systems/Lighting/LightSystem.h" 
 #include "../../../ECS/Systems/DayNightSystem.h"
 #include "../../../Graphics/PrimitiveMesh.h"
+#include "../../LightPass/LightPass.h"
   
 class SkyboxPass {
 public:
@@ -41,10 +41,10 @@ public:
 
     void RenderDebugSun() {
         // pega luz e transform do sol
-        if (LightSystem::currentSun == INVALID_ENTITY) return;
+        if (LightPass::currentSun == INVALID_ENTITY) return;
 
-        auto& sunTransform = GEngine->scene->GetComponent<TransformComponent>(LightSystem::currentSun);
-        auto& sunLight = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun);
+        auto& sunTransform = GEngine->scene->GetComponent<TransformComponent>(LightPass::currentSun);
+        auto& sunLight = GEngine->scene->GetComponent<LightComponent>(LightPass::currentSun);
 
         // direção e posição
         glm::vec3 sunDir = sunTransform.GetForwardDirection();

@@ -74,6 +74,10 @@
     <IncludePath>C:\Users\mathe\source\repos\SauceGear\SauceGear\External\Libraries\Includes;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\mathe\source\repos\SauceGear\SauceGear\External\Libraries\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\mathe\source\repos\SauceGear\SauceGear\External\Libraries\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\mathe\source\repos\SauceGear\SauceGear\External\Libraries\Lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -127,11 +131,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Libraries;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)External\Libraries\Includes;$(ProjectDir)External\Libraries;$(ProjectDir)External\ImGui</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)External\Libraries\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -141,11 +148,11 @@
     <ClCompile Include="Engine\Assets\ModelAsset.cpp" />
     <ClCompile Include="Engine\Instancing\MaterialInstance.cpp" />
     <ClCompile Include="Engine\DebugRender\DebugLinesRenderer.cpp" />
-    <ClCompile Include="Engine\ECS\Systems\Lighting\CascadeSun.cpp" />
-    <ClCompile Include="Engine\ECS\Systems\Lighting\LightDirectional.cpp" />
-    <ClCompile Include="Engine\ECS\Systems\Lighting\LightPoint.cpp" />
-    <ClCompile Include="Engine\ECS\Systems\Lighting\LightSystem.cpp" />
-    <ClCompile Include="Engine\ECS\Systems\Lighting\ShadowPool.cpp" />
+    <ClCompile Include="Engine\Renderer\LightPass\LightMakers\CascadeSun.cpp" />
+    <ClCompile Include="Engine\Renderer\LightPass\LightMakers\LightDirectional.cpp" />
+    <ClCompile Include="Engine\Renderer\LightPass\LightMakers\LightPoint.cpp" />
+    <ClCompile Include="Engine\Renderer\LightPass\LightPass.cpp" />
+    <ClCompile Include="Engine\Renderer\LightPass\ShadowPool.cpp" />
     <ClCompile Include="Engine\ECS\Systems\TextRender\TextRenderSystem.cpp" />
     <ClCompile Include="Engine\Graphics\ComputeShader.cpp" />
     <ClCompile Include="Editor\Panels\FileExplorer\popup.h" />
@@ -207,6 +214,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor\Drawers\MaterialInspector.h" />
+    <ClInclude Include="Editor\Themes\Theme4.h" />
     <ClInclude Include="Engine\Assets\AssetDatabase.h" />
     <ClInclude Include="Engine\Assets\AssetLoader.h" />
     <ClInclude Include="Engine\Assets\IAsset.h" />
@@ -222,11 +230,11 @@
     <ClInclude Include="Engine\ECS\Components\TextComponent.h" />
     <ClInclude Include="Engine\ECS\Systems\AABBSystem.h" />
     <ClInclude Include="Engine\ECS\Systems\EndLoopSystem.h" />
-    <ClInclude Include="Engine\ECS\Systems\Lighting\CascadeSun.h" />
-    <ClInclude Include="Engine\ECS\Systems\Lighting\LightDirectional.h" />
-    <ClInclude Include="Engine\ECS\Systems\Lighting\LightPoint.h" />
-    <ClInclude Include="Engine\ECS\Systems\Lighting\LightSystem.h" />
-    <ClInclude Include="Engine\ECS\Systems\Lighting\ShadowPool.h" />
+    <ClInclude Include="Engine\Renderer\LightPass\LightMakers\CascadeSun.h" />
+    <ClInclude Include="Engine\Renderer\LightPass\LightMakers\LightDirectional.h" />
+    <ClInclude Include="Engine\Renderer\LightPass\LightMakers\LightPoint.h" />
+    <ClInclude Include="Engine\Renderer\LightPass\LightPass.h" />
+    <ClInclude Include="Engine\Renderer\LightPass\ShadowPool.h" />
     <ClInclude Include="Engine\ECS\Systems\OctreeWorldSystem.h" />
     <ClInclude Include="Engine\Core\EditorState.h" />
     <ClInclude Include="Engine\ECS\Systems\OutlineSystem.h" />

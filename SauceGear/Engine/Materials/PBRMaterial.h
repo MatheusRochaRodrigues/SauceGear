@@ -10,10 +10,10 @@ public:
         ASSERT(shader && "PBR_GBuffer shader not loaded");
 
         layout = {
-            { "Albedo",    { ParamDef::Texture, 0 } },
-            { "Normal",    { ParamDef::Texture, 1 } },
-            { "Metallic",  { ParamDef::Float,   2 } },
-            { "Roughness", { ParamDef::Float,   3 } }
+            { "Albedo",    { ParamDef::Texture, 0, /*slider*/ 0.0f, 1.0f, true } },
+            { "Normal",    { ParamDef::Texture, 1, /*slider*/ 0.0f, 1.0f, true } },
+            { "Metallic",  { ParamDef::Float,   2, /*slider*/ 0.0f, 1.0f, true } },
+            { "Roughness", { ParamDef::Float,   3, /*slider*/ 0.0f, 1.0f, true } }
         };
     }
 };

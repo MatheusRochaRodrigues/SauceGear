@@ -65,7 +65,7 @@ struct ChunkBuffer { //Chunk
 };
 
 struct Chunk {
-    std::unique_ptr<MeshAsset>           mesh;
+    std::shared_ptr<MeshAsset>      mesh;
     std::unique_ptr<ChunkBuffer>    buff;     //sdf
 
     glm::vec3 coord; glm::ivec3     coordWorld;  

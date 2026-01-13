@@ -1,7 +1,9 @@
 ﻿#include "PBRPipeline.h" 
   
 void PBRPipeline::Init() {
-    std::cout << "init" << std::endl; 
+    std::cout << "init" << std::endl;
+
+    lightPass = new LightPass();
 
     geometryPass = new GeometryPass(&ShaderLibrary::Get("PBR_GBuffer"));
     lightingPass = new DeferredLightingPass(

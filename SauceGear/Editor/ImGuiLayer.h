@@ -25,7 +25,6 @@ public:
 
     void ShowDockspace(); 
     void RenderIPanels(Scene&);
-    void config_style();
      
     void ShowTopBar();
     bool draggingWindow = false; 
@@ -37,4 +36,12 @@ public:
 private:
     std::vector<std::shared_ptr<IPanel>> RegisteredPanels;
     void RegisterPanels();
+
+    //Themes 
+    void igThemeV3(
+        int hue07 = 1, int alt07 = 7, int nav07 = 5,  //Most Important, i choise default values
+        int lit01 = 0, int compact01 = 0, int border01 = 1, int shape0123 = 1
+    );
+    //Themes 2
+    void config_style();
 };

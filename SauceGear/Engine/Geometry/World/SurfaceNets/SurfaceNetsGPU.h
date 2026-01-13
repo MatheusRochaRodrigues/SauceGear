@@ -14,7 +14,7 @@
 
 class SurfaceNetsGPU {
 public: 
-    static std::unique_ptr<MeshAsset> Generate(
+    static std::shared_ptr<MeshAsset> Generate(
         const ChunkBuffer& buff,
         glm::vec3 uOffset,
         GLuint computeProgram,
@@ -127,7 +127,7 @@ public:
         //std::cout << "possui indices" << std::endl;
          
         // Cria Mesh
-        auto mesh = std::make_unique<MeshAsset>();
+        auto mesh = std::make_shared<MeshAsset>();
         mesh->UploadFromRaw(positions, normals, indices);
 
         return mesh;

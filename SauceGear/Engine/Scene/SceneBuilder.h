@@ -7,6 +7,7 @@
 #include "../Assets/AssetLoader.h"
 #include "../Instancing/ModelInstance.h"
 #include "../ECS/Components/MeshComponent.h"
+#include "../Materials/MaterialLibrary.h"
 
 class SceneBuilder {       //GameObjectFactory
 public: 
@@ -51,6 +52,40 @@ public:
 
         return root;
     }*/
+
+    static Entity CreateModel(const std::shared_ptr<MeshAsset> mesh, std::shared_ptr<MaterialInstance> mat = nullptr) {
+        if (!mesh) {
+            std::cout << "Mesh vazia para a entidade" << std::endl;
+            return INVALID_ENTITY;
+        }   
+        auto& scene = *GEngine->scene;
+        Entity entity = scene.CreateEntity();
+        //Special Components
+
+        scene.AddComponent<NameComponent>(entity).name = mesh->name;
+        scene.AddComponent<TransformComponent>(entity);
+
+        auto& mr = scene.AddComponent<MeshRenderer>(entity);
+        mr.mesh = std::make_shared<MeshInstance>(mesh);
+
+        auto asset = std::make_shared<MaterialAsset>();
+        asset->name = mesh->name;  // name 
+        asset->base = MaterialLibrary::Get("PBR_Default");
+        //asset->defaults["Albedo"].data = glm::vec3(1, 0, 1);
+        asset->defaults["Albedo"].data = ModelLoader::lastTexID;
+        asset->defaults["Metallic"].data = 0.5f;
+        asset->defaults["Roughness"].data = 0.1f; 
+        mat = MaterialAsset::Instantiate(asset);
+        //if (!mat) 
+         
+        mr.materials.push_back(mat); 
+
+        mr.BuildBatches(); // custo pago UMA vez
+
+        scene.AddComponent<AABBComponent>(entity);
+
+        return entity;
+    }
 
      
     static Entity CreateModel(const std::string& path) {

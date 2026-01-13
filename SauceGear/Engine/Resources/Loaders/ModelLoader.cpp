@@ -20,9 +20,9 @@ std::shared_ptr<ModelAsset> ModelLoader::Load(const std::string& path) {
     const aiScene* scene = importer.ReadFile(
         path,
         aiProcess_Triangulate |
-        aiProcess_FlipUVs |
-        aiProcess_CalcTangentSpace |
-        aiProcess_JoinIdenticalVertices
+        aiProcess_FlipUVs // |
+        //aiProcess_CalcTangentSpace |
+        //aiProcess_JoinIdenticalVertices
     );
 
     if (!scene || !scene->mRootNode)
@@ -72,6 +72,10 @@ void ModelLoader::ProcessNodes(
             std::vector<Vertex>   vertices;
             std::vector<uint32_t> indices;
             std::vector<SubMesh>  submeshes; 
+             
+            vertices.reserve(aiM->mNumVertices); 
+            indices.reserve(aiM->mNumFaces * 3); 
+            submeshes.reserve(1); 
 
             //-------------------------------------------------Extraction----------------------------------------------------------
             // VERTICES 
@@ -202,6 +206,8 @@ ModelLoader::CreateMaterialAssetFromAssimp(
         if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &tex) == AI_SUCCESS) {
             asset->defaults["Albedo"].data =
                 TextureCache::Get().Load(directory + "/" + tex.C_Str());
+
+            ModelLoader::lastTexID = TextureCache::Get().Load(directory + "/" + tex.C_Str());
         }
 
         asset->defaults["Metallic"].data  = 0.1f;

@@ -33,6 +33,7 @@ public:
             std::cout << "cs 1" << std::endl;
 
             Entity entity = SceneBuilder::CreateModel("Engine/Resources/Models/backpack/backpack.obj");
+            //Entity entity = SceneBuilder::CreateModel("Engine/Resources/Models/Skull/Skull.obj");
             std::cout << "cs 2" << std::endl;
 
             auto& l = GetComponent<TransformComponent>(entity);
@@ -84,18 +85,18 @@ public:
             pLight.intensity = 1.0f;
         }
         {
-            //Entity pointLight = SceneBuilder::CreateGameObject("Light2");
-            //auto& pTransform = GetComponent<TransformComponent>(pointLight);
-            //pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
-            ///*auto& redn = AddComponent<MeshRenderer>(pointLight);
-            //redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
-            //pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            //pTransform.position = glm::vec3(0, 0, 0);
-            //auto& pLight = AddComponent<LightComponent>(pointLight);
-            ////pLight.type = ShadowType::Point;
-            //pLight.SetTypeLight(LightType::Point);
-            //pLight.color = glm::vec3(0, 1, 0);
-            //pLight.intensity = 1.0f;
+            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
+            auto& pTransform = GetComponent<TransformComponent>(pointLight);
+            pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f);
+            /*auto& redn = AddComponent<MeshRenderer>(pointLight);
+            redn.model = new Model("Resources/Models/backpack/backpack.obj");*/
+            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+            pTransform.position = glm::vec3(0, 0, 0);
+            auto& pLight = AddComponent<LightComponent>(pointLight);
+            //pLight.type = ShadowType::Point;
+            pLight.SetTypeLight(LightType::Point);
+            pLight.color = glm::vec3(0, 1, 0);
+            pLight.intensity = 1.0f;
         }  
 
         // Render para um framebuffer
@@ -148,8 +149,7 @@ public:
         //material->SetFallbackColor("Albedo", glm::vec3(0, 0.5f, 0.2f));
         //material->SetFallbackFloat("Roughness", 0.65f);
         //material->SetFloat("Metallic", 0.1f);
-
-        /*
+         
         std::cout << "AAAAA" << std::endl;
         for(auto& ckt : sys.gnrtChunk()) {
             Chunk* ck = ckt.first;
@@ -167,7 +167,7 @@ public:
                 " - lod: " + std::to_string(ck->lod) +
                 "  { " + std::to_string(ck->dbg) + " }"; 
 
-            Entity xz = SceneBuilder::CreateModel(ck->mesh.get());
+            Entity xz = SceneBuilder::CreateModel(ck->mesh);
             auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck, node, node->center); 
             for (auto& nc : node->children) pp.points.push_back(nc->center);
 
@@ -181,9 +181,9 @@ public:
 
             //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
             auto& aaaa = AddComponent<DebugMeshComponent>(xz);  
-        }
-        */
+        } 
         std::cout << "AAAAAee" << std::endl;
+
 
         DebugRenderer::Point(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
         DebugRenderer::Point(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);

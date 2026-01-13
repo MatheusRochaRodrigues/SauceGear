@@ -3,6 +3,8 @@
 #include <glm/glm.hpp> 
 #include <iostream>  
 
+#include "../Reflection/Macros.h"
+
 #define MAX_LIGHTS 16
 
 enum class ShadowLOD {

@@ -1,13 +1,26 @@
-#include "SceneECS.h"
-#include "../ECS/Systems/SystemHelper.h" 
+#include "SceneECS.h" 
+
+#include "../ECS/Systems/RenderSystem.h" 
+#include "../ECS/Systems/MoveSystem.h"
+#include "../ECS/Systems/CameraSystem.h"
+#include "../ECS/Systems/PostProcessSystem.h" 
+#include "../ECS/Systems/GlobalUniformSystem.h" 
+#include "../ECS/Systems/PickingSystem.h" 
+#include "../ECS/Systems/DayNightSystem.h"  
+#include "../ECS/Systems/ComputeSyncSystem.h"  
+#include "../ECS/Systems/TransformSystem.h"  
+#include "../ECS/Systems/EndLoopSystem.h" 
+#include "../ECS/Systems/AABBSystem.h"   
+#include "../ECS/Systems/DebugRenderer.h"   
+#include "../ECS/Systems/TextRender/TextRenderSystem.h"  
+
+#include "../ECS/Components/ComponentsHelper.h" 
 
 void SceneECS::initECS() {
     ///----------Components
     //auto* physics = scene.RegisterSystem<PhysicsSystem>();
     componentManager->Register<CameraComponent>();
-    componentManager->Register<TransformComponent>();
-    //componentManager->Register<Material>(); 
-    //componentManager->Register<MeshFilter>(); 
+    componentManager->Register<TransformComponent>(); 
     componentManager->Register<MeshRenderer>();
     componentManager->Register<LightComponent>();
     componentManager->Register<HierarchyComponent>();
@@ -24,15 +37,15 @@ void SceneECS::initECS() {
     RegisterSystem <AABBSystem>();
     RegisterSystem <CameraSystem>();
     RegisterSystem <ComputeSyncSystem>();
-    RegisterSystem <DayNightSystem>();
-    RegisterSystem <LightSystem> ();
+    RegisterSystem <DayNightSystem>(); 
     RegisterSystem <GlobalUniformSystem>(); 
     RegisterSystem <RenderSystem>(); 
     RegisterSystem <DebugRenderer>();
+    RegisterSystem <PostProcessSystem>();
     RegisterSystem <TextRenderSystem>();
-    RegisterSystem <PostProcessSystem>(); 
-    //RegisterSystem <OctreeWorldSystem>();  
     RegisterSystem <PickingSystem>();
+
+    //RegisterSystem <OctreeWorldSystem>();  
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>(); 

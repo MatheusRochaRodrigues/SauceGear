@@ -3,6 +3,10 @@
 #include "ConstructMap.h" 
 #include "MakeMap.h" 
 #include "../../../ECS/Systems/DebugRenderer.h"
+#include "../../World/SurfaceNets/MapGenerator.h"
+#include "../../World/SurfaceNets/GSurfPool.h"
+#include "../../World/SurfaceNets/SurfaceNetsGPU.h"
+#include "../../../Graphics/ComputeShader.h"
 
 struct ChunkRequest {
     glm::vec3 position;  // centro do chunk

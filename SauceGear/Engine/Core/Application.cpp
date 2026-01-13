@@ -33,29 +33,9 @@ int Application::Init() {
 
     GEngine = new EngineContext{ scene, renderer, window, time, input, new EditorState};
     GEngine->input->Initialize(GEngine->window);                 // conecta input ao contexto da janela 
-    renderer->Initialize();                              // inicializa entidades/sistemas da cena                scene.Init();   
-     
-    GEngine->renderer->GetShadowShader_Sun = new Shader("Shadows/ShadowMapCasc.vs", "Shadows/ShadowMapCasc.gs", "Shadows/ShadowMapCasc.fs");
-    GEngine->renderer->GetShadowShader_Directional = new Shader("Shadows/ShadowMapD.vs", "Shadows/ShadowMapD.fs");
-    GEngine->renderer->GetShadowShader_Point = new Shader("Shadows/ShadowMapP.vs", "Shadows/ShadowMapP.gs", "Shadows/ShadowMapP.fs");
-     
-
-    //GBuffer
-    GEngine->renderer->GetGBufferShader = new Shader("DeferredShading/gBuffer.vs", "DeferredShading/gBuffer.fs");
-    //Lighting pos GBuffer
-    GEngine->renderer->GetLightingShader = new Shader("DeferredShading/DeferredShading.vs", "DeferredShading/DeferredShading.fs");
-    GEngine->renderer->GetSunLightingShader = new Shader("DeferredShading/DeferredShadingSun.vs", "DeferredShading/DeferredShadingSun.fs");
-
-
-    // Começa com Blinn-Phong
-    //renderSystem.SetRenderer(std::make_unique<BlinnPhongRenderer>());
-    //renderSystem.Render(scene); 
-    // Troca para PBR
-    //renderSystem.SetRenderer(std::make_unique<PBRRenderer>());
-    //renderSystem.Render(scene);
-     
-    std::cout << "po4" << std::endl;
-
+    renderer->Initialize();                              // inicializa entidades/sistemas da cena                scene.Init();    
+        
+       
     stbi_set_flip_vertically_on_load(true);
 }
 

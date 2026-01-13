@@ -71,6 +71,36 @@ namespace ImGuiUtils {
         return ImGui::DragFloat3(label, &value.x, 0.1f);
     }
 
+    inline bool DrawVec3(
+        const char* label,
+        glm::vec3& v,
+        float speed = 0.1f
+    ) {
+        ImGui::TextUnformatted(label);
+        ImGui::SameLine(120);
+
+        float width = ImGui::CalcItemWidth();
+        float itemWidth = (width - 8.0f) / 3.0f;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 0));
+
+        ImGui::SetNextItemWidth(itemWidth);
+        auto a = ImGui::DragFloat("##X", &v.x, speed);
+        ImGui::SameLine();
+
+        ImGui::SetNextItemWidth(itemWidth);
+        auto b = ImGui::DragFloat("##Y", &v.y, speed);
+        ImGui::SameLine();
+
+        ImGui::SetNextItemWidth(itemWidth);
+        auto c = ImGui::DragFloat("##Z", &v.z, speed);
+
+        ImGui::PopStyleVar();
+
+        return a || b || c;
+    }
+
+
     inline bool DragVec3Colored(const char* label, glm::vec3& value, float speed = 0.1f) {
         bool changed = false;
 

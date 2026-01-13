@@ -15,7 +15,7 @@ public:
     // Gera ou carrega do cache.
     // cacheDir: Resources/Cache/IBL/
     // Retorna IBLSet preenchido.
-    static IBLSet EnsureIBL(const std::string& hdrPath, const std::string& cacheDir);
+    static IBLSet EnsureIBL(const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap = false);
 
     // Destrói GL objects (se você quiser liberar explicitamente)
     static void Destroy(IBLSet& set);

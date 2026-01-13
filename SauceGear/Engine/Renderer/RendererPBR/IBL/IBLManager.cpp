@@ -3,7 +3,93 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "../../../Graphics/FullscreenQuad.h"
 #include "../../../Renderer/Shaders/ShaderLibrary.h"
-#include "PersistenceIBL.hpp"
+#include "PersistenceIBL.hpp" 
+#include <array>
+#include <string>
+
+static GLuint LoadCubemapPNG(const std::array<std::string, 6>& faces)
+{
+    stbi_set_flip_vertically_on_load(false); // cubemap NÃO flipa
+
+    GLuint texID;
+    glGenTextures(1, &texID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+
+    int w, h, comp;
+    for (int i = 0; i < 6; i++) {
+        unsigned char* data = stbi_load(faces[i].c_str(), &w, &h, &comp, 3);
+        if (!data) {
+            std::cerr << "[IBL] Falha ao carregar face: " << faces[i] << "\n";
+            continue;
+        }
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            GL_RGB16F,          // <<< mantém float no GPU
+            w, h,
+            0,
+            GL_RGB,
+            GL_UNSIGNED_BYTE,  // <<< PNG = LDR
+            data
+        );
+
+        stbi_image_free(data);
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    return texID;
+}
+
+static GLuint LoadCubemapHDR(const std::array<std::string, 6>& faces)
+{
+    stbi_set_flip_vertically_on_load(false);
+
+    GLuint texID;
+    glGenTextures(1, &texID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+
+    int w, h, comp;
+    for (int i = 0; i < 6; i++) {
+        float* data = stbi_loadf(faces[i].c_str(), &w, &h, &comp, 3);
+        if (!data) {
+            std::cerr << "[IBL] Falha ao carregar HDR face: " << faces[i] << "\n";
+            continue;
+        }
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            GL_RGB16F,
+            w, h,
+            0,
+            GL_RGB,
+            GL_FLOAT,
+            data
+        );
+
+        stbi_image_free(data);
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    return texID;
+}
+
 
 // === Helpers para captura ===
 static glm::mat4 CaptureProjection() {
@@ -42,7 +128,7 @@ GLuint IBLManager::LoadHDRTexture(const std::string& path) {
 
 // === Interface principal ===
 //create ambient IBL                    LoadOrBuild
-IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cacheDir) {
+IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap) {
     //----------------------------SETUP-----------------------------------------
     // Lazy init do FBO/RBO default se não tiver sido passado
     //problema com destrutor 
@@ -62,23 +148,47 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cach
     //start
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST); // às vezes depth atrapalha
-
-    IBLSet set{};  
-    GLuint hdr = LoadHDRTexture(hdrPath);
-    if (!hdr) {
-        std::cerr << "[IBL] Falha ao carregar HDR: " << hdrPath << "\n";
-        return set;
-    }
-
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     const auto proj = CaptureProjection();
     const auto views = CaptureViews();
 
-    set.envCubemap = CreateCubemap_Tex(512);
-    RenderHDRToCubemap(hdr, set.envCubemap, hdrToCube, proj, views, captureFBO, captureRBO);
-    glDeleteTextures(1, &hdr);
+    IBLSet set{};  
+     
+    // === FONTE DO ENVIRONMENT MAP ===  
+    if (!isAlreadyCubeMap) {
+        // ---------- EQUIRETANGULAR HDR ----------
+        GLuint hdr = LoadHDRTexture(hdrPath);
+        if (!hdr) {
+            std::cerr << "[IBL] Falha ao carregar HDR: " << hdrPath << "\n";
+            return set;
+        } 
 
+        set.envCubemap = CreateCubemap_Tex(512);
+        RenderHDRToCubemap(
+            hdr, set.envCubemap, 
+            hdrToCube, proj, views, 
+            captureFBO, captureRBO
+        ); 
+
+        glDeleteTextures(1, &hdr);
+    }
+    else
+    {
+        // ---------- CUBEMAP PNG DIRETO ----------
+        std::array<std::string, 6> faces = {
+            hdrPath + "/right.png",
+            hdrPath + "/left.png",
+            hdrPath + "/top.png",
+            hdrPath + "/bottom.png",
+            hdrPath + "/front.png",
+            hdrPath + "/back.png"
+        };
+
+        set.envCubemap = LoadCubemapHDR(faces);
+    }
+     
+    // === IBL PIPELINE =======    
     set.irradiance = CreateIrradiance_Tex(32);
     ConvolveIrradianceToDiffuse(set.envCubemap, set.irradiance, Irradiance, proj, views, captureFBO, captureRBO);
 
@@ -88,6 +198,9 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cach
     set.brdfLUT = CreateBRDFLUT_Tex(512);
     IntegrateBRDF(set.brdfLUT, BRDF, captureFBO, captureRBO, 512);
      
+
+
+
 
     //Debug
     

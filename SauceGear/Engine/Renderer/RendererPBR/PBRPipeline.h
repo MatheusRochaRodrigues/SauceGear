@@ -13,6 +13,8 @@
 #include "Passes/SkyboxPass.h"
 #include "Passes/TransparentPass.h"
 
+#include "../LightPass/LightPass.h"
+
 using Scene = SceneECS; 
 
 class PBRPipeline : public IRenderPipeline {
@@ -23,6 +25,8 @@ public:
         HandleFBOs();
         //ibl = DayNightSystem::GetSkyboxFront();
 
+        //Render Shadow
+        lightPass->Update();
         // GBUFFER + STENCIL
         geometryPass->Execute(scene, *gBuffer);                  //shaders.gbuffer
         // DEFERRED LIGHTING
@@ -32,7 +36,8 @@ public:
         // FORWARD  
         forwardPass->Execute(scene, *gBuffer, *framebuffer);
         // SKYBOX
-        skyboxPass->Execute(*GEngine->mainCamera, ibl.prefilter);  //shaders.skybox
+        //skyboxPass->Execute(*GEngine->mainCamera, ibl.prefilter);  //shaders.skybox
+        skyboxPass->Execute(*GEngine->mainCamera, ibl.envCubemap);  //shaders.skybox
          
            
         GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
@@ -44,11 +49,12 @@ public:
     void Shutdown() override;
 
     // util
-    std::string currentHDR = "Engine/Resources/Textures/hdr/tst/dikhololo_night_4k.hdr";
+    std::string currentHDR = "Engine/Resources/Textures/hdr/spruit_sunrise_4k.hdr";
     std::string cacheDir = "Engine/Resources/Cache/IBL";
 
     Framebuffer* framebuffer = nullptr; // final color + depth (default: true depth) 
-private: 
+private:
+    LightPass*               lightPass;
     GeometryPass*            geometryPass;
     DeferredLightingPass*    lightingPass;
     ForwardPass*             forwardPass;
@@ -58,8 +64,7 @@ private:
     Framebuffer* lightingBuffer = nullptr; // opcional se quiser acumular separado (aqui vou direto no framebuffer final)
      
     // IBL 
-    IBLSet     ibl {};
-    //GLuint     iblFBO = 0, iblRBO = 0; 
+    IBLSet     ibl {};                                                          //GLuint     iblFBO = 0, iblRBO = 0; 
 
     // passes
     void HandleFBOs();  

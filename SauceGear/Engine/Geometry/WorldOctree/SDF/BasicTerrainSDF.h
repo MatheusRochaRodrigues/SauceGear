@@ -1,12 +1,12 @@
 #pragma once
 #include "SignedDistanceField.h"
-#include "../Utils/PerlinNoise.h"
+#include "../../../Utils/PerlinNoise.h"
 
 class BasicTerrainSDF : public SignedDistanceField {
 public:
 
     float sample_height(glm::vec2 pos) const {
-        static PerlinNoise perlin(1337); 
+        static PerlinNoise perlin(1337);
         float n = perlin.noise(pos * 0.01f) * 20.0f;
         return n;
     }

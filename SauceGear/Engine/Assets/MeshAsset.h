@@ -10,7 +10,7 @@ struct SubMesh {
     uint32_t indexOffset = 0;
     uint32_t indexCount = 0;
 
-    uint32_t indexMaterialAsset;
+    uint32_t indexMaterialAsset = 0;
     //std::shared_ptr<MaterialAsset> materialAsset;
     std::string name;
 };

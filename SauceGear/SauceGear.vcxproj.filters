@@ -114,19 +114,19 @@
     <ClCompile Include="Engine\Graphics\ComputeShader.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ECS\Systems\Lighting\ShadowPool.cpp">
+    <ClCompile Include="Engine\Renderer\LightPass\ShadowPool.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ECS\Systems\Lighting\LightSystem.cpp">
+    <ClCompile Include="Engine\Renderer\LightPass\LightPass.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ECS\Systems\Lighting\LightDirectional.cpp">
+    <ClCompile Include="Engine\Renderer\LightPass\LightMakers\LightDirectional.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ECS\Systems\Lighting\CascadeSun.cpp">
+    <ClCompile Include="Engine\Renderer\LightPass\LightMakers\CascadeSun.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ECS\Systems\Lighting\LightPoint.cpp">
+    <ClCompile Include="Engine\Renderer\LightPass\LightMakers\LightPoint.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Utils\PerlinNoise.cpp">
@@ -560,22 +560,22 @@
     <ClInclude Include="Engine\Geometry\World\SurfaceNets\MapGenerator.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\Lighting\LightSystem.h">
+    <ClInclude Include="Engine\Renderer\LightPass\LightPass.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\ECS\Components\LightComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\Lighting\LightPoint.h">
+    <ClInclude Include="Engine\Renderer\LightPass\LightMakers\LightPoint.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\Lighting\CascadeSun.h">
+    <ClInclude Include="Engine\Renderer\LightPass\LightMakers\CascadeSun.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\Lighting\LightDirectional.h">
+    <ClInclude Include="Engine\Renderer\LightPass\LightMakers\LightDirectional.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\Lighting\ShadowPool.h">
+    <ClInclude Include="Engine\Renderer\LightPass\ShadowPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Geometry\World\SurfaceNets\SurfaceNetsBufferPool.h">
@@ -825,6 +825,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Drawers\MaterialInspector.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Themes\Theme4.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

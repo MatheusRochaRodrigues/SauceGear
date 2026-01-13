@@ -2,7 +2,7 @@
 #include "../../ECS/Components/TransformComponent.h"
 #include "../../ECS/Components/MeshRenderer.h"
 //#include "../../ECS/Components/Material.h"
-#include "../../ECS/Systems/Lighting/LightSystem.h"
+#include "../LightPass/LightPass.h"
 
 #include "../../Graphics/FullscreenQuad.h"
 
@@ -13,7 +13,7 @@ void BlinnPhongPipeline::HandleFBOs() {
         gBuffer->Resize(framebuffer->GetWidth(), framebuffer->GetHeight()); 
 }
 
-
+/*
 void BlinnPhongPipeline::GeometryPass(SceneECS& scene) {
     gBuffer->Bind();
     glClearColor(0.0, 0.0, 0.0, 1.0); // keep it black so it doesn't leak into g-buffer
@@ -27,7 +27,7 @@ void BlinnPhongPipeline::GeometryPass(SceneECS& scene) {
         auto& trans = GEngine->scene->GetComponent<TransformComponent>(e);
         auto& meshRenderer = GEngine->scene->GetComponent<MeshRenderer>(e);
 
-        Shader* shader = GEngine->renderer->GetGBufferShader;
+        Shader* shader = GEngine->renderer->GetGBufferShader;       //Geomtry classic withouth PBR, he are in comment in Sahder Library to Future
         shader->setMat4("model", trans.GetMatrix());
 
         //for each material
@@ -42,7 +42,7 @@ void BlinnPhongPipeline::GeometryPass(SceneECS& scene) {
     }
     gBuffer->Unbind();
 }
-
+*/
 
 
 void BlinnPhongPipeline::LightingPass(SceneECS& scene) {

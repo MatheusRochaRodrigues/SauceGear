@@ -19,9 +19,12 @@ public:
         defaults = std::move(fresh->defaults);
         lastWrite = std::filesystem::last_write_time(path);
     }   
-     
+    
+    MaterialAsset() = default;
 
-    static std::shared_ptr<MaterialInstance> Instantiate(const std::shared_ptr<MaterialAsset>& self) {
+    explicit MaterialAsset(const std::shared_ptr<MaterialBase>& base) : base(base) {};
+
+    static inline std::shared_ptr<MaterialInstance> Instantiate(const std::shared_ptr<MaterialAsset>& self) {
         return std::make_shared<MaterialInstance>(self);
     }   
 };

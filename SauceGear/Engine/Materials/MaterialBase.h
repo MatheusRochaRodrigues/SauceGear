@@ -19,6 +19,11 @@ public:
         enum Type { Float, Vec3, Vec4, Texture };
         Type type;
         uint32_t unit;
+         
+
+        float min = 0.0f;
+        float max = 1.0f;
+        bool useSlider = false;
     };
 
     std::unordered_map<std::string, ParamDef> layout;

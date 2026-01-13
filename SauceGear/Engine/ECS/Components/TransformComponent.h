@@ -175,7 +175,10 @@ struct TransformComponent {
     const glm::mat4& GetMatrix() const { return model; }
      
     // DIRTY CONTROL 
-    void MarkLocalDirty() { localDirty = true; worldDirty = true;   } 
+    void MarkLocalDirty() { 
+        localDirty = true; worldDirty = true;
+        std::cout << "movidoaq2" << std::endl;
+    }
     void MarkWorldDirty() { worldDirty = true;                      }
      
     // HELPERS 

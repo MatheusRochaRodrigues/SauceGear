@@ -5,7 +5,8 @@
 #include "../../Renderer/RendererPBR/IBL/IBLManager.h" 
 #include "../../Graphics/ComputeShader.h"
 #include "../../Core/EngineContext.h" 
-#include "../../ECS/Systems/Lighting/LightSystem.h"
+
+#include "../../Renderer/LightPass/LightPass.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -63,8 +64,8 @@ struct DayNightSystem : public System {
 
     void Init() { 
         // pré-carrega os HDRs em IBL sets
-        s_cycle.nightHDR = { "Engine/Resources/Textures/hdr/tst/dikhololo_night_4k.hdr", {} };
-        s_cycle.dawnHDR = { "Engine/Resources/Textures/hdr/spruit_sunrise_4k.hdr", {} };
+        s_cycle.nightHDR = { "Assets/HDR/uploads_files_3782135_Anime+sky.hdr", {} };
+        s_cycle.dawnHDR =  { "Assets/HDR/uploads_files_3782135_Anime+sky.hdr", {} };
         s_cycle.dayHDR = { "Engine/Resources/Textures/hdr/tst/Kloppenheim (1).hdr", {} };
 
         s_cycle.dayHDR.second   = IBLManager::EnsureIBL(s_cycle.dayHDR.first,   cacheDir);
@@ -86,6 +87,8 @@ struct DayNightSystem : public System {
 
     bool init = true;
     void Update(float dt) override { 
+        return;
+
         if (init) Init();
 
         s_cycle.timeOfDay += s_cycle.daySpeed * dt;
@@ -126,9 +129,9 @@ struct DayNightSystem : public System {
     }
 
     void UpdateSun(float normalized) {
-        if (LightSystem::currentSun == INVALID_ENTITY) return;
-        auto& sunT = GEngine->scene->GetComponent<TransformComponent>(LightSystem::currentSun);
-        auto& sunL = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun);
+        if (LightPass::currentSun == INVALID_ENTITY) return;
+        auto& sunT = GEngine->scene->GetComponent<TransformComponent>(LightPass::currentSun);
+        auto& sunL = GEngine->scene->GetComponent<LightComponent>(LightPass::currentSun);
 
         float sunAngle = glm::radians(-90.0f + 360.0f * normalized);
         sunT.rotation = glm::vec3(sunAngle, 0.0f, 0.0f);
