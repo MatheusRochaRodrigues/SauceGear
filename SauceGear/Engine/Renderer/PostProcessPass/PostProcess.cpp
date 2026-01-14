@@ -1,32 +1,35 @@
-#include "PostProcessSystem.h" 
-#include "../../Graphics/Framebuffer.h"
+#include "PostProcess.h" 
+#include "../../Graphics/Framebuffer.h" 
+#include "Pass/BaW_pp.h"
  
-PostProcessSystem::PostProcessSystem() {
-
-    std::cout << "1433" << std::endl;
+PostProcess::PostProcess() {
     shaderView = new Shader("PostProcess/post.vs", "PostProcess/post.fs");
-    //passes.push_back(new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)));
+
+    //passes.push_back(new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0))); 
+    passes.push_back(std::make_unique<BaW_pp>()); 
 }
 
-void PostProcessSystem::initialize(PostProcessComponent& pp) {    //PostProcessSystem
+void PostProcess::initialize() {    //PostProcessSystem                   PostProcessComponent& pp
     unsigned int width = GEngine->window->GetWidth();
     unsigned int height = GEngine->window->GetHeight();
-    pp.outputFBO = new Framebuffer(width, height, { { FramebufferTextureType::ColorRGB } }, true);
+    //pp.outputFBO = new Framebuffer(width, height, { { FramebufferTextureType::ColorRGB } }, true);
+
+
     //PostProcessComponent::outputFBO = new Framebuffer(width, height, { {FramebufferTextureType::Float16} });
 }
 
-void PostProcessSystem::Resize(int w, int h) {
+void PostProcess::Resize(int w, int h) {
     /*width = w;
     height = h;
     for (auto& pass : passes)
         pass.Resize(w, h);*/
 }
 
-void PostProcessSystem::AddPass(PostProcessComponent* pass) {
+void PostProcess::AddPass(PostProcessPass* pass) {
     passes.emplace_back(pass);                              //passes.emplace_back(width, height, fragPath);
 } 
 
-void PostProcessSystem::InitFullscreenQuad() {
+void PostProcess::InitFullscreenQuad() {
     float quadVertices[] = {
         // positions   // texCoords
         -1.0f,  1.0f,  0.0f, 1.0f,
@@ -48,7 +51,7 @@ void PostProcessSystem::InitFullscreenQuad() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-void PostProcessSystem::DrawQuad() {
+void PostProcess::DrawQuad() {
     if (quadVAO == 0) InitFullscreenQuad();
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -56,8 +59,9 @@ void PostProcessSystem::DrawQuad() {
 }
 
  
-GLuint PostProcessSystem::GetFinalTexture() const {
-    return passes.empty() ? 0 : passes.back()->GetOutputTexture();
+GLuint PostProcess::GetFinalTexture() const {
+    //return passes.empty() ? 0 : passes.back()->GetOutputTexture();
+    return 0;
 }
 
 

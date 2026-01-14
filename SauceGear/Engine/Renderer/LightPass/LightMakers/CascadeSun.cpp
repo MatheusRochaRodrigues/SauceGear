@@ -87,7 +87,7 @@ void CascadeSun::Init() {
     glGenFramebuffers(1, &cascadeFBO);
     glGenTextures(1, &cascadeDepthMapArray);
 
-    int cascadeResolution = 2048;
+    int cascadeResolution = resolution /*2048*/;
     const int layers = CASCADE_COUNT; // N cascades -> layers/matrices
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, cascadeDepthMapArray);
@@ -186,7 +186,7 @@ void CascadeSun::UpdateSunShadow(LightComponent& sun, TransformComponent& transf
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     // Renderiza cascades
-    glViewport(0, 0, 2048, 2048);
+    glViewport(0, 0, resolution, resolution);
     glBindFramebuffer(GL_FRAMEBUFFER, cascadeFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
     glCullFace(GL_FRONT);  // peter panning

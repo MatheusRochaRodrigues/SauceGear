@@ -2,8 +2,7 @@
 
 #include "../ECS/Systems/RenderSystem.h" 
 #include "../ECS/Systems/MoveSystem.h"
-#include "../ECS/Systems/CameraSystem.h"
-#include "../ECS/Systems/PostProcessSystem.h" 
+#include "../ECS/Systems/CameraSystem.h" 
 #include "../ECS/Systems/GlobalUniformSystem.h" 
 #include "../ECS/Systems/PickingSystem.h" 
 #include "../ECS/Systems/DayNightSystem.h"  
@@ -37,13 +36,12 @@ void SceneECS::initECS() {
     RegisterSystem <AABBSystem>();
     RegisterSystem <CameraSystem>();
     RegisterSystem <ComputeSyncSystem>();
+    RegisterSystem <PickingSystem>();
     RegisterSystem <DayNightSystem>(); 
     RegisterSystem <GlobalUniformSystem>(); 
     RegisterSystem <RenderSystem>(); 
     RegisterSystem <DebugRenderer>();
-    RegisterSystem <PostProcessSystem>();
     RegisterSystem <TextRenderSystem>();
-    RegisterSystem <PickingSystem>();
 
     //RegisterSystem <OctreeWorldSystem>();  
 

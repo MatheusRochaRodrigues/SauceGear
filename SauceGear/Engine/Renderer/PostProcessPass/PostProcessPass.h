@@ -2,8 +2,10 @@
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/Framebuffer.h"
 
-struct PostProcessComponent { 
-
+struct PostProcessPass {
+    Shader* shader;           // Shader do efeito 
+    virtual void Apply() = 0;                          
+    virtual ~PostProcessPass() = default;
 };
 
 

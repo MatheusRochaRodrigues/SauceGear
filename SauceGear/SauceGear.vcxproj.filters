@@ -51,7 +51,7 @@
     <ClCompile Include="Engine\Graphics\Framebuffer.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ECS\Systems\PostProcessSystem.cpp">
+    <ClCompile Include="Engine\Renderer\PostProcessPass\PostProcess.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Editor\Panels\SceneViewPanel.h">
@@ -332,7 +332,7 @@
     <ClInclude Include="Engine\Graphics\Framebuffer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\PostProcessSystem.h">
+    <ClInclude Include="Engine\Renderer\PostProcessPass\PostProcess.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\FullscreenQuad.h">
@@ -830,6 +830,15 @@
     <ClInclude Include="Editor\Themes\Theme4.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Editor\Drawers\DrawFieldTexture.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\PostProcessPass\Pass\BaW_pp.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\PostProcessPass\PostProcessPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Engine\Resources\Shaders\PBR\background.fs">
@@ -919,7 +928,7 @@
     <None Include="Engine\Resources\Shaders\Shadows\ShadowMapCasc.fs" />
     <None Include="Engine\Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />
-    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic_PBR.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic\Classic_PBR.glsl" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
     <None Include="Engine\Resources\Shaders\Utils\Shadows.glsl" />
     <None Include="Engine\Resources\Shaders\Compute\LerpCubemap.comp" />
@@ -996,6 +1005,7 @@
     <None Include="freetype.dll" />
     <None Include="imgui.ini" />
     <None Include="Engine\Resources\Shaders\Utils\PBR.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic\pbr_eval.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

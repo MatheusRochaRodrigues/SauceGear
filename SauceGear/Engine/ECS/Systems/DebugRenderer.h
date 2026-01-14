@@ -110,9 +110,7 @@ public:
                 
             }
 
-            lineRenderer.Update(dt);
-            pointRenderer.Update(dt);
-
+            lineRenderer.Update(dt);                    pointRenderer.Update(dt); 
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         } catch (const std::exception& e) {

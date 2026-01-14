@@ -56,9 +56,10 @@ public:
         IBLSet& ibl)
     {
         target.Bind();
-        glDisable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_DEPTH_TEST); 
+        glClear(GL_COLOR_BUFFER_BIT);           //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+        /*
         // AMBIENT
         glDisable(GL_BLEND);
         iblAmbient->use();
@@ -66,25 +67,23 @@ public:
         GBufferBinder::Bind(gbuffer);
         IBLBinder::Bind(ibl);
         RenderQuad();
-
+        */
 
         //--------------------------------------------------------------------------------------------------------------------------------
         // ------------------- SUN -------------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------------------------------------
         // ** ADDITIVE LIGHTS **
         glEnable(GL_BLEND); glBlendEquation(GL_FUNC_ADD); glBlendFunc(GL_ONE, GL_ONE);
-        glEnable(GL_CULL_FACE); glCullFace(GL_BACK);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
+        glEnable(GL_CULL_FACE); glCullFace(GL_BACK); 
 
         //(fullscreen) RENDERIZAÇAO
         if (LightPass::SetSunToShader(dirLight)) {
             GBufferBinder::Bind(gbuffer);
             dirLight->setVec3("camPos", GEngine->mainCamera->GetPosition());
             RenderQuad();
-        }
-         
+        } 
+
+        /*
 
         //--------------------------------------------------------------------------------------------------------------------------------
         // ------------------ POINTS -----------------------------------------------------------------------------------------------------
@@ -126,6 +125,8 @@ public:
 
         // Renderiza as esferas instanciadas, uma para cada luz pontual
         sphereMesh->DrawInstanced(instanceData.size());
+
+        */
 
         //End  
         glDisable(GL_BLEND);

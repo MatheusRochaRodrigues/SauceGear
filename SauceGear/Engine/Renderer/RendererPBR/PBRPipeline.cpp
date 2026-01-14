@@ -32,6 +32,7 @@ void PBRPipeline::Init() {
     ibl = IBLManager::EnsureIBL(currentHDR, cacheDir );
     std::cout << "init3" << std::endl;
      
+    postProcess = new PostProcess();
 }
 
 void PBRPipeline::Shutdown() { 

@@ -176,8 +176,7 @@ struct TransformComponent {
      
     // DIRTY CONTROL 
     void MarkLocalDirty() { 
-        localDirty = true; worldDirty = true;
-        std::cout << "movidoaq2" << std::endl;
+        localDirty = true;      worldDirty = true; 
     }
     void MarkWorldDirty() { worldDirty = true;                      }
      

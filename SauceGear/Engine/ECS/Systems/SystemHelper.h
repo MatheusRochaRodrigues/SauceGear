@@ -2,8 +2,7 @@
 
 #include "RenderSystem.h" 
 #include "MoveSystem.h"
-#include "CameraSystem.h"
-#include "PostProcessSystem.h" 
+#include "CameraSystem.h" 
 #include "GlobalUniformSystem.h" 
 #include "PickingSystem.h" 
 #include "DayNightSystem.h"  

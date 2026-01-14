@@ -12,18 +12,21 @@
 
 class MaterialBinder {
 public:
-    static std::shared_ptr<Texture> Resolve( const std::string& name, const MaterialBase::ParamDef& def, const MaterialInstance* inst ) {
+    static std::shared_ptr<Texture> Resolve(
+        const std::string& name,
+        const MaterialBase::ParamDef& def,
+        const MaterialInstance* inst
+    ) {
         if (inst) {
             auto it = inst->overrides.find(name);
             if (it != inst->overrides.end()) {
                 if (auto t = std::get_if<std::shared_ptr<Texture>>(&it->second.data))
                     return *t;
-                if (auto c = std::get_if<glm::vec4>(&it->second.data))
-                    return TextureCache::Get().GetSolidColor(*c);
             }
         }
         return TextureCache::Get().GetSolidColor({ 1,1,1,1 });
     }
+
      
     static void Bind(MaterialInstance& inst, MaterialAsset& asset, MaterialBase& base) {
         for (auto& [name, def] : base.layout) {

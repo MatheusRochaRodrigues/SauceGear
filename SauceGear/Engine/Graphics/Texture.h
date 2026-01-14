@@ -77,6 +77,11 @@ public:
     static void attechment() {
 
     }
+
+
+    // Editor
+    bool isSolidColor = false;
+    glm::vec4 solidColor = { 1,1,1,1 };
 private:
     void LoadFromFile(const char* path, bool useSRGB);
     void LoadCubeMap(const std::vector<std::string>& faces);

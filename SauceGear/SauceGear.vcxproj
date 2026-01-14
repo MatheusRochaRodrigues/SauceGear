@@ -195,7 +195,7 @@
     <ClCompile Include="Engine\Serializer\MaterialSerializer.cpp" />
     <ClCompile Include="Engine\Resources\Primitives\Primitive.cpp" />
     <ClCompile Include="Engine\Scene\SceneBuilder.h" />
-    <ClCompile Include="Engine\ECS\Systems\PostProcessSystem.cpp" />
+    <ClCompile Include="Engine\Renderer\PostProcessPass\PostProcess.cpp" />
     <ClCompile Include="Engine\Core\Application.cpp" />
     <ClCompile Include="Engine\Core\EngineContext.cpp" />
     <ClCompile Include="Engine\Graphics\Renderer.cpp" />
@@ -213,6 +213,7 @@
     <ClCompile Include="stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Editor\Drawers\DrawFieldTexture.h" />
     <ClInclude Include="Editor\Drawers\MaterialInspector.h" />
     <ClInclude Include="Editor\Themes\Theme4.h" />
     <ClInclude Include="Engine\Assets\AssetDatabase.h" />
@@ -243,6 +244,7 @@
     <ClInclude Include="Engine\Instancing\ModelInstance.h" />
     <ClInclude Include="Engine\Materials\MaterialBinder.h" />
     <ClInclude Include="Engine\Materials\MaterialLibrary.h" />
+    <ClInclude Include="Engine\Renderer\PostProcessPass\PostProcessPass.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\Bindings\GBufferBinder.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\Bindings\IBLBinder.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\IBL\IBLSet.h" />
@@ -288,6 +290,7 @@
     <ClInclude Include="Engine\Renderer\RenderItem.h" />
     <ClInclude Include="Engine\Renderer\RenderQueue.h" />
     <ClInclude Include="Engine\Resources\Loaders\HierarchyNode.h" />
+    <ClInclude Include="Engine\Renderer\PostProcessPass\Pass\BaW_pp.h" />
     <ClInclude Include="Engine\Serializer\MaterialSerializer.h" />
     <ClInclude Include="Engine\Math\Plane.h" />
     <ClInclude Include="Engine\Math\Ray.h" />
@@ -377,7 +380,7 @@
     <ClInclude Include="Engine\ECS\Components\PostEffects\BlurEffectComponent.h" />
     <ClInclude Include="Engine\ECS\ScriptInspector.h" />
     <ClInclude Include="Engine\ECS\Systems\GlobalUniformSystem.h" />
-    <ClInclude Include="Engine\ECS\Systems\PostProcessSystem.h" />
+    <ClInclude Include="Engine\Renderer\PostProcessPass\PostProcess.h" />
     <ClInclude Include="Engine\ECS\Components\PostProcessComponent.h" />
     <ClInclude Include="Engine\ECS\Components\CameraComponent.h" />
     <ClInclude Include="Engine\ECS\Systems\CameraSystem.h" />
@@ -454,6 +457,7 @@
     <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
     <None Include="Engine\Resources\Shaders\solid.fs" />
     <None Include="Engine\Resources\Shaders\Utils\PBR.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic\pbr_eval.glsl" />
     <None Include="freetype.dll" />
     <None Include="imgui.ini" />
     <None Include="Resources\Shaders\Utils\brdf_ggx.glsl" />
@@ -482,7 +486,7 @@
     <None Include="Engine\Resources\Shaders\Compute\extras\LerpCubemap2.comp" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional.fs" />
     <None Include="Engine\Resources\Shaders\Compute\extras\TestCube2.comp" />
-    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic_PBR.glsl" />
+    <None Include="Engine\Resources\Shaders\Utils\PBR\Classic\Classic_PBR.glsl" />
     <None Include="Engine\Resources\Shaders\DeferredShading\extras\DeferredShadingSun.fs" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_directional0.fs" />
     <None Include="Engine\Resources\Shaders\Utils\lighting.glsl" />

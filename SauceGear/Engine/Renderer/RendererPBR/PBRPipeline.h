@@ -14,6 +14,7 @@
 #include "Passes/TransparentPass.h"
 
 #include "../LightPass/LightPass.h"
+#include "../PostProcessPass/PostProcess.h"
 
 using Scene = SceneECS; 
 
@@ -22,27 +23,29 @@ public:
     void Init() override;
      
     void Render(Scene& scene) override {   
-        HandleFBOs();
-        //ibl = DayNightSystem::GetSkyboxFront();
+        //=============================================TimeLine============================================================
+        HandleFBOs();                       //ibl = DayNightSystem::GetSkyboxFront();
 
         //Render Shadow
         lightPass->Update();
         // GBUFFER + STENCIL
-        geometryPass->Execute(scene, *gBuffer);                  //shaders.gbuffer
+        geometryPass->Execute(scene, *gBuffer);                  
         // DEFERRED LIGHTING
         lightingPass->Execute(scene, *framebuffer, *gBuffer, ibl);
-        // OUTLINE PASS  
+        // OUTLINE PASS   
         
         // FORWARD  
         forwardPass->Execute(scene, *gBuffer, *framebuffer);
-        // SKYBOX
-        //skyboxPass->Execute(*GEngine->mainCamera, ibl.prefilter);  //shaders.skybox
+        // SKYBOX 
         skyboxPass->Execute(*GEngine->mainCamera, ibl.envCubemap);  //shaders.skybox
          
-           
+        //postProcess->Update();
+        
+        //========================================BUFFER RENDER============================================================
         GEngine->renderer->GetTextureRendered = framebuffer->GetTexture(0); 
         //auto& light = GEngine->scene->GetComponent<LightComponent>(LightSystem::currentSun); GEngine->renderer->GetTextureRendered = light.depthMap;
         //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(2);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -59,6 +62,9 @@ private:
     DeferredLightingPass*    lightingPass;
     ForwardPass*             forwardPass;
     SkyboxPass*              skyboxPass;
+
+    //Post process
+    PostProcess*             postProcess;
 
     Framebuffer* gBuffer = nullptr;         // Position/Normal/Albedo/MetalRoughAO (+depth)                 gBufferFBO
     Framebuffer* lightingBuffer = nullptr; // opcional se quiser acumular separado (aqui vou direto no framebuffer final)
