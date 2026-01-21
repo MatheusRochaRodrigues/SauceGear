@@ -1,8 +1,7 @@
 #include "EditorApp.h"
 #include "../Engine/Core/Application.h"
 #include "../Engine/Platform/Window.h"
-#include "../Engine/Scene/GameScene.h"
-
+#include "../Engine/Scene/GameScene.h" 
 
 void EditorApp::Run() {
     ImGuiLayer imguiLayer;

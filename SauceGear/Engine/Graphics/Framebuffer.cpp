@@ -74,6 +74,12 @@ void Framebuffer::Init() {
             internalFormat = GL_RGBA8;      //GL_RGBA8          R = Metallic, G = Roughness, B = AO, A = ?
             format = GL_RGBA;
             break;
+             
+        case FramebufferTextureType::HDR:
+            internalFormat = GL_RGBA16F;
+            format = GL_RGBA;
+            dataType = GL_FLOAT;
+            break;
     }
 
 
@@ -174,3 +180,12 @@ void Framebuffer::CreateFramebuffer(GLuint& fbo, GLuint& texture) {
 
 
 
+
+
+
+
+//void verify() {
+//    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+//    if (status != GL_FRAMEBUFFER_COMPLETE)
+//        std::cout << "Framebuffer incompleto: " << status << std::endl;
+//}

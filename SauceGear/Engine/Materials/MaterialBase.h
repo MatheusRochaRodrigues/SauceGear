@@ -9,6 +9,7 @@ enum class MaterialDomain {
     Forward,
     Transparent
 };
+ 
 
 class MaterialBase {
 public:
@@ -16,20 +17,23 @@ public:
     Shader* shader = nullptr;
 
     struct ParamDef {
-        enum Type { Float, Vec3, Vec4, Texture };
+        enum Type               { Float, Vec3, Vec4, Texture };     // that's define what shader expects to receive 
         Type type;
-        uint32_t unit;
-         
+
+        enum class UIType       { Drag, Slider, Color, NONE };            // This defines how the user edits.          , Texture
+        UIType specification;
+
+        uint32_t unit = 0;     // só usado se shaderType == Texture, logo se for textura
+
 
         float min = 0.0f;
         float max = 1.0f;
-        bool useSlider = false;
+        //bool useSlider = false;
     };
 
     std::unordered_map<std::string, ParamDef> layout;
     virtual ~MaterialBase() = default;
 };
-
 
 
 

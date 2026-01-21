@@ -1,15 +1,8 @@
-#pragma once
-
-//Engine Dependecies
-//#include "../Scene/SceneECS.h" 
+#pragma once 
 #include "../Engine/Scene/GameScene.h" 
 #include "../Engine/Platform/Window.h"
  
-#define IMGUI_ENABLE_DOCKING // antes de incluir imgui.h
-//#include "imgui.h"
-//#include "imgui_impl_glfw.h"
-//#include "imgui_impl_opengl3.h"
-//#include "ImGuizmo.h" 
+#define IMGUI_ENABLE_DOCKING // antes de incluir imgui.h 
 
 #include "Panels/IPanelHelper.h"
 #include "Panels/InspectorPanel.h"

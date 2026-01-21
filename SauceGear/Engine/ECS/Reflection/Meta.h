@@ -14,6 +14,28 @@ enum class FieldKind {
     Vector
 };
 
+
+struct EnumInfo {
+    std::string name;
+
+    struct Value {
+        std::string label;
+        int value;
+    };
+
+    std::vector<Value> values;
+};
+enum class EditorWidget {
+    Default,
+    EnumCombo,
+    EnumRadio,
+    EnumButtons,
+    EnumFlags
+};
+
+
+
+
 struct FieldInfo {
     std::string name;
     std::type_index type{ typeid(void) }; // inicializa com typeid(void)
@@ -27,6 +49,11 @@ struct FieldInfo {
     size_t(*getSize)(void*) = nullptr;
     void* (*getElement)(void*, size_t) = nullptr;
     void   (*resize)(void*, size_t) = nullptr;
+
+
+    // Enum
+    EnumInfo* enumInfo = nullptr;
+    EditorWidget widget = EditorWidget::Default;
 };
 
 struct TypeInfo {

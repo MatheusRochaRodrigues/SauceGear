@@ -6,12 +6,12 @@ layout(std140, binding = 2) uniform LightSpaceMatrices {
     mat4 lightSpaceMatrices[MAX_CASCADES];
 };
 
-uniform sampler2DArray cascadeShadowMap;
-uniform float cascadePlaneDistances[MAX_CASCADES]; 
-uniform int cascadeCount;   // number of frusta - 1
+uniform sampler2DArray  cascadeShadowMap;
+uniform float           cascadePlaneDistances[MAX_CASCADES]; 
+uniform int             cascadeCount;   // number of frusta - 1
 
-uniform mat4 view; 
-uniform float farPlane;
+uniform float           farPlane;
+uniform mat4            view; 
 
 // ==== Seleção do cascade pelo depth em view space ====
 int GetCascadeIndex(vec3 worldPos) {
@@ -66,6 +66,17 @@ float ShadowCalculationCascade(vec3 WorldPos, vec3 Normal, vec3 lightDir) {
 
     return shadow;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

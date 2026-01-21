@@ -4,11 +4,14 @@
 #include "../ECS/Components/ComponentsHelper.h"
 #include <stdexcept> 
 #include "SceneBuilder.h"
-#include "../Geometry/World/SurfaceNets/Voxel.h"
 #include <memory>
 
 #include"../ECS/Systems/DebugRenderer.h"
 #include "../GUI/FontManager.h" 
+
+//#include "../Geometry/World/SurfaceNet/World/SurfaceNets/Voxel.h"
+#include "../Geometry/World/DC/DCTree.h"
+#include "../Resources/Primitives/Primitive.h"
   
 class GameScene : public SceneECS {
 public: 
@@ -26,6 +29,7 @@ public:
             std::cout << "[INFO Scene] ComputeManager entity criado: " << computeManager << "\n";
         }
 
+        /*
         {
             stbi_set_flip_vertically_on_load(true);
             std::cout << "cs 1" << std::endl;
@@ -37,6 +41,7 @@ public:
             auto& l = GetComponent<TransformComponent>(entity);
             l.position = glm::vec3(1, 1, 0);  
         }
+        */
 
         {
             Entity pointLight = SceneBuilder::CreateGameObject("Sun");
@@ -60,6 +65,17 @@ public:
             pLight.color = glm::vec3(0, 1, 0);
             pLight.intensity = 1.0f;
         }
+        {
+            Entity pointLight = SceneBuilder::CreateGameObject("Light3");
+            auto& pTransform = GetComponent<TransformComponent>(pointLight); 
+            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+            pTransform.position = glm::vec3(0, 0, 1);
+            auto& pLight = AddComponent<LightComponent>(pointLight);
+            pLight.SetTypeLight(LightType::Point);
+            pLight.color = glm::vec3(1, 1, 1);
+            pLight.intensity = 11.0f;
+        }
+
 
         // Render para um framebuffer
         //GLuint sceneFBO, sceneTexture;
@@ -71,91 +87,85 @@ public:
 
         /*Entity blurX = CreateEntity();
         AddComponent<PostProcessComponent>( blurX, new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)) );*/
-         
 
-        voxelSystem sys; 
+        /*
+        const int octreeSize = 64;
+        
+        VertexBuffer vertexBuffer;      IndexBuffer indexBuffer;
 
-        std::cout << "AAAAA" << std::endl;
-        for (auto& ckt : sys.gnrtChunk()) {
-            Chunk* ck = ckt.first;
-            OctreeNode* node = ckt.second;
+        auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize, 1);
+        GenerateMeshFromOctree(root, vertexBuffer, indexBuffer);
+        std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(vertexBuffer, indexBuffer);
+        mesh->name = "DC";
+        SceneBuilder::CreateModel(mesh);
+        */
 
-            std::cout << "o - 00" << std::endl;
-            std::cout << "ck " << ck->coord.x << " " << ck->coord.y << " " << ck->coord.z << std::endl;
-            auto& scene = GEngine->scene;
-            auto mesh = ck->mesh.get();
 
-            mesh->name = "CK = " +
-                std::to_string(ck->coord.x) + ", " +
-                std::to_string(ck->coord.y) + ", " +
-                std::to_string(ck->coord.z) +
-                " - lod: " + std::to_string(ck->lod) +
-                "  { " + std::to_string(ck->dbg) + " }";
 
-            Entity xz = SceneBuilder::CreateModel(ck->mesh);
-            auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck, node, node->center);
-            for (auto& nc : node->children) pp.points.push_back(nc->center);
+        int nrRows = 7;
+        int nrColumns = 7;
+        float spacing = 2.5;
+        // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
+        glm::mat4 model = glm::mat4(1.0f);
+        for (int row = 0; row < nrRows; ++row)
+        { 
+            for (int col = 0; col < nrColumns; ++col)
+            {
+                auto asset = std::make_shared<MaterialAsset>();
+                asset->name = "Sphere";  // name 
+                asset->base = MaterialLibrary::Get("PBR_Default"); 
 
-            OctreeNode* aux = node->children[0];
-            while (aux->subdivided) aux = aux->children[0];
-            aux = aux->father;
-            for (auto& nc : aux->children) pp.pointsDeep.push_back(nc->center);
-            pp.lod = aux->depthLOD;
+                asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(1, 0, 0, 1));
 
-            //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
+                float r = (float)row / (float)nrRows;
+                asset->defaults["Metallic"].data = TextureCache::Get().GetSolidColor(glm::vec4(r, r, r, 1));
 
-            //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
-            auto& aaaa = AddComponent<DebugMeshComponent>(xz);
+                // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
+                // on direct lighting. 
+                r = glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f);
+                asset->defaults["Roughness"].data = TextureCache::Get().GetSolidColor(glm::vec4(r, r, r, 1));
+
+
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(
+                    (float)(col - (nrColumns / 2)) * spacing,
+                    (float)(row - (nrRows / 2)) * spacing,
+                    -2.0f
+                ));
+                auto e = SceneBuilder::CreateModel(PrimitiveMesh::Sphere(), asset->Instantiate(asset));
+                auto& t = SceneECS::GetComponent<TransformComponent>(e);
+                //t.SetLocalFromMatrix(model);
+                t.SetLocalPosition(glm::vec3(
+                    (float)(col - (nrColumns / 2))* spacing,
+                    (float)(row - (nrRows / 2))* spacing,
+                    -2.0f));
+                
+            }
         }
-        std::cout << "AAAAAee" << std::endl;
-         
-        DebugRenderer::Point(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
-        DebugRenderer::Point(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
-        DebugRenderer::Point(glm::vec3(0, 0, 0), glm::vec3(1.0f, 0, 0), 6.0f, DebugPointType::Circle, true);
-         
+
+
+        // render light source (simply re-render sphere at light positions)
+        // this looks a bit off as we use the same shader, but it'll make their positions obvious and 
+        // keeps the codeprint small.
+        /*for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
         {
-            auto e = SceneBuilder::CreateGameObject("Font");
-            auto& tr = scn->GetComponent<TransformComponent>(e);
-            tr.SetLocalPosition(glm::vec3(0, 0, 0)); // topo centro (0..1)
-            //tr.SetLocalPosition(glm::vec3( 0.5f, 0.5f, 0 )); // topo centro (0..1)
+            glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+            newPos = lightPositions[i];
+            pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
+            pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 
-            auto& txt = scn->AddComponent<TextComponent>(e);
-            txt.text = "DEBUG SDF VIEW";
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, newPos);
+            model = glm::scale(model, glm::vec3(0.5f));
+            pbrShader.setMat4("model", model);
+            pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+            renderSphere();
+        }*/
 
-            txt.fontID = FontManager::Load("Assets/Fonts/ProggyClean.ttf", 48);
 
-            txt.space = TextComponent::Space::Screen;
-            txt.units = TextComponent::Units::Relative;
-            txt.align = TextComponent::Align::Left;
-            txt.anchor = TextComponent::Anchor::TopCenter;
 
-            txt.color = { 1,0,0,1 };
+        return;
 
-            txt.style.outlineThickness = 0.1f;
-            txt.style.outlineColor = { 0,0,0,1 };
-
-        } 
-        {
-            auto e = SceneBuilder::CreateGameObject("Font");
-            auto& tr = scn->GetComponent<TransformComponent>(e);
-            tr.SetLocalPosition(glm::vec3(0.5f, 5.5f, 0)); // topo centro (0..1)
-
-            auto& txt = scn->AddComponent<TextComponent>(e);
-            txt.text = "3dD";
-
-            txt.fontID = FontManager::Load("Assets/Fonts/ProggyClean.ttf", 48);
-
-            txt.space = TextComponent::Space::World;
-            txt.units = TextComponent::Units::Relative;
-            txt.align = TextComponent::Align::Left;
-            txt.anchor = TextComponent::Anchor::TopCenter;
-
-            txt.color = { 1,0,0,1 };
-
-            txt.style.outlineThickness = 0.1f;
-            txt.style.outlineColor = { 0,0,0,1 };
-
-        } 
 
         /*
         {
@@ -225,5 +235,94 @@ public:
         return;
 
     }
+
+
+    void f() { 
+        //voxelSystem sys;
+
+        //std::cout << "AAAAA" << std::endl;
+        //for (auto& ckt : sys.gnrtChunk()) {
+        //    Chunk* ck = ckt.first;
+        //    OctreeNode* node = ckt.second;
+
+        //    std::cout << "o - 00" << std::endl;
+        //    std::cout << "ck " << ck->coord.x << " " << ck->coord.y << " " << ck->coord.z << std::endl;
+        //    auto& scene = GEngine->scene;
+        //    auto mesh = ck->mesh.get();
+
+        //    mesh->name = "CK = " +
+        //        std::to_string(ck->coord.x) + ", " +
+        //        std::to_string(ck->coord.y) + ", " +
+        //        std::to_string(ck->coord.z) +
+        //        " - lod: " + std::to_string(ck->lod) +
+        //        "  { " + std::to_string(ck->dbg) + " }";
+
+        //    Entity xz = SceneBuilder::CreateModel(ck->mesh);
+        //    auto& pp = scene->AddComponent<SurfaceNetsComponent>(xz, ck, node, node->center);
+        //    for (auto& nc : node->children) pp.points.push_back(nc->center);
+
+        //    OctreeNode* aux = node->children[0];
+        //    while (aux->subdivided) aux = aux->children[0];
+        //    aux = aux->father;
+        //    for (auto& nc : aux->children) pp.pointsDeep.push_back(nc->center);
+        //    pp.lod = aux->depthLOD;
+
+        //    //GeneratorMap::DebugPrintSDF(ck->buff->density, sysv.get_voxelGrid());
+
+        //    //auto& bb = scene->GetComponent<MeshRenderer>(xz); 
+        //    auto& aaaa = AddComponent<DebugMeshComponent>(xz);
+        //}
+        //std::cout << "AAAAAee" << std::endl;
+
+        //DebugRenderer::Point(glm::vec3(1, 1, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+        //DebugRenderer::Point(glm::vec3(1, 2, 1), glm::vec3(1.0f), 6.0f, DebugPointType::Square, true);
+        //DebugRenderer::Point(glm::vec3(0, 0, 0), glm::vec3(1.0f, 0, 0), 6.0f, DebugPointType::Circle, true);
+
+        //{
+        //    auto e = SceneBuilder::CreateGameObject("Font");
+        //    auto& tr = scn->GetComponent<TransformComponent>(e);
+        //    tr.SetLocalPosition(glm::vec3(0, 0, 0)); // topo centro (0..1)
+        //    //tr.SetLocalPosition(glm::vec3( 0.5f, 0.5f, 0 )); // topo centro (0..1)
+
+        //    auto& txt = scn->AddComponent<TextComponent>(e);
+        //    txt.text = "DEBUG SDF VIEW";
+
+        //    txt.fontID = FontManager::Load("Assets/Fonts/ProggyClean.ttf", 48);
+
+        //    txt.space = TextComponent::Space::Screen;
+        //    txt.units = TextComponent::Units::Relative;
+        //    txt.align = TextComponent::Align::Left;
+        //    txt.anchor = TextComponent::Anchor::TopCenter;
+
+        //    txt.color = { 1,0,0,1 };
+
+        //    txt.style.outlineThickness = 0.1f;
+        //    txt.style.outlineColor = { 0,0,0,1 };
+
+        //}
+        //{
+        //    auto e = SceneBuilder::CreateGameObject("Font");
+        //    auto& tr = scn->GetComponent<TransformComponent>(e);
+        //    tr.SetLocalPosition(glm::vec3(0.5f, 5.5f, 0)); // topo centro (0..1)
+
+        //    auto& txt = scn->AddComponent<TextComponent>(e);
+        //    txt.text = "3dD";
+
+        //    txt.fontID = FontManager::Load("Assets/Fonts/ProggyClean.ttf", 48);
+
+        //    txt.space = TextComponent::Space::World;
+        //    txt.units = TextComponent::Units::Relative;
+        //    txt.align = TextComponent::Align::Left;
+        //    txt.anchor = TextComponent::Anchor::TopCenter;
+
+        //    txt.color = { 1,0,0,1 };
+
+        //    txt.style.outlineThickness = 0.1f;
+        //    txt.style.outlineColor = { 0,0,0,1 };
+
+        //}
+
+    }
+
 
 };

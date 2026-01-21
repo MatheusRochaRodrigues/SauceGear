@@ -1,12 +1,14 @@
 #include "PostProcess.h" 
 #include "../../Graphics/Framebuffer.h" 
+//Passes
 #include "Pass/BaW_pp.h"
  
 PostProcess::PostProcess() {
     shaderView = new Shader("PostProcess/post.vs", "PostProcess/post.fs");
 
-    //passes.push_back(new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0))); 
     passes.push_back(std::make_unique<BaW_pp>()); 
+
+    //passes.push_back(new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)));  
 }
 
 void PostProcess::initialize() {    //PostProcessSystem                   PostProcessComponent& pp

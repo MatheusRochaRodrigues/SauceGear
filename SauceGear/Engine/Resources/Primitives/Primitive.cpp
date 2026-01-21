@@ -24,7 +24,7 @@ std::shared_ptr<MeshAsset> PrimitiveMesh::Cube() {
     std::vector<uint32_t> i;
     BuildCube(v, i);
 
-    cube = std::make_shared<MeshAsset>();
+    cube = std::make_shared<MeshAsset>(v, i);
     cube->name = "Primitive_Cube"; 
     return cube;
 }
@@ -36,7 +36,7 @@ std::shared_ptr<MeshAsset> PrimitiveMesh::CubeInverse() {
     std::vector<uint32_t> i;
     BuildCubeInverse(v, i);
 
-    cubeInverse = std::make_shared<MeshAsset>();
+    cubeInverse = std::make_shared<MeshAsset>(v, i);
     cubeInverse->name = "Primitive_Cube_Inverse"; 
     return cubeInverse;
 }
@@ -48,7 +48,7 @@ std::shared_ptr<MeshAsset> PrimitiveMesh::Plane() {
     std::vector<uint32_t> i;
     BuildPlane(v, i);
 
-    plane = std::make_shared<MeshAsset>();
+    plane = std::make_shared<MeshAsset>(v, i);
     plane->name = "Primitive_Plane"; 
     return plane;
 }
@@ -62,7 +62,7 @@ std::shared_ptr<MeshAsset> PrimitiveMesh::Sphere(
     std::vector<uint32_t> i;
     BuildSphere(v, i, segments, rings, radius);
 
-    auto mesh = std::make_shared<MeshAsset>();
+    auto mesh = std::make_shared<MeshAsset>(v, i);
     mesh->name = "Primitive_Sphere"; 
     return mesh;
 }
@@ -77,7 +77,7 @@ std::shared_ptr<MeshAsset> PrimitiveMesh::Cylinder(
     std::vector<uint32_t> i;
     BuildCylinder(v, i, segments, height, radius, capped);
 
-    auto mesh = std::make_shared<MeshAsset>();
+    auto mesh = std::make_shared<MeshAsset>(v, i);
     mesh->name = "Primitive_Cylinder"; 
     return mesh;
 }
@@ -182,9 +182,15 @@ void PrimitiveMesh::BuildSphere(
             uint32_t a = y * (segments + 1) + x;
             uint32_t b = a + segments + 1;
 
-            i.insert(i.end(), {
+            /*i.insert(i.end(), {
                 a, b, a + 1,
                 a + 1, b, b + 1
+                });*/
+
+            // CCW (front face correta)
+            i.insert(i.end(), {
+                a,     a + 1, b,
+                a + 1, b + 1, b
                 });
         }
     }
@@ -222,10 +228,17 @@ void PrimitiveMesh::BuildCylinder(
         uint32_t i2 = i0 + 2;
         uint32_t i3 = i0 + 3;
 
-        i.insert(i.end(), {
+        /*i.insert(i.end(), {
             i0, i2, i1,
             i1, i2, i3
+            });*/
+
+        //CCW
+        i.insert(i.end(), {
+            i0, i1, i2,
+            i1, i3, i2
             });
+
     }
 
     if (!capped) return;
@@ -241,7 +254,12 @@ void PrimitiveMesh::BuildCylinder(
     }
 
     for (unsigned s = 0; s < segments; ++s)
-        i.insert(i.end(), { topCenter, topCenter + s + 1, topCenter + s + 2 });
+        i.insert(i.end(), { //CCW
+            topCenter,
+            topCenter + s + 2,
+            topCenter + s + 1
+        }); 
+        //i.insert(i.end(), { topCenter, topCenter + s + 1, topCenter + s + 2 });
 
     // BOTTOM
     uint32_t botCenter = (uint32_t)v.size();
@@ -357,10 +375,17 @@ PrimitiveMesh::CreateTorus(
             uint32_t a = i * (ringSegments + 1) + j;
             uint32_t b = a + ringSegments + 1;
 
-            indices.insert(indices.end(), {
+            /*indices.insert(indices.end(), {
                 a, b, a + 1,
                 a + 1, b, b + 1
-                });
+                });*/
+
+            //CCW
+            indices.insert(indices.end(), {
+                a,     a + 1, b,
+                a + 1, b + 1, b
+            });
+
         }
     }
 
@@ -369,4 +394,60 @@ PrimitiveMesh::CreateTorus(
     torusAsset->SetData(std::move(vertices), std::move(indices));
 
     return torusAsset;
+}
+
+
+
+
+
+
+
+std::shared_ptr<MeshAsset>
+PrimitiveMesh::CreateSphere2RenderingLightInstance(uint32_t xSegments, uint32_t ySegments) {
+    static std::shared_ptr<MeshAsset> sphereLightAsset;
+    if (sphereLightAsset) return sphereLightAsset;      //cached
+
+    //Build
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+
+    for (uint32_t y = 0; y <= ySegments; ++y) {
+        for (uint32_t x = 0; x <= xSegments; ++x) {
+            float xSegment = (float)x / xSegments;
+            float ySegment = (float)y / ySegments;
+
+            float xPos = std::cos(xSegment * 2.0f * glm::pi<float>()) *
+                std::sin(ySegment * glm::pi<float>());
+            float yPos = std::cos(ySegment * glm::pi<float>());
+            float zPos = std::sin(xSegment * 2.0f * glm::pi<float>()) *
+                std::sin(ySegment * glm::pi<float>());
+
+            Vertex v{};
+            v.Position = glm::vec3(xPos, yPos, zPos);
+            v.Normal = glm::normalize(v.Position);
+            v.TexCoords = { xSegment, ySegment };
+
+            vertices.push_back(v);
+        }
+    }
+
+    for (uint32_t y = 0; y < ySegments; ++y) {
+        for (uint32_t x = 0; x < xSegments; ++x) {
+            uint32_t i0 = y * (xSegments + 1) + x;
+            uint32_t i1 = i0 + 1;
+            uint32_t i2 = i0 + (xSegments + 1);
+            uint32_t i3 = i2 + 1;
+
+            indices.insert(indices.end(), {
+                i0, i2, i1,
+                i1, i2, i3
+                });
+        }
+    }
+
+    sphereLightAsset = std::make_shared<MeshAsset>();
+    sphereLightAsset->name = "Sphere_Light";
+    sphereLightAsset->SetData(std::move(vertices), std::move(indices));
+
+    return sphereLightAsset;
 }

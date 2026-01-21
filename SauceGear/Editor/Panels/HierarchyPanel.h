@@ -14,7 +14,7 @@ struct HierarchyPanel : IPanel {
         ImVec2 mousePos = ImGui::GetMousePos();
 
         // Shift + A
-        if (ImGui::IsKeyDown(ImGuiKey_LeftShift) && ImGui::IsKeyPressed(ImGuiKey_A, true)) {
+        if (ImGui::IsKeyDown(ImGuiKey_LeftShift) && ImGui::IsKeyPressed(ImGuiKey_Tab, true)) {
             ImGui::OpenPopup("AddObjectMenu");
             ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
         }
@@ -40,12 +40,10 @@ struct HierarchyPanel : IPanel {
         // Menu principal
         if (ImGui::BeginPopup("AddObjectMenu", ImGuiWindowFlags_AlwaysAutoResize)) {
 
-            if (ImGui::BeginMenu("Mesh")) {
-
+            if (ImGui::BeginMenu("Mesh")) { 
                 // Cube spawn direto
-                if (ImGui::MenuItem("Cube")) {
-                            //AQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
-                    //SceneBuilder::CreateModel(PrimitiveMesh::CreateCube(defaultMaterial));
+                if (ImGui::MenuItem("Cube")) { 
+                    SceneBuilder::CreateModel(PrimitiveMesh::Cube());
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -82,9 +80,8 @@ struct HierarchyPanel : IPanel {
                 ImGui::InputInt("Rings", &rings);
                 ImGui::InputFloat("Radius", &radius);
 
-                if (ImGui::Button("Spawn Sphere")) {
-                    //AQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
-                    //SceneBuilder::CreateModel(PrimitiveMesh::CreateSphere(defaultMaterial, segments, rings, radius));
+                if (ImGui::Button("Spawn Sphere")) { 
+                    SceneBuilder::CreateModel(PrimitiveMesh::Sphere(segments, rings, radius));
                     showConfigWindow = false;
                 }
             }
@@ -99,9 +96,8 @@ struct HierarchyPanel : IPanel {
                 ImGui::InputFloat("Radius", &radius);
                 ImGui::Checkbox("Capped", &capped);
 
-                if (ImGui::Button("Spawn Cylinder")) { 
-                    //AQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
-                    //SceneBuilder::CreateModel(PrimitiveMesh::CreateCylinder(defaultMaterial, segments, height, radius, capped));
+                if (ImGui::Button("Spawn Cylinder")) {  
+                    SceneBuilder::CreateModel(PrimitiveMesh::Cylinder(segments, height, radius, capped));
                     showConfigWindow = false;
                 }
             }

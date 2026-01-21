@@ -126,31 +126,6 @@ void CascadeSun::Init() {
 
     lightSpaceMatrices.resize(layers);            
     cascadePlaneDistances.resize(layers);          
-}
-
-static void ComputeCascadeSplits(
-    float nearClip,
-    float farClip,
-    int cascadeCount,
-    float lambda,
-    std::vector<float>& outSplits
-) {
-    outSplits.resize(cascadeCount);
-
-    float clipRange = farClip - nearClip;
-    float minZ = nearClip;
-    float maxZ = nearClip + clipRange;
-
-    float range = maxZ - minZ;
-    float ratio = maxZ / minZ;
-
-    for (int i = 0; i < cascadeCount; i++) {
-        float p = (i + 1) / (float)cascadeCount;
-        float log = minZ * std::pow(ratio, p);
-        float lin = minZ + range * p;
-        float d = lambda * (log - lin) + lin;
-        outSplits[i] = d;
-    }
 } 
 
 void CascadeSun::UpdateSunShadow(LightComponent& sun, TransformComponent& transform) {
@@ -160,22 +135,14 @@ void CascadeSun::UpdateSunShadow(LightComponent& sun, TransformComponent& transf
     if (!camera) return;
 
     
+    //  Cascade Planes Setup
     float farClip = camera->farClip;
     // Define splits
     cascadePlaneDistances[0] = farClip / 50.0f;
     cascadePlaneDistances[1] = farClip / 25.0f;
     cascadePlaneDistances[2] = farClip / 10.0f;
     cascadePlaneDistances[3] = farClip / 2.0f;
-    cascadePlaneDistances[4] = farClip; //ate o fim da camera
-    
-
-    //ComputeCascadeSplits(
-    //    camera->nearClip,
-    //    camera->farClip,
-    //    CASCADE_COUNT,
-    //    0.95f, // lambda (0.9–0.95 ideal)
-    //    cascadePlaneDistances
-    //);
+    cascadePlaneDistances[4] = farClip; //ate o fim da camera 
 
 
     GetLightSpaceMatrices(transform); 
@@ -199,3 +166,40 @@ void CascadeSun::UpdateSunShadow(LightComponent& sun, TransformComponent& transf
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GEngine->window->SetWindowViewport0();
 }
+
+
+
+
+
+//ComputeCascadeSplits(
+//    camera->nearClip,
+//    camera->farClip,
+//    CASCADE_COUNT,
+//    0.95f, // lambda (0.9–0.95 ideal)
+//    cascadePlaneDistances
+//);
+
+//static void ComputeCascadeSplits(
+//    float nearClip,
+//    float farClip,
+//    int cascadeCount,
+//    float lambda,
+//    std::vector<float>& outSplits
+//) {
+//    outSplits.resize(cascadeCount);
+//
+//    float clipRange = farClip - nearClip;
+//    float minZ = nearClip;
+//    float maxZ = nearClip + clipRange;
+//
+//    float range = maxZ - minZ;
+//    float ratio = maxZ / minZ;
+//
+//    for (int i = 0; i < cascadeCount; i++) {
+//        float p = (i + 1) / (float)cascadeCount;
+//        float log = minZ * std::pow(ratio, p);
+//        float lin = minZ + range * p;
+//        float d = lambda * (log - lin) + lin;
+//        outSplits[i] = d;
+//    }
+//}

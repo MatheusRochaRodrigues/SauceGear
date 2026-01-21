@@ -1,74 +1,71 @@
 #version 440 core
 
-#include <PBR.glsl>
-#include <Shadows.glsl>
+#include <LightType.glsl>       //esse sempre primeiro   
+#include <Shadows.glsl>         //esse dps de colocar LightType
+
+#include <PBR/pbr_eval.glsl>
 
 #define MAX_LIGHTS 16
 
 in vec2 TexCoords;
 
-struct LightSun { 
-    vec3  direction;
-    vec3  color;
-    float intensity;  
-}; 
-uniform LightSun light;   
-
-// G-Buffer
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gAlbedo;
-uniform sampler2D gMRA;
-
+// Sun
+uniform LightData light;  
 uniform vec3 viewPos;
 
-out vec4 FragColor; 
+// G-Buffer
+uniform sampler2D gPosition;    // 0
+uniform sampler2D gAlbedo;      // 1
+uniform sampler2D gNormal;      // 2
+uniform sampler2D gMRA;         // 3
+ 
+uniform int shadowWay;
 
-
-
+out vec4 FragColor;   
 
 // ==== Main PBR lighting pass ====
 void main()
-{
-    vec3 WorldPos = texture(gPosition, TexCoords).rgb;               
-    vec3 N = texture(gNormal, TexCoords).rgb;  
+{   
+    //Extract G-Buffer
+    vec3 N          = texture(gNormal,   TexCoords).rgb;                        // N = normalize(N * 2.0 - 1.0);
+
     if(all(lessThan(abs(N), vec3(1e-6)))) discard;
 
-    vec3 albedo = pow(texture(gAlbedo, TexCoords).rgb, vec3(2.2));
-    vec3 mra    = texture(gMRA, TexCoords).rgb;
-    float metallic  = mra.r;
-    float roughness = clamp(mra.g, 0.04, 1.0);
-    float ao        = mra.b; 
+    vec3 WorldPos   = texture(gPosition, TexCoords).rgb;   
+    vec3 albedo     = texture(gAlbedo,   TexCoords).rgb;    // is already in SRGB else -> vec3 albedo     = pow(texture(gAlbedo, TexCoords).rgb, vec3(2.2))   
+    vec3 mra        = texture(gMRA,      TexCoords).rgb; 
+
+    //=======================================================================================================
+    //PBR  
+    PBRSurface surf;
+    surf.albedo   = albedo.rgb;
+    surf.metallic = mra.r;
+    surf.roughness= mra.g;
+    surf.ao       = mra.b;
+
+    vec3 L = normalize(light.direction);           //-light.direction
+
+    PBRData l;
+    l.N = normalize(N);
+    l.V = normalize(viewPos - WorldPos);
+    l.L = L;
+    l.H = normalize(l.V + l.L);
+
+    vec3 radiance = light.color * light.intensity; 
+    vec3 Lo = ComputePBR(surf, l, radiance); 
      
-    vec3 V = normalize(viewPos - WorldPos); 
-    vec3 F0 = mix(vec3(0.04), albedo, metallic);
-
-    vec3 L = normalize(light.direction);    // direcional         //-light.direction
-    vec3 H = normalize(V + L);   
-
-    float NdotL = max(dot(N,L),0.0);
-    float NDF = DistributionGGX(N,H,roughness);
-    float G   = GeometrySmith(N,V,L,roughness);
-    vec3  F   = fresnelSchlick(max(dot(H,V),0.0), F0);
-
-    vec3 numerator = NDF*G*F;
-    float denominator = 4.0 * max(dot(N,V),0.0) * NdotL + 1e-5;
-    vec3 specular = numerator / denominator;
-        
-    vec3 kS = F; 
-    vec3 kD = (1.0 - kS) * (1.0 - metallic);
-
-    //float shadow = ShadowCalculationCascade(WorldPos, N, L);    
-    float shadow = 0;    
+    // Shadow 
+    float shadow = 0;
+    if(shadowWay == 1) shadow = ShadowCalculationCascade(WorldPos, N, L); 
     
-    vec3 radiance = light.color;
-    vec3 Lo = (kD*albedo/PI + specular) * radiance * NdotL * (1.0 - shadow);
-
-    vec3 color = Lo; 
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2)); 
-
-    FragColor = vec4(color, 1.0);
+    Lo *= (1.0 - shadow);  
+    // Out
+    FragColor = vec4(Lo, 1.0); 
+      
+    //DEBUG
+    //FragColor = vec4(normalize(N) * 0.5 + 0.5, 1.0);
+    //FragColor = vec4(Lo, 1.0); 
+    //return; 
 }
 
 

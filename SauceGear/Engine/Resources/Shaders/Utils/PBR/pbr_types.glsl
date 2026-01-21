@@ -1,15 +1,15 @@
-#pragma once
+
 
 struct PBRSurface {
-    vec3 albedo;
+    vec3  albedo;
     float metallic;
     float roughness;
     float ao;
 };
 
-struct PBRLighting {
-    vec3 N;
-    vec3 V;
-    vec3 L;
-    vec3 H;
+struct PBRData {
+    vec3 N;     // Normal
+    vec3 V;     // View
+    vec3 L;     // Light
+    vec3 H;     // Half
 };

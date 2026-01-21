@@ -8,16 +8,18 @@
 class Texture;
 class MaterialAsset;
 
+using MaterialValue = std::variant<
+    std::monostate,
+    float,
+    glm::vec3,
+    glm::vec4,
+    std::shared_ptr<Texture>
+>; 
+
 class MaterialInstance {
 public:
     struct Value {
-        std::variant<
-            std::monostate,
-            float,
-            glm::vec3,
-            glm::vec4,
-            std::shared_ptr<Texture>
-        > data;
+        MaterialValue data;
     };
 
     std::string path;       //debug

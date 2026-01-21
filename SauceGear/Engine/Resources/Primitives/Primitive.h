@@ -22,6 +22,9 @@ public:
 
     static std::shared_ptr<MeshAsset>
         CreateSphere2RenderingLight(uint32_t xSegments = 32, uint32_t ySegments = 32);
+     
+    static std::shared_ptr<MeshAsset>
+        CreateSphere2RenderingLightInstance(uint32_t xSegments = 32, uint32_t ySegments = 32);
 
     static std::shared_ptr<MeshAsset>
         CreateTorus(uint32_t segments = 32,

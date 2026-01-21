@@ -5,13 +5,15 @@
 #include <glad/glad.h>
 #include "../Graphics/Vertex.h"
 #include "../Assets/MaterialAsset.h"
+ 
+typedef std::vector<Vertex> VertexBuffer;
+typedef std::vector<uint32_t> IndexBuffer;
 
 struct SubMesh {
     uint32_t indexOffset = 0;
     uint32_t indexCount = 0;
 
-    uint32_t indexMaterialAsset = 0;
-    //std::shared_ptr<MaterialAsset> materialAsset;
+    uint32_t indexMaterialAsset = 0;        //std::shared_ptr<MaterialAsset> materialAsset;
     std::string name;
 };
 

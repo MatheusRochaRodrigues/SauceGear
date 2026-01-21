@@ -114,6 +114,30 @@ namespace InspectorDrawer {
             char* base = static_cast<char*>(instance);
             void* ptr = base + field.offset;                        //equivalent -> void* fieldPtr = (char*)componentPtr + field.offset;
             bool changed = false;
+             
+            // ===== ENUM =====
+            if (field.enumInfo) {
+                int* value = static_cast<int*>(ptr); 
+                switch (field.widget) {
+
+                case EditorWidget::EnumCombo: {
+                    std::vector<const char*> labels;
+                    for (auto& v : field.enumInfo->values)
+                        labels.push_back(v.label.c_str());
+
+                    int current = *value;
+                    if (ImGui::Combo(field.name.c_str(), &current, labels.data(), (int)labels.size())) {
+                        *value = current;
+                        changed = true;
+                    }
+                    break;
+                } 
+                case EditorWidget::EnumRadio:  break; 
+                case EditorWidget::EnumButtons:  break; 
+                case EditorWidget::EnumFlags:  break;
+                }
+            }
+             
 
             if      (field.type == typeid(float))       
                 changed |= ImGuiUtils::DragFloat(field.name.c_str(), *static_cast<float*>(ptr));
@@ -131,19 +155,26 @@ namespace InspectorDrawer {
                 changed |= DrawQuatAsEuler(field.name, static_cast<glm::quat*>(ptr));
             }
 
-                // ... strings, enums etc 
+            // ... strings, enums etc  
+            else if (field.type == typeid(std::string)) {
+                std::string& str = *static_cast<std::string*>(ptr);
 
-                /*if (field.type == typeid(std::string)) {
-                    std::string* s = static_cast<std::string*>(ptr);
-                    char buf[512];
-                    std::strncpy(buf, s->c_str(), sizeof(buf));
-                    buf[sizeof(buf) - 1] = '\0';
-                    if (ImGui::InputText(field.name.c_str(), buf, sizeof(buf))) {
-                        *s = std::string(buf);
-                        if (ownerType && ownerType->onEdited) ownerType->onEdited(instance);
-                    }
-                }*/ 
+                // buffer temporário local
+                char buffer[512];
+                std::memset(buffer, 0, sizeof(buffer));
 
+#ifdef _MSC_VER
+                strncpy_s(buffer, sizeof(buffer), str.c_str(), _TRUNCATE);
+#else
+                std::strncpy(buffer, str.c_str(), sizeof(buffer) - 1);
+#endif
+                 
+                if (ImGui::InputText(field.name.c_str(), buffer, sizeof(buffer))) {
+                    str = std::string(buffer);
+                    changed = true;
+                }
+            }
+             
 
             if (changed && ownerType && ownerType->onEdited) ownerType->onEdited(instance);     // instance == componentPtr
 

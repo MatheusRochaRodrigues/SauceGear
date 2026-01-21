@@ -11,7 +11,8 @@ enum class FramebufferTextureType {
     //Deffered
     Position, Normal, Albedo,    
     //PBR
-    MetallicRoughnessAO
+    MetallicRoughnessAO,
+    HDR
 };
 
 struct FramebufferAttachment {

@@ -1,4 +1,60 @@
-#include "MeshInstance.h"
+#include "MeshInstance.h"  
+ 
+void MeshInstance::SetInstanceData(
+    const void* data,
+    size_t dataSize,
+    const std::vector<std::pair<GLuint, GLint>>& attributes)
+{
+    if (instanceVBO == 0) glGenBuffers(1, &instanceVBO);
+
+    mesh->Bind();
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
+
+    // calcula stride
+    size_t stride = 0;
+    for (auto& a : attributes)
+        stride += sizeof(float) * a.second;
+
+    size_t offset = 0;
+    for (auto& attr : attributes) {
+        GLuint loc = attr.first;
+        GLint  size = attr.second;
+
+        glEnableVertexAttribArray(loc);
+        glVertexAttribPointer(
+            loc, size, GL_FLOAT, GL_FALSE,
+            stride, (void*)offset
+        );
+        glVertexAttribDivisor(loc, 1);
+
+        offset += sizeof(float) * size;
+    }
+
+    glBindVertexArray(0);
+}
+
+
+void MeshInstance::DrawInstanced(uint32_t instanceCount, uint32_t submesh) const {
+    const auto& sm = mesh->submeshes[submesh];
+
+    mesh->Bind();
+    glDrawElementsInstanced(
+        GL_TRIANGLES,
+        sm.indexCount,
+        GL_UNSIGNED_INT,
+        (void*)(sm.indexOffset * sizeof(uint32_t)),
+        instanceCount
+    );
+}
+
+
+
+
+
+
+
+
 
 //void MeshInstance::UploadInstanceMatrices( const std::vector<glm::mat4>& matrices ) {
 //    uint32_t instanceVBO = VBO; //Teste
@@ -42,54 +98,3 @@
 //        count
 //    );
 //}
-
-
- 
-void MeshInstance::SetInstanceData(
-    const void* data,
-    size_t dataSize,
-    const std::vector<std::pair<GLuint, GLint>>& attributes)
-{
-    if (instanceVBO == 0)
-        glGenBuffers(1, &instanceVBO);
-
-    mesh->Bind();
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_DYNAMIC_DRAW);
-
-    // calcula stride
-    size_t stride = 0;
-    for (auto& a : attributes)
-        stride += sizeof(float) * a.second;
-
-    size_t offset = 0;
-    for (auto& attr : attributes) {
-        GLuint loc = attr.first;
-        GLint  size = attr.second;
-
-        glEnableVertexAttribArray(loc);
-        glVertexAttribPointer(
-            loc, size, GL_FLOAT, GL_FALSE,
-            stride, (void*)offset
-        );
-        glVertexAttribDivisor(loc, 1);
-
-        offset += sizeof(float) * size;
-    }
-
-    glBindVertexArray(0);
-}
-
-
-void MeshInstance::DrawInstanced(uint32_t instanceCount, uint32_t submesh) const {
-    const auto& sm = mesh->submeshes[submesh];
-
-    mesh->Bind();
-    glDrawElementsInstanced(
-        GL_TRIANGLES,
-        sm.indexCount,
-        GL_UNSIGNED_INT,
-        (void*)(sm.indexOffset * sizeof(uint32_t)),
-        instanceCount
-    );
-}

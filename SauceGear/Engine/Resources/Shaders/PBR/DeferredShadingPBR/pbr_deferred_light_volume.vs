@@ -11,10 +11,12 @@ layout (std140, binding = 0) uniform Matrices
     mat4 view;
 };
 
-flat out int instanceID;
+flat out int lightIndex;
 
 void main() {
-    instanceID = gl_InstanceID;
+    //lightIndex = int(iD);  //gl_InstanceID
+    lightIndex = gl_InstanceID;
+
     vec3 worldPos = aPos * aRadius + aInstancePos;
     gl_Position = projection * view * vec4(worldPos, 1.0);
 }

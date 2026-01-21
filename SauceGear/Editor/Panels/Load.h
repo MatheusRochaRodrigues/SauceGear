@@ -1,7 +1,12 @@
 #pragma once   
+#include <glad/glad.h>
+#include <stb/stb_image.h>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h" 
+
+#include <iostream>
  
 // Declaração da função
 static ImTextureID guiLoadTexture(const std::string& path) {

@@ -19,7 +19,7 @@ static void DrawMeshRendererInspector(MeshRenderer& renderer) {
     );
 
     ImGui::Separator();
-
+    
     ImGui::Text("Materials");
     for (size_t i = 0; i < renderer.materials.size(); ++i) {
         auto& mat = renderer.materials[i];
@@ -37,9 +37,16 @@ static void DrawMeshRendererInspector(MeshRenderer& renderer) {
         ImGui::PopID();
     }
 }
+ 
 
-static void DrawMaterialBlock(MaterialInstance& inst) {
+// UI helpers (Unity style columns) 
+static void BeginRow(const char* label) {
+    ImGui::TextUnformatted(label);
+    ImGui::SameLine(140);
+    ImGui::SetNextItemWidth(-1);
+}
 
+static void DrawMaterialBlock(MaterialInstance& inst) { 
     ImGuiTreeNodeFlags flags =
         ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_Framed |
@@ -51,8 +58,10 @@ static void DrawMaterialBlock(MaterialInstance& inst) {
 
     if (ImGui::TreeNodeEx(inst.asset.get(), flags, "%s", header.c_str())) {
 
-        ImGui::TextDisabled("Shader");
-        ImGui::SameLine(120);
+        //ImGui::TextDisabled("Shader");
+        //ImGui::SameLine(120);
+        BeginRow("Shader");
+
         ImGui::Text(inst.asset->base->shader->name.c_str());
 
         ImGui::Separator();
@@ -62,7 +71,6 @@ static void DrawMaterialBlock(MaterialInstance& inst) {
         ImGui::TreePop();
     }
 }
-
 
 
 struct InspectorPanel : IPanel {

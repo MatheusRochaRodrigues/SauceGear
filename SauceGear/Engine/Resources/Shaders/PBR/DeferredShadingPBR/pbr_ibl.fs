@@ -3,34 +3,34 @@
 out vec4 FragColor;
 
 uniform sampler2D gPosition;
-uniform sampler2D gNormal;
 uniform sampler2D gAlbedo;
+uniform sampler2D gNormal;
 uniform sampler2D gMRA;
 
 uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
-uniform sampler2D  brdfLUT;
+uniform sampler2D   brdfLUT;
 
 uniform vec3 viewPos;
-uniform vec2 screenSize;
+//uniform vec2 screenSize;
 
 in vec2 TexCoords; // se seu fullscreen.vs não passar, gere por gl_FragCoord
-
-vec3 getN(vec3 n) { return normalize(n); }
+ 
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0-roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-void main(){
+void main(){ 
     //vec2 uv = gl_FragCoord.xy / screenSize;
     vec2 uv = TexCoords;
 
     vec3  pos = texture(gPosition, uv).rgb;
     vec3  N   = texture(gNormal,   uv).rgb;
     if(all(lessThan(abs(N), vec3(1e-6)))) discard; // pixel vazio do GBuffer
-    N = getN(N);
+    N = normalize(N);
     vec3  albedo = pow(texture(gAlbedo, uv).rgb, vec3(2.2)); // linear
     vec3  mra = texture(gMRA, uv).rgb;
+
     float metallic  = mra.r;
     float roughness = clamp(mra.g, 0.04, 1.0);
     float ao        = mra.b;
@@ -53,9 +53,10 @@ void main(){
     vec2 brdf = texture(brdfLUT, vec2(max(dot(N,V),0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 color = (kd * diffuse + specular) * ao;
+    vec3 color = (kd * diffuse + specular) * ao;    //Ambient
 
-    // gamma
-    color = pow(color, vec3(1.0/2.2));
-    FragColor = vec4(color, 1.0); 
+    //vec3 color = kd * diffuse * ao + specular;
+    //specular *= mix(1.0, ao, roughness);
+
+    FragColor = vec4(color, 1.0);                   //Ambient result
 }

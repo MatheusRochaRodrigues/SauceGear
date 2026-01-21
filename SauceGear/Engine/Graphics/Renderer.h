@@ -1,7 +1,7 @@
 #pragma once
 #include "../Scene/SceneECS.h"
 #include "../ECS/Components/ComponentsHelper.h"  
-#include "../Graphics/PrimitiveMesh.h"   
+#include "../Graphics/PrimitiveMesh.h"    
 
 //backend de renderização.
 class Renderer {
@@ -21,7 +21,7 @@ public:
 
     void RenderSceneWithShader(Shader* overrideShader); 
     static void RenderSceneWithShader2(Shader* overrideShader); 
-        
+     
 private:  
     SceneECS* m_Scene;
     Shader pbrShader;

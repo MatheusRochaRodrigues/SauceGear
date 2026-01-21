@@ -1,6 +1,7 @@
 ﻿#include "ImGuiLayer.h"
 #include "../Engine/Core/EngineContext.h"  
 #include "../Engine/Graphics/Renderer.h" 
+#include "Panels/SettingsPanel.h" 
  
 void ImGuiLayer::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
@@ -70,6 +71,7 @@ void ImGuiLayer::RegisterPanels() {
     RegisteredPanels.push_back(std::make_shared<HierarchyPanel>());
     RegisteredPanels.push_back(std::make_shared<InspectorPanel>());
     RegisteredPanels.push_back(std::make_shared<FileExplorerPanel>());
+    RegisteredPanels.push_back(std::make_shared<SettingsPanel>()); 
 }
 
 void ImGuiLayer::RenderIPanels(Scene& scene) {

@@ -2,15 +2,15 @@
 #include "../../Scene/SceneECS.h"
 #include "../../Graphics/Renderer.h"
 #include "PostProcessPass.h" 
+#include "Pass/Fix_HDR_GAMMA_pp.h"
 
 class PostProcess {
 public:
     PostProcess();
-    void initialize();      //PostProcessPass& pp
+    void initialize();  
 
-    void Update() {  
-        SceneECS& scene = *GEngine->scene; 
-        GEngine->renderer->frameScreen->Bind();
+    void Execute(Scene& scene, Framebuffer& ppFBO) { 
+        ppFBO.Bind();
 
         for (auto& pp : passes) {  
             pp->shader->use();
@@ -27,11 +27,31 @@ public:
             glEnable(GL_DEPTH_TEST);
 
         }
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-        Finish();
+        //Finish();
     }
 
-    void Finish() {
+    void correct_HDR_GAMA(Framebuffer& ppFBO) {
+        static Fix_HDR_GAMMA_pp* correct = nullptr;
+        if (correct == nullptr) correct = new Fix_HDR_GAMMA_pp();
+
+        ppFBO.Bind();
+        correct->shader->use();   
+        correct->shader->setInt("scene", 0); // define local texture in shader
+        glActiveTexture(GL_TEXTURE0); 
+        glBindTexture(GL_TEXTURE_2D, GEngine->renderer->GetTextureRendered);    // set texture render scene
+
+        glDisable(GL_DEPTH_TEST);
+        DrawQuad();
+        glEnable(GL_DEPTH_TEST);  
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+    }
+
+    void Finish(Framebuffer& ppFBO, bool fixToneGamma = true) {
+        if(fixToneGamma) correct_HDR_GAMA(ppFBO);
+
         //===================================== FINALE =============================================================
         //GAME_RUNTIME
         #ifdef EDITOR_BUILD

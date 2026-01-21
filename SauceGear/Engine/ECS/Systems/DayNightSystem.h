@@ -138,7 +138,7 @@ struct DayNightSystem : public System {
 
         float sunHeight = glm::clamp(glm::sin(sunAngle), 0.0f, 1.0f);
         sunL.intensity = glm::mix(0.0f, s_cycle.currentExposure * 1.0f, sunHeight);
-        sunL.color = glm::mix(glm::vec3(0.03f), s_cycle.currentSkyTint, glm::clamp(sunHeight * 1.2f, 0.0f, 1.0f));
+        //sunL.color = glm::mix(glm::vec3(0.03f), s_cycle.currentSkyTint, glm::clamp(sunHeight * 1.2f, 0.0f, 1.0f));
 
         s_cycle.currentExposure = glm::mix(s_cycle.exposureNight, s_cycle.exposureDay, s_cycle.t);
         s_cycle.currentSkyTint = glm::mix(s_cycle.nightColor, s_cycle.dayColor, s_cycle.t);

@@ -13,9 +13,7 @@
 
 class ModelLoader {
 public:
-    static std::shared_ptr<ModelAsset> Load(const std::string& path);
-
-    static inline std::shared_ptr<Texture> lastTexID;
+    static std::shared_ptr<ModelAsset> Load(const std::string& path); 
 private: 
     static std::shared_ptr<MeshAsset> ProcessMesh(
         aiMesh* aiM,

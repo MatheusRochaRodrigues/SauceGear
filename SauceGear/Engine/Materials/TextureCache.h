@@ -57,7 +57,7 @@ public:
         auto tex = std::make_shared<Texture>();
         tex->CreateFromMemory(px, 1, 1, GL_RGBA);
         tex->isSolidColor = true;
-        tex->solidColor = color;
+        tex->dataColor = color;
 
         solidColorCache[key] = tex;
         return tex;

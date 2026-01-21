@@ -74,14 +74,11 @@ public:
     Texture* WhiteTexture();
     void CreateFromMemory(uint8_t* data, int width, int height, GLenum format = GL_RGBA);
     
-    static void attechment() {
-
-    }
-
+    static void attechment() { } 
 
     // Editor
     bool isSolidColor = false;
-    glm::vec4 solidColor = { 1,1,1,1 };
+    glm::vec4 dataColor = { 1,1,1,1 };
 private:
     void LoadFromFile(const char* path, bool useSRGB);
     void LoadCubeMap(const std::vector<std::string>& faces);

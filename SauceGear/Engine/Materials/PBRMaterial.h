@@ -8,12 +8,13 @@ public:
         domain = MaterialDomain::Deferred;
         shader = &ShaderLibrary::Get("PBR_GBuffer");
         ASSERT(shader && "PBR_GBuffer shader not loaded");
-
+         
         layout = {
-            { "Albedo",    { ParamDef::Texture, 0, /*slider*/ 0.0f, 1.0f, true } },
-            { "Normal",    { ParamDef::Texture, 1, /*slider*/ 0.0f, 1.0f, true } },
-            { "Metallic",  { ParamDef::Float,   2, /*slider*/ 0.0f, 1.0f, true } },
-            { "Roughness", { ParamDef::Float,   3, /*slider*/ 0.0f, 1.0f, true } }
-        };
+            { "Albedo",    {ParamDef::Texture, ParamDef::UIType::Color,  1 } },
+            { "Normal",    {ParamDef::Texture, ParamDef::UIType::NONE,   2 } },
+            { "Metallic",  {ParamDef::Texture, ParamDef::UIType::Slider, 3, /*slider*/ 0.0f, 1.0f } },
+            { "Roughness", {ParamDef::Texture, ParamDef::UIType::Slider, 4, /*slider*/ 0.0f, 1.0f } }
+        }; 
+
     }
 };

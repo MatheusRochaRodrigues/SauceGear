@@ -24,6 +24,7 @@ struct MaterialInspector {
         if (ImGui::ColorEdit4(name.c_str(), &val.x))
             v.data = val;
     } 
+
     static void SanitizeMaterialValue(MaterialInstance::Value& v) {
         // Caso antigo: glm::vec4 → solid color texture
         if (std::holds_alternative<glm::vec4>(v.data)) {
@@ -46,9 +47,15 @@ struct MaterialInspector {
         }
     }
 
+    static std::shared_ptr<Texture> MakeScalarTexture(float v) {
+        return TextureCache::Get().GetSolidColor({ v, v, v, 1.0f });
+    }
+
+
     static void DrawFieldTexture(
         const char* label,
         MaterialInstance::Value& v,
+        const MaterialBase::ParamDef& def,
         MaterialInstance& inst
     ) {
         // 🔒 SANITIZA ANTES DE QUALQUER USO
@@ -74,15 +81,39 @@ struct MaterialInspector {
 
         // Solid color editor
         if (tex && tex->isSolidColor) {
-            glm::vec4 color = tex->solidColor;
-            ImGui::SetNextItemWidth(120);
+            ImGui::SetNextItemWidth(120); 
 
-            if (ImGui::ColorEdit4(
-                (std::string("##") + label).c_str(),
-                &color.x
-            )) {
-                v.data = TextureCache::Get().GetSolidColor(color);
-                inst.dirty = true;
+            float scalar = tex->dataColor.x;
+
+            string name = std::string("##") + label; 
+            switch (def.specification) {
+
+            case MaterialBase::ParamDef::UIType::Color:
+                glm::vec4 color = tex->dataColor;
+                if (ImGui::ColorEdit4(name.c_str(), &color.x)) {    //(std::string("##") + label).c_str()
+                    v.data = TextureCache::Get().GetSolidColor(color);
+                    inst.dirty = true;
+                }
+            break;
+
+
+            case MaterialBase::ParamDef::UIType::Slider:
+                //DrawLabeledFloat(name.c_str(), v, def.min, def.max);     // ImGui::SliderFloat(name.c_str(), &v, def.min, def.max); 
+                if (ImGui::SliderFloat( (std::string("##scalar_") + label).c_str(),  &scalar, 0.0f, 1.0f )) {
+                    v.data = MakeScalarTexture(scalar);
+                    inst.dirty = true;
+                }
+                tex->dataColor.x = scalar;
+            break; 
+
+
+            case MaterialBase::ParamDef::UIType::Drag: 
+                ImGui::DragFloat(name.c_str(), &scalar, 0.01f);
+                inst.dirty = true;  
+                tex->dataColor.x = scalar;
+
+                break;
+
             }
         }
 
@@ -151,7 +182,7 @@ private:
         case MaterialBase::ParamDef::Float: {
             float v = std::get<float>(value->data);
 
-            if (def.useSlider)
+            if (def.specification == MaterialBase::ParamDef::UIType::Slider)
                 DrawLabeledFloat(name.c_str(), v, def.min, def.max);     // ImGui::SliderFloat(name.c_str(), &v, def.min, def.max);
             else
                 ImGui::DragFloat(name.c_str(), &v, 0.01f);
@@ -169,11 +200,20 @@ private:
             break;
 
         case MaterialBase::ParamDef::Texture: 
-            DrawFieldTexture(name.c_str(), *value, inst);     //DrawTexture(name, *value, inst);
+            DrawFieldTexture(name.c_str(), *value, def, inst);     //DrawTexture(name, *value, inst);
             break;
         }
 
         ImGui::PopID();
+    }
+
+    // ================================
+    // UI helpers (Unity style columns)
+    // ================================
+    static void BeginRow(const char* label) {
+        ImGui::TextUnformatted(label);
+        ImGui::SameLine(140);
+        ImGui::SetNextItemWidth(-1);
     }
 
 };
@@ -209,6 +249,56 @@ Sem TreeNode → sem empurrar tudo para a direita.
         }
     }
 } 
+
+
+*/
+
+
+
+/*
+
+
+        case MaterialBase::ParamDef::UIType::Slider: {
+            BeginRow(name.c_str());
+
+            float v = std::get<float>(value->data);
+            if (ImGui::SliderFloat( ("##" + name).c_str(), &v,  def.min,
+                def.max
+            )) {
+                value->data = v;
+                inst.dirty = true;
+            }
+            break;
+        }
+
+        case MaterialBase::ParamDef::UIType::Drag: {
+            BeginRow(name.c_str());
+
+            float v = std::get<float>(value->data);
+            if (ImGui::DragFloat(("##" + name).c_str(), &v, 0.01f)) {
+                value->data = v;
+                inst.dirty = true;
+            }
+            break;
+        }
+
+        case MaterialBase::ParamDef::UIType::Color: {
+            BeginRow(name.c_str());
+
+            glm::vec4 c = std::get<glm::vec4>(value->data);
+            if (ImGui::ColorEdit4(("##" + name).c_str(), &c.x)) {
+                value->data = c;
+                inst.dirty = true;
+            }
+            break;
+        }
+
+        case MaterialBase::ParamDef::UIType::Texture: {
+            BeginRow(name.c_str());
+            DrawTextureSlot(name.c_str(), *value, inst);
+            break;
+        }
+
 
 
 */

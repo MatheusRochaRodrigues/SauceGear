@@ -8,7 +8,7 @@
  
 #include "../Scene/ComponentManager.h"
 #include "../ECS/System.h"  
-#include "../ECS/Reflection/Macros.h"
+#include "../ECS/Reflection/Macros.h" 
 
 class SceneECS {
 public:
@@ -170,8 +170,8 @@ private:
     Entity selectedEntity = INVALID_ENTITY;
 };
 
-
-
+ 
+using Scene = SceneECS;
 
 
 

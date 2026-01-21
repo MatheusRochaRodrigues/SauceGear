@@ -40,7 +40,9 @@ void main()
     vec3 N = normalize(normalMatrix * aNormal);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
-    mat3 TBN = transpose(mat3(T, B, N));  
+    //mat3 TBN = transpose(mat3(T, B, N));  
+    mat3 TBN = mat3(T, B, N); // SEM transpose aqui
+
 
 
     gl_Position = projection * view * worldPos;

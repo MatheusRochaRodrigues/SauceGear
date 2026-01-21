@@ -2,6 +2,7 @@
 #include "SceneECS.h"
 #include "../Core/EngineContext.h"
 #include "../ECS/Components/ComponentsHelper.h"
+#include "../ECS/Components/HierarchyComponent.h"
 #include "../Resources/Loaders/ModelLoader.h"  
 #include "../Utils/AABBBuilder.h"
 #include "../Assets/AssetLoader.h"
@@ -68,22 +69,24 @@ public:
         auto& mr = scene.AddComponent<MeshRenderer>(entity);
         mr.mesh = std::make_shared<MeshInstance>(mesh);
 
-        auto asset = std::make_shared<MaterialAsset>();
-        asset->name = mesh->name;  // name 
-        asset->base = MaterialLibrary::Get("PBR_Default");
-        //asset->defaults["Albedo"].data = glm::vec3(1, 0, 1);
-        asset->defaults["Albedo"].data = ModelLoader::lastTexID;
-        asset->defaults["Metallic"].data = 0.5f;
-        asset->defaults["Roughness"].data = 0.1f; 
-        mat = MaterialAsset::Instantiate(asset);
-        //if (!mat) 
-         
-        mr.materials.push_back(mat); 
+        if (!mat) {
+            auto asset = std::make_shared<MaterialAsset>();
+            asset->name = mesh->name;  // name 
+            asset->base = MaterialLibrary::Get("PBR_Default");
+            float value = 1;
+            asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(value, value, value, 1));
+            value = 0.2f;
+            asset->defaults["Metallic"].data = TextureCache::Get().GetSolidColor(glm::vec4(value, value, value, 1));
+            value = 0.5f;
+            asset->defaults["Roughness"].data = TextureCache::Get().GetSolidColor(glm::vec4(value, value, value, 1));
 
+            mat = MaterialAsset::Instantiate(asset);
+            //if (!mat) 
+        } 
+        mr.materials.push_back(mat);  
         mr.BuildBatches(); // custo pago UMA vez
 
-        scene.AddComponent<AABBComponent>(entity);
-
+        scene.AddComponent<AABBComponent>(entity); 
         return entity;
     }
 

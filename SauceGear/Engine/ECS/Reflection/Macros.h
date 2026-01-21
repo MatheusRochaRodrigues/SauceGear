@@ -74,3 +74,27 @@
                                                                           \
     GetTypeInfo().fields.push_back(f);                                    \
 }
+
+
+
+
+
+#define BEGIN_ENUM_INFO(ENUM) \
+    EnumInfo ENUM##_EnumInfo{ #ENUM, {
+
+#define ENUM_VALUE(ENUM, VALUE) \
+    { #VALUE, (int)ENUM::VALUE },
+
+#define END_ENUM_INFO() } };
+
+
+#define REFLECT_ENUM_FIELD(FIELD, ENUM, WIDGET) \
+{ \
+    FieldInfo f; \
+    f.name = #FIELD; \
+    f.type = typeid(ENUM); \
+    f.offset = offsetof(__CurrentClass, FIELD); \
+    f.enumInfo = &ENUM##_EnumInfo; \
+    f.widget = WIDGET; \
+    GetTypeInfo().fields.push_back(f); \
+}

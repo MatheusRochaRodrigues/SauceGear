@@ -5,33 +5,45 @@
 #include "../Materials/MaterialBase.h" 
 #include <iostream>
 #include <type_traits>
-#include <variant>
- 
+#include <variant> 
+
 #define LOG_WARN(fmt, ...) \
     std::cout << "[WARN] " << fmt << std::endl
 
 class MaterialBinder {
 public:
-    static std::shared_ptr<Texture> Resolve(
-        const std::string& name,
-        const MaterialBase::ParamDef& def,
-        const MaterialInstance* inst
-    ) {
-        if (inst) {
-            auto it = inst->overrides.find(name);
-            if (it != inst->overrides.end()) {
-                if (auto t = std::get_if<std::shared_ptr<Texture>>(&it->second.data))
-                    return *t;
-            }
+    static void Resolve(MaterialValue& v)
+    {
+        // já é textura → ok
+        if (std::holds_alternative<std::shared_ptr<Texture>>(v))
+            return;
+
+        // float → solid texture
+        if (auto f = std::get_if<float>(&v)) {
+            v = TextureCache::Get().GetSolidColor({ *f, *f, *f, 1.0f });
+            return;
         }
-        return TextureCache::Get().GetSolidColor({ 1,1,1,1 });
+
+        // vec4 → solid texture
+        if (auto c = std::get_if<glm::vec4>(&v)) {
+            v = TextureCache::Get().GetSolidColor(*c);
+            return;
+        }
+
+        // fallback defensivo
+        v = TextureCache::Get().GetSolidColor({ 1,1,1,1 });
     }
 
+
      
-    static void Bind(MaterialInstance& inst, MaterialAsset& asset, MaterialBase& base) {
+    static void Bind(MaterialInstance& inst, MaterialAsset& asset, MaterialBase& base) { 
+#ifdef DGB
+        std::cout << std::endl << "mat dgb " << asset.name << std::endl;
+#endif
+
         for (auto& [name, def] : base.layout) {
 
-            const MaterialInstance::Value* value = nullptr;
+            MaterialInstance::Value* value = nullptr;
 
             if (inst.overrides.find(name) != inst.overrides.end())
                 value = &inst.overrides[name];
@@ -40,6 +52,14 @@ public:
 
             if (!value)
                 continue;
+             
+#ifdef DGB
+            std::cout << "1 " << name                   << std::endl;
+            std::cout << "2 " << def.type               << std::endl;
+            std::cout << "3 " << value->data.index()    << std::endl;
+#endif 
+
+            if (def.type == MaterialBase::ParamDef::Type::Texture) Resolve(value->data);
 
             bool applied = false;
 
@@ -65,16 +85,23 @@ public:
                     }
                 }
                 else if constexpr (std::is_same_v<T, std::shared_ptr<Texture>>) {
-                    if (def.type == MaterialBase::ParamDef::Texture) {
+                    if (def.type == MaterialBase::ParamDef::Type::Texture) {
                         base.shader->setTexture2D(name, value->ID, def.unit);
                         applied = true;
                     }
                 }
-                }, value->data);
+            }, value->data);
+
 
             if (!applied) {
+                std::cout << name << " + " << std::endl;
                 LOG_WARN("Material param '{}' type mismatch", name);
             }
+
+#ifdef DGB
+            std::cout << "----------------------------------------------------" << std::endl;
+#endif
+
         }
     }
 

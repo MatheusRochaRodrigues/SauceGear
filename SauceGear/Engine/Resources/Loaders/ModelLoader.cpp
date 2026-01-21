@@ -194,24 +194,27 @@ ModelLoader::CreateMaterialAssetFromAssimp(
         asset->base = MaterialLibrary::Get("PBR_Default");
         ASSERT(asset->base && "MaterialBase inexistente");
         
-        // Albedo cor
+        auto TrySetTexture = [&](aiTextureType type, const char* paramName, float fallback = 0)
+        {
+            aiString tex;
+            if (aiMat->GetTexture(type, 0, &tex) == AI_SUCCESS) 
+                asset->defaults[paramName].data = TextureCache::Get().Load(directory + "/" + tex.C_Str());
+            else
+                asset->defaults[paramName].data = fallback;
+
+        };
+
+        // Fallback
         aiColor3D color(1, 1, 1);
         if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
             asset->defaults["Albedo"].data =
                 glm::vec3(color.r, color.g, color.b);
-        }
+        }   
 
-        // Albedo textura
-        aiString tex;
-        if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &tex) == AI_SUCCESS) {
-            asset->defaults["Albedo"].data =
-                TextureCache::Get().Load(directory + "/" + tex.C_Str());
-
-            ModelLoader::lastTexID = TextureCache::Get().Load(directory + "/" + tex.C_Str());
-        }
-
-        asset->defaults["Metallic"].data  = 0.1f;
-        asset->defaults["Roughness"].data = 0.5f;
+        // Texturas (se existirem)
+        TrySetTexture(aiTextureType_DIFFUSE, "Albedo");
+        TrySetTexture(aiTextureType_METALNESS, "Metallic", 0.1f);
+        TrySetTexture(aiTextureType_DIFFUSE_ROUGHNESS, "Roughness", 0.5f);
 
         return asset;
     });

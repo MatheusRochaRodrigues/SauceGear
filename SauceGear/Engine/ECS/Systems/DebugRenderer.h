@@ -8,7 +8,7 @@
 #include "../../DebugRender/DebugWireframeRenderer.h"
 #include "../../DebugRender/DebugPointRenderer.h"
 
-#include "../../Geometry/WorldOctree/SurfaceNets/OctreeNode.h"
+#include "../../Geometry/World/SurfaceNet/WorldOctree/SurfaceNets/OctreeNode.h"
 
 class DebugRenderer : public System {
 public:
