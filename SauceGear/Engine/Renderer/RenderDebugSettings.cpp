@@ -24,5 +24,6 @@ EnumInfo RenderViewMode_EnumInfo{
         { "Position",      (int)RenderViewMode::Position },
         { "MRA",           (int)RenderViewMode::MRA },
         { "Depth",         (int)RenderViewMode::Depth },
+        { "AO",            (int)RenderViewMode::AO },
     }
 };

@@ -17,6 +17,10 @@ public:
 
     //acesso void* universal.
     virtual void* GetRaw(Entity e) = 0;
+
+
+
+    virtual void EmplaceDefault(Entity e) = 0; // to rtti reflection can add components in editor
 };
 
 template<typename T>
@@ -40,12 +44,24 @@ public:
         return components.at(entity);
     }
 
+    T* TryGet(Entity entity) {
+        auto it = components.find(entity);
+        if (it == components.end())
+            return nullptr;
+        return &it->second;
+    } 
+
     void* GetRaw(Entity entity) override {
         return &components.at(entity); // ponteiro cru
     }
 
     std::unordered_set<Entity>& GetEntitySet() {
         return entities;
+    }
+
+
+    void EmplaceDefault(Entity e) override {
+        Add(e, T{}); // construtor default
     }
 
 private:
@@ -171,6 +187,19 @@ public:
         return *entities.begin(); // retorna o primeiro (ordem indefinida, mas ok)
     }
 
+
+    template<typename T>
+    T* TryGetComponent(Entity entity) {
+        auto it = storages.find(std::type_index(typeid(T)));
+        if (it == storages.end())
+            return nullptr;
+
+        auto* storage = static_cast<ComponentStorage<T>*>(it->second.get());
+        return storage->TryGet(entity);
+    }
+
+
+     
 
 private:
     std::unordered_map<std::type_index, std::unique_ptr<IComponentStorage>> storages;

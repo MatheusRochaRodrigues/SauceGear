@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <typeindex>
 //#include <typeinfo>
+#include "../../Scene/ECSBridge.h" 
 
 // Macros para registro automático
 #define REFLECT_CLASS(CLASS) \
@@ -98,3 +99,21 @@
     f.widget = WIDGET; \
     GetTypeInfo().fields.push_back(f); \
 }
+
+
+
+
+//#define REFLECT_ADD_COMPONENT() \
+//    GetTypeInfo().Add = [](SceneECS& scene, Entity e) { \
+//        scene.AddComponent<__CurrentClass>(e); \
+//    };
+
+#define REFLECT_ADD_COMPONENT()                                    \
+    GetTypeInfo().Add = [](void* scene, Entity e) {               \
+        ECSBridge::AddComponent(scene, e, GetTypeInfo().typeIndex); \
+    };
+
+
+
+#define REFLECT_NOT_REMOVABLE() \
+    GetTypeInfo().removable = false;

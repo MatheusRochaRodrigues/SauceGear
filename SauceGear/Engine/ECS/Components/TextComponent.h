@@ -3,7 +3,9 @@
 #include <glm/glm.hpp>
 #include <cstdint>
 #include "../../GUI/FontRenderer.h"
- 
+
+using namespace std;
+
 struct TextStyle {
     float outlineThickness = 0.0f;
     glm::vec4 outlineColor = { 0,0,0,1 };       
@@ -64,6 +66,17 @@ struct TextComponent {
     void LoadFont(string s) {
 
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+    }
+
+
+    // REFLECTION 
+    REFLECT_CLASS(TextComponent) {
+        REFLECT_HEADER("TextComponent");
+        REFLECT_FIELD(text);
+        REFLECT_FIELD(color);
+        REFLECT_FIELD(scale);
+
+        REFLECT_ADD_COMPONENT();
     }
 };
 

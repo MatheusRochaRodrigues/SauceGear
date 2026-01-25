@@ -34,6 +34,8 @@ struct TransformComponent {
      
     // REFLECTION 
     REFLECT_CLASS(TransformComponent) {
+        REFLECT_NOT_REMOVABLE();
+
         REFLECT_HEADER("Global TransformComponent (read-only)");
         REFLECT_FIELD(position);
         REFLECT_FIELD(rotation);

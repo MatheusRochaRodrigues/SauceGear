@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Editor\Drawers\MaterialInspector.cpp" />
+    <ClCompile Include="Editor\FileDialog\FileDialog.cpp" />
     <ClCompile Include="Editor\Panels\DrawMeshRendererInspector.h" />
     <ClCompile Include="Engine\Assets\AssetLoader.cpp" />
     <ClCompile Include="Engine\Assets\ModelAsset.cpp" />
@@ -176,7 +177,9 @@
     <ClCompile Include="Editor\Panels\HierarchyPanel.h" />
     <ClCompile Include="Editor\Panels\InspectorPanel.h" />
     <ClCompile Include="Editor\Panels\SceneViewPanel.h" />
+    <ClCompile Include="Engine\Renderer\RendererPBR\Passes\SSAOPass\SSAOPass.cpp" />
     <ClCompile Include="Engine\Resources\Loaders\ModelLoader.cpp" />
+    <ClCompile Include="Engine\Scene\ECSBridge.cpp" />
     <ClCompile Include="Engine\Scene\SceneBuilder.cpp" />
     <ClCompile Include="Engine\Serializer\ModelSerializer.cpp" />
     <ClCompile Include="External\ImGui\GraphEditor.cpp" />
@@ -196,7 +199,6 @@
     <ClCompile Include="Engine\Renderer\RendererPBR\IBL\IBLManager.cpp" />
     <ClCompile Include="Engine\GUI\FontAtlasBuilder.cpp" />
     <ClCompile Include="Engine\GUI\FontRenderer.cpp" />
-    <ClCompile Include="Editor\Panels\IPanelHelper.h" />
     <ClCompile Include="Engine\Renderer\RendererPBR\PBRPipeline.cpp" />
     <ClCompile Include="Engine\Materials\MaterialImporter.cpp" />
     <ClCompile Include="Engine\Serializer\MaterialSerializer.cpp" />
@@ -222,6 +224,7 @@
   <ItemGroup>
     <ClInclude Include="Editor\Drawers\DrawFieldTexture.h" />
     <ClInclude Include="Editor\Drawers\MaterialInspector.h" />
+    <ClInclude Include="Editor\FileDialog\FileDialog.h" />
     <ClInclude Include="Editor\Panels\SettingsPanel.h" />
     <ClInclude Include="Editor\Themes\Theme4.h" />
     <ClInclude Include="Engine\Assets\AssetDatabase.h" />
@@ -234,8 +237,8 @@
     <ClInclude Include="Engine\DebugRender\DebugDraw.h" />
     <ClInclude Include="Engine\ECS\Components\DebugMeshComponent.h" />
     <ClInclude Include="Engine\ECS\Components\LightComponent.h" />
-    <ClInclude Include="Engine\ECS\Components\MaterialComponent.h" />
     <ClInclude Include="Engine\ECS\Components\OutlineComponent.h" />
+    <ClInclude Include="Engine\Graphics\SharedDepthStencil.h" />
     <ClInclude Include="Engine\Renderer\LightPass\LightUniform.h" />
     <ClInclude Include="Engine\Renderer\LightPass\LightUtils.h" />
     <ClInclude Include="Engine\Renderer\PostProcessPass\Pass\Fix_HDR_GAMMA_pp.h" />
@@ -254,7 +257,7 @@
     <ClInclude Include="Engine\Renderer\LightPass\ShadowPool.h" />
     <ClInclude Include="Engine\ECS\Systems\OctreeWorldSystem.h" />
     <ClInclude Include="Engine\Core\EditorState.h" />
-    <ClInclude Include="Engine\ECS\Systems\OutlineSystem.h" />
+    <ClInclude Include="Engine\Renderer\Outline\OutlinePass.h" />
     <ClInclude Include="Engine\ECS\Systems\TextRender\TextRenderSystem.h" />
     <ClInclude Include="Engine\Instancing\MeshInstance.h" />
     <ClInclude Include="Engine\Instancing\ModelInstance.h" />
@@ -269,6 +272,7 @@
     <ClInclude Include="Engine\Renderer\RendererPBR\Passes\GeometryPass.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\Passes\ShadowPass.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\Passes\SkyboxPass.h" />
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\SSAOPass\SSAOPass.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\Passes\TransparentPass.h" />
     <ClInclude Include="Engine\Renderer\RendererPBR\RenderPass.h" />
     <ClInclude Include="Engine\Renderer\Shaders\ShaderLibrary.h" />
@@ -307,6 +311,7 @@
     <ClInclude Include="Engine\Renderer\RenderQueue.h" />
     <ClInclude Include="Engine\Resources\Loaders\HierarchyNode.h" />
     <ClInclude Include="Engine\Renderer\PostProcessPass\Pass\BaW_pp.h" />
+    <ClInclude Include="Engine\Scene\ECSBridge.h" />
     <ClInclude Include="Engine\Serializer\MaterialSerializer.h" />
     <ClInclude Include="Engine\Math\Plane.h" />
     <ClInclude Include="Engine\Math\Ray.h" />
@@ -397,13 +402,11 @@
     <ClInclude Include="Engine\ECS\ScriptInspector.h" />
     <ClInclude Include="Engine\ECS\Systems\GlobalUniformSystem.h" />
     <ClInclude Include="Engine\Renderer\PostProcessPass\PostProcess.h" />
-    <ClInclude Include="Engine\ECS\Components\PostProcessComponent.h" />
     <ClInclude Include="Engine\ECS\Components\CameraComponent.h" />
     <ClInclude Include="Engine\ECS\Systems\CameraSystem.h" />
     <ClInclude Include="Engine\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Core\InputSystem.h" />
     <ClInclude Include="Engine\Scene\ComponentManager.h" />
-    <ClInclude Include="Engine\ECS\Components\ComponentsHelper.h" />
     <ClInclude Include="ECS\Components\Material.h" />
     <ClInclude Include="Engine\ECS\Components\MeshRenderer.h" />
     <ClInclude Include="Engine\ECS\Components\TransformComponent.h" />
@@ -427,7 +430,6 @@
     <ClInclude Include="Engine\Graphics\RenderUtils.h" />
     <ClInclude Include="Engine\ECS\Systems\MoveSystem.h" />
     <ClInclude Include="Engine\ECS\Systems\RenderSystem.h" />
-    <ClInclude Include="Engine\ECS\Systems\SystemHelper.h" />
     <ClInclude Include="Engine\ECS\Systems\ScriptSystem .h" />
     <ClInclude Include="Engine\ECS\Components\ScriptComponent.h" />
     <ClInclude Include="Engine\ECS\Components\Tags\TransparentTag.h" />
@@ -455,7 +457,18 @@
     <None Include="Engine\Resources\Shaders\debugQuad.vs" />
     <None Include="Engine\Resources\Shaders\debugQuadDepth.fs" />
     <None Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAO.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\dfrdSSAO.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAO.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAOBlur.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SphereSun.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_4.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_3.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_1.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_2.fs" />
     <None Include="Engine\Resources\Shaders\GLSL\AtlasTextSDF.vs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard.vs" />
     <None Include="Engine\Resources\Shaders\GUI\AtlasTextSDF_Just2D.vs" />
     <None Include="Engine\Resources\Shaders\GUI\AtlasTextMSDF.fs" />
     <None Include="Engine\Resources\Shaders\GUI\AtlasTextSDF.fs" />
@@ -466,8 +479,10 @@
     <None Include="Engine\Resources\Shaders\GUI\SimpleText3D.vs" />
     <None Include="Engine\Resources\Shaders\GUI\TextRender.fs" />
     <None Include="Engine\Resources\Shaders\GUI\TextRender.vs" />
-    <None Include="Engine\Resources\Shaders\Outline\outline.fs" />
-    <None Include="Engine\Resources\Shaders\Outline\outline.vs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline.fs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline.vs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline2.fs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline2.vs" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_point.fs" />
     <None Include="Engine\Resources\Shaders\PostProcess\Correct_HDR_GAMA.fs" />
     <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.fs" />
@@ -598,8 +613,7 @@
     <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPU.comp2" />
     <None Include="Engine\Resources\Shaders\Utils\WorleyNoise.glsl" />
     <None Include="Engine\Resources\Shaders\Compute\Map\VoxelMap.comp" />
-    <None Include="Engine\Resources\Shaders\Envirolnment\Sun.fs" />
-    <None Include="Engine\Resources\Shaders\Envirolnment\Sun.vs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SphereSun.vs" />
     <None Include="Engine\Resources\Shaders\Compute\Map\VoxelMap2.comp" />
     <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\SurfaceNetsGPU_SCG.comp" />
     <None Include="Engine\Resources\Shaders\GUI\AtlasTextRender.fs" />

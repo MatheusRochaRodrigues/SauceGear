@@ -47,20 +47,23 @@ void Texture::LoadFromFile(const char* path, bool useSRGB) {
 }
 
 // Textura para framebuffer (2D ou multisample)
-Texture::Texture(unsigned int width, unsigned int height,
+Texture::Texture(
+    unsigned int width, unsigned int height,
     GLenum internalFormat,
     bool MultiSamples,
     GLenum format,
-    unsigned int samples)
-{
+    unsigned int samples
+) {
     glGenTextures(1, &ID);
 
-    if (MultiSamples == 1) {
+    if (MultiSamples) {
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ID);
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, internalFormat, width, height, GL_TRUE);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-    }
-    else {
+    } 
+    //Texture 2D Default
+    else 
+    {
         glBindTexture(GL_TEXTURE_2D, ID);
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
 
@@ -73,6 +76,29 @@ Texture::Texture(unsigned int width, unsigned int height,
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 }
+
+
+// Textura para framebuffer (2D)
+Texture::Texture(
+    unsigned int width, unsigned int height,
+    GLenum internalFormat, GLenum format,
+    GLenum type,
+    GLint wrap, GLint filtering,
+    const void* data
+){
+    glGenTextures(1, &ID);   
+    glBindTexture(GL_TEXTURE_2D, ID);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
+
+    // filtros padrão
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+
+    glBindTexture(GL_TEXTURE_2D, 0); 
+}
+
 
 Texture::Texture(const std::vector<std::string>& faces) {
     LoadCubeMap(faces);
@@ -197,7 +223,7 @@ void Texture::BindToUnit(Shader& shader, const char* uniformName, GLuint texture
 
 
 
-unsigned int Texture::LoadFromFile(const std::string& filename, bool gamma)
+unsigned int Texture::LoadFromFile(const std::string& filename, bool useSRGB)
 {
     path = filename;
     //unsigned int textureID;
@@ -207,16 +233,22 @@ unsigned int Texture::LoadFromFile(const std::string& filename, bool gamma)
     unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
-        GLenum format;
-        if (nrComponents == 1)
+        internalFormat = GL_RGB;         format = GL_RGB;
+        if (nrComponents == 1) {
+            internalFormat = GL_RED;
             format = GL_RED;
-        else if (nrComponents == 3)
+        }
+        else if (nrComponents == 3) {
+            internalFormat = useSRGB ? GL_SRGB : GL_RGB;
             format = GL_RGB;
-        else if (nrComponents == 4)
+        }
+        else if (nrComponents == 4) {
+            internalFormat = useSRGB ? GL_SRGB_ALPHA : GL_RGBA;
             format = GL_RGBA;
+        }
 
         glBindTexture(GL_TEXTURE_2D, ID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

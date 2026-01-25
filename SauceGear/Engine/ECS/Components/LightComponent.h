@@ -24,6 +24,8 @@ struct LightComponent {
         REFLECT_HEADER("LightComponent");
         REFLECT_FIELD(color);
         REFLECT_FIELD(intensity);
+
+        REFLECT_ADD_COMPONENT();
     }
 
     void SetTypeLight(LightType type) {

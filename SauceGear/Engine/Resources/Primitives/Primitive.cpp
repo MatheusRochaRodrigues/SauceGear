@@ -102,11 +102,26 @@ static void AddQuad(
     v.push_back({ c, n, {1,1} });
     v.push_back({ d, n, {0,1} });
 
+    /*
+    v.push_back({ a, n, {0,0} });
+    v.push_back({ d, n, {0,1} });
+    v.push_back({ c, n, {1,1} });
+    v.push_back({ b, n, {1,0} });
+
+    */
+
     // CCW
     i.insert(i.end(), {
         start, start + 1, start + 2,
         start, start + 2, start + 3
         });
+
+    //
+    /*i.insert(i.end(), {
+    start, start + 2, start + 1,
+    start, start + 3, start + 2
+        });*/
+
 }
 
 // ---------- CUBE ----------
@@ -143,9 +158,17 @@ void PrimitiveMesh::BuildPlane(
 ) {
     float h = 0.5f;
 
+    /*
     AddQuad(
         v, i,
         { -h,0,-h }, { h,0,-h }, { h,0, h }, { -h,0, h },
+        { 0,1,0 }
+    );
+    */
+
+    AddQuad(
+        v, i,
+        { -h,0,-h }, { -h,0, h }, { h,0, h }, { h,0,-h },
         { 0,1,0 }
     );
 }

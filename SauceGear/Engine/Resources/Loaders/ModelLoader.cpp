@@ -194,11 +194,11 @@ ModelLoader::CreateMaterialAssetFromAssimp(
         asset->base = MaterialLibrary::Get("PBR_Default");
         ASSERT(asset->base && "MaterialBase inexistente");
         
-        auto TrySetTexture = [&](aiTextureType type, const char* paramName, float fallback = 0)
+        auto TrySetTexture = [&](aiTextureType type, const char* paramName, float fallback = 0, bool isSRGB = false)
         {
             aiString tex;
             if (aiMat->GetTexture(type, 0, &tex) == AI_SUCCESS) 
-                asset->defaults[paramName].data = TextureCache::Get().Load(directory + "/" + tex.C_Str());
+                asset->defaults[paramName].data = TextureCache::Get().Load(directory + "/" + tex.C_Str(), isSRGB);
             else
                 asset->defaults[paramName].data = fallback;
 
@@ -212,7 +212,7 @@ ModelLoader::CreateMaterialAssetFromAssimp(
         }   
 
         // Texturas (se existirem)
-        TrySetTexture(aiTextureType_DIFFUSE, "Albedo");
+        TrySetTexture(aiTextureType_DIFFUSE, "Albedo", 0, true);
         TrySetTexture(aiTextureType_METALNESS, "Metallic", 0.1f);
         TrySetTexture(aiTextureType_DIFFUSE_ROUGHNESS, "Roughness", 0.5f);
 

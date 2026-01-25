@@ -1,11 +1,11 @@
 #pragma once 
 #include "../Engine/Scene/GameScene.h" 
 #include "../Engine/Platform/Window.h"
+#include <imgui.h>
  
-#define IMGUI_ENABLE_DOCKING // antes de incluir imgui.h 
+#define IMGUI_ENABLE_DOCKING // antes de incluir imgui.h  
 
-#include "Panels/IPanelHelper.h"
-#include "Panels/InspectorPanel.h"
+class IPanel;
 
 using Scene = SceneECS; // Apelido dentro da classe 
 

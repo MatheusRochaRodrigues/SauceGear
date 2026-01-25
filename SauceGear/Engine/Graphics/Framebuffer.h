@@ -5,9 +5,12 @@
 
 #include "../Core/EngineContext.h"
 #include "../Platform/Window.h"
+#include "SharedDepthStencil.h"
 
 enum class FramebufferTextureType {
     Color, Depth, Float16, Integer, ColorRGB, ColorRGBA,
+    //Only Channels
+    REDFloat, //R16F, 
     //Deffered
     Position, Normal, Albedo,    
     //PBR
@@ -22,7 +25,13 @@ struct FramebufferAttachment {
 
 class Framebuffer {
 public:
-    Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments, bool useDepthRenderbuffer = false);
+    // Sem profundidade
+    Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments);
+    // RBO próprio
+    Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments, bool useDepthRenderbuffer);
+    // RBO compartilhado
+    Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments, GLuint sdRBO, bool useFallbackRB);
+    
     ~Framebuffer();
 
     void Bind() const;
@@ -32,6 +41,7 @@ public:
     GLuint GetTexture(int index) const;
     GLuint GetDepthTexture() const;
     GLuint GetID() const { return fbo; }
+    GLuint GetRBO() const { return depthRBO; }
 
     int GetWidth()  { return width;  }
     int GetHeight() { return height; }
@@ -63,6 +73,20 @@ private:
     GLuint depthTexture = 0;
     GLuint depthRBO = 0;
     bool useRenderbuffer = false;
-
+    bool notHasDepth = false;
+     
+    bool ownsDepthRBO = false;   
+    GLuint sharedRBO = 0;
 
 };
+
+//to future, Like A Vulkan struct to Data Info
+/*
+struct RenderTarget {
+    int width, height;
+    SharedDepthStencil depth;
+    Framebuffer gbuffer;
+    Framebuffer lighting;
+    Framebuffer post;
+};
+*/

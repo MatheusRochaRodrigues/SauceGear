@@ -1,6 +1,8 @@
 #pragma once
 #include "../../Core/Camera.h" 
-#include "../../ECS/Components/ComponentsHelper.h"
+#include "../../ECS/Components/CameraComponent.h"
+#include "../../ECS/Components/TransformComponent.h"
+#include "../../ECS/Components/TransformComponent.h"
 #include "../../Core/Input.h"
 
 class CameraSystem : public System {

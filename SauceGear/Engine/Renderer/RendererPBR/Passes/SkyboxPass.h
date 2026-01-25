@@ -3,8 +3,10 @@
 #include "../../../Graphics/FullscreenQuad.h"
 #include "../../../ECS/Systems/DayNightSystem.h"
 #include "../../../Graphics/PrimitiveMesh.h"
-#include "../../LightPass/LightPass.h"
-  
+#include "../../LightPass/LightPass.h" 
+#include "../../../Core/EngineContext.h"
+#include "../../../Core/Time.h"
+
 class SkyboxPass {
 public:
     SkyboxPass(Shader* shader) : shader(shader) {
@@ -15,8 +17,9 @@ public:
         shader->setInt("environmentMap", 0);
     }
 
-    void Execute(Camera& cam, GLuint cubemap)
+    void Execute(Camera& cam, GLuint cubemap, Framebuffer& target)
     { 
+        target.Bind();
         DrawSkybox(cam, cubemap);
         RenderDebugSun();
     }
@@ -40,39 +43,58 @@ public:
     }
 
     void RenderDebugSun() {
-        // pega luz e transform do sol
         if (LightPass::currentSun == INVALID_ENTITY) return;
 
         auto& sunTransform = GEngine->scene->GetComponent<TransformComponent>(LightPass::currentSun);
         auto& sunLight = GEngine->scene->GetComponent<LightComponent>(LightPass::currentSun);
 
-        // direção e posição
         glm::vec3 sunDir = sunTransform.GetForwardDirection();
         glm::vec3 camPos = GEngine->mainCamera->GetPosition();
-        glm::vec3 sunPos = camPos + sunDir * 80.0f; // coloca “longe” da câmera
-          
-        // cria shader se ainda não existir
-        static Shader* debugSunShader = nullptr;
-        if (!debugSunShader) debugSunShader = new Shader("Envirolnment/Sun.vs", "Envirolnment/Sun.fs");
+        glm::vec3 sunPos = camPos + sunDir * 80.0f; // sol "longe" da câmera
 
-        debugSunShader->use(); 
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), sunPos);
-        model = glm::scale(model, glm::vec3(20.0f)); // tamanho da esfera
+        // cria shader billboard se não existir
+        static Shader* sunBillboardShader = nullptr;
+        if (!sunBillboardShader)
+            sunBillboardShader = new Shader("Envirolnment/SunBillboard.vs", "Envirolnment/SunBillboard.fs");
 
-        debugSunShader->setMat4("model", model);
-        debugSunShader->setMat4("view", GEngine->mainCamera->GetViewMatrix());
-        debugSunShader->setMat4("projection", GEngine->mainCamera->GetProjectionMatrix()); 
-        debugSunShader->setVec3("color", glm::vec3(0.5f, 0, 0.5f));
+        // quad simples para billboard (2 triângulos)
+        static std::shared_ptr<MeshInstance> quadMesh = nullptr;
+        if (!quadMesh) {
+            std::vector<Vertex> verts(4);
+            verts[0].Position = { -1.0f, -1.0f, 0.0f };
+            verts[1].Position = { 1.0f, -1.0f, 0.0f };
+            verts[2].Position = { -1.0f,  1.0f, 0.0f };
+            verts[3].Position = { 1.0f,  1.0f, 0.0f };
 
+            std::vector<uint32_t> indices = { 0,1,2, 2,1,3 };
+
+            auto quadAsset = std::make_shared<MeshAsset>();
+            quadAsset->SetData(std::move(verts), std::move(indices));
+            quadAsset->name = "SunQuad";
+
+            quadMesh = std::make_shared<MeshInstance>(quadAsset);
+        }
+
+        // pass uniforms
+        sunBillboardShader->use();
+        sunBillboardShader->setVec3("sunPos", sunPos);
+        sunBillboardShader->setMat4("view", GEngine->mainCamera->GetViewMatrix());
+        sunBillboardShader->setMat4("projection", GEngine->mainCamera->GetProjectionMatrix());
+        sunBillboardShader->setFloat("size", 20.0f); // tamanho do sol
+        sunBillboardShader->setVec3("color", sunLight.color);
+        sunBillboardShader->setFloat("time", GEngine->time->GetTime());
+
+        // blending aditivo
         glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-        glDepthMask(GL_FALSE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE); 
+        glDepthMask(GL_FALSE);      //glDisable(GL_DEPTH_TEST);
 
-        sphereMesh->Draw();
+        quadMesh->Draw();
 
-        glDepthMask(GL_TRUE);
+        glDepthMask(GL_TRUE);       //glEnable(GL_DEPTH_TEST); 
         glDisable(GL_BLEND);
     }
+
 
 private:
     Shader* shader;

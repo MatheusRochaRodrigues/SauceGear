@@ -1,5 +1,11 @@
 ﻿#pragma once
 #include "../../ECS/System.h"
+
+#include "../../ECS/Components/DebugMeshComponent.h"
+#include "../../ECS/Components/SurfaceNetsComponent.h"
+#include "../../ECS/Components/AABBComponent.h"
+#include "../../ECS/Components/MeshRenderer.h"
+
 #include "../../Scene/SceneECS.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/Renderer.h"

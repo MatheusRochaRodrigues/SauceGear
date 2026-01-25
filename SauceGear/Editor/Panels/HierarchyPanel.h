@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "IPanel.h"
-#include "../../Engine/ECS/Components/ComponentsHelper.h" 
+#include "../../Engine/ECS/Components/HierarchyComponent.h" 
 #include "../../Engine/Graphics/Renderer.h"  
 #include "../../Engine/Scene/SceneBuilder.h"  
 #include "../../Engine/Core/KeyCodes.h"  

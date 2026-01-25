@@ -1,8 +1,7 @@
 #define EDITOR_BUILD
+#include <iostream>
 #include "EditorApp.h"
-#include "../Engine/Core/Application.h"   // <- precisa desse
-
-//#include "../ECS/Systems/SystemHelper.h"  
+#include "../Engine/Core/Application.h"   // <- precisa desse 
 
 int main() { 
     try {

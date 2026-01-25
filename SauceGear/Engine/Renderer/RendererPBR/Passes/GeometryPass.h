@@ -2,6 +2,11 @@
 #include "../../../Graphics/Framebuffer.h"   
 #include "../../../Graphics/Renderer.h" 
 
+#include "../../../ECS/Components/OutlineComponent.h" 
+#include "../../../ECS/Components/MeshRenderer.h" 
+#include "../../../ECS/Components/OutlineComponent.h" 
+#include "../../../ECS/Components/TransformComponent.h" 
+
 using Scene = SceneECS; 
 
 class GeometryPass {
@@ -12,8 +17,15 @@ public:
     {
         gbuffer.Bind(); 
         glEnable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     /// glClearColor(0, 0, 0, 1);
-          
+        glEnable(GL_STENCIL_TEST);
+
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);     
+
+        //Stencil
+        glStencilMask(0xFF); // permite escrita
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // only if it passes the depth test and the stencil, which will be written.
+        //Depth
         glDepthFunc(GL_LESS);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
@@ -22,12 +34,26 @@ public:
         for (auto e : scene.GetEntitiesWith<MeshRenderer, TransformComponent>()) {
             auto& tr = scene.GetComponent<TransformComponent>(e);
             auto& mr = scene.GetComponent<MeshRenderer>(e);
+             
+            // Stencil setup
+            bool hasOutline = scene.HasComponent<OutlineComponent>(e) && scene.GetComponent<OutlineComponent>(e).enabled; 
+            /*
+            if (hasOutline || e == scene.GetSelectedEntity()) 
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);   // -> escreve stencil APENAS se precisar
+            else 
+                glStencilFunc(GL_ALWAYS, 0, 0xFF);
+            */
 
-            shader->setMat4("model", tr.GetMatrix());
+            // escreve stencil 1 apenas para quem tem outline
+            glStencilFunc(GL_ALWAYS, hasOutline ? 1 : 0, 0xFF);
 
+
+            //DrawGPU
+            shader->setMat4("model", tr.GetMatrix()); 
             mr.Draw();
         }
 
+        glDisable(GL_STENCIL_TEST);
         gbuffer.Unbind();
     }
 

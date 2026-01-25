@@ -4,6 +4,7 @@
 #include "../../Engine/Materials/MaterialBase.h"
 #include "../../Engine/Materials/TextureCache.h"
 #include "../../Engine/Assets/MaterialAsset.h"
+#include "../FileDialog/FileDialog.h"
 
 struct MaterialInspector {
 
@@ -69,15 +70,18 @@ struct MaterialInspector {
         auto& tex = std::get<std::shared_ptr<Texture>>(v.data);
         ImTextureID id = tex ? (ImTextureID)(intptr_t)tex->ID : 0;
 
-        ImGui::Image(id, ImVec2(64, 64));
+        ImGui::Image(id, ImVec2(64, 64), ImVec2(0, 1)/*uv0*/, ImVec2(1, 0)/*uv1*/);
         ImGui::SameLine();
 
         ImGui::BeginGroup();
 
         if (ImGui::Button("Load")) {
-            // TODO: file dialog
-            inst.dirty = true;
-        }
+            std::string path = FileDialog::Open("*.png;*.jpg");
+            if (!path.empty()) {
+                v.data = TextureCache::Get().Load(path);
+                inst.dirty = true;
+            }
+        } 
 
         // Solid color editor
         if (tex && tex->isSolidColor) {
@@ -201,6 +205,7 @@ private:
 
         case MaterialBase::ParamDef::Texture: 
             DrawFieldTexture(name.c_str(), *value, def, inst);     //DrawTexture(name, *value, inst);
+            //if (name == "Albedo") { ImGui::Checkbox("SRGB", &inst.isSRGB);          ImGui::Separator(); }
             break;
         }
 

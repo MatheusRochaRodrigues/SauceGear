@@ -78,6 +78,25 @@ void ShaderLibrary::Init() {
         "PBR/IBL/brdf.vs",
         "PBR/IBL/brdf.fs"
     );
+
+
+    //============================================================= Stencil =============================================================
+    // Shader simples para desenhar outline 
+    shaders["Outline"] = Shader(
+        "Stencil/outline.vs",
+        "Stencil/outline.fs"
+    );
+
+    //============================================================= Diversos =============================================================
+    // SSAO
+    shaders["SSAO"] = Shader(
+        "DeferredShading/SSAO/SSAO.vs",
+        "DeferredShading/SSAO/SSAO.fs"
+    );
+    shaders["SSAOBlur"] = Shader(
+        "DeferredShading/SSAO/SSAO.vs",
+        "DeferredShading/SSAO/SSAOBlur.fs"
+    );
 }
 
 Shader& ShaderLibrary::Get(const std::string& name) {

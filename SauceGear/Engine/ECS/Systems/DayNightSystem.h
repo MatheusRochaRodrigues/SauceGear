@@ -1,5 +1,7 @@
 ﻿#pragma once
-#include "../../ECS/Components/ComponentsHelper.h"
+#include "../../ECS/Components/TransformComponent.h"
+#include "../../ECS/Components/LightComponent.h"
+#include "../../ECS/Components/ComputeSyncComponent.h"
 #include "../../Scene/SceneECS.h"
 #include "../../ECS/System.h"
 #include "../../Renderer/RendererPBR/IBL/IBLManager.h" 

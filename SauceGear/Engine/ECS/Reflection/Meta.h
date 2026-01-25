@@ -5,6 +5,11 @@
 #include <typeindex>
 #include <cstddef>
 #include <functional>
+//#include "../../Scene/SceneECS.h"
+
+//class SceneECS;
+using Entity = uint32_t; // ou forward do seu Entity
+
 
 enum class FieldKind {
     Value,    // campo normal
@@ -63,6 +68,12 @@ struct TypeInfo {
 
     // em TypeInfo:
     std::function<void(void* instance)> onEdited = nullptr; 
+
+    //AddComponent   -   factory ECS
+    //std::function<void(SceneECS&, Entity)> Add;       //* > & ?
+    void (*Add)(void* scene, Entity) = nullptr;                 //equivalent há = std::function<void(void*, Entity)> Add;
+
+    bool removable = true;
 };
 
 class ReflectionRegistry {
@@ -90,7 +101,28 @@ public:
         return (it != typesByIndex.end()) ? it->second : nullptr;
     }
 
+    std::unordered_map<std::string, TypeInfo>& GetAll() {           //const std::unordered_map<std::string, TypeInfo>& GetAll() const
+        return types;
+    }
+
 private:
     std::unordered_map<std::string, TypeInfo> types; // lookup por nome
     std::unordered_map<std::type_index, TypeInfo*> typesByIndex; // lookup por type_index
 };
+
+
+
+/*
+
+EXTRA (nível Unreal / Unity)
+
+Você pode evoluir isso depois para:
+
+enum class ComponentFlags {
+    None        = 0,
+    NotRemovable= 1 << 0,
+    Hidden      = 1 << 1,
+    RuntimeOnly = 1 << 2
+};
+
+*/

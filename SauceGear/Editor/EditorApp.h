@@ -1,5 +1,4 @@
-#pragma once
-#include "ImGuiLayer.h"  
+#pragma once 
 
 // forward declarations
 class Application;
@@ -14,7 +13,7 @@ public:
 private:
     Application* app;
     Window* window;
-    Scene* scene;
+    GameScene* scene;
 };
 
  

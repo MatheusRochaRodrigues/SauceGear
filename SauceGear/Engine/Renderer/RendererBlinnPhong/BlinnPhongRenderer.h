@@ -3,6 +3,8 @@
 #include "../../Graphics/Framebuffer.h"
 #include "../../Resources/Primitives/Primitive.h" 
 #include "../../Graphics/Renderer.h"
+#include "../../Instancing/MeshInstance.h"
+#include "../../Scene/SceneECS.h"
 
 class BlinnPhongPipeline : public IRenderPipeline {
 public:

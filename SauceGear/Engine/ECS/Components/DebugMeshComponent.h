@@ -20,5 +20,7 @@ struct DebugMeshComponent {
         REFLECT_HEADER("AABB");
         REFLECT_FIELD(showBox);
         REFLECT_FIELD(colorBox);
+
+        REFLECT_ADD_COMPONENT();
     }
 };

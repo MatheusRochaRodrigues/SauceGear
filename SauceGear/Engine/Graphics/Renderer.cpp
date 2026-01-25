@@ -1,5 +1,7 @@
 #include "Renderer.h" 
 #include "../Core/EngineContext.h" 
+#include "../ECS/Components/TransformComponent.h"
+#include "../ECS/Components/MeshRenderer.h"
 
 void Renderer::Init(SceneECS* scene) {  m_Scene = scene;   }
 

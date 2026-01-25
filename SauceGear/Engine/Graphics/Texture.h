@@ -10,6 +10,7 @@ public:
     std::string type;         // Tipo: diffuse, specular, etc.
     std::string path;         // Caminho original (se aplicável)
     GLenum format = GL_RGB;   // Formato de leitura
+    GLenum internalFormat = GL_RGB; // formato interno da textura
     GLuint unit = 0;          // Unidade de textura vinculada
     bool sucess = false;
 
@@ -40,10 +41,16 @@ public:
 
     // Textura para framebuffer (2D ou multisample)
     Texture(unsigned int width, unsigned int height,
-        GLenum internalFormat = GL_RGB,
-        bool MultiSamples = 0,
-        GLenum format = GL_RGB,
-        unsigned int samples = 0);
+        GLenum internalFormat,      //= GL_RGB
+        bool MultiSamples,          //= 0
+        GLenum format,              //= GL_RGB
+        unsigned int samples);      //= 0
+
+    Texture(unsigned int width, unsigned int height,
+        GLenum internalFormat, GLenum format,
+        GLenum type,
+        GLint wrap, GLint filtering,
+        const void* data = nullptr);
 
     // Criar cubemap a partir de faces
     Texture(const std::vector<std::string>& faces); // faces[6]
@@ -70,7 +77,7 @@ public:
     void SetUnit(Shader& shader, const char* uniform, GLuint unit);
 
 
-    unsigned int LoadFromFile(const std::string& filename, bool gamma = false);
+    unsigned int LoadFromFile(const std::string& filename, bool useSRGB = false);
     Texture* WhiteTexture();
     void CreateFromMemory(uint8_t* data, int width, int height, GLenum format = GL_RGBA);
     

@@ -4,7 +4,8 @@
 #include "../../Core/Camera.h"   
 #include "../Math/Ray.h"  
 #include "../Math/AABB.h"  
-#include "../../ECS/Components/ComponentsHelper.h"
+#include "../../ECS/Components/TransformComponent.h"
+#include "../../ECS/Components/AABBComponent.h"
 #include "../Scene/SceneECS.h"  
 
 #include "../ECS/Systems/DebugRenderer.h"

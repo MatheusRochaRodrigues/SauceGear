@@ -31,6 +31,7 @@ public:
 
     explicit MaterialInstance(const std::shared_ptr<MaterialAsset>& b);
 
+    //bool isSRGB = false;           //srgb      linearGamma
 };
 
 

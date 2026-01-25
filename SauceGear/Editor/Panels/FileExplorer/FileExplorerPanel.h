@@ -1,8 +1,7 @@
 #pragma once
 #include <filesystem>
 #include "../Load.h" 
-#include "popup.h"
-#include "../../Engine/ECS/Components/ComponentsHelper.h" 
+#include "popup.h" 
 #include "../../Engine/Graphics/Renderer.h"   
 
 struct FileExplorerPanel : IPanel {

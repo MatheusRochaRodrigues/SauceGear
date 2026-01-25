@@ -17,6 +17,7 @@ uniform sampler2D Roughness;  // 4
 //uniform sampler2D MRAO;     // OTIMIZADO
 
 uniform bool op_Normal; 
+//uniform bool op_LinearGamma; 
 
 uniform bool correctGama; 
 
@@ -25,8 +26,13 @@ void main() {
     gPosition = FragPos;
     
     // and the diffuse per-fragment color
-    gAlbedo.rgb = pow(texture(Albedo, TexCoords).rgb, vec3(2.2));   //convert SRGB to linear space
-    //gAlbedo.rgb = texture(Albedo, TexCoords).rgb;   
+    gAlbedo.rgb = texture(Albedo, TexCoords).rgb;   
+    /*
+    if(op_LinearGamma)      
+        gAlbedo.rgb = texture(Albedo, TexCoords).rgb;   
+    else    // (not LinearGamma) == Tetxure SRGB
+        gAlbedo.rgb = pow(texture(Albedo, TexCoords).rgb, vec3(2.2));   //convert SRGB to linear space
+    */
 
     // normal map
     if (op_Normal) { 

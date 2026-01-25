@@ -8,6 +8,9 @@ class ForwardPass {
 public:
     void Execute(Scene& scene, Framebuffer& gbuffer, Framebuffer& framebuffer)
     {
+        return;
+        blitDataDepthStencil(gbuffer, framebuffer);
+        
         // (opcional) transparências/partículas usando PBR forward com IBL:
         // copiar depth do gbuffer -> framebuffer se quiser ordenar contra opacos 
 
@@ -38,5 +41,19 @@ public:
 
 
         // ... desenhe transparentes com shader PBR forward e BindIBLTo() 
+    }
+
+    void blitDataDepthStencil(Framebuffer& read, Framebuffer& write) {
+        int SCR_WIDTH = read.GetWidth();
+        int SCR_HEIGHT = read.GetHeight();
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, read.GetID());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, write.GetID()); // write to default framebuffer
+        glBlitFramebuffer(
+            0, 0, SCR_WIDTH, SCR_HEIGHT,
+            0, 0, SCR_WIDTH, SCR_HEIGHT,
+            GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
+            GL_NEAREST
+        );
+        //framebuffer->Bind();                    // glBindFramebuffer(GL_FRAMEBUFFER, ); 
     }
 };

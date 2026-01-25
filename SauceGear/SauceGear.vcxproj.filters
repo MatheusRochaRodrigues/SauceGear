@@ -78,9 +78,6 @@
     <ClCompile Include="Editor\EditorMain.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Editor\Panels\IPanelHelper.h">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Resources\Primitives\Primitive.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
@@ -246,6 +243,15 @@
     <ClCompile Include="Engine\Renderer\LightPass\LightUniform.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\RendererPBR\Passes\SSAOPass\SSAOPass.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\FileDialog\FileDialog.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Scene\ECSBridge.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -332,12 +338,6 @@
     <ClInclude Include="Engine\Scene\SceneManager.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Components\ComponentsHelper.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\SystemHelper.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\Camera.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -345,9 +345,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\KeyCodes.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ECS\Components\PostProcessComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Graphics\Framebuffer.h">
@@ -638,9 +635,6 @@
     <ClInclude Include="Engine\ECS\Components\OutlineComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ECS\Systems\OutlineSystem.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\ECS\Components\TextComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
@@ -666,9 +660,6 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Backup\Transform.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\ECS\Components\MaterialComponent.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Materials\MaterialBinder.h">
@@ -884,6 +875,24 @@
     <ClInclude Include="Engine\Renderer\LightPass\LightUniform.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\PostProcessPass\Pass\Fix_HDR_GAMMA_pp.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\Outline\OutlinePass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\SharedDepthStencil.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\SSAOPass\SSAOPass.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\FileDialog\FileDialog.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Scene\ECSBridge.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Engine\Resources\Shaders\PBR\background.fs">
@@ -1003,8 +1012,7 @@
     <None Include="Engine\Resources\Shaders\Shadows\Extras\ShadowMapCasc.vs" />
     <None Include="Engine\Resources\Shaders\debugQuad.vs" />
     <None Include="Engine\Resources\Shaders\debugQuadDepth.fs" />
-    <None Include="Engine\Resources\Shaders\Envirolnment\Sun.vs" />
-    <None Include="Engine\Resources\Shaders\Envirolnment\Sun.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SphereSun.vs" />
     <None Include="Engine\Resources\Shaders\Compute\Map\VoxelMap1.comp" />
     <None Include="Engine\Resources\Shaders\Compute\SurfaceNet\Legacy\SurfaceNetsGPUBasic.comp" />
     <None Include="Engine\Resources\Shaders\DebugP\dbgIntancing_line.fs" />
@@ -1022,8 +1030,8 @@
     <None Include="Engine\DebugRender\Shader\debug_wire.vs" />
     <None Include="Engine\DebugRender\Shader\debug_point.fs" />
     <None Include="Engine\DebugRender\Shader\debug_point.vs" />
-    <None Include="Engine\Resources\Shaders\Outline\outline.fs" />
-    <None Include="Engine\Resources\Shaders\Outline\outline.vs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline2.fs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline2.vs" />
     <None Include="Engine\Resources\Shaders\GUI\TextRender.fs" />
     <None Include="Engine\Resources\Shaders\GUI\TextRender.vs" />
     <None Include="Engine\Resources\Shaders\GUI\AtlasTextRender.fs" />
@@ -1072,6 +1080,20 @@
     <None Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_point.fs" />
     <None Include="Engine\Resources\Shaders\Utils\ShadowsPoint.glsl" />
+    <None Include="Engine\Resources\Shaders\PostProcess\Correct_HDR_GAMA.fs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline.fs" />
+    <None Include="Engine\Resources\Shaders\Stencil\outline.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\dfrdSSAO.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAO.fs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAO.vs" />
+    <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAOBlur.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SphereSun.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard.vs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_4.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_3.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_1.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_2.fs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

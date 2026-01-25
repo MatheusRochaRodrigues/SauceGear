@@ -1,7 +1,13 @@
 ﻿#include "ImGuiLayer.h"
+
 #include "../Engine/Core/EngineContext.h"  
 #include "../Engine/Graphics/Renderer.h" 
+
 #include "Panels/SettingsPanel.h" 
+#include "Panels/SceneViewPanel.h"
+#include "Panels/FileExplorer/FileExplorerPanel.h"
+#include "Panels/HierarchyPanel.h"
+#include "Panels/InspectorPanel.h" 
  
 void ImGuiLayer::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();

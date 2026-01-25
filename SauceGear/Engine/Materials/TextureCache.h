@@ -83,7 +83,7 @@ public:
     }
 
 
-    std::shared_ptr<Texture> Load(const std::string& filename)
+    std::shared_ptr<Texture> Load(const std::string& filename, bool isSRGB = false)
     {
         auto it = texCache.find(filename);
         if (it != texCache.end()) {
@@ -94,7 +94,7 @@ public:
         else {
             // não existe, cria e insere
             texCache[filename] = make_shared<Texture>();
-            texCache[filename]->LoadFromFile(filename);
+            texCache[filename]->LoadFromFile(filename, isSRGB);
             return texCache[filename];
         }
     }

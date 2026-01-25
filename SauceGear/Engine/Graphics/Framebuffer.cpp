@@ -1,8 +1,19 @@
 #include "Framebuffer.h"
 #include <iostream>
 
+Framebuffer::Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments)
+    : width(width), height(height), attachmentSpecs(attachments) {
+    notHasDepth = true;
+    Init();
+}
+
 Framebuffer::Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments, bool useDepthRB)
     : width(width), height(height), attachmentSpecs(attachments), useRenderbuffer(useDepthRB) {
+    Init();
+}
+
+Framebuffer::Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments, GLuint sdRBO, bool useFallbackRB)
+    : width(width), height(height), attachmentSpecs(attachments), sharedRBO(sdRBO), useRenderbuffer(useFallbackRB) {
     Init();
 }
 
@@ -11,7 +22,7 @@ Framebuffer::~Framebuffer() {
     for (auto tex : colorTextures)
         glDeleteTextures(1, &tex);
     if (depthTexture) glDeleteTextures(1, &depthTexture);
-    if (depthRBO) glDeleteRenderbuffers(1, &depthRBO);
+    if (depthRBO && ownsDepthRBO) glDeleteRenderbuffers(1, &depthRBO);
 }
 
 void Framebuffer::Init() {
@@ -54,8 +65,8 @@ void Framebuffer::Init() {
 
         //Deffered
         case FramebufferTextureType::Position:
-            internalFormat = GL_RGB16F;
-            format = GL_RGB;
+            internalFormat = GL_RGB16F;         //RGBA  -opcional
+            format = GL_RGB;                    //RGBA  -opcional
             dataType = GL_FLOAT;
             break;
         case FramebufferTextureType::Normal:
@@ -68,6 +79,12 @@ void Framebuffer::Init() {
             format = GL_RGBA;
             break;
 
+        //Only Channels
+        case FramebufferTextureType::REDFloat:
+            internalFormat = GL_R16F;       //GL_RED
+            format = GL_RED;
+            dataType = GL_FLOAT;
+            break; 
 
         //PBR
         case FramebufferTextureType::MetallicRoughnessAO:
@@ -85,39 +102,64 @@ void Framebuffer::Init() {
 
         glBindTexture(GL_TEXTURE_2D, colorTextures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, dataType, nullptr);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        //New
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorTextures[i], 0);
         drawBuffers[drawIndex++] = GL_COLOR_ATTACHMENT0 + i;
     }
 
     if (drawIndex > 0)
+        // tell OpenGL which color attachments we'll use (of this framebuffer) for rendering 
         glDrawBuffers(drawIndex, drawBuffers);
     else
         glDrawBuffer(GL_NONE);
 
-    if (useRenderbuffer) {
-        glGenRenderbuffers(1, &depthRBO);
-        glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthRBO);
-    }
-    else {
-        glGenTextures(1, &depthTexture);
-        glBindTexture(GL_TEXTURE_2D, depthTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+    if (!notHasDepth) {
+        // create and attach depth buffer (renderbuffer)
+        if (sharedRBO) {
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+                GL_DEPTH_STENCIL_ATTACHMENT,
+                GL_RENDERBUFFER,
+                sharedRBO
+            );
+            depthRBO = sharedRBO;
+            ownsDepthRBO = false;
+
+        }
+        else if (useRenderbuffer) {
+            glGenRenderbuffers(1, &depthRBO);
+            glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthRBO);
+
+            ownsDepthRBO = true;
+        }
+        else {
+            glGenTextures(1, &depthTexture);
+            glBindTexture(GL_TEXTURE_2D, depthTexture);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+        }
     }
 
+    // finally check if framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "[Framebuffer] Incompleto!\n";
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+// optional you can use just only GL_DEPTH_ATTACHMENT
+//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, SCR_WIDTH, SCR_HEIGHT);
+//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
 
 void Framebuffer::Bind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -141,11 +183,11 @@ void Framebuffer::Resize(int newWidth, int newHeight) {
 
     // Recria tudo
     glDeleteFramebuffers(1, &fbo);
-    for (auto tex : colorTextures)
-        glDeleteTextures(1, &tex);
+    for (auto tex : colorTextures) glDeleteTextures(1, &tex);
     if (depthTexture) glDeleteTextures(1, &depthTexture);
-    if (depthRBO) glDeleteRenderbuffers(1, &depthRBO);
+    if (depthRBO && ownsDepthRBO) glDeleteRenderbuffers(1, &depthRBO);
 
+    fbo = 0; depthTexture = 0; depthRBO = 0;
     Init();
 }
 

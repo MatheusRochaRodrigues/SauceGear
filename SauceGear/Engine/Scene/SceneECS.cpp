@@ -1,5 +1,6 @@
-#include "SceneECS.h" 
+#include "SceneECS.h"  
 
+// Systems
 #include "../ECS/Systems/RenderSystem.h" 
 #include "../ECS/Systems/MoveSystem.h"
 #include "../ECS/Systems/CameraSystem.h" 
@@ -12,8 +13,21 @@
 #include "../ECS/Systems/AABBSystem.h"   
 #include "../ECS/Systems/DebugRenderer.h"   
 #include "../ECS/Systems/TextRender/TextRenderSystem.h"  
+// Components
+#include "../ECS/Components/TransformComponent.h"
+#include "../ECS/Components/MeshRenderer.h"  
+#include "../ECS/Components/Velocity.h" 
+#include "../ECS/Components/LightComponent.h" 
+#include "../ECS/Components/CameraComponent.h"  
+#include "../ECS/Components/GlobalUniformComponent.h"  
+//#include "../ECS/Components/NativeScriptComponent.h"  
+#include "../ECS/Components/HierarchyComponent.h"  
+#include "../ECS/Components/AABBComponent.h"  
+#include "../ECS/Components/ComputeSyncComponent.h"   
+#include "../ECS/Components/SurfaceNetsComponent.h"   
+#include "../ECS/Components/DebugMeshComponent.h"   
+#include "../ECS/Components/TextComponent.h"  
 
-#include "../ECS/Components/ComponentsHelper.h" 
 
 void SceneECS::initECS() {
     ///----------Components
@@ -59,6 +73,28 @@ void SceneECS::DestroyEntity(Entity entity) {
     return entityManager.DestroyEntity(entity);
 }
 
+void SceneECS::AddComponentByType(Entity e, std::type_index type) {
+    auto it = componentManager->GetAllStorages().find(type);
+    if (it == componentManager->GetAllStorages().end())
+        return;
+
+    if (auto* ti = ReflectionRegistry::Get().Get(type)) {
+        if (ti->Add) {
+            ti->Add(this, e);
+        }
+    }
+}
+
+void SceneECS::AddComponentByType_Internal(Entity e, std::type_index type) {
+    auto& storages = componentManager->GetAllStorages();
+    auto it = storages.find(type);
+    if (it == storages.end())
+        return;
+
+    // NÃO chama TypeInfo::Add
+    it->second->EmplaceDefault(e);
+}
+
 
 void SceneECS::AddToParent(Entity father, Entity child) {
     if (!HasComponent<HierarchyComponent>(father))
@@ -83,6 +119,7 @@ void SceneECS::AddToParent(Entity father, Entity child) {
         currentH->nextSibling = child;
     }
 }
+
 
 //Entity parent = SceneBuilder::CreateGameObject("parent 2");
 //Entity child1 = SceneBuilder::CreateGameObject("Child 2");

@@ -1,6 +1,9 @@
 ﻿#pragma once
+#include <glm/glm.hpp> 
+#include <glm/ext.hpp> 
+
 #include "IPanel.h"
-#include "../../Engine/ECS/Components/ComponentsHelper.h" 
+#include "../../Engine/ECS/Components/AABBComponent.h" 
 #include "../../Engine/Graphics/Renderer.h"  
 #include "Load.h"
 
@@ -34,8 +37,7 @@ struct SceneViewPanel : IPanel {
 
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
         //verify size buffer
-        if (viewportSize.x != lastSize.x || viewportSize.y != lastSize.y) {
-            //std::cout << viewportSize.x << " " << viewportSize.y << std::endl;
+        if (viewportSize.x != lastSize.x || viewportSize.y != lastSize.y) { 
             GEngine->renderer->frameScreen->Resize((int)viewportSize.x, (int)viewportSize.y);     //GEngine->renderer->ResizeFramebuffer((int)viewportSize.x, (int)viewportSize.y);
             lastSize = viewportSize;
 

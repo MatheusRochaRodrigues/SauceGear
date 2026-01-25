@@ -1,7 +1,12 @@
 ﻿#pragma once
 #include "SceneECS.h" 
 #include "../Graphics/Framebuffer.h" 
-#include "../ECS/Components/ComponentsHelper.h"
+
+#include "../ECS/Components/CameraComponent.h"
+#include "../ECS/Components/TransformComponent.h"
+#include "../ECS/Components/ComputeSyncComponent.h"
+#include "../ECS/Components/LightComponent.h"
+
 #include <stdexcept> 
 #include "SceneBuilder.h"
 #include <memory>
@@ -28,8 +33,13 @@ public:
             AddComponent<ComputeSyncComponent>(computeManager);
             std::cout << "[INFO Scene] ComputeManager entity criado: " << computeManager << "\n";
         }
-
-        /*
+        {
+            auto e = SceneBuilder::CreateModel(PrimitiveMesh::Plane());
+            auto& pTransform = GetComponent<TransformComponent>(e); 
+            pTransform.SetLocalScale(glm::vec3(30, 30, 30));
+            pTransform.SetLocalPosition(glm::vec3(0, -6, 0));
+        }
+        
         {
             stbi_set_flip_vertically_on_load(true);
             std::cout << "cs 1" << std::endl;
@@ -41,7 +51,7 @@ public:
             auto& l = GetComponent<TransformComponent>(entity);
             l.position = glm::vec3(1, 1, 0);  
         }
-        */
+        
 
         {
             Entity pointLight = SceneBuilder::CreateGameObject("Sun");
@@ -88,9 +98,8 @@ public:
         /*Entity blurX = CreateEntity();
         AddComponent<PostProcessComponent>( blurX, new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)) );*/
 
-        /*
-        const int octreeSize = 64;
         
+        const int octreeSize = 64; 
         VertexBuffer vertexBuffer;      IndexBuffer indexBuffer;
 
         auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize, 1);
@@ -98,7 +107,7 @@ public:
         std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(vertexBuffer, indexBuffer);
         mesh->name = "DC";
         SceneBuilder::CreateModel(mesh);
-        */
+        
 
 
 
@@ -163,11 +172,10 @@ public:
         }*/
 
 
+         
 
-        return;
 
-
-        /*
+        
         {
             Entity e = scn->CreateEntity();
 
@@ -176,24 +184,23 @@ public:
 
             auto& txt = scn->AddComponent<TextComponent>(e);
             txt.text =
-                "Voxel Debug\n"
-                "LOD: 3\n"
-                "Nodes: 128";
+                "Debug Engine\n"
+                "Gear Sauce";
 
-            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 24);
-
+            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 24); 
             txt.space = TextComponent::Space::Screen;
             txt.units = TextComponent::Units::Relative;
             //txt.align = TextComponent::Align::Left;
             txt.anchor = TextComponent::Anchor::TopLeft;
+            txt.color = vec4(0.3f, 0.0f, 0.6f, 1);
 
             txt.style.shadowOffset = { 2, -2 };
             txt.style.shadowColor = { 0,0,0,0.6f };
 
 
         }
-        */
-        /*
+        
+        
         {
             Entity e = scn->CreateEntity();
 
@@ -201,20 +208,21 @@ public:
             tr.position = { 400, 400, 0 };
 
             auto& txt = scn->AddComponent<TextComponent>(e);
-            txt.text = "2323v";
+            txt.text = "Hello World";
 
             txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 24);
 
-            txt.space = TextComponent::Space::Screen;
+            txt.space = TextComponent::Space::World;
             txt.units = TextComponent::Units::Pixels;
             txt.align = TextComponent::Align::Left;
             //txt.anchor = TextComponent::Anchor::TopLeft;
 
+            txt.color = vec4(0.5f, 0.5f, 0, 1);
             txt.style.shadowOffset = { 2, -2 };
             txt.style.shadowColor = { 0,0,0,0.6f };
 
         }
-        */
+        
 
 
         //auto e = scn->CreateEntity();

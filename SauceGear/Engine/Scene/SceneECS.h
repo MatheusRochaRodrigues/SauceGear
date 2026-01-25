@@ -5,6 +5,7 @@
 #include <memory>
 #include <typeindex>
 #include <type_traits>
+#include <cassert>
  
 #include "../Scene/ComponentManager.h"
 #include "../ECS/System.h"  
@@ -45,7 +46,11 @@ public:
         auto it = storages.find(type.typeIndex);
         if (it != storages.end()) {
             it->second->Remove(entity);
+            return;
         }
+        
+        std::cout << "[Error] nao foi possivel remover o Componente (não existe)" << std::endl;
+        //assert(false && "TransformComponent cannot be removed");
     }
 
 
@@ -56,8 +61,16 @@ public:
 
     template<typename T>
     T& GetComponent(Entity entity) {
-        return componentManager->GetComponent<T>(entity);
+        assert(HasComponent<T>(entity));
+        return componentManager->GetComponent<T>(entity);           // scene.GetComponent<Transform>(e)     // assert no debug
     }
+    //  auto& t = scene.GetComponent<Transform>(e);                 
+
+    template<typename T>
+    T* TryGetComponent(Entity entity) {                           
+        return componentManager->TryGetComponent<T>(entity);        //  if (auto* t = scene.TryGetComponent<Transform>(e))     // seguro        
+    }
+     
 
     // Utilidade: obter entidades com um conjunto de componentes
     template<typename... Components>
@@ -161,6 +174,13 @@ public:
         return entityManager.Exists(e); // delega para o EntityManager
     }
 
+    void AddComponentByType(Entity e, std::type_index type);
+
+    bool CanAddComponentType(std::type_index type) const {
+        return componentManager->GetAllStorages().count(type) != 0;
+    }
+
+    void AddComponentByType_Internal(Entity e, std::type_index type);
 
 private:
     std::unique_ptr<ComponentManager> componentManager = std::make_unique<ComponentManager>(); 

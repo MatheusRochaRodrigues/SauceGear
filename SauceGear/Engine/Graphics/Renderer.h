@@ -1,7 +1,10 @@
 #pragma once
 #include "../Scene/SceneECS.h"
-#include "../ECS/Components/ComponentsHelper.h"  
+#include "../Core/Camera.h"
+#include "../Platform/Window.h" 
+#include "../Graphics/Framebuffer.h" 
 #include "../Graphics/PrimitiveMesh.h"    
+#include "../Graphics/Shader.h"    
 
 //backend de renderização.
 class Renderer {
@@ -20,8 +23,8 @@ public:
     void Render(Shader shader); 
 
     void RenderSceneWithShader(Shader* overrideShader); 
-    static void RenderSceneWithShader2(Shader* overrideShader); 
-     
+    static void RenderSceneWithShader2(Shader* overrideShader);  
+
 private:  
     SceneECS* m_Scene;
     Shader pbrShader;

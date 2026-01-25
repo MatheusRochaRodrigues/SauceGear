@@ -12,7 +12,8 @@ enum class RenderViewMode : int {
     Normal,
     Position,
     MRA,
-    Depth
+    Depth,
+    AO
 }; 
 
 // Apenas declaração (não define!)
@@ -30,10 +31,15 @@ struct RenderDebugSettings {
 
     bool postProcess    = false;
 
+    bool outlineSys = false;
+    bool OutlDepth  = true;
+
     std::string stgTeste;
 
     REFLECT_CLASS(RenderDebugSettings) {
         REFLECT_ENUM_FIELD(viewMode, RenderViewMode, EditorWidget::EnumCombo)
+        REFLECT_SPACE();
+
         REFLECT_HEADER("lights -> IRadiance and Radiance");
         REFLECT_FIELD(IBLAmbient);
         REFLECT_FIELD(SunLight);
@@ -43,6 +49,13 @@ struct RenderDebugSettings {
         REFLECT_FIELD(Skybox)
         REFLECT_HEADER("PostProcess");
         REFLECT_FIELD(postProcess)
+        REFLECT_SPACE();
+
+        REFLECT_HEADER("Outline System");
+        REFLECT_FIELD(outlineSys)
+        REFLECT_FIELD(OutlDepth)
+        REFLECT_SPACE();
+
         REFLECT_HEADER("Debug");
         REFLECT_FIELD(stgTeste)
     }

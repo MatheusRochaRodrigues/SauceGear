@@ -27,6 +27,7 @@ struct MeshRenderer {
     REFLECT_CLASS(MeshRenderer) {
         REFLECT_HEADER("MeshRenderer");  
 
+        REFLECT_ADD_COMPONENT();
     }
 
     void BuildBatches() {
@@ -71,6 +72,30 @@ struct MeshRenderer {
             for (uint32_t sm : batch.submeshes)
                 mesh->DrawSubmesh(sm);
         }
+    }
+
+    void Draw(Shader* shader) {
+        if (!mesh) return;
+
+        for (auto& batch : batches) {
+            auto* base = batch.material->asset->base.get();
+             
+            MaterialBinder::Bind(
+                *batch.material,
+                *batch.material->asset,
+                *base
+            );
+
+            for (uint32_t sm : batch.submeshes)
+                mesh->DrawSubmesh(sm);
+        }
+    }
+
+    void DrawMesh() {
+        if (!mesh) return; 
+        for (auto& batch : batches)  
+            for (uint32_t sm : batch.submeshes)
+                mesh->DrawSubmesh(sm);  
     }
 };
 

@@ -1,13 +1,17 @@
 ﻿#pragma once
 #include "SceneECS.h"
 #include "../Core/EngineContext.h"
-#include "../ECS/Components/ComponentsHelper.h"
+
+#include "../ECS/Components/AABBComponent.h"
 #include "../ECS/Components/HierarchyComponent.h"
+#include "../ECS/Components/OutlineComponent.h"
+#include "../ECS/Components/TextComponent.h"
+#include "../ECS/Components/MeshComponent.h"
+
 #include "../Resources/Loaders/ModelLoader.h"  
 #include "../Utils/AABBBuilder.h"
 #include "../Assets/AssetLoader.h"
 #include "../Instancing/ModelInstance.h"
-#include "../ECS/Components/MeshComponent.h"
 #include "../Materials/MaterialLibrary.h"
 
 class SceneBuilder {       //GameObjectFactory
@@ -86,7 +90,9 @@ public:
         mr.materials.push_back(mat);  
         mr.BuildBatches(); // custo pago UMA vez
 
-        scene.AddComponent<AABBComponent>(entity); 
+        scene.AddComponent<AABBComponent>(entity);
+        scene.AddComponent<OutlineComponent>(entity);
+
         return entity;
     }
 
