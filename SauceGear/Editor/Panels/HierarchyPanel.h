@@ -6,11 +6,159 @@
 #include "../../Engine/Core/KeyCodes.h"  
 #include "../../Engine/Resources/Primitives/Primitive.h"  
 
-struct HierarchyPanel : IPanel {  
-    void ShowAddMenu(std::shared_ptr<MaterialInstance> defaultMaterial) {
-        static char meshToSpawn[32] = "";     // Tipo selecionado para configuração
-        static bool showConfigWindow = false; // Janela de parâmetros
+struct HierarchyPanel : IPanel {   
 
+    //void Draw(SceneECS& scene) override { 
+    //    ImGui::Begin("Hierarchy");
+    //     
+    //    ShowAddMenu(nullptr);
+
+    //    HandleShortcuts(scene);
+    //    //DrawHierarchyPopup("currentDirectory");
+
+    //    for (Entity entity : scene.GetAllEntities()) {
+    //        // Só renderiza se nao tiver pai (ou seja, é um nó raiz da hierarquia)
+    //        if (scene.HasComponent<HierarchyComponent>(entity)) {
+    //            const auto& hierarchy = scene.GetComponent<HierarchyComponent>(entity);
+    //            if (hierarchy.parent == INVALID_ENTITY) {
+    //                DrawEntityNode(scene, entity);
+    //            }
+    //        }
+    //        else {
+    //            // Entidades sem HierarchyComponent sao tratadas como raiz também
+    //            DrawEntityNode(scene, entity);
+    //        }
+    //    } 
+    //    ImGui::End(); 
+    //}
+
+    void Draw(SceneECS& scene) override {
+        ImGui::Begin("Hierarchy");
+
+        HandleShortcuts(scene);
+
+        for (Entity entity : scene.GetAllEntities()) {
+            if (IsRoot(scene, entity)) {
+                DrawEntityNode(scene, entity);
+            }
+        }
+
+        ImGui::End();
+    }
+
+    const char* GetName() override { return "Scene"; }
+
+private: 
+    // ===============================
+    // CONTEXT MENU
+    // ===============================
+    void DrawContextMenu(SceneECS& scene, Entity entity) {
+
+        ImGui::PushID((int)entity); // ID ÚNICO POR ENTIDADE
+
+        if (ImGui::BeginPopupContextItem()) {
+
+            if (ImGui::MenuItem("Add Object")) {
+                ImGui::OpenPopup("AddObjectMenu");
+            }
+
+            if (ImGui::MenuItem("Delete")) {
+                scene.DestroyEntity(entity);
+                ImGui::EndPopup();
+                ImGui::PopID();
+                return;
+            }
+
+            ImGui::Separator();
+
+            DrawAddObjectPopup(); //  RENOMEADO
+
+            ImGui::EndPopup();
+        }
+
+        ImGui::PopID();
+    }
+
+
+    void DrawEntityNode(SceneECS& scene, Entity entity) {
+
+        const char* label =
+            scene.HasComponent<NameComponent>(entity)
+            ? scene.GetComponent<NameComponent>(entity).name.c_str()
+            : "Entity";
+
+        bool hasChildren = false;
+        if (scene.HasComponent<HierarchyComponent>(entity)) {
+            hasChildren = scene.GetComponent<HierarchyComponent>(entity).firstChild != INVALID_ENTITY;
+        }
+
+        ImGuiTreeNodeFlags flags =
+            ImGuiTreeNodeFlags_OpenOnArrow |
+            ImGuiTreeNodeFlags_SpanAvailWidth;
+
+        if (scene.GetSelectedEntity() == entity)
+            flags |= ImGuiTreeNodeFlags_Selected;
+
+        if (!hasChildren)
+            flags |= ImGuiTreeNodeFlags_Leaf;
+
+        bool open = ImGui::TreeNodeEx(
+            (void*)(intptr_t)entity,
+            flags,
+            "%s",
+            label
+        );
+
+        // seleção
+        if (ImGui::IsItemClicked()) {
+            scene.SelectEntity(entity);
+        }
+
+        // contexto
+        DrawContextMenu(scene, entity);
+
+        // 👇 REGRA CORRETA
+        if (open) {
+            if (hasChildren) {
+                Entity child = scene.GetComponent<HierarchyComponent>(entity).firstChild;
+                while (child != INVALID_ENTITY) {
+                    DrawEntityNode(scene, child);
+                    child = scene.GetComponent<HierarchyComponent>(child).nextSibling;
+                }
+            }
+            ImGui::TreePop();
+        }
+    }
+
+
+
+    // ===============================
+    // INPUT
+    // ===============================
+    void HandleShortcuts(SceneECS& scene) {
+        if (scene.GetSelectedEntity() != INVALID_ENTITY &&
+            ImGui::IsWindowFocused() &&
+            ImGui::IsKeyPressed(ImGuiKey_Delete)) {
+
+            scene.DestroyEntity(scene.GetSelectedEntity());
+        }
+    }
+
+    // ===============================
+   // HIERARCHY
+   // ===============================
+    bool IsRoot(SceneECS& scene, Entity e) {
+        if (!scene.HasComponent<HierarchyComponent>(e))
+            return true;
+
+        return scene.GetComponent<HierarchyComponent>(e).parent == INVALID_ENTITY;
+    }
+
+private: 
+
+    void DrawAddObjectPopup() {
+        static char meshToSpawn[32] = "";     // Tipo selecionado para configuração
+        static bool showConfigWindow = false; // Janela de parâmetros 
         ImVec2 mousePos = ImGui::GetMousePos();
 
         // Shift + A
@@ -19,30 +167,12 @@ struct HierarchyPanel : IPanel {
             ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
         }
 
-        // Clique direito sobre a Hierarchy (ou qualquer janela)
-        // Detecta clique direito sobre a Hierarchy
-        //if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-        if (ImGui::IsWindowHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-            ImGui::OpenPopup("AddObjectMenu");
-            ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
-        }
-
-        // Clique direito sobre a Hierarchy
-        //if (ImGui::BeginPopupContextWindow("HierarchyContext", ImGuiPopupFlags_MouseButtonRight)) {
-        //    if (ImGui::MenuItem("Add Object")) {
-        //        ImGui::CloseCurrentPopup();        // Fecha o menu do clique direito
-        //        ImGui::OpenPopup("AddObjectMenu"); // Marca o outro popup como aberto
-        //        ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
-        //    }
-        //    //ImGui::EndPopup();
-        //}
-
         // Menu principal
         if (ImGui::BeginPopup("AddObjectMenu", ImGuiWindowFlags_AlwaysAutoResize)) {
 
-            if (ImGui::BeginMenu("Mesh")) { 
+            if (ImGui::BeginMenu("Mesh")) {
                 // Cube spawn direto
-                if (ImGui::MenuItem("Cube")) { 
+                if (ImGui::MenuItem("Cube")) {
                     SceneBuilder::CreateModel(PrimitiveMesh::Cube());
                     ImGui::CloseCurrentPopup();
                 }
@@ -56,8 +186,20 @@ struct HierarchyPanel : IPanel {
 
                 // Cylinder → abre janela de configuração
                 if (ImGui::MenuItem("Cylinder")) {
-                    strcpy_s(meshToSpawn, sizeof(meshToSpawn), "Cylinder"); 
+                    strcpy_s(meshToSpawn, sizeof(meshToSpawn), "Cylinder");
                     showConfigWindow = true;
+                    ImGui::CloseCurrentPopup();
+                }
+
+                // Cylinder → abre janela de configuração
+                if (ImGui::MenuItem("Plane")) {
+                    auto e = SceneBuilder::CreateModel(PrimitiveMesh::Plane());
+                    scn->AddComponent<NameComponent>(e).name = "Plane";
+                    ImGui::CloseCurrentPopup();
+                }
+
+                if (ImGui::MenuItem("Ligth")) {
+                    auto e = SceneBuilder::CreateLight();
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -80,7 +222,7 @@ struct HierarchyPanel : IPanel {
                 ImGui::InputInt("Rings", &rings);
                 ImGui::InputFloat("Radius", &radius);
 
-                if (ImGui::Button("Spawn Sphere")) { 
+                if (ImGui::Button("Spawn Sphere")) {
                     SceneBuilder::CreateModel(PrimitiveMesh::Sphere(segments, rings, radius));
                     showConfigWindow = false;
                 }
@@ -96,7 +238,7 @@ struct HierarchyPanel : IPanel {
                 ImGui::InputFloat("Radius", &radius);
                 ImGui::Checkbox("Capped", &capped);
 
-                if (ImGui::Button("Spawn Cylinder")) {  
+                if (ImGui::Button("Spawn Cylinder")) {
                     SceneBuilder::CreateModel(PrimitiveMesh::Cylinder(segments, height, radius, capped));
                     showConfigWindow = false;
                 }
@@ -105,38 +247,20 @@ struct HierarchyPanel : IPanel {
             ImGui::End();
         }
     }
+};
+
+  
 
 
 
-    void Draw(SceneECS& scene) override { 
-        ImGui::Begin("Hierarchy");
-         
-        ShowAddMenu(nullptr);
 
-        //DrawHierarchyPopup("currentDirectory");
 
-        for (Entity entity : scene.GetAllEntities()) {
-            // Só renderiza se nao tiver pai (ou seja, é um nó raiz da hierarquia)
-            if (scene.HasComponent<HierarchyComponent>(entity)) {
-                const auto& hierarchy = scene.GetComponent<HierarchyComponent>(entity);
-                if (hierarchy.parent == INVALID_ENTITY) {
-                    DrawEntityNode(scene, entity);
-                }
-            }
-            else {
-                // Entidades sem HierarchyComponent sao tratadas como raiz também
-                DrawEntityNode(scene, entity);
-            }
-        } 
-        ImGui::End(); 
-    }
-
-    const char* GetName() override { return "Scene"; }
-
-private:
-     
-    void DrawEntityNode(SceneECS& scene, Entity entity) {
-        const auto& name = scene.HasComponent<NameComponent>(entity) ? scene.GetComponent<NameComponent>(entity).name : "Unnamed Entity";
+/*
+void DrawEntityNode(SceneECS& scene, Entity entity) {
+        const char* label =
+            scene.HasComponent<NameComponent>(entity)
+            ? scene.GetComponent<NameComponent>(entity).name.c_str()
+            : "Entity";
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         if (scene.GetSelectedEntity() == entity)
@@ -150,9 +274,9 @@ private:
 
         bool open = false;
         if (hasChildren)
-            open = ImGui::TreeNodeEx((void*)(intptr_t)entity, flags, "%s", name.c_str());
+            open = ImGui::TreeNodeEx((void*)(intptr_t)entity, flags, "%s", label);
         else
-            ImGui::TreeNodeEx((void*)(intptr_t)entity, flags | ImGuiTreeNodeFlags_Leaf, "%s", name.c_str());
+            ImGui::TreeNodeEx((void*)(intptr_t)entity, flags | ImGuiTreeNodeFlags_Leaf, "%s", label);
 
         if (ImGui::IsItemClicked())
             scene.SelectEntity(entity);
@@ -170,8 +294,4 @@ private:
         if (!hasChildren)
             ImGui::TreePop(); // necessário para manter o estado correto se não tiver filhos
     }
-
-     
-};
-
-  
+*/

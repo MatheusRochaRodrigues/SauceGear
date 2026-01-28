@@ -56,7 +56,9 @@ public:
         Scene& scene,
         Framebuffer& target,
         Framebuffer& gbuffer, 
-        IBLSet& ibl)
+        IBLSet& ibl,
+        bool SSAO = false,
+        GLuint SSAOBuffer = 0)
     {
         target.Bind();
         glDisable(GL_DEPTH_TEST); 
@@ -71,6 +73,15 @@ public:
             iblAmbient->setVec3("viewPos", GEngine->mainCamera->GetPosition());
             GBufferBinder::Bind(gbuffer);
             IBLBinder::Bind(ibl);
+
+            //SSAO Setup
+            iblAmbient->setBool("existSSAO", SSAO);
+            if (SSAO) {
+                iblAmbient->setInt("SSAO", 8);
+                glActiveTexture(GL_TEXTURE8); 
+                glBindTexture(GL_TEXTURE_2D, SSAOBuffer);  
+            } //-------------------------------------------------
+
             RenderQuad();
         }
         

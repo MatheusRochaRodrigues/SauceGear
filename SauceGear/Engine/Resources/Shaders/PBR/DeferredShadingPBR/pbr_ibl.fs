@@ -7,6 +7,9 @@ uniform sampler2D gAlbedo;
 uniform sampler2D gNormal;
 uniform sampler2D gMRA;
 
+uniform bool existSSAO;
+uniform sampler2D SSAO;
+
 uniform samplerCube irradianceMap;
 uniform samplerCube prefilterMap;
 uniform sampler2D   brdfLUT;
@@ -57,6 +60,11 @@ void main(){
 
     //vec3 color = kd * diffuse * ao + specular;
     //specular *= mix(1.0, ao, roughness);
+
+    //SSAO
+    if(existSSAO){
+        color *= texture(SSAO, uv).r; // here we add occlusion factor              vec3 ambient    ==    AmbientOcclusion
+    }
 
     FragColor = vec4(color, 1.0);                   //Ambient result
 }

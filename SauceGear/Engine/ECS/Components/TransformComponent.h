@@ -61,6 +61,11 @@ struct TransformComponent {
         MarkLocalDirty();
     }
 
+    void SetLocalRotation(const glm::vec3& rot) {
+        localRotation = glm::quat(glm::radians(rot));
+        MarkLocalDirty();
+    }
+
     void SetLocalRotation(const glm::quat& rot) {
         localRotation = glm::normalize(rot);
         MarkLocalDirty();
@@ -80,6 +85,13 @@ struct TransformComponent {
         MarkLocalDirty();
     }
 
+    //glm::quat(vec3) usa ordem XYZ implicitamente              -> atencao = O gizmo do seu editor PRECISA usar a mesma ordem
+    void SetLocalEulerDegrees(const glm::vec3& eulerDeg) {
+        localRotation = glm::quat(glm::radians(eulerDeg));
+        MarkLocalDirty();
+    }
+
+
     void SetLocalFromMatrix(const glm::mat4& mat) {
         glm::vec3 pos, scl;
         glm::quat rot;
@@ -94,6 +106,10 @@ struct TransformComponent {
         localScale = scl;
 
         MarkLocalDirty();
+    }
+
+    glm::vec3 GetLocalEulerDegrees() const {
+        return glm::degrees(glm::eulerAngles(localRotation));
     }
 
      
@@ -199,3 +215,20 @@ struct TransformComponent {
         return glm::normalize(rotation * glm::vec3(0, 0, -1));
     }
 };
+
+
+/*
+formas de setar rotaçao manualmente em codigo
+
+glm::mat4 model(1.0f);
+model = glm::translate(model, glm::vec3(1.089f, -10.667f, 13.343f));
+model *= glm::toMat4(glm::quat(glm::radians(glm::vec3(
+   -45.308f,
+    65.636f,
+   -34.439f
+))));
+model = glm::scale(model, glm::vec3(1.268f));
+
+t.SetLocalFromMatrix(model);
+
+*/

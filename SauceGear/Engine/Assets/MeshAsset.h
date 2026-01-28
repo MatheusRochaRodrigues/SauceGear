@@ -4,10 +4,7 @@
 #include <memory>
 #include <glad/glad.h>
 #include "../Graphics/Vertex.h"
-#include "../Assets/MaterialAsset.h"
- 
-typedef std::vector<Vertex> VertexBuffer;
-typedef std::vector<uint32_t> IndexBuffer;
+#include "../Assets/MaterialAsset.h" 
 
 struct SubMesh {
     uint32_t indexOffset = 0;

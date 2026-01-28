@@ -3,6 +3,7 @@
 #include <glm/glm.hpp> 
 #include <iostream>   
 #include "../Reflection/Macros.h"
+#include "../../Data/Color.h"
   
 enum class ShadowLOD { HIGH, MEDIUM, LOW, NONE }; 
 enum class LightType { Directional, Point, Spot };
@@ -12,7 +13,7 @@ enum class LightType { Directional, Point, Spot };
 struct LightComponent {                              
     LightType   type = LightType::Point;               
     glm::vec3   position = glm::vec3(0.0f);            
-    glm::vec3   color = glm::vec3(1.0f);               
+    glm::vec3   color = glm::vec3(1.0f);            //glm::vec3   color = glm::vec3(1.0f);                 
     float       intensity = 1.0f;                           
     float       range = 25.0f;                            
     float       angle = 45.0f;     // Para Spot            
@@ -20,10 +21,18 @@ struct LightComponent {
     glm::mat4   lightSpaceMatrix = glm::mat4(1.0f);                                 
     GLuint      depthMap = 0;       
 
+    float       intensityBillboard = 25.0f;
+
     REFLECT_CLASS(LightComponent) {
         REFLECT_HEADER("LightComponent");
-        REFLECT_FIELD(color);
+        
+        REFLECT_FIELD_COLOR(color)
+        //REFLECT_FIELD(color)
+            //.UI(EditorWidget::Color);
+        
         REFLECT_FIELD(intensity);
+
+        REFLECT_FLOAT_SLIDER(intensityBillboard, 0.0f, 100.0f);   // cromaticidade
 
         REFLECT_ADD_COMPONENT();
     }
@@ -33,6 +42,8 @@ struct LightComponent {
         this->range = (type == LightType::Directional) ? 7.5f : 25.0f;
         this->position = (type == LightType::Directional) ? glm::vec3(-2.0f, 4.0f, -1.0f) : glm::vec3(0.0f);
     };  
+
+private:
 
 };
  

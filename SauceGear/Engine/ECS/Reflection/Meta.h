@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -14,7 +14,7 @@ using Entity = uint32_t; // ou forward do seu Entity
 enum class FieldKind {
     Value,    // campo normal
     Header,   // header visual
-    Space,     // espaço vertical
+    Space,     // espaÃ§o vertical
 
     Vector
 };
@@ -30,13 +30,20 @@ struct EnumInfo {
 
     std::vector<Value> values;
 };
+
+
 enum class EditorWidget {
     Default,
     EnumCombo,
     EnumRadio,
     EnumButtons,
-    EnumFlags
+    EnumFlags,
+
+    Color,
+    SliderFloat,
+    SliderInt
 };
+
 
 
 
@@ -46,19 +53,24 @@ struct FieldInfo {
     std::type_index type{ typeid(void) }; // inicializa com typeid(void)
     size_t offset = 0; 
 
-    FieldKind kind = FieldKind::Value; // default é campo normal
+    FieldKind kind = FieldKind::Value; // default Ã© campo normal
 
 
     std::type_index elementType{ typeid(void) }; // tipo interno (vector)
-    // Interface genérica para containers
+    // Interface genÃ©rica para containers
     size_t(*getSize)(void*) = nullptr;
     void* (*getElement)(void*, size_t) = nullptr;
     void   (*resize)(void*, size_t) = nullptr;
 
 
+    // --- UI metadata ---
     // Enum
     EnumInfo* enumInfo = nullptr;
     EditorWidget widget = EditorWidget::Default;
+
+    float min = 0.0f;
+    float max = 1.0f;
+    float speed = 0.01f;   // fallback p/ DragFloat
 };
 
 struct TypeInfo {
@@ -71,7 +83,7 @@ struct TypeInfo {
 
     //AddComponent   -   factory ECS
     //std::function<void(SceneECS&, Entity)> Add;       //* > & ?
-    void (*Add)(void* scene, Entity) = nullptr;                 //equivalent há = std::function<void(void*, Entity)> Add;
+    void (*Add)(void* scene, Entity) = nullptr;                 //equivalent hÃ¡ = std::function<void(void*, Entity)> Add;
 
     bool removable = true;
 };
@@ -83,7 +95,7 @@ public:
         return instance;
     }
 
-    // Registra o TypeInfo e guarda também type_index
+    // Registra o TypeInfo e guarda tambÃ©m type_index
     void RegisterType(const std::string& name, TypeInfo& type, std::type_index typeIndex) {        //TypeInfo&& type RValue
         type.typeIndex = typeIndex;
         types[name] = type;                                                                        //types[name] = std::move(type);
@@ -114,9 +126,9 @@ private:
 
 /*
 
-EXTRA (nível Unreal / Unity)
+EXTRA (nÃ­vel Unreal / Unity)
 
-Você pode evoluir isso depois para:
+VocÃª pode evoluir isso depois para:
 
 enum class ComponentFlags {
     None        = 0,

@@ -2,10 +2,12 @@
 #include "../../../Graphics/Framebuffer.h"    
 #include "../../../Graphics/FullscreenQuad.h"
 #include "../../../ECS/Systems/DayNightSystem.h"
-#include "../../../Graphics/PrimitiveMesh.h"
 #include "../../LightPass/LightPass.h" 
 #include "../../../Core/EngineContext.h"
 #include "../../../Core/Time.h"
+#include "../../../Core/Camera.h"
+#include "../../../Instancing/MeshInstance.h" 
+#include "../../../Resources/Primitives/Primitive.h"
 
 class SkyboxPass {
 public:
@@ -15,13 +17,17 @@ public:
         // Shaders defaults
         shader->use();
         shader->setInt("environmentMap", 0);
+        
+        skybox = LoadCubemap2TEX();
     }
 
     void Execute(Camera& cam, GLuint cubemap, Framebuffer& target)
     { 
+        if (cubemap == 0) cubemap = skybox;
+
         target.Bind();
         DrawSkybox(cam, cubemap);
-        RenderDebugSun();
+        //RenderDebugSun();
     }
 
     void DrawSkybox(Camera& cam, GLuint cubemap) {
@@ -84,6 +90,9 @@ public:
         sunBillboardShader->setVec3("color", sunLight.color);
         sunBillboardShader->setFloat("time", GEngine->time->GetTime());
 
+        sunBillboardShader->setFloat("intensity", sunLight.intensityBillboard);
+
+        /*
         // blending aditivo
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE); 
@@ -93,10 +102,31 @@ public:
 
         glDepthMask(GL_TRUE);       //glEnable(GL_DEPTH_TEST); 
         glDisable(GL_BLEND);
+        */
+
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE); 
+        
+        glEnable(GL_DEPTH_TEST); //  Usa depth buffer existente
+        glDepthFunc(GL_LESS); 
+        // NÃO escreve depth
+        glDepthMask(GL_FALSE);
+
+        quadMesh->Draw();
+
+        // restaura
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+
     }
 
 
+    static inline std::string path = "Assets/HDR/sky_47_2k (1)/sky_47_cubemap_2k";
+    GLuint skybox;
 private:
     Shader* shader;
     std::shared_ptr<MeshInstance> sphereMesh = nullptr;
+
+    static GLuint LoadCubemap2TEX();
 };

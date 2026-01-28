@@ -1,4 +1,4 @@
-#include "SceneECS.h"  
+﻿#include "SceneECS.h"  
 
 // Systems
 #include "../ECS/Systems/RenderSystem.h" 
@@ -69,9 +69,59 @@ Entity SceneECS::CreateEntity() {
     return entityManager.CreateEntity();
 } 
 
+
 void SceneECS::DestroyEntity(Entity entity) {
-    return entityManager.DestroyEntity(entity);
+    if (!entityManager.Exists(entity))
+        return;
+
+    // 1️ Remove da hierarquia (pai / filhos)
+    if (HasComponent<HierarchyComponent>(entity)) {
+        auto& h = GetComponent<HierarchyComponent>(entity);
+
+        // Remove referencia do pai
+        if (h.parent != INVALID_ENTITY && HasComponent<HierarchyComponent>(h.parent)) {
+            auto& parent = GetComponent<HierarchyComponent>(h.parent);
+
+            Entity child = parent.firstChild;
+            Entity prev = INVALID_ENTITY;
+
+            while (child != INVALID_ENTITY) {
+                if (child == entity) {
+                    if (prev == INVALID_ENTITY)
+                        parent.firstChild = h.nextSibling;
+                    else
+                        GetComponent<HierarchyComponent>(prev).nextSibling = h.nextSibling;
+                    break;
+                }
+                prev = child;
+                child = GetComponent<HierarchyComponent>(child).nextSibling;
+            }
+        }
+
+        // Remove filhos recursivamente
+        Entity child = h.firstChild;
+        while (child != INVALID_ENTITY) {
+            Entity next = GetComponent<HierarchyComponent>(child).nextSibling;
+            DestroyEntity(child);
+            child = next;
+        }
+    }
+
+    // 2️ Remove TODOS os componentes
+    const auto& storages = componentManager->GetAllStorages();
+    for (auto& [type, storage] : storages) {
+        if (storage->Has(entity))
+            storage->Remove(entity);
+    }
+
+    // 3️ Remove entidade
+    entityManager.DestroyEntity(entity);
+
+    // 4️ Limpa seleção
+    if (selectedEntity == entity)
+        selectedEntity = INVALID_ENTITY;
 }
+
 
 void SceneECS::AddComponentByType(Entity e, std::type_index type) {
     auto it = componentManager->GetAllStorages().find(type);
@@ -91,7 +141,7 @@ void SceneECS::AddComponentByType_Internal(Entity e, std::type_index type) {
     if (it == storages.end())
         return;
 
-    // N�O chama TypeInfo::Add
+    // NÃO chama TypeInfo::Add
     it->second->EmplaceDefault(e);
 }
 
@@ -154,7 +204,7 @@ void SceneECS::AddToParent(Entity father, Entity child) {
 
 
 //unsigned int SceneECS::CreateEntity() {
-//    // sua l�gica aqui, exemplo:
+//    // sua lógica aqui, exemplo:
 //    static unsigned int nextId = 1;
 //    return nextId++;
 //}

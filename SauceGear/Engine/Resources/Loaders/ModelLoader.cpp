@@ -159,6 +159,8 @@ uint32_t ModelLoader::GetOrCreateMaterialIndex(
 ) {
     std::string key = model->name + "::" + aiMat->GetName().C_Str();
 
+    std::cout << " kl " << key << std::endl;
+
     // O(1) average
     auto it = model->materialsLUT.find(key);
     if (it != model->materialsLUT.end()) return it->second;
@@ -174,6 +176,72 @@ uint32_t ModelLoader::GetOrCreateMaterialIndex(
 
     return index;
 }
+
+
+
+
+
+
+enum class TextureSemantic {
+    Albedo,
+    Normal,
+    Metallic,
+    Roughness,
+    AO
+};
+
+/*
+models/
+ └ backpack/
+    ├ backpack.obj
+    └ textures/
+       ├ backpack_ALBEDO.png
+       ├ backpack_NORMAL.png
+       ├ backpack_METAL.png
+       ├ backpack_ROUGHNESS.png
+       ├ backpack_AO.png 
+*/
+
+static const std::unordered_map<TextureSemantic, std::vector<std::string>> TextureSuffixes = {
+    { TextureSemantic::Albedo,    { "_ALBEDO", "_DIFFUSE", "_BASECOLOR" } },
+    { TextureSemantic::Normal,    { "_NORMAL", "_NRM" } },
+    { TextureSemantic::Metallic,  { "_METAL", "_METALLIC" } },
+    { TextureSemantic::Roughness, { "_ROUGH", "_ROUGHNESS" } },
+    { TextureSemantic::AO,        { "_AO", "_OCCLUSION" } },
+};
+
+static std::shared_ptr<Texture> TryFindTextureByConvention(
+    const std::string& baseDir,
+    const std::string& modelName,
+    TextureSemantic semantic,
+    bool isSRGB
+) {
+    namespace fs = std::filesystem;
+
+    fs::path texturesDir = fs::path(baseDir) / "textures";
+    if (!fs::exists(texturesDir))
+        return nullptr;
+
+    for (auto& suffix : TextureSuffixes.at(semantic)) {
+        for (auto& ext : { ".png", ".jpg", ".jpeg", ".tga" }) {
+            fs::path candidate =
+                texturesDir / (modelName + suffix + ext);
+
+            if (fs::exists(candidate)) {
+                return TextureCache::Get().Load(
+                    candidate.string(),
+                    isSRGB
+                );
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+
+
+
 
 
  
@@ -194,27 +262,46 @@ ModelLoader::CreateMaterialAssetFromAssimp(
         asset->base = MaterialLibrary::Get("PBR_Default");
         ASSERT(asset->base && "MaterialBase inexistente");
         
-        auto TrySetTexture = [&](aiTextureType type, const char* paramName, float fallback = 0, bool isSRGB = false)
+        auto ResolveTexture = [&](aiTextureType assimpType,
+            TextureSemantic semantic,
+            const char* paramName,
+            float fallback,
+            bool isSRGB)  -> bool
         {
-            aiString tex;
-            if (aiMat->GetTexture(type, 0, &tex) == AI_SUCCESS) 
-                asset->defaults[paramName].data = TextureCache::Get().Load(directory + "/" + tex.C_Str(), isSRGB);
-            else
-                asset->defaults[paramName].data = fallback;
+            aiString tex; 
 
-        };
+            // Assimp
+            if (aiMat->GetTexture(assimpType, 0, &tex) == AI_SUCCESS) {
+                asset->defaults[paramName].data =
+                    TextureCache::Get().Load(directory + "/" + tex.C_Str(), isSRGB);
+                return true;
+            }
 
-        // Fallback
-        aiColor3D color(1, 1, 1);
-        if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-            asset->defaults["Albedo"].data =
-                glm::vec3(color.r, color.g, color.b);
-        }   
+            // Convenção por pasta
+            if (auto texAsset = TryFindTextureByConvention(directory, modelName, semantic, isSRGB)) {
+                asset->defaults[paramName].data = texAsset;
+                return true;
+            }
+
+            // Fallback constante
+            asset->defaults[paramName].data = fallback;
+
+            return false;
+        }; 
+
 
         // Texturas (se existirem)
-        TrySetTexture(aiTextureType_DIFFUSE, "Albedo", 0, true);
-        TrySetTexture(aiTextureType_METALNESS, "Metallic", 0.1f);
-        TrySetTexture(aiTextureType_DIFFUSE_ROUGHNESS, "Roughness", 0.5f);
+        if (!ResolveTexture(aiTextureType_DIFFUSE, TextureSemantic::Albedo, "Albedo", 0, true)) { 
+            // Fallback
+            aiColor3D color(1, 1, 1);
+            if (aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)  
+                asset->defaults["Albedo"].data =
+                    glm::vec3(color.r, color.g, color.b); 
+        }
+        ResolveTexture(aiTextureType_NORMALS, TextureSemantic::Normal, "Normal", 0.5f, false);
+        ResolveTexture(aiTextureType_METALNESS, TextureSemantic::Metallic, "Metallic", 0.1f, false);
+        ResolveTexture(aiTextureType_DIFFUSE_ROUGHNESS, TextureSemantic::Roughness, "Roughness", 0.5f, false);
+        ResolveTexture(aiTextureType_AMBIENT_OCCLUSION, TextureSemantic::AO, "AO", 1.0f, false); 
 
         return asset;
     });

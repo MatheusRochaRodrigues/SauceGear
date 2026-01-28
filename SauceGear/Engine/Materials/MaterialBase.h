@@ -17,6 +17,7 @@ public:
     Shader* shader = nullptr;
 
     struct ParamDef {
+        // shader expectation
         enum Type               { Float, Vec3, Vec4, Texture };     // that's define what shader expects to receive 
         Type type;
 

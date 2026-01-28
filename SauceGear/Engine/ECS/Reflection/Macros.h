@@ -117,3 +117,39 @@
 
 #define REFLECT_NOT_REMOVABLE() \
     GetTypeInfo().removable = false;
+
+
+#define REFLECT_FIELD_COLOR(FIELD) \
+{ \
+    FieldInfo f; \
+    f.name = #FIELD; \
+    f.type = std::type_index(typeid(decltype(__CurrentClass::FIELD))); \
+    f.offset = offsetof(__CurrentClass, FIELD); \
+    f.widget = EditorWidget::Color; \
+    GetTypeInfo().fields.push_back(f); \
+}
+
+
+#define REFLECT_FLOAT_SLIDER(FIELD, MIN, MAX) \
+{ \
+    FieldInfo f; \
+    f.name = #FIELD; \
+    f.type = typeid(float); \
+    f.offset = offsetof(__CurrentClass, FIELD); \
+    f.widget = EditorWidget::SliderFloat; \
+    f.min = MIN; \
+    f.max = MAX; \
+    GetTypeInfo().fields.push_back(f); \
+}
+
+#define REFLECT_INT_SLIDER(FIELD, MIN, MAX) \
+{ \
+    FieldInfo f; \
+    f.name = #FIELD; \
+    f.type = typeid(int); \
+    f.offset = offsetof(__CurrentClass, FIELD); \
+    f.widget = EditorWidget::SliderInt; \
+    f.min = (float)(MIN); \
+    f.max = (float)(MAX); \
+    GetTypeInfo().fields.push_back(f); \
+}

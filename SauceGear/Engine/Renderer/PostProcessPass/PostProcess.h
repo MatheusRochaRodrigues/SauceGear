@@ -3,16 +3,28 @@
 #include "../../Graphics/Renderer.h"
 #include "PostProcessPass.h" 
 #include "Pass/Fix_HDR_GAMMA_pp.h"
+#include "Pass/ACESColorBoostPP.h"
+#include "../RenderDebugSettings.h"
 
 class PostProcess {
 public:
     PostProcess();
     void initialize();  
 
-    void Execute(Scene& scene, Framebuffer& ppFBO) { 
-        ppFBO.Bind();
+    // We return available buffer write
+    Framebuffer* Execute(Scene& scene, Framebuffer& ppFBO_A, Framebuffer& ppFBO_B) {
+        // existem 2 buffers para evitar um feedback loop:
+        // e usado apenas para evitar renderizar um quad lendo da própria textura de cor do framebuffer
+        // ppFBO_A <--> ppFBO_B  == ping pong
 
-        for (auto& pp : passes) {  
+        GLuint inputTexture = GEngine->renderer->GetTextureRendered;
+
+        Framebuffer* writeFBO = &ppFBO_A;
+        Framebuffer* readFBO = &ppFBO_B;
+
+        for (auto& pp : passes) {   
+            writeFBO->Bind();
+
             pp->shader->use();
             pp->Apply();  // chama a lógica individual de cada efeito    
               
@@ -20,24 +32,31 @@ public:
             pp->shader->setInt("scene", 0);
             glActiveTexture(GL_TEXTURE0);   
             // set texture render scene
-            glBindTexture(GL_TEXTURE_2D, GEngine->renderer->GetTextureRendered);
+            glBindTexture(GL_TEXTURE_2D, inputTexture);
 
             glDisable(GL_DEPTH_TEST);
             DrawQuad();
             glEnable(GL_DEPTH_TEST);
 
+            // saída vira entrada do próximo pass
+            inputTexture = writeFBO->GetTexture(0);
+
+            // ping-pong
+            std::swap(writeFBO, readFBO);
         }
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-        //Finish();
+        // resultado FINAL
+        GEngine->renderer->GetTextureRendered = inputTexture; 
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default                    //Finish();
+
+        return writeFBO;
     }
 
-    void correct_HDR_GAMA(Framebuffer& ppFBO) {
-        static Fix_HDR_GAMMA_pp* correct = nullptr;
-        if (correct == nullptr) correct = new Fix_HDR_GAMMA_pp();
-
+    void correct_HDR_GAMA(Framebuffer& ppFBO, PostProcessPass* correct) {
         ppFBO.Bind();
-        correct->shader->use();   
+        correct->shader->use();
+        correct->Apply();  // chama a lógica individual de cada efeito    
         correct->shader->setInt("scene", 0); // define local texture in shader
         glActiveTexture(GL_TEXTURE0); 
         glBindTexture(GL_TEXTURE_2D, GEngine->renderer->GetTextureRendered);    // set texture render scene
@@ -49,9 +68,23 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     }
 
-    void Finish(Framebuffer& ppFBO, bool fixToneGamma = true) {
-        if(fixToneGamma) correct_HDR_GAMA(ppFBO);
+    void CorrectSpaceColor(Framebuffer& ppFBO) {  
+        // Ambos sao Tonemmaping e possuem correção Gamma
+        static ACESColorBoostPP* ACES = nullptr;
+        if (ACES == nullptr) ACES = new ACESColorBoostPP();
 
+        static Fix_HDR_GAMMA_pp* Reinhard = nullptr;
+        if (Reinhard == nullptr) Reinhard = new Fix_HDR_GAMMA_pp();
+
+        if (GetEngineSettings().renderDebug.hdrMode == HDRMode::ACESFilm)      //gammaPass->Apply(inputTexture, writeFBO);
+            correct_HDR_GAMA(ppFBO, ACES);
+        else
+            correct_HDR_GAMA(ppFBO, Reinhard);
+
+        GEngine->renderer->GetTextureRendered = ppFBO.GetTexture(0); 
+    }
+
+    void Finish() {
         //===================================== FINALE =============================================================
         //GAME_RUNTIME
         #ifdef EDITOR_BUILD

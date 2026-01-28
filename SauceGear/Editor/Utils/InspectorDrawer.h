@@ -1,5 +1,6 @@
 #pragma once
 #include "ImGuiUtils.h"
+#include "../../Engine/Data/Color.h"
 #include "../../Engine/ECS/Reflection/Meta.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -136,19 +137,58 @@ namespace InspectorDrawer {
                 case EditorWidget::EnumButtons:  break; 
                 case EditorWidget::EnumFlags:  break;
                 }
-            }
-             
+            } 
 
-            if      (field.type == typeid(float))       
-                changed |= ImGuiUtils::DragFloat(field.name.c_str(), *static_cast<float*>(ptr));
-            else if (field.type == typeid(int))         
-                changed |= ImGuiUtils::DragInt(field.name.c_str(), *static_cast<int*>(ptr));
+            if      (field.type == typeid(float)) {
+                float& v = *static_cast<float*>(ptr); 
+                if (field.widget == EditorWidget::SliderFloat) {
+                    changed |= ImGui::SliderFloat(
+                        field.name.c_str(), &v,  field.min,  field.max
+                    );
+                } else {
+                    changed |= ImGuiUtils::DragFloat(field.name.c_str(), v);
+                }
+            }
+
+            else if (field.type == typeid(int)) {
+                int& v = *static_cast<int*>(ptr);
+
+                if (field.widget == EditorWidget::SliderInt) {
+                    changed |= ImGui::SliderInt(
+                        field.name.c_str(),
+                        &v,
+                        (int)field.min,
+                        (int)field.max
+                    );
+                }
+                else {
+                    changed |= ImGuiUtils::DragInt(field.name.c_str(), v);
+                }
+            }
+
             else if (field.type == typeid(bool))        
                 changed |= ImGuiUtils::Checkbox(field.name.c_str(), *static_cast<bool*>(ptr));
             else if (field.type == typeid(glm::vec2))   
-                changed |= ImGuiUtils::DragVec2Colored(field.name.c_str(), *static_cast<glm::vec2*>(ptr));
-            else if (field.type == typeid(glm::vec3))   
-                changed |= ImGuiUtils::DragVec3Colored(field.name.c_str(), *static_cast<glm::vec3*>(ptr));      //DrawVec3Field(field.name, *(glm::vec3*)fieldPtr);
+                changed |= ImGuiUtils::DragVec2Colored(field.name.c_str(), *static_cast<glm::vec2*>(ptr)); 
+
+            else if (field.type == typeid(glm::vec3)) {
+                glm::vec3& c = *static_cast<glm::vec3*>(ptr);
+
+                if (field.widget == EditorWidget::Color) {
+                    if (ImGui::ColorEdit3(
+                        field.name.c_str(),
+                        &c.x,
+                        ImGuiColorEditFlags_HDR |
+                        ImGuiColorEditFlags_Float |
+                        ImGuiColorEditFlags_AlphaBar
+                    )) {
+                        changed = true;
+                    }
+                } else {
+                    changed |= ImGuiUtils::DragVec3Colored(field.name.c_str(), c);
+                } 
+            } 
+            
             else if (field.type == typeid(glm::vec4))   
                 changed |= ImGuiUtils::DragVec4(field.name.c_str(), *static_cast<glm::vec4*>(ptr));
             else if (field.type == typeid(glm::quat)) {
@@ -174,7 +214,47 @@ namespace InspectorDrawer {
                     changed = true;
                 }
             }
-             
+            
+            else if (field.type == typeid(Color)) {
+                Color& c = *static_cast<Color*>(ptr);
+
+                /*float col[4] = { c.r, c.g, c.b, c.a };*/
+
+                if (ImGui::ColorEdit4(
+                    field.name.c_str(),
+                    &c.value.x,    //col
+                    ImGuiColorEditFlags_HDR |
+                    ImGuiColorEditFlags_Float |
+                    ImGuiColorEditFlags_AlphaBar
+                )) {
+                    /*c.r = col[0]; c.g = col[1]; c.b = col[2]; c.a = col[3];*/
+                    changed = true;
+                }
+            }
+
+            /*              Aprimorado mas comentei por teste
+            else if (field.type == typeid(Color)) {
+                Color& c = *static_cast<Color*>(ptr);
+
+                float col[4] = { c.r, c.g, c.b, c.a };
+
+                ImGuiColorEditFlags flags = ImGuiColorEditFlags_Float;
+
+                if (c.space == ColorSpace::HDR)
+                    flags |= ImGuiColorEditFlags_HDR;
+                if (c.space == ColorSpace::SRGB)
+                    flags |= ImGuiColorEditFlags_DisplayRGB;
+
+                if (ImGui::ColorEdit4(
+                    field.name.c_str(),
+                    col,
+                    flags
+                )) {
+                    c.r = col[0];    c.g = col[1];    c.b = col[2];    c.a = col[3];
+                    changed = true;
+                }
+            }
+            */
 
             if (changed && ownerType && ownerType->onEdited) ownerType->onEdited(instance);     // instance == componentPtr
 

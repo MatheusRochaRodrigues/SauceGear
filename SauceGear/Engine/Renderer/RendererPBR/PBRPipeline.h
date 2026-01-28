@@ -19,6 +19,8 @@ class SharedDepthStencil;
 class SSAOPass;
 //class SSAOBlurPass;
 
+class FogPass;
+
 class PBRPipeline : public IRenderPipeline {
 public:
     void Init() override;
@@ -42,12 +44,16 @@ private:
     //SSAO
     SSAOPass*                ssaoPass;
 
+    FogPass*                 fogPass;
+
     //FBOs
     SharedDepthStencil* sharedDepthStencil; //Depth Shared
 
     Framebuffer* gBuffer = nullptr;         // Position/Normal/Albedo/MetalRoughAO (+depth)                 gBufferFBO
     Framebuffer* lightingBuffer = nullptr;     // final color + depth (default: true depth)        //tambem pode ser conhecido como lightingBuffer
-    Framebuffer* ppBuffer = nullptr;  // opcional se quiser acumular separado (aqui vou direto no lightingBuffer final)
+    
+    Framebuffer* postBufferA = nullptr;  // opcional se quiser acumular separado (aqui vou direto no lightingBuffer final)
+    Framebuffer* postBufferB = nullptr;  // opcional se quiser acumular separado (aqui vou direto no lightingBuffer final)
     
     Framebuffer* ssaoBuffer     = nullptr;
     Framebuffer* ssaoBlurBuffer = nullptr;

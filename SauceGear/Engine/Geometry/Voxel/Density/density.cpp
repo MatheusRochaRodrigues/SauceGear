@@ -1,5 +1,6 @@
 #include "density.h" 
 #include <glm/ext.hpp>
+#include "../../World/SurfaceNet/WorldOctree/SDF/Terrain.h"
 using namespace glm;
 
 // ----------------------------------------------------------------------------
@@ -49,9 +50,11 @@ float FractalNoise(
 }
 
 // ----------------------------------------------------------------------------
-
+static Terrain t;
 float Density_Func(const vec3& worldPosition)
 {
+	return t.sdfDistance(worldPosition);
+
 	const float MAX_HEIGHT = 20.f;
 	const float noise = FractalNoise(4, 0.5343f, 2.2324f, 0.68324f, vec2(worldPosition.x, worldPosition.z));
 	const float terrain = worldPosition.y - (MAX_HEIGHT * noise);
@@ -61,3 +64,6 @@ float Density_Func(const vec3& worldPosition)
 
 	return max(-cube, min(sphere, terrain));
 }
+
+
+

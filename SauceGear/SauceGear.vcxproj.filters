@@ -219,16 +219,13 @@
     <ClCompile Include="Editor\Panels\DrawMeshRendererInspector.h">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\World\Density\density.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\Density\density.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\World\DC\DCTree.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\DC\QEF\qef.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\World\DC\QEF\qef.cpp">
-      <Filter>Arquivos de Origem</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Geometry\World\DC\QEF\svd.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\DC\QEF\svd.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="stb.cpp">
@@ -250,6 +247,30 @@
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Scene\ECSBridge.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\Chunk\Chunk.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\DC\DCMeshBuilder.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\Octree\OctreeBuilder.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\Octree\ConstructLeaf.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Platform\Welcome.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\RendererPBR\Passes\SkyboxPass.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\Panels\HierarchyPanel.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\RendererPBR\Passes\FogPass.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -767,16 +788,13 @@
     <ClInclude Include="Engine\Renderer\PostProcessPass\PostProcessPass.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\Density\density.h">
+    <ClInclude Include="Engine\Geometry\Voxel\Density\density.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\DC\DCTree.h">
+    <ClInclude Include="Engine\Geometry\Voxel\DC\QEF\qef.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\DC\QEF\qef.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\DC\QEF\svd.h">
+    <ClInclude Include="Engine\Geometry\Voxel\DC\QEF\svd.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\BasicTerrainSDF.h">
@@ -891,6 +909,36 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Scene\ECSBridge.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\Octree\DCNode.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\Chunk\Chunk.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\DC\DCMeshBuilder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\Octree\OctreeBuilder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\DC\OctreeDrawInfo.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\Octree\ConstructLeaf.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Data\Color.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Platform\Welcome.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\PostProcessPass\Pass\ACESColorBoostPP.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\RendererPBR\Passes\FogPass.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1094,6 +1142,11 @@
     <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_3.fs" />
     <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_1.fs" />
     <None Include="Engine\Resources\Shaders\Envirolnment\SunBillboard\SunBillboard_2.fs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\ACESColorBoost.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\NewFolder1\SunBillboard.fs" />
+    <None Include="Engine\Resources\Shaders\Envirolnment\NewFolder1\SunBillboard1.fs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\Fog.fs" />
+    <None Include="Engine\Resources\Shaders\PostProcess\FogLinearize.fs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Editor\Styles\styles1.txt" />

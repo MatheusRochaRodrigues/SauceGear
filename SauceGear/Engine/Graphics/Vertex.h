@@ -1,5 +1,6 @@
 #pragma once 
 #include <glm/glm.hpp> 
+#include <vector> 
 
 #define MAX_BONE_INFLUENCE 4 
 
@@ -21,3 +22,7 @@ struct Vertex {
     //weights from each bone
     float m_Weights[MAX_BONE_INFLUENCE];
 };
+
+
+typedef std::vector<Vertex> VertexBuffer;
+typedef std::vector<uint32_t> IndexBuffer;

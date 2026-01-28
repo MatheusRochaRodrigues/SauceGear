@@ -11,11 +11,11 @@ enum OctreeNodeType
 	Node_Internal,
 	Node_Psuedo,
 	Node_Leaf,
-}; 
+};
 
-struct OctreeDrawInfo 
+struct OctreeDrawInfo
 {
-	OctreeDrawInfo() : index(-1) , corners(0) { }
+	OctreeDrawInfo() : index(-1), corners(0) {}
 
 	int				index;
 	int				corners;
@@ -35,7 +35,7 @@ public:
 		, size(0)
 		, drawInfo(nullptr)
 	{
-		for (int i = 0; i < 8; i++) children[i] = nullptr; 
+		for (int i = 0; i < 8; i++) children[i] = nullptr;
 	}
 
 	DCNode(const OctreeNodeType _type)
@@ -53,12 +53,12 @@ public:
 	OctreeNodeType	type;
 	ivec3			min;
 	int				size;
-	DCNode*			children[8];
-	OctreeDrawInfo*	drawInfo;
-}; 
+	DCNode* children[8];
+	OctreeDrawInfo* drawInfo;
+};
 
 DCNode* BuildOctree(const ivec3& min, const int size, const float threshold);
 void DestroyOctree(DCNode* node);
 void GenerateMeshFromOctree(DCNode* node, VertexBuffer& vertexBuffer, IndexBuffer& indexBuffer);
- 
+
 

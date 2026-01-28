@@ -6,7 +6,8 @@
 #include "../../Engine/Scene/SceneECS.h"
 #include "../ImGui/Fonts/IconsFontAwesome5.h"
 #include "../../Engine/ECS/Components/MeshRenderer.h"
-#include "../Panels/DrawMeshRendererInspector.h"
+#include "InspectorPanel.h" 
+#include "../Drawers/MaterialInspector.h" 
 
 
 static void DrawMeshRendererInspector(MeshRenderer& renderer) {

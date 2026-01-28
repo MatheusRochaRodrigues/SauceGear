@@ -7,6 +7,7 @@
 #include "../../../../Core/EngineContext.h"
 #include "../../../../Platform/Window.h"
 #include "../../../../Core/Camera.h" 
+#include "../../../RenderDebugSettings.h"
 
 class SSAOPass {
 public:
@@ -27,7 +28,13 @@ public:
         shader->setInt("gPosition", 0);
         shader->setInt("gNormal", 1); 
         shader->setInt("texNoise", 2);
-         
+        
+        auto& eS = GetEngineSettings().renderDebug;
+        shader->setInt("kernelSize", eS.sKernelSize);
+        shader->setFloat("radius", eS.sRadius);
+        shader->setFloat("bias", eS.sBias);
+        shader->setFloat("power", eS.Power);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, gbuffer.GetTexture(0));        // Position
 

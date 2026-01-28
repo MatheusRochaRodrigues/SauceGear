@@ -16,7 +16,7 @@
 int Application::Init() {
     // cria janela GLFW
     window = new Window();
-    if (!window->Create("Editor Window", 1600, 900)) return -1;  // Configura contexto OpenGL e glad  
+    if (!window->Create("GEAR SAUCE", 1600, 900)) return -1;  // Configura contexto OpenGL e glad  
 
     time = new Time();
     time->Init();

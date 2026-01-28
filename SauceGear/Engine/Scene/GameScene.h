@@ -15,9 +15,12 @@
 #include "../GUI/FontManager.h" 
 
 //#include "../Geometry/World/SurfaceNet/World/SurfaceNets/Voxel.h"
-#include "../Geometry/World/DC/DCTree.h"
 #include "../Resources/Primitives/Primitive.h"
   
+//#include "../Geometry/World/DC/DCTree.h"
+#include "../Geometry/Voxel/DC/DCMeshBuilder.h"
+#include "../Geometry/Voxel/Octree/OctreeBuilder.h"
+
 class GameScene : public SceneECS {
 public: 
     void Load() override {
@@ -32,40 +35,50 @@ public:
             computeManager = CreateEntity();
             AddComponent<ComputeSyncComponent>(computeManager);
             std::cout << "[INFO Scene] ComputeManager entity criado: " << computeManager << "\n";
-        }
-        {
-            auto e = SceneBuilder::CreateModel(PrimitiveMesh::Plane());
-            auto& pTransform = GetComponent<TransformComponent>(e); 
-            pTransform.SetLocalScale(glm::vec3(30, 30, 30));
-            pTransform.SetLocalPosition(glm::vec3(0, -6, 0));
-        }
-        
-        {
-            stbi_set_flip_vertically_on_load(true);
-            std::cout << "cs 1" << std::endl;
+        } 
 
-            Entity entity = SceneBuilder::CreateModel("Engine/Resources/Models/backpack/backpack.obj");
-            //Entity entity = SceneBuilder::CreateModel("Engine/Resources/Models/Skull/Skull.obj");
-            std::cout << "cs 2" << std::endl;
+        /*{
+            stbi_set_flip_vertically_on_load(true);  
+            Entity entity = SceneBuilder::CreateModel("Engine/Resources/Models/backpack/backpack.obj");  
+            GetComponent<TransformComponent>(entity).position = glm::vec3(1, 1, 0);  
+        } */
 
-            auto& l = GetComponent<TransformComponent>(entity);
-            l.position = glm::vec3(1, 1, 0);  
+        {
+            {
+                Entity entity = SceneBuilder::CreateModel("Assets/Models3D/CapsuleP.obj");  
+                auto& t = GetComponent<TransformComponent>(entity); 
+                glm::mat4 model(1);
+                model = glm::translate(model, glm::vec3(-18.086, -16.381, 21.492));
+                model = glm::rotate(model, 32.668f, glm::vec3(0, 1, 0));
+                model = glm::scale(model, glm::vec3(0.760, 0.760, 0.760));
+                t.SetLocalFromMatrix(model);
+            }  
+            {
+                Entity entity = SceneBuilder::CreateModel("Assets/Models3D/Wheel.obj");
+                auto& t = GetComponent<TransformComponent>(entity); 
+                // posição
+                t.SetLocalPosition({ 1.089f, -10.667f, 13.343f }); 
+                // rotação (Euler em graus)
+                t.SetLocalEulerDegrees({ -45.308f, 65.636f, -34.439f }); 
+                // escala
+                t.SetLocalScale({ 1.268f, 1.268f, 1.268f }); 
+                // força atualização imediata (opcional se o sistema já atualiza)
+                //t.UpdateWorldAsRoot();
+
+            } 
         }
-        
 
         {
             Entity pointLight = SceneBuilder::CreateGameObject("Sun");
             auto& pTransform = GetComponent<TransformComponent>(pointLight); 
-            pTransform.rotation = glm::vec3(21.0f, 0.0f, 1.0f); 
-            pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
-            pTransform.position = glm::vec3(20.0f, 50, 20.0f);
+            pTransform.SetLocalRotation(glm::vec3(-155.551, 36.502, 110.245));
             auto& pLight = AddComponent<LightComponent>(pointLight); 
             pLight.SetTypeLight(LightType::Directional);
-            pLight.color = glm::vec3(1, 0, 1);
-            pLight.intensity = 1.0f;
+            pLight.color = glm::vec3(0.749, 0.400, 0.059);
+            pLight.intensity = 4.200f;
         }
         {
-            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
+            Entity pointLight = SceneBuilder::CreateGameObject("Light1");
             auto& pTransform = GetComponent<TransformComponent>(pointLight);
             pTransform.rotation = glm::vec3(-2.0f, 4.0f, -1.0f); 
             pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
@@ -76,7 +89,7 @@ public:
             pLight.intensity = 1.0f;
         }
         {
-            Entity pointLight = SceneBuilder::CreateGameObject("Light3");
+            Entity pointLight = SceneBuilder::CreateGameObject("Light2");
             auto& pTransform = GetComponent<TransformComponent>(pointLight); 
             pTransform.scale = glm::vec3(0.05, 0.05, 0.05);
             pTransform.position = glm::vec3(0, 0, 1);
@@ -99,16 +112,27 @@ public:
         AddComponent<PostProcessComponent>( blurX, new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)) );*/
 
         
-        const int octreeSize = 64; 
+
+        const int octreeSize = 64; // 64 
         VertexBuffer vertexBuffer;      IndexBuffer indexBuffer;
 
-        auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize, 1);
+        auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize);  //, 1
         GenerateMeshFromOctree(root, vertexBuffer, indexBuffer);
         std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(vertexBuffer, indexBuffer);
         mesh->name = "DC";
-        SceneBuilder::CreateModel(mesh);
-        
 
+        auto asset = std::make_shared<MaterialAsset>();
+        asset->base = MaterialLibrary::Get("PBR_Default");
+        asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(0.551, 0.436, 0.044, 1));
+        asset->defaults["Metallic"].data = TextureCache::Get().GetSolidColor(glm::vec4(0, 0, 0, 1));
+        asset->defaults["Roughness"].data = TextureCache::Get().GetSolidColor(glm::vec4(1, 1, 1, 1));
+
+        asset->name = "DC Mat";  // name 
+        auto e = SceneBuilder::CreateModel(mesh, MaterialAsset::Instantiate(asset));
+
+        auto* t = GEngine->scene->TryGetComponent<TransformComponent>(e);
+        t->SetLocalPosition(glm::vec3(0, -16, 0));
+         
 
 
         int nrRows = 7;
@@ -136,6 +160,7 @@ public:
 
 
                 model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(0, 4, 0));
                 model = glm::translate(model, glm::vec3(
                     (float)(col - (nrColumns / 2)) * spacing,
                     (float)(row - (nrRows / 2)) * spacing,
@@ -169,60 +194,50 @@ public:
             pbrShader.setMat4("model", model);
             pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
             renderSphere();
-        }*/
-
-
-         
-
+        }*/ 
 
         
         {
-            Entity e = scn->CreateEntity();
-
+            Entity e = scn->CreateEntity(); 
             auto& tr = scn->AddComponent<TransformComponent>(e);
-            tr.position = { 0.02f, 0.85f, 0 };
+            scn->AddComponent<NameComponent>(e).name = "TEXT 1";
+            tr.SetLocalPosition( glm::vec3(0.02f, 0.026f, 0 ));
 
             auto& txt = scn->AddComponent<TextComponent>(e);
             txt.text =
-                "Debug Engine\n"
-                "Gear Sauce";
+                "Dual Contouring\n";
 
-            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 24); 
+            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 48); 
             txt.space = TextComponent::Space::Screen;
             txt.units = TextComponent::Units::Relative;
             //txt.align = TextComponent::Align::Left;
             txt.anchor = TextComponent::Anchor::TopLeft;
-            txt.color = vec4(0.3f, 0.0f, 0.6f, 1);
+            txt.color = vec4(2.5f, 0.0f, 0.0f, 1);
 
             txt.style.shadowOffset = { 2, -2 };
-            txt.style.shadowColor = { 0,0,0,0.6f };
+            txt.style.shadowColor = { 0,0,0,0.6f }; 
+        }  
 
-
-        }
-        
-        
         {
             Entity e = scn->CreateEntity();
 
             auto& tr = scn->AddComponent<TransformComponent>(e);
-            tr.position = { 400, 400, 0 };
+            scn->AddComponent<NameComponent>(e).name = "Hello World!!!"; 
 
             auto& txt = scn->AddComponent<TextComponent>(e);
             txt.text = "Hello World";
 
-            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 24);
+            txt.scale = 0.02;
+            txt.fontID = FontManager::Load("Assets/Fonts/Roboto_Condensed-Black.ttf", 128);
 
             txt.space = TextComponent::Space::World;
             txt.units = TextComponent::Units::Pixels;
-            txt.align = TextComponent::Align::Left;
-            //txt.anchor = TextComponent::Anchor::TopLeft;
-
-            txt.color = vec4(0.5f, 0.5f, 0, 1);
-            txt.style.shadowOffset = { 2, -2 };
-            txt.style.shadowColor = { 0,0,0,0.6f };
-
-        }
-        
+            txt.align = TextComponent::Align::Center;
+            txt.anchor = TextComponent::Anchor::Center;
+            txt.color = vec4(0.75f, 0.75f, 0, 1);
+            txt.style.shadowOffset = { 1.5, -1.5 };
+            txt.style.shadowColor = { 0,0,0,0.6f }; 
+        } 
 
 
         //auto e = scn->CreateEntity();
@@ -237,11 +252,9 @@ public:
 
         //auto& tr = scn->AddComponent<TransformComponent>(e);
         //tr.position = { 540.0f, 570.0f, 0.0f }; // igual LearnOpenGL
-
-
+         
         std::cout << "Corners 27" << std::endl;
-        return;
-
+        return; 
     }
 
 

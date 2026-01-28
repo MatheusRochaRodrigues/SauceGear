@@ -6,34 +6,34 @@ const int MATERIAL_SOLID = 1;
 
 const float QEF_ERROR = 1e-6f;
 const int QEF_SWEEPS = 4;
- 
+
 
 const ivec3 CHILD_MIN_OFFSETS[] =
 {
 	// needs to match the vertMap from Dual Contouring impl
-	ivec3( 0, 0, 0 ),
-	ivec3( 0, 0, 1 ),
-	ivec3( 0, 1, 0 ),
-	ivec3( 0, 1, 1 ),
-	ivec3( 1, 0, 0 ),
-	ivec3( 1, 0, 1 ),
-	ivec3( 1, 1, 0 ),
-	ivec3( 1, 1, 1 ),
+	ivec3(0, 0, 0),
+	ivec3(0, 0, 1),
+	ivec3(0, 1, 0),
+	ivec3(0, 1, 1),
+	ivec3(1, 0, 0),
+	ivec3(1, 0, 1),
+	ivec3(1, 1, 0),
+	ivec3(1, 1, 1),
 };
 
 // ----------------------------------------------------------------------------
 // data from the original DC impl, drives the contouring process
 
-const int edgevmap[12][2] = 
+const int edgevmap[12][2] =
 {
 	{0,4},{1,5},{2,6},{3,7},	// x-axis 
 	{0,2},{1,3},{4,6},{5,7},	// y-axis
 	{0,1},{2,3},{4,5},{6,7}		// z-axis
 };
 
-const int edgemask[3] = { 5, 3, 6 } ;
+const int edgemask[3] = { 5, 3, 6 };
 
-const int vertMap[8][3] = 
+const int vertMap[8][3] =
 {
 	{0,0,0},
 	{0,0,1},
@@ -45,22 +45,22 @@ const int vertMap[8][3] =
 	{1,1,1}
 };
 
-const int faceMap[6][4] = {{4, 8, 5, 9}, {6, 10, 7, 11},{0, 8, 1, 10},{2, 9, 3, 11},{0, 4, 2, 6},{1, 5, 3, 7}} ;
-const int cellProcEdgeMask[6][5] = {{0,1,2,3,0},{4,5,6,7,0},{0,4,1,5,1},{2,6,3,7,1},{0,2,4,6,2},{1,3,5,7,2}} ;
- 
+const int faceMap[6][4] = { {4, 8, 5, 9}, {6, 10, 7, 11},{0, 8, 1, 10},{2, 9, 3, 11},{0, 4, 2, 6},{1, 5, 3, 7} };
+const int cellProcEdgeMask[6][5] = { {0,1,2,3,0},{4,5,6,7,0},{0,4,1,5,1},{2,6,3,7,1},{0,2,4,6,2},{1,3,5,7,2} };
+
 const int edgeProcEdgeMask[3][2][5] = {
 	{{3,2,1,0,0},{7,6,5,4,0}},
 	{{5,1,4,0,1},{7,3,6,2,1}},
 	{{6,4,2,0,2},{7,5,3,1,2}},
 };
 
-const int processEdgeMask[3][4] = {{3,2,1,0},{7,5,6,4},{11,10,9,8}} ;
+const int processEdgeMask[3][4] = { {3,2,1,0},{7,5,6,4},{11,10,9,8} };
 
 // -------------------------------------------------------------------------------
 
 DCNode* SimplifyOctree(DCNode* node, float threshold)
 {
-	if (!node) return NULL; 
+	if (!node) return NULL;
 
 	if (node->type != Node_Internal)  return node;	// can't simplify!
 
@@ -84,8 +84,8 @@ DCNode* SimplifyOctree(DCNode* node, float threshold)
 			{
 				qef.add(child->drawInfo->qef);
 
-				midsign = (child->drawInfo->corners >> (7 - i)) & 1; 
-				signs[i] = (child->drawInfo->corners >> i) & 1; 
+				midsign = (child->drawInfo->corners >> (7 - i)) & 1;
+				signs[i] = (child->drawInfo->corners >> i) & 1;
 
 				edgeCount++;
 			}
@@ -112,9 +112,9 @@ DCNode* SimplifyOctree(DCNode* node, float threshold)
 		return node;
 	}
 
-	if (position.x < node->min.x || position.x > (node->min.x + node->size) ||
-		position.y < node->min.y || position.y > (node->min.y + node->size) ||
-		position.z < node->min.z || position.z > (node->min.z + node->size))
+	if (position.x < node->min.x || position.x >(node->min.x + node->size) ||
+		position.y < node->min.y || position.y >(node->min.y + node->size) ||
+		position.z < node->min.z || position.z >(node->min.z + node->size))
 	{
 		const auto& mp = qef.getMassPoint();
 		position = vec3(mp.x, mp.y, mp.z);
@@ -130,7 +130,7 @@ DCNode* SimplifyOctree(DCNode* node, float threshold)
 			// Undetermined, use centre sign instead
 			drawInfo->corners |= (midsign << i);
 		}
-		else 
+		else
 		{
 			drawInfo->corners |= (signs[i] << i);
 		}
@@ -142,7 +142,7 @@ DCNode* SimplifyOctree(DCNode* node, float threshold)
 		if (node->children[i])
 		{
 			DCNode* child = node->children[i];
-			if (child->type == Node_Psuedo || 
+			if (child->type == Node_Psuedo ||
 				child->type == Node_Leaf)
 			{
 				drawInfo->averageNormal += child->drawInfo->averageNormal;
@@ -179,7 +179,7 @@ DCNode* SimplifyOctree(DCNode* node, float threshold)
 
 void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
 {
-	if (!node) return; 
+	if (!node) return;
 
 	if (node->type != Node_Leaf) {
 		for (int i = 0; i < 8; i++)
@@ -198,7 +198,7 @@ void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
 		}
 
 		d->index = vertexBuffer.size();
-		vertexBuffer.push_back(Vertex{d->position, d->averageNormal});		//vertexBuffer.push_back(Vertex(d->position, d->averageNormal));
+		vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });		//vertexBuffer.push_back(Vertex(d->position, d->averageNormal));
 	}
 }
 
@@ -225,12 +225,12 @@ void ContourProcessEdge(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 		{
 			minSize = node[i]->size;
 			minIndex = i;
-			flip = m1 != MATERIAL_AIR; 
+			flip = m1 != MATERIAL_AIR;
 		}
 
 		indices[i] = node[i]->drawInfo->index;
 
-		signChange[i] = 
+		signChange[i] =
 			(m1 == MATERIAL_AIR && m2 != MATERIAL_AIR) ||
 			(m1 != MATERIAL_AIR && m2 == MATERIAL_AIR);
 	}
@@ -344,12 +344,12 @@ const int faceProcFaceMask[3][4][3] = {
 	{{2,0,1},{6,4,1},{3,1,1},{7,5,1}},		// Y
 	{{1,0,2},{3,2,2},{5,4,2},{7,6,2}}		// Z
 };
- 
+
 const int faceProcEdgeMask[3][4][6] = {
 	{{1,4,0,5,1,1},{1,6,2,7,3,1},{0,4,6,0,2,2},{0,5,7,1,3,2}},
 	{{0,2,3,0,1,0},{0,6,7,4,5,0},{1,2,0,6,4,2},{1,3,1,7,5,2}},
 	{{1,1,0,3,2,0},{1,5,4,7,6,0},{0,1,5,0,4,1},{0,3,7,2,6,1}}
-}; 
+};
 
 // ContourFaceProc resolve diferenças de LOD ENTRE DUAS CÉLULAS que compartilham UMA FACE
 // Ela NÃO gera triângulos diretamente (exceto via EdgeProc)
@@ -410,17 +410,7 @@ void ContourFaceProc(DCNode* node[2], int dir, IndexBuffer& indexBuffer)
 
 		for (int i = 0; i < 4; i++)
 		{
-			DCNode* edgeNodes[4];
-
-			// Para essa aresta interna:
-			// quais filhos participam dela?
-			const int c[4] =	//obs : só será necessario essa informação quando a aresta nao esta no no mais fino pois é necessario saber quais nós tocaram essa edge
-			{
-				faceProcEdgeMask[dir][i][1],
-				faceProcEdgeMask[dir][i][2],
-				faceProcEdgeMask[dir][i][3],
-				faceProcEdgeMask[dir][i][4],
-			};
+			DCNode* edgeNodes[4]; 
 
 			// Escolhe qual padrão de lados usar (node[0] ou node[1])
 			const int* order = orders[faceProcEdgeMask[dir][i][0]];
@@ -437,6 +427,16 @@ void ContourFaceProc(DCNode* node[2], int dir, IndexBuffer& indexBuffer)
 				}
 				else
 				{
+					// Para essa aresta interna:
+					// quais filhos participam dela?
+					const int c[4] =	//obs : só será necessario essa informação quando a aresta nao esta no no mais fino pois é necessario saber quais nós tocaram essa edge
+					{
+						faceProcEdgeMask[dir][i][1],
+						faceProcEdgeMask[dir][i][2],
+						faceProcEdgeMask[dir][i][3],
+						faceProcEdgeMask[dir][i][4],
+					};
+
 					// Caso contrário, descemos para o filho correto
 					edgeNodes[j] = node[order[j]]->children[c[j]];
 				}
@@ -653,7 +653,7 @@ DCNode* ConstructOctreeNodes(DCNode* node)
 	{
 		return ConstructLeaf(node);
 	}
-	
+
 	const int childSize = node->size / 2;
 	bool hasChildren = false;
 
@@ -696,7 +696,7 @@ DCNode* BuildOctree(const ivec3& min, const int size, const float threshold)
 
 void GenerateMeshFromOctree(DCNode* node, VertexBuffer& vertexBuffer, IndexBuffer& indexBuffer)
 {
-	if (!node) return; 
+	if (!node) return;
 
 	vertexBuffer.clear();
 	indexBuffer.clear();		//onde os triângulos finais serão escritos

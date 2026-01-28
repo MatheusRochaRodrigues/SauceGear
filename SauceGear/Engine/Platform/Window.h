@@ -1,8 +1,8 @@
-#pragma once
-
+#pragma once 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "Welcome.h"
 
 class Window {
 public:
@@ -15,10 +15,14 @@ public:
     };
 
     bool InitializeGL() {
+        SG::Welcome::ClearConsole();  SG::Welcome::PrintSauceGear();
+        SG::Welcome::SetColor(11, 36);  SG::Welcome::TypeText("Initializing SAUCE GEAR Engine\n\n");
+
         if (!glfwInit()) {
             std::cerr << "Failed to initialize GLFW" << std::endl;
             return false;
         }
+        SG::Welcome::Load("GLFW");
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -53,9 +57,27 @@ public:
         //glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+            SG::Welcome::SetColor(12, 31);
             std::cerr << "Failed to initialize GLAD" << std::endl;
+            std::cout << "OpenGL loader failed\n";
             return false;
         }
+        SG::Welcome::Load("OpenGL");
+
+        // GPU INFO
+        std::cout << "\n";
+        SG::Welcome::SetColor(11, 36);
+        std::cout << "GPU      : " << glGetString(GL_RENDERER) << "\n";
+        std::cout << "Vendor   : " << glGetString(GL_VENDOR) << "\n";
+        std::cout << "OpenGL   : " << glGetString(GL_VERSION) << "\n";
+        SG::Welcome::ResetColor();
+
+        std::cout << "\n";
+        SG::Welcome::SetColor(10, 32);
+        std::cout << "SAUCE GEAR READY\n";
+        SG::Welcome::ResetColor();
+
+
 
         glViewport(0, 0, m_width, m_height);
         glEnable(GL_DEPTH_TEST);

@@ -4,6 +4,7 @@
 #include <variant>
 #include <memory>
 #include <glm/glm.hpp> 
+#include "../Data/Color.h"
 
 class Texture;
 class MaterialAsset;
@@ -11,6 +12,7 @@ class MaterialAsset;
 using MaterialValue = std::variant<
     std::monostate,
     float,
+    Color,
     glm::vec3,
     glm::vec4,
     std::shared_ptr<Texture>

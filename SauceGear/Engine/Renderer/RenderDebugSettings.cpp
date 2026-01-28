@@ -25,5 +25,34 @@ EnumInfo RenderViewMode_EnumInfo{
         { "MRA",           (int)RenderViewMode::MRA },
         { "Depth",         (int)RenderViewMode::Depth },
         { "AO",            (int)RenderViewMode::AO },
+        { "Fog",           (int)RenderViewMode::Fog },
     }
 };
+
+
+
+
+
+// 2 option
+EnumInfo SkyboxMode_EnumInfo{
+    "SkyboxMode",
+    {
+        { "Skybox",                 (int)SkyboxMode::Skybox },
+        { "IBLEnvirolnment",        (int)SkyboxMode::IBLEnvirolnment }
+    }
+};
+
+
+
+
+
+// 2 option
+EnumInfo HDRMode_EnumInfo{
+    "HDRMode",
+    {
+        { "ACESFilm",                 (int)HDRMode::ACESFilm },
+        { "HDR",                      (int)HDRMode::HDR }
+    }
+};
+
+

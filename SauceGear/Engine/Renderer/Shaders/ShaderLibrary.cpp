@@ -97,6 +97,11 @@ void ShaderLibrary::Init() {
         "DeferredShading/SSAO/SSAO.vs",
         "DeferredShading/SSAO/SSAOBlur.fs"
     );
+
+    // Fog 
+    shaders["Fog"] = Shader(
+        "PostProcess/post.vs", "PostProcess/Fog.fs"
+    );
 }
 
 Shader& ShaderLibrary::Get(const std::string& name) {

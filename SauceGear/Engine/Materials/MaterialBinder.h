@@ -14,13 +14,22 @@ class MaterialBinder {
 public:
     static void Resolve(MaterialValue& v)
     {
-        // já é textura → ok
+        // Já é textura → ok
         if (std::holds_alternative<std::shared_ptr<Texture>>(v))
             return;
 
-        // float → solid texture
+        // Color → solid texture
+        if (auto c = std::get_if<Color>(&v)) {
+            //v = TextureCache::Get().GetSolidColor( glm::vec4(c->r, c->g, c->b, c->a) );
+            v = TextureCache::Get().GetSolidColor(c->value);
+            return;
+        }
+
+        // float → grayscale solid texture
         if (auto f = std::get_if<float>(&v)) {
-            v = TextureCache::Get().GetSolidColor({ *f, *f, *f, 1.0f });
+            v = TextureCache::Get().GetSolidColor(
+                glm::vec4(*f, *f, *f, 1.0f)
+            );
             return;
         }
 
@@ -32,7 +41,7 @@ public:
 
         // fallback defensivo
         v = TextureCache::Get().GetSolidColor({ 1,1,1,1 });
-    }
+    } 
 
 
      
@@ -122,6 +131,7 @@ private:
     static const char* VariantTypeToString(
         const std::variant<
         std::monostate,
+        Color,
         float,
         glm::vec3,
         glm::vec4,
@@ -133,6 +143,7 @@ private:
 
             if constexpr (std::is_same_v<T, std::monostate>)                return "None";
             else if constexpr (std::is_same_v<T, float>)                    return "Float";
+            else if constexpr (std::is_same_v<T, Color>)                    return "Color";
             else if constexpr (std::is_same_v<T, glm::vec3>)                return "Vec3";
             else if constexpr (std::is_same_v<T, glm::vec4>)                return "Vec4";
             else if constexpr (std::is_same_v<T, std::shared_ptr<Texture>>) return "Texture";

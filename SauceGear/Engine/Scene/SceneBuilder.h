@@ -7,6 +7,7 @@
 #include "../ECS/Components/OutlineComponent.h"
 #include "../ECS/Components/TextComponent.h"
 #include "../ECS/Components/MeshComponent.h"
+#include "../ECS/Components/LightComponent.h"
 
 #include "../Resources/Loaders/ModelLoader.h"  
 #include "../Utils/AABBBuilder.h"
@@ -77,11 +78,10 @@ public:
             auto asset = std::make_shared<MaterialAsset>();
             asset->name = mesh->name;  // name 
             asset->base = MaterialLibrary::Get("PBR_Default");
-            float value = 1;
-            asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(value, value, value, 1));
-            value = 0.2f;
+            asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(0.5f, 0.5f, 0.1f, 1));
+            float value = 0.0f; 
             asset->defaults["Metallic"].data = TextureCache::Get().GetSolidColor(glm::vec4(value, value, value, 1));
-            value = 0.5f;
+            value = 1.0f;
             asset->defaults["Roughness"].data = TextureCache::Get().GetSolidColor(glm::vec4(value, value, value, 1));
 
             mat = MaterialAsset::Instantiate(asset);
@@ -153,6 +153,23 @@ public:
     }
      
     Entity CreateCube();
+
+
+
+    //Special Create tools GameOBJ 
+    static Entity CreateLight(string name = "Light") {
+        auto& scene = *GEngine->scene;
+        Entity entity = scene.CreateEntity();
+        //Special Components
+        scene.AddComponent<NameComponent>(entity).name = name;                      //AddComponent<NameComponent>(entity, name); 
+        scene.AddComponent<TransformComponent>(entity);
+        auto& pLight = scene.AddComponent<LightComponent>(entity); 
+        pLight.SetTypeLight(LightType::Point);
+        pLight.color = glm::vec3(0.8, 0.8, 0.8);
+        pLight.intensity = 5.0f;
+
+        return entity;
+    }
 };
 
 

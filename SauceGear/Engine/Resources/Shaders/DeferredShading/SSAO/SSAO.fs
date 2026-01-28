@@ -11,9 +11,10 @@ uniform sampler2D texNoise;
 uniform vec3 samples[64];   //64
 
 // parameters (you'd probably want to use them as uniforms to more easily tweak the effect)
-int kernelSize = 64;        //64
-float radius = 0.5;
-float bias = 0.025;                             //float bias = 0.005;
+uniform int kernelSize;      //int kernelSize = 32;        //64
+uniform float radius;        //float radius = 0.5;
+uniform float bias;          //float bias = 0.025;         //float bias = 0.005;
+uniform float power;           
 
 // tile noise texture over screen based on screen dimensions divided by noise size
 uniform vec2 noiseScale;                // = vec2(800.0/4.0, 600.0/4.0); 
@@ -60,5 +61,7 @@ void main()
     }
     occlusion = 1.0 - (occlusion / kernelSize);
     
-    FragColor = occlusion;
+    FragColor = pow(occlusion, power);
+
+    //FragColor = occlusion;
 }
