@@ -10,7 +10,7 @@ public:
     // ======== Altura do terreno ========
     float get_heightmap(vec2 pos) const {
         float base = noise.fbm(pos * 0.01f) * 15.0f;  // montanhas
-        float detail = noise.fbm(pos * 0.2f) * 0.2f;  // detalhes
+        float detail = noise.fbm(pos * 0.2f) * 0.1f;  // detalhes       //noise.fbm(pos * 0.2f) * 0.2f
         return base + detail;
     } 
 

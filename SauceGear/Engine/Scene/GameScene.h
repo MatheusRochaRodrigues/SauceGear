@@ -113,7 +113,8 @@ public:
 
         
 
-        const int octreeSize = 64; // 64 
+        //const int octreeSize = 64; // 64    //128    //256
+        const int octreeSize = 256;  //pow(2, 8)  
         VertexBuffer vertexBuffer;      IndexBuffer indexBuffer;
 
         auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize);  //, 1
@@ -223,6 +224,7 @@ public:
 
             auto& tr = scn->AddComponent<TransformComponent>(e);
             scn->AddComponent<NameComponent>(e).name = "Hello World!!!"; 
+            tr.SetLocalPosition(glm::vec3(0, 11.5f, 0));
 
             auto& txt = scn->AddComponent<TextComponent>(e);
             txt.text = "Hello World";

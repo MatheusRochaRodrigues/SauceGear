@@ -5,12 +5,104 @@ using namespace glm;
 
 bool NodeHasSurface(ivec3 min, int size)
 {
+	//First Way
 	const float d = Density_Func(min + (size/2));
 	const float surfaceNetThreshold = size * 2 * 2.25f;
 	return std::abs(d) < surfaceNetThreshold;
 
+	//Second Way
+	/*float sdfMin = +FLT_MAX;
+	float sdfMax = -FLT_MAX;
+
+	for (int i = 0; i < 8; i++)
+	{
+		const vec3 p = vec3(min + CHILD_MIN_OFFSETS[i] * size);
+		const float d = Density_Func(p);
+		sdfMin = glm::min(sdfMin, d);
+		sdfMax = glm::max(sdfMax, d);
+	}
+
+	vec3 center = vec3(min) + vec3(size) * 0.5f;
+
+	float dcenter = Density_Func(center);
+	sdfMin = glm::min(sdfMin, dcenter);
+	sdfMax = glm::max(sdfMax, dcenter);
+
+	// Se o zero NÃO está no intervalo, não existe superfície
+	return !(sdfMin > 0.f || sdfMax < 0.f); */
+
+	//Tercery Way
+	/*float sdfMin = +FLT_MAX;
+	float sdfMax = -FLT_MAX;
+
+	static const vec3 faceOffsets[6] = {
+		{0.5f, 0.5f, 0.0f},
+		{0.5f, 0.5f, 1.0f},
+		{0.5f, 0.0f, 0.5f},
+		{0.5f, 1.0f, 0.5f},
+		{0.0f, 0.5f, 0.5f},
+		{1.0f, 0.5f, 0.5f}
+	};
+
+	for (int i = 0; i < 6; i++)
+	{
+		vec3 p = vec3(min) + faceOffsets[i] * float(size);
+		float d = Density_Func(p);
+		sdfMin = std::min(sdfMin, d);
+		sdfMax = std::max(sdfMax, d);
+	}
+
+	vec3 center = vec3(min) + vec3(size) * 0.5f;
+
+	float dcenter = Density_Func(center);
+	sdfMin = glm::min(sdfMin, dcenter);
+	sdfMax = glm::max(sdfMax, dcenter);
+
+	// Se o zero NÃO está no intervalo, não existe superfície
+	return !(sdfMin > 0.f || sdfMax < 0.f);  */
+
+	// 4 Way
+	/*bool hasEdgeCrossing = false;
+
+	for (int e = 0; e < 12; e++)
+	{
+		vec3 p0 = edgeStart(e);
+		vec3 p1 = edgeEnd(e);
+
+		float d0 = Density_Func(p0);
+		float d1 = Density_Func(p1);
+
+		if ((d0 < 0) != (d1 < 0))
+		{
+			hasEdgeCrossing = true;
+			break;
+		}
+	} */
+
 } 
  
+
+/*
+int GetMinVoxelSizeForLOD(const ivec3& min, int size)
+{
+	// Centro do nó
+	const vec3 center = vec3(min) + vec3(size * 0.5f);
+
+	// Distância da câmera (substitua pela sua)
+	extern vec3 gCameraPosition;
+	const float dist = glm::length(center - gCameraPosition);
+
+	// Exemplo de shells de LOD
+	if (dist < 64.0f)   return 1;   // LOD 0
+	if (dist < 128.0f)  return 2;   // LOD 1
+	if (dist < 256.0f)  return 4;   // LOD 2
+	if (dist < 512.0f)  return 8;   // LOD 3
+
+	return 16; // muito longe
+}
+
+*/
+
 
 // ---------------------------------------------------------------------------- 
 vec3 ApproximateZeroCrossingPosition(const vec3& p0, const vec3& p1)
