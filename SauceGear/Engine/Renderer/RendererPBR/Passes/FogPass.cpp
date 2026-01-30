@@ -4,10 +4,9 @@
 #include "../../RenderDebugSettings.h"
 #include "../../../Graphics/FullscreenQuad.h"
 
-void FogPass::Execute(Framebuffer* target, Framebuffer* gbuffer, glm::vec3 camPos) { 
+void FogPass::Execute(Framebuffer* lightingBuffer, Framebuffer* gbuffer, glm::vec3 camPos) {
     auto& fog = GetEngineSettings().renderDebug;          //auto& fog = scene.GetFogSettings(); 
 
-    target->Bind();
     glDisable(GL_DEPTH_TEST);
 
     shader->use();
@@ -26,10 +25,9 @@ void FogPass::Execute(Framebuffer* target, Framebuffer* gbuffer, glm::vec3 camPo
     //shader->setMat4("u_InvProjection", scene.camera.GetInvProjection());
     //shader->setMat4("u_InvView", scene.camera.GetInvView());
 
-    //target->GetTexture(0)->Bind(0);
-    //gbuffer->GetDepthTexture()->Bind(1);
+    //target->GetTexture(0)->Bind(0);     //gbuffer->GetDepthTexture()->Bind(1);
 
-    glActiveTexture(GL_TEXTURE0);  glBindTexture(GL_TEXTURE_2D, target->GetTexture(0));
+    glActiveTexture(GL_TEXTURE0);  glBindTexture(GL_TEXTURE_2D, lightingBuffer->GetTexture(0));
     glActiveTexture(GL_TEXTURE1);  glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(0));      //gbuffer->GetDepthTexture()
 
     RenderQuad();

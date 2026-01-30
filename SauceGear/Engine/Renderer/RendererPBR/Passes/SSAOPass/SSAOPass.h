@@ -53,20 +53,7 @@ public:
 
         RenderQuad();     //DrawFullscreenQuad                  occlusion
         ssao.Unbind();
-    }
-
-    void BlurPostProcess(Framebuffer& ssao, Framebuffer& out) {
-        out.Bind();
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        shaderPPBlur->use();
-        shaderPPBlur->setInt("ssaoInput", 0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, ssao.GetTexture(0));        // Normal
-        RenderQuad();
-
-        out.Unbind();
-    }
+    } 
 
     void Execute(Framebuffer& gbuffer, Framebuffer& ssao, Framebuffer& out) {
         glViewport(0, 0, ssao.GetWidth(), ssao.GetHeight());
@@ -78,7 +65,18 @@ public:
         // CUIDADO AQ, pois n temos certeza se essa viwport pode nao representar a real resolução da janela, observe bem isso
         GEngine->window->SetWindowViewport0();
     };
-     
+
+    void BlurPostProcess(Framebuffer& ssao, Framebuffer& out) {
+        out.Bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+        shaderPPBlur->use();
+        shaderPPBlur->setInt("ssaoInput", 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ssao.GetTexture(0));        // Normal
+        RenderQuad();
+        out.Unbind();
+    }
+
 private:
     Shader* shader;
     Shader* shaderPPBlur;

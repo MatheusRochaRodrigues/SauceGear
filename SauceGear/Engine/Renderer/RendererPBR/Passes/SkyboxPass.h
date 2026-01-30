@@ -21,14 +21,9 @@ public:
         skybox = LoadCubemap2TEX();
     }
 
-    void Execute(Camera& cam, GLuint cubemap, Framebuffer& target)
+    void Execute(Camera& cam, GLuint cubemap)
     { 
-        if (cubemap == 0) cubemap = skybox;
-
-        target.Bind();
-
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        if (cubemap == 0) cubemap = skybox; 
 
         DrawSkybox(cam, cubemap);
         //RenderDebugSun();

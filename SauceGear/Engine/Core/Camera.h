@@ -14,14 +14,16 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+
+    UP,
+    DOWN
 };
 
 // Default camera values
 const float YAW = -90.0f;
-const float PITCH = 0.0f;
-//const float SPEED = 2.5f;
-const float SPEED = 4.5f;
+const float PITCH = 0.0f; 
+const float SPEED = 5.0f;   //4.5f              //2.5f
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;           //FOV
 
@@ -47,7 +49,9 @@ public:
     //bool isDirty = true;
 
     // constructor with vectors
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), 
+        float yaw = YAW, float pitch = PITCH) : 
+        Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = position;
         WorldUp = up;
@@ -56,7 +60,8 @@ public:
         updateCameraVectors();
     }
     // constructor with scalar values
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
+    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : 
+        Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
         Position = glm::vec3(posX, posY, posZ);
         WorldUp = glm::vec3(upX, upY, upZ);
@@ -69,7 +74,10 @@ public:
     glm::mat4 viewMatrix;
 
     void UpdtMatrices() {
-        projectionMatrix = glm::perspective(glm::radians(Zoom), (float)GEngine->window->m_width / (float)GEngine->window->m_height, 0.1f, 100.0f);
+        projectionMatrix = glm::perspective(
+            glm::radians(Zoom), 
+            (float)GEngine->window->m_width / (float)GEngine->window->m_height, 0.1f, 100.0f);
+
         viewMatrix = glm::lookAt(Position, Position + Front, Up);
     }
 
@@ -108,7 +116,7 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime, bool sprint = false)
     { 
         float currentSpeed = MovementSpeed;
-        if (sprint) currentSpeed *= 2.0f; // multiplica a velocidade quando shift é pressionado 
+        if (sprint) currentSpeed *= 2.5f; // multiplica a velocidade quando shift é pressionado 
 
         float velocity = currentSpeed * deltaTime;  //float velocity = MovementSpeed * deltaTime;
          
@@ -120,6 +128,11 @@ public:
             Position -= Right * velocity;
         if (direction == RIGHT)
             Position += Right * velocity;
+         
+        if (direction == UP)
+            Position += WorldUp * velocity;
+        if (direction == DOWN)
+            Position -= WorldUp * velocity;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.

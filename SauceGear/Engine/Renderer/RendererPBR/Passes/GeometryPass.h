@@ -13,9 +13,8 @@ class GeometryPass {
 public:
     GeometryPass(Shader* shader) : shader(shader) {};
 
-    void Execute(Scene& scene, Framebuffer& gbuffer)
-    {
-        gbuffer.Bind(); 
+    void Execute(Scene& scene)
+    { 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
 
@@ -54,7 +53,6 @@ public:
         }
 
         glDisable(GL_STENCIL_TEST);
-        gbuffer.Unbind();
     }
 
 private:

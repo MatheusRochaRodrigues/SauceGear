@@ -53,14 +53,12 @@ public:
     }
 
     void Execute(
-        Scene& scene,
-        Framebuffer& target,
+        Scene& scene, 
         Framebuffer& gbuffer, 
         IBLSet& ibl,
         bool SSAO = false,
         GLuint SSAOBuffer = 0)
     {
-        target.Bind();
         glDisable(GL_DEPTH_TEST); 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);           
@@ -83,14 +81,7 @@ public:
             } //-------------------------------------------------
 
             RenderQuad();
-        }
-        
-
-        //Finish  
-        glDisable(GL_BLEND);
-        glDisable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);        glDepthMask(GL_TRUE);         // não escreve no depth  
-        return;
+        }  
 
 
         // ADDITIVE LIGHTS     -> to SunLight and PointLights

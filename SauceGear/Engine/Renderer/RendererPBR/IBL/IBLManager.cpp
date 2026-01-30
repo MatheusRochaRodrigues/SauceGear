@@ -97,12 +97,12 @@ static glm::mat4 CaptureProjection() {
 }
 static std::vector<glm::mat4> CaptureViews() {
     return {
-        glm::lookAt(glm::vec3(0,0,0), glm::vec3(1, 0, 0), glm::vec3(0,-1, 0)),  // +X
-        glm::lookAt(glm::vec3(0,0,0), glm::vec3(-1,0, 0), glm::vec3(0,-1, 0)),  // -X
-        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1)),  // +Y
-        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0,-1, 0), glm::vec3(0, 0,-1)),  // -Y
-        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0, 0, 1), glm::vec3(0,-1, 0)),  // +Z
-        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0, 0,-1), glm::vec3(0,-1, 0)),  // -Z
+        glm::lookAt(glm::vec3(0,0,0), glm::vec3(1, 0, 0), glm::vec3(0,-1, 0)),
+        glm::lookAt(glm::vec3(0,0,0), glm::vec3(-1,0, 0), glm::vec3(0,-1, 0)),
+        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1)),
+        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0,-1, 0), glm::vec3(0, 0,-1)),
+        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0, 0, 1), glm::vec3(0,-1, 0)),
+        glm::lookAt(glm::vec3(0,0,0), glm::vec3(0, 0,-1), glm::vec3(0,-1, 0)),
     };
 }
 
@@ -115,40 +115,47 @@ GLuint IBLManager::LoadHDRTexture(const std::string& path) {
     int width, height, nrComponents;
     float* data = stbi_loadf(path.c_str(), &width, &height, &nrComponents, 0);
     if (!data) return 0;
-
-    //Sanitiza Lixo de dados que pode haver no HDR
-    for (int i = 0; i < width * height * 3; i++) {
-        float& v = data[i];
-
-        if (!std::isfinite(v)) v = 0.0f;
-
-        v = glm::clamp(v, 0.0f, 65504.0f); // limite FP16
-    }
-
-
-    GLenum format = (nrComponents == 3) ? GL_RGB : GL_RGBA;
-    GLenum internalFormat = (nrComponents == 3) ? GL_RGB16F : GL_RGBA16F;
-
     GLuint tex = 0; glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_FLOAT, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
     stbi_image_free(data);
     return tex;
 }
 
-IBLSet IBLManager::resolveHDRtoCube(
-    const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap, Shader& hdrToCube,
-    const glm::mat4& proj, const std::vector<glm::mat4>& views, 
-    GLuint captureFBO , GLuint captureRBO
-) {
+// === Interface principal ===
+//create ambient IBL                    LoadOrBuild
+IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap) {
+    //----------------------------SETUP-----------------------------------------
+    // Lazy init do FBO/RBO default se não tiver sido passado
+    //problema com destrutor 
+    static GLuint captureFBO = 0; static GLuint captureRBO = 0;
+    if (captureFBO == 0) {
+        glGenFramebuffers(1, &captureFBO);
+        glGenRenderbuffers(1, &captureRBO);
+    }
+
+    Shader& hdrToCube = ShaderLibrary::Get("HDR_ToCubemap");
+    Shader& Irradiance = ShaderLibrary::Get("IBL_Irradiance");
+    Shader& Prefilter = ShaderLibrary::Get("IBL_Prefilter");
+    Shader& BRDF = ShaderLibrary::Get("IBL_BRDF");
+    //--------------------------------------------------------------------------
+
+
+    //start
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST); // às vezes depth atrapalha
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    const auto proj = CaptureProjection();
+    const auto views = CaptureViews();
+
     IBLSet set{};
 
+    // === FONTE DO ENVIRONMENT MAP ===  
     if (!isAlreadyCubeMap) {
         // ---------- EQUIRETANGULAR HDR ----------
         GLuint hdr = LoadHDRTexture(hdrPath);
@@ -163,9 +170,11 @@ IBLSet IBLManager::resolveHDRtoCube(
             hdrToCube, proj, views,
             captureFBO, captureRBO
         );
-        glDeleteTextures(1, &hdr);
 
-    } else {
+        glDeleteTextures(1, &hdr);
+    }
+    else
+    {
         // ---------- CUBEMAP PNG DIRETO ----------
         std::array<std::string, 6> faces = {
             hdrPath + "/right.png",
@@ -175,60 +184,41 @@ IBLSet IBLManager::resolveHDRtoCube(
             hdrPath + "/front.png",
             hdrPath + "/back.png"
         };
+
         set.envCubemap = LoadCubemapHDR(faces);
     }
 
-    return set;
-}
-
-
-// ================================================ MAIN =====================================================
-//create ambient IBL                    LoadOrBuild
-IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap) {
-    //----------------------------SETUP----------------------------------------- 
-    //problema com destrutor 
-    static GLuint captureFBO = 0; static GLuint captureRBO = 0;
-    if (captureFBO == 0) {
-        glGenFramebuffers(1, &captureFBO); 
-        glGenRenderbuffers(1, &captureRBO);
-    }  
-
-    Shader& hdrToCube   = ShaderLibrary::Get("HDR_ToCubemap");
-    Shader& Irradiance  = ShaderLibrary::Get("IBL_Irradiance");
-    Shader& Prefilter   = ShaderLibrary::Get("IBL_Prefilter");
-    Shader& BRDF        = ShaderLibrary::Get("IBL_BRDF");
-    //--------------------------------------------------------------------------
-      
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST); // às vezes depth atrapalha
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
-    const auto proj = CaptureProjection();   const auto views = CaptureViews(); 
-
-    //----------------------------START----------------------------------------- 
-    // 
-    // === FONTE DO ENVIRONMENT MAP ===  
-    IBLSet set = resolveHDRtoCube(
-        hdrPath, cacheDir, isAlreadyCubeMap, hdrToCube,proj,views,captureFBO, captureRBO);
-
     // === IBL PIPELINE =======    
-    // Radiance Map -> Diffuse
     set.irradiance = CreateIrradiance_Tex(32);
-    ConvolveIrradianceToDiffuse(
-        set.envCubemap, set.irradiance, Irradiance, proj, views, captureFBO, captureRBO);
+    ConvolveIrradianceToDiffuse(set.envCubemap, set.irradiance, Irradiance, proj, views, captureFBO, captureRBO);
 
-    // PreFilter Map -> Specular
     set.prefilter = CreatePrefilter_Tex(128, 5);
-    PrefilterToSpecular(
-        set.envCubemap, set.prefilter, Prefilter, proj, views, captureFBO, captureRBO, 5);
+    PrefilterToSpecular(set.envCubemap, set.prefilter, Prefilter, proj, views, captureFBO, captureRBO, 5);
 
-    // BRDF Map -> Look at Table to Find data
     set.brdfLUT = CreateBRDFLUT_Tex(512);
     IntegrateBRDF(set.brdfLUT, BRDF, captureFBO, captureRBO, 512);
-      
+
+
+
+
+
+    //Debug
+
+    set.width = 512;
+    set.mipLevels = 5;
+
+    //int size = 32;
+    //glGenTextures(1, &set.debugFace);
+    //glBindTexture(GL_TEXTURE_2D, set.debugFace);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
+
+    //// copia os pixels da face do cubemap para a textura 2D
+    //glCopyImageSubData(set.irradiance, GL_TEXTURE_CUBE_MAP_POSITIVE_X + 1, 0, 0, 0, 0,
+    //    set.debugFace, GL_TEXTURE_2D, 0, 0, 0, 0,
+    //    size, size, 1);
+
     return set;
-} 
-// ============================================================================================================
+}
 
 void IBLManager::Destroy(IBLSet& s) {
     if (s.envCubemap) glDeleteTextures(1, &s.envCubemap);
@@ -238,96 +228,52 @@ void IBLManager::Destroy(IBLSet& s) {
     s = {};
 }
 
+
 GLuint IBLManager::CreateCubemap_Tex(int size) {
-    GLuint tex; //tex == envCubemap
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-
+    GLuint id; glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, id);
     for (int i = 0; i < 6; i++)
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            0,
-            GL_RGB16F,
-            size, size,
-            0,
-            GL_RGB,
-            GL_FLOAT,
-            nullptr
-        );
-
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return tex;
+    return id;
 }
 
-
-void IBLManager::RenderHDRToCubemap(
-    GLuint hdrTexture,
-    GLuint envCubemap,
-    Shader& shEquirect,
-    const glm::mat4& proj,
+void IBLManager::RenderHDRToCubemap(GLuint hdrTexture, GLuint envCubemap,
+    Shader& shEquirect, const glm::mat4& proj,
     const std::vector<glm::mat4>& views,
-    GLuint fbo,
-    GLuint rbo)
-{
-    glViewport(0, 0, 512, 512);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    // FIX: define explicitamente qual attachment será desenhado
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-    glFramebufferRenderbuffer(
-        GL_FRAMEBUFFER,
-        GL_DEPTH_ATTACHMENT,
-        GL_RENDERBUFFER,
-        rbo
-    );
-
-    // FIX: clear color explícito (NVIDIA IMPORTANTÍSSIMO)
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    GLuint fbo, GLuint rbo) {
 
     shEquirect.use();
     shEquirect.setInt("equirectangularMap", 0);
     shEquirect.setMat4("projection", proj);
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
+    glViewport(0, 0, 512, 512);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+
     for (int i = 0; i < 6; i++) {
         shEquirect.setMat4("view", views[i]);
-
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            envCubemap,
-            0
-        );
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << "[IBL] FBO incompleto na face " << i << "\n";
+            std::cerr << "FBO incompleto!\n";
         }
-
-        // LIMPA TODA A FACE
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         RenderCube();
     }
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // FIX: NÃO gerar mipmap aqui
-    glGenerateMipmap(GL_TEXTURE_CUBE_MAP); 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
-
 
 GLuint IBLManager::CreateIrradiance_Tex(int size) {
     GLuint id; glGenTextures(1, &id);
@@ -353,19 +299,13 @@ void IBLManager::ConvolveIrradianceToDiffuse(GLuint envCubemap, GLuint irradianc
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
     glViewport(0, 0, 32, 32);
-
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
-    for (int i = 0; i < 6; i++) {   //i == face
+    for (int i = 0; i < 6; i++) {
         shIrr.setMat4("view", views[i]);
-
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradiance, 0);
-
-        glClearColor(0, 0, 0, 1);   //glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         RenderCube();
     }
@@ -382,28 +322,6 @@ GLuint IBLManager::CreatePrefilter_Tex(int baseSize, int mips) {
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     return id;
 }
-
-//GLuint IBLManager::CreatePrefilter_Tex(int baseSize, int mips) {
-//    GLuint id; glGenTextures(1, &id);
-//    glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-//
-//    for (int i = 0; i < 6; i++)
-//        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, baseSize, baseSize, 0, GL_RGB, GL_FLOAT, nullptr);
-//
-//    /*glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);*/
-//
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // be sure to set minification filter to mip_linear 
-//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    // generate mipmaps for the cubemap so OpenGL automatically allocates the required memory.
-//    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-//
-//    return id;
-//}
 
 //Forma mais explicita de gerar mips sem depender de glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 //GLuint IBLManager::CreatePrefilter_Tex(int baseSize, int mips) {
@@ -434,8 +352,6 @@ void IBLManager::PrefilterToSpecular(GLuint envCubemap, GLuint prefilter,
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
     for (int mip = 0; mip < maxMip; ++mip) {
         int mipW = (int)(128 * std::pow(0.5, mip));
         int mipH = (int)(128 * std::pow(0.5, mip));
@@ -479,7 +395,7 @@ void IBLManager::IntegrateBRDF(GLuint brdfLUT, Shader& shBRDF,
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     RenderQuad();           // renderQuad();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-} 
+}
 
 
 
@@ -495,9 +411,9 @@ IBLSet IBLManager::CreateEmptyIBL(int width, int mipLevels) {
     set.width = 512;
     set.mipLevels = 5;
 
-    set.envCubemap = CreateEmptyCubemap (512, 1);        // skybox                 //512
-    set.irradiance = CreateEmptyCubemap (32,  1);        // irradiance menor       //32
-    set.prefilter  = CreateEmptyCubemap (128, 5);                                  //128
+    set.envCubemap = CreateEmptyCubemap(512, 1);        // skybox                 //512
+    set.irradiance = CreateEmptyCubemap(32, 1);        // irradiance menor       //32
+    set.prefilter = CreateEmptyCubemap(128, 5);                                  //128
 
     //set.width = width;
     //set.mipLevels = mipLevels;
@@ -557,25 +473,3 @@ GLuint IBLManager::CreateCubemap(int size, GLenum internalFormat, int mipLevels)
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     return tex;
 }
-
-
-
-
-/*
-
-//Debug
-
-set.width = 512;
-set.mipLevels = 5;
-
-//int size = 32;
-//glGenTextures(1, &set.debugFace);
-//glBindTexture(GL_TEXTURE_2D, set.debugFace);
-//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, size, size, 0, GL_RGB, GL_FLOAT, nullptr);
-
-//// copia os pixels da face do cubemap para a textura 2D
-//glCopyImageSubData(set.irradiance, GL_TEXTURE_CUBE_MAP_POSITIVE_X + 1, 0, 0, 0, 0,
-//    set.debugFace, GL_TEXTURE_2D, 0, 0, 0, 0,
-//    size, size, 1);
-
-*/

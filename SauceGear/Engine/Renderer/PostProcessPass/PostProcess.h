@@ -53,8 +53,7 @@ public:
         return writeFBO;
     }
 
-    void correct_HDR_GAMA(Framebuffer& ppFBO, PostProcessPass* correct) {
-        ppFBO.Bind();
+    void correct_HDR_GAMA(PostProcessPass* correct) {
         correct->shader->use();
         correct->Apply();  // chama a lógica individual de cada efeito    
         correct->shader->setInt("scene", 0); // define local texture in shader
@@ -68,7 +67,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     }
 
-    void CorrectSpaceColor(Framebuffer& ppFBO) {  
+    void CorrectSpaceColor() {  
         // Ambos sao Tonemmaping e possuem correção Gamma
         static ACESColorBoostPP* ACES = nullptr;
         if (ACES == nullptr) ACES = new ACESColorBoostPP();
@@ -77,11 +76,10 @@ public:
         if (Reinhard == nullptr) Reinhard = new Fix_HDR_GAMMA_pp();
 
         if (GetEngineSettings().renderDebug.hdrMode == HDRMode::ACESFilm)      //gammaPass->Apply(inputTexture, writeFBO);
-            correct_HDR_GAMA(ppFBO, ACES);
+            correct_HDR_GAMA(ACES);
         else
-            correct_HDR_GAMA(ppFBO, Reinhard);
+            correct_HDR_GAMA(Reinhard);
 
-        GEngine->renderer->GetTextureRendered = ppFBO.GetTexture(0); 
     }
 
     void Finish() {

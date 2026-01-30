@@ -63,7 +63,7 @@ public:
             return false;
         }
         //-----------------------------------------------------------
-            EnableGLDebug();    // Ative apenas para Debug, pois é pesado
+            //EnableGLDebug();    // Ative apenas para Debug, pois é pesado
         //-----------------------------------------------------------
 
         SG::Welcome::Load("OpenGL");

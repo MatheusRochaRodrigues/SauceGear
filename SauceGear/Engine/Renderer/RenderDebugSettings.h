@@ -46,10 +46,10 @@ struct RenderDebugSettings {
     bool IBLAmbient     = true;
     bool SunLight       = true;
     bool PointLights    = true;
-    bool Shadow         = false;
+    bool Shadow         = true;
     
     //SSAO_Params
-    bool  SSAO          = false;
+    bool  SSAO          = true;
     int   sKernelSize   = 32;
     float sRadius       = 0.5f;    
     float sBias         = 0.025;
@@ -65,21 +65,19 @@ struct RenderDebugSettings {
 
     //HDR
     HDRMode hdrMode = HDRMode::ACESFilm;
-    bool GammaHDR_correct = false;
+    bool GammaHDR_correct = true;
     float Exposure = 1.0f;
     float Saturation = 1.0f;
     float Contrast = 1.1f;
     float Power = 1.0f;
 
-    //-----------------------------------------
-
+    //----------------------------------------- 
     SkyboxMode skyMode = SkyboxMode::IBLEnvirolnment;
     bool Skybox         = true;
 
     bool postProcess    = false;
 
-    bool outlineSys = false;
-    bool OutlDepth  = true;
+    bool outlineSys = false;                                        //bool OutlDepth  = true;
 
     std::string stgTeste;
 
@@ -132,8 +130,7 @@ struct RenderDebugSettings {
         REFLECT_SPACE();
 
         REFLECT_HEADER("Outline System");
-        REFLECT_FIELD(outlineSys)
-        REFLECT_FIELD(OutlDepth)
+        REFLECT_FIELD(outlineSys) 
         REFLECT_SPACE();
 
         REFLECT_HEADER("Debug");

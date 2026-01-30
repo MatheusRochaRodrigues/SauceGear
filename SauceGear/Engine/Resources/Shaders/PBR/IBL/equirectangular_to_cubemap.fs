@@ -19,11 +19,28 @@ void main()
     vec3 color = texture(equirectangularMap, uv).rgb;
 
     //Sanitize
-    color = max(color, vec3(0.0));
-    color = min(color, vec3(65504.0)); 
-    if (any(isnan(color)) || any(isinf(color))) color = vec3(0.0);
-       
+    // Mata NaN/Inf primeiro
+    if (any(isnan(color)) || any(isinf(color))) color = vec3(0.0); 
+
+    // Clamp físico (não matemático)
+    color = clamp(color, 0.0, 2000.0);          //outra alternativa -> 1000.0 (para IBL isso já é muito alto)
+    
+    // Clamp usando o max float para rgb16
+    //color = min(color, vec3(65504.0)); 
+
+    // compressão suave (REMOVE banding)
+    // color = color / (color + vec3(1.0)); 
 
     
     FragColor = vec4(color, 1.0);
 }
+
+
+
+/* 
+    //Sanitize
+    color = max(color, vec3(0.0));
+    color = min(color, vec3(65504.0)); 
+    if (any(isnan(color)) || any(isinf(color))) color = vec3(0.0);
+       
+*/

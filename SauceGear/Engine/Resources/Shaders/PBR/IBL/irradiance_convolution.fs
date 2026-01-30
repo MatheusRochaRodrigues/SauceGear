@@ -34,5 +34,9 @@ void main()
     }
     irradiance = PI * irradiance * (1.0 / float(nrSamples));
     
+    
+    //testando para ver se nvidia funciona melhor     irradiance = clamp(irradiance, 0.0, 10000.0); 
+
+
     FragColor = vec4(irradiance, 1.0);
 }

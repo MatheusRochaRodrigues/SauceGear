@@ -7,20 +7,50 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <fcntl.h>
+#include <io.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
+
+
 namespace SG::Welcome {
 
 #ifdef _WIN32
-    void EnableANSI()
+    static int g_oldStdoutMode = -1;
+    static int g_oldStderrMode = -1;
+#endif
+
+
+#ifdef _WIN32 
+
+    void SetupConsole()
     {
+        // Habilita ANSI
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        DWORD dwMode = 0;
-        GetConsoleMode(hOut, &dwMode);
-        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-        SetConsoleMode(hOut, dwMode);
+        DWORD mode = 0;
+        GetConsoleMode(hOut, &mode);
+        mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(hOut, mode);
+
+        // SALVA o modo antigo
+        g_oldStdoutMode = _setmode(_fileno(stdout), _O_U16TEXT);
+        g_oldStderrMode = _setmode(_fileno(stderr), _O_U16TEXT);
+    }
+
+#endif
+
+
+#ifdef _WIN32
+    void RestoreConsole()
+    {
+        if (g_oldStdoutMode != -1)
+            _setmode(_fileno(stdout), g_oldStdoutMode);
+
+        if (g_oldStderrMode != -1)
+            _setmode(_fileno(stderr), g_oldStderrMode);
     }
 #endif
 
@@ -78,33 +108,42 @@ namespace SG::Welcome {
     void PrintSauceGear()
     {
         InitConsoleUTF8();
-        EnableANSI();
-
-
+        SetupConsole();
 
 
         SetColor(12, "\033[38;5;196m");
-        std::cout <<
-            R"(███████╗ █████╗ ██╗   ██╗ ██████╗███████╗
-██╔════╝██╔══██╗██║   ██║██╔════╝██╔════╝
-███████╗███████║██║   ██║██║     █████╗
-╚════██║██╔══██║██║   ██║██║     ██╔══╝
-███████║██║  ██║╚██████╔╝╚██████╗███████╗)";
+        std::wcout <<
+            L" ██████╗ ███████╗ █████╗ ██████╗\n"
+            L"██╔════╝ ██╔════╝██╔══██╗██╔══██╗\n"
+            L"██║  ███╗█████╗  ███████║██████╔╝\n"
+            L"██║   ██║██╔══╝  ██╔══██║██╔══██╗\n"
+            L"╚██████╔╝███████╗██║  ██║██║  ██║\n"
+            L" ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝\n";
+
         ResetColor();
 
-        std::cout << "\n";
+        std::wcout << "\n";
 
-        SetColor(7, "\033[38;5;250m");
-        std::cout <<
-            R"( ██████╗ ███████╗ █████╗ ██████╗
-██╔════╝ ██╔════╝██╔══██╗██╔══██╗
-██║  ███╗█████╗  ███████║██████╔╝
-██║   ██║██╔══╝  ██╔══██║██╔══██╗
-╚██████╔╝███████╗██║  ██║██║  ██║
- ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝)";
+        SetColor(12, "\033[38;5;196m");
+        std::wcout <<
+            L"███████╗ █████╗ ██╗   ██╗ ██████╗███████╗\n"
+            L"██╔════╝██╔══██╗██║   ██║██╔════╝██╔════╝\n"
+            L"███████╗███████║██║   ██║██║     █████╗\n"
+            L"╚════██║██╔══██║██║   ██║██║     ██╔══╝\n"
+            L"███████║██║  ██║╚██████╔╝╚██████╗███████╗\n";
+
         ResetColor();
+         
+        std::wcout << "\n\n";
 
-        std::cout << "\n\n";
+
+#ifdef _WIN32
+        RestoreConsole(); // 🔥 VOLTA AO NORMAL
+#endif
+
+
+        std::cout << "Log normal ASCII\n\n";
+
     }
 
 

@@ -10,9 +10,7 @@ class OutlinePass {
 public:
     OutlinePass(Shader* outlineShader) : outlineShader(outlineShader) {};
 
-    void Execute(Scene& scene, Framebuffer& target) {
-        glBindFramebuffer(GL_FRAMEBUFFER, target.GetID());
-         
+    void Execute(Scene& scene) { 
         // 1 desabilitar depth gera um efeito muito interessante que permite vc ver a sinueta do objeto(style Fill) quando sobreposto por outros objetos
         // glDisable(GL_DEPTH_TEST); 
         // 2

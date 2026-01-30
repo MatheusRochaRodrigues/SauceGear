@@ -1,6 +1,9 @@
 ﻿#include "PBRPipeline.h" 
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/SharedDepthStencil.h"
+#include "../RenderDebugSettings.h" 
+#include "../../Materials/MaterialLibrary.h"
+#include "../Shaders/ShaderLibrary.h"
 
 #include "Passes/GeometryPass.h"
 #include "Passes/DeferredLightingPass.h"
@@ -8,16 +11,11 @@
 #include "Passes/SkyboxPass.h"
 #include "Passes/TransparentPass.h"
 #include "Passes/SSAOPass/SSAOPass.h"
-#include "Passes/FogPass.h"
-
+#include "Passes/FogPass.h" 
 #include "../LightPass/LightPass.h"
 #include "../PostProcessPass/PostProcess.h"
-#include "../RenderDebugSettings.h"
-
 #include "../Outline/OutlinePass.h"
 
-#include "../../Materials/MaterialLibrary.h"
-#include "../Shaders/ShaderLibrary.h"
   
 void PBRPipeline::Init() {
     std::cout << "initPipeline" << std::endl; 
@@ -73,56 +71,60 @@ void PBRPipeline::Init() {
 void PBRPipeline::Render(Scene& scene) {
     auto& engineSettings = GetEngineSettings();
     auto& debug = engineSettings.renderDebug;
+    
     //=============================================TimeLine============================================================
     HandleFBOs();                       //ibl = DayNightSystem::GetSkyboxFront();
 
     // Render Light and Shadows
-    //lightPass->Update(debug.Shadow);
+    lightPass->Update(debug.Shadow);
+    
     // GBUFFER + STENCIL
-    geometryPass->Execute(scene, *gBuffer);
+    gBuffer->Bind();
+    geometryPass->Execute(scene);
+    gBuffer->Unbind();
 
-    //if (debug.SSAO) ssaoPass->Execute(*gBuffer, *ssaoBuffer, *ssaoBlurBuffer);
+    // SSAO - proprio gerenciamento de FBO Interno
+    if (debug.SSAO) ssaoPass->Execute(*gBuffer, *ssaoBuffer, *ssaoBlurBuffer);
 
     // Deferred Lighting                    (usa ssao)
-    lightingPass->Execute(scene, *lightingBuffer, *gBuffer, ibl,   
-        debug.SSAO, ssaoBlurBuffer->GetTexture(0));
-    // outline usa depth + stencil do geometry
-    //if (GetEngineSettings().renderDebug.outlineSys) outlinePass->Execute(scene, *lightingBuffer);
+    lightingBuffer->Bind();
+    lightingPass->Execute(scene, *gBuffer, ibl, debug.SSAO, ssaoBlurBuffer->GetTexture(0));
+
+    // outline usa depth + stencil do geometry 
+    if (GetEngineSettings().renderDebug.outlineSys) outlinePass->Execute(scene);
+     
+    // Forward  
+    //forwardPass->Execute(scene, *gBuffer, *lightingBuffer); 
+
+    // Skybox 
+    /*postBufferA->Bind();   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+    lightingBuffer->Bind();
+    if (GetEngineSettings().renderDebug.Skybox) 
+        skyboxPass->Execute(
+            *GEngine->mainCamera, 
+            (debug.skyMode == SkyboxMode::Skybox ? 0 : ibl.envCubemap) 
+        );
 
 
     // === FOG PASS (AQUI) ===
-    /*if (engineSettings.renderDebug.FogEnabled) {
+    postBufferA->Bind();
+    if (engineSettings.renderDebug.FogEnabled) {
         fogPass->Execute(
             lightingBuffer,
             gBuffer,
             GEngine->mainCamera->Position
         );
-    }*/
-
-    // Forward  
-    //forwardPass->Execute(scene, *gBuffer, *lightingBuffer);
-    
-    // Skybox 
-    /*postBufferA->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-    if (GetEngineSettings().renderDebug.Skybox) 
-        skyboxPass->Execute(*GEngine->mainCamera, 
-            (debug.skyMode == SkyboxMode::Skybox ? ibl.prefilter : ibl.irradiance),
-            *lightingBuffer);
+    }
 
     // SUN
-    //skyboxPass->RenderDebugSun();
-     
-
-
+    skyboxPass->RenderDebugSun();
+      
 
     //========================================BUFFER RENDER============================================================ 
-
     //----------------------------- New Debug Edit ------------------------------------------------------------
     switch (debug.viewMode) {
     case RenderViewMode::FinalLighting:
-        GEngine->renderer->GetTextureRendered = lightingBuffer->GetTexture(0);
-        //GEngine->renderer->GetTextureRendered = lightingBuffer->GetTexture(0);
+        GEngine->renderer->GetTextureRendered = postBufferA->GetTexture(0);    //lightingBuffer->GetTexture(0);
         break;
 
     case RenderViewMode::Position:
@@ -141,8 +143,7 @@ void PBRPipeline::Render(Scene& scene) {
         GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(3);
         break;
 
-    case RenderViewMode::Depth:
-        //GEngine->renderer->GetTextureRendered = gBuffer->get;     //GEngine->renderer->GetTextureRendered = gBuffer->GetDepthTexture();
+    case RenderViewMode::Depth: 
         break;
 
     case RenderViewMode::AO:
@@ -151,37 +152,23 @@ void PBRPipeline::Render(Scene& scene) {
 
     case RenderViewMode::Fog: 
         break;
-    }
-    //---------------------------------------------------------------------------------------------------------- 
-    //GEngine->renderer->GetTextureRendered = lightingBuffer->GetTexture(0);  
-    //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(1);
+    } 
 
-    // POST PROCESSING    
-    auto fboFinale = postBufferA;
+    // POST PROCESSING -------------------------------------------------------------------------------------- 
+    auto fboFinale = postBufferB;
     if (engineSettings.renderDebug.postProcess)  
         fboFinale = postProcess->Execute(scene, *postBufferA, *postBufferB);  
-    //Finish, to next fase
-    if(engineSettings.renderDebug.GammaHDR_correct) postProcess->CorrectSpaceColor(*fboFinale); 
-     
 
-    //GEngine->renderer->GetTextureRendered = postBufferA->GetTexture(0);
+    //Finish, to next fase
+    if (engineSettings.renderDebug.GammaHDR_correct) {
+        fboFinale->Bind();
+        postProcess->CorrectSpaceColor();
+        GEngine->renderer->GetTextureRendered = fboFinale->GetTexture(0);
+    }
+      
     postProcess->Finish();  
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-/*
-* opcionalmente pode usar ping pong para revesar os buffers d etextura nos fbos para sempre q escrever em um, troca para outro buffer
-* para escrever, enquanto usa oq foie scrito anteriormente trocando seus ponteiros
-* 
-// Frame atual
-BindFBO(fboB);
-glBindTexture(GL_TEXTURE_2D, texA);
-Draw();
-
-// Próximo frame
-std::swap(texA, texB);
-std::swap(fboA, fboB);
-*/
+} 
 
 
 void PBRPipeline::HandleFBOs() {
@@ -218,3 +205,24 @@ void PBRPipeline::Shutdown() {
     IBLManager::Destroy(ibl);
 }
  
+
+
+
+
+
+
+
+
+/*
+* opcionalmente pode usar ping pong para revesar os buffers d etextura nos fbos para sempre q escrever em um, troca para outro buffer
+* para escrever, enquanto usa oq foie scrito anteriormente trocando seus ponteiros
+*
+// Frame atual
+BindFBO(fboB);
+glBindTexture(GL_TEXTURE_2D, texA);
+Draw();
+
+// Próximo frame
+std::swap(texA, texB);
+std::swap(fboA, fboB);
+*/

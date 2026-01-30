@@ -10,6 +10,10 @@ namespace SG::Welcome {
     void SetColor(int win, int ansi);
     void SetColor(int winColor, const char* ansi);
     void ResetColor();
+
+
+    static bool s_unicode;
+    static bool s_ansi;
 }
 
 

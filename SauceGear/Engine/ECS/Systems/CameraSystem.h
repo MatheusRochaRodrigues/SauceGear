@@ -37,6 +37,8 @@ public:
                 if (Input::GetKey(KEY_A)) cam->ProcessKeyboard(LEFT, deltaTime, sprint);
                 if (Input::GetKey(KEY_D)) cam->ProcessKeyboard(RIGHT, deltaTime, sprint);
 
+                if (Input::GetKey(KEY_LEFT_CONTROL)) cam->ProcessKeyboard(DOWN, deltaTime, sprint);
+                if (Input::GetKey(KEY_SPACE)) cam->ProcessKeyboard(UP, deltaTime, sprint);
 
                 //// Rotação com o mouse (Ex: se botão direito pressionado)
                 if (Input::GetMouseButton(MOUSE_BUTTON_RIGHT)) {
