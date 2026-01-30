@@ -178,12 +178,28 @@ Column 1  Weight=1.4757
 Column 0  Weight=0.5243
 Column 1  Weight=1.4757
 
+[Table][0xC69F271C,2]
+Column 0  Weight=0.5243
+Column 1  Weight=1.4757
+
+[Table][0x2CAC8DC8,2]
+Column 0  Weight=-nan(ind)
+Column 1  Weight=-nan(ind)
+
+[Table][0x16CF4AED,2]
+Column 0  Weight=0.5243
+Column 1  Weight=1.4757
+
+[Table][0xF007E7E9,2]
+Column 0  Weight=0.5243
+Column 1  Weight=1.4757
+
 [Docking][Data]
 DockSpace     ID=0x0FCAA000 Window=0x3DA2F1DE Pos=4,56 Size=1592,836 Split=X Selected=0xE601B12F
   DockNode    ID=0x00000003 Parent=0x0FCAA000 SizeRef=1058,1016 Split=Y Selected=0xE601B12F
     DockNode  ID=0x00000001 Parent=0x00000003 SizeRef=1075,852 CentralNode=1 Selected=0xE601B12F
     DockNode  ID=0x00000002 Parent=0x00000003 SizeRef=1075,162 Selected=0x9C2B5678
   DockNode    ID=0x00000004 Parent=0x0FCAA000 SizeRef=532,1016 Split=Y Selected=0xBABDAE5E
-    DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=332,570 Selected=0xBABDAE5E
-    DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=332,444 Selected=0x4746B4B8
+    DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=332,469 Selected=0xBABDAE5E
+    DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=332,365 Selected=0x4746B4B8
 

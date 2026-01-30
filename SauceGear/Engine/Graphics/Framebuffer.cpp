@@ -1,5 +1,6 @@
 #include "Framebuffer.h"
 #include <iostream>
+#include <assert.h>
 
 Framebuffer::Framebuffer(int width, int height, const std::vector<FramebufferAttachment>& attachments)
     : width(width), height(height), attachmentSpecs(attachments) {
@@ -18,11 +19,14 @@ Framebuffer::Framebuffer(int width, int height, const std::vector<FramebufferAtt
 }
 
 Framebuffer::~Framebuffer() {
-    glDeleteFramebuffers(1, &fbo);
+    if (fbo) glDeleteFramebuffers(1, &fbo);
     for (auto tex : colorTextures)
         glDeleteTextures(1, &tex);
     if (depthTexture) glDeleteTextures(1, &depthTexture);
     if (depthRBO && ownsDepthRBO) glDeleteRenderbuffers(1, &depthRBO);
+
+    fbo = depthTexture = 0;
+    colorTextures.clear();
 }
 
 void Framebuffer::Init() {
@@ -63,7 +67,7 @@ void Framebuffer::Init() {
             format = GL_RGBA;
             break;
 
-        //Deffered
+            //Deffered
         case FramebufferTextureType::Position:
             internalFormat = GL_RGB16F;         //RGBA  -opcional
             format = GL_RGB;                    //RGBA  -opcional
@@ -79,25 +83,61 @@ void Framebuffer::Init() {
             format = GL_RGBA;
             break;
 
-        //Only Channels
+            //Only Channels
         case FramebufferTextureType::REDFloat:
             internalFormat = GL_R16F;       //GL_RED
             format = GL_RED;
             dataType = GL_FLOAT;
-            break; 
+            break;
 
-        //PBR
+            //PBR
         case FramebufferTextureType::MetallicRoughnessAO:
             internalFormat = GL_RGBA8;      //GL_RGBA8          R = Metallic, G = Roughness, B = AO, A = ?
             format = GL_RGBA;
             break;
-             
+
         case FramebufferTextureType::HDR:
             internalFormat = GL_RGBA16F;
             format = GL_RGBA;
             dataType = GL_FLOAT;
             break;
-    }
+
+
+
+        case FramebufferTextureType::ColorRGBA8:
+            internalFormat = GL_RGBA8;
+            format = GL_RGBA;
+            dataType = GL_UNSIGNED_BYTE;
+            break;
+
+        case FramebufferTextureType::RGBA16F:
+            internalFormat = GL_RGBA16F;
+            format = GL_RGBA;
+            dataType = GL_FLOAT;
+            break;
+
+        case FramebufferTextureType::RGB16F:
+            internalFormat = GL_RGB16F;
+            format = GL_RGB;
+            dataType = GL_FLOAT;
+            break;
+
+        case FramebufferTextureType::R16F:
+            internalFormat = GL_R16F;
+            format = GL_RED;
+            dataType = GL_FLOAT;
+            break;
+
+        case FramebufferTextureType::R32I:
+            internalFormat = GL_R32I;
+            format = GL_RED_INTEGER;
+            dataType = GL_INT;
+            break;
+
+        default:
+            assert(false && "Formato inválido");
+
+        }
 
 
         glBindTexture(GL_TEXTURE_2D, colorTextures[i]);
@@ -108,7 +148,7 @@ void Framebuffer::Init() {
 
         //New
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorTextures[i], 0);
         drawBuffers[drawIndex++] = GL_COLOR_ATTACHMENT0 + i;
@@ -154,6 +194,8 @@ void Framebuffer::Init() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "[Framebuffer] Incompleto!\n";
 
+    Clear();
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -163,6 +205,11 @@ void Framebuffer::Init() {
 
 void Framebuffer::Bind() const {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    //Nao sao necessario nenhum deles --------------------------------------
+    //glViewport(0, 0, width, height);
+    //if (!drawBuffers.empty()) glDrawBuffers((GLsizei)drawBuffers.size(), drawBuffers.data());
+    //else glDrawBuffer(GL_NONE);
 }
 
 void Framebuffer::Unbind() const {
@@ -178,6 +225,8 @@ GLuint Framebuffer::GetDepthTexture() const {
 }
 
 void Framebuffer::Resize(int newWidth, int newHeight) {
+    //if (w == width && h == height) return;
+
     width = newWidth;
     height = newHeight;
 
@@ -191,6 +240,15 @@ void Framebuffer::Resize(int newWidth, int newHeight) {
     Init();
 }
 
+void Framebuffer::Clear() const {
+    Bind();
+
+    const float zero[4] = { 0,0,0,0 };
+    for (GLuint i = 0; i < colorTextures.size(); i++)       //colorAttachments == colorTextures
+        glClearBufferfv(GL_COLOR, i, zero);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
 
 
 //           Exemplo de Uso

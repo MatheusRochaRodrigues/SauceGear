@@ -15,7 +15,13 @@ uniform vec3 u_FogColorFar;
 
 void main() {
     vec3 sceneColor = texture(u_SceneColor, TexCoords).rgb;
+
     vec3 worldPos = texture(u_Position, TexCoords).rgb;
+    // pixel vazio do GBuffer
+    if (all(lessThan(abs(worldPos), vec3(1e-6)))) {
+        FragColor = vec4(sceneColor, 1.0);
+        return;
+    }
 
     float linearDepth = length(worldPos - u_CamPos);
 

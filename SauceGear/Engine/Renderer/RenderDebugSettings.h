@@ -46,10 +46,10 @@ struct RenderDebugSettings {
     bool IBLAmbient     = true;
     bool SunLight       = true;
     bool PointLights    = true;
-    bool Shadow         = true;
+    bool Shadow         = false;
     
     //SSAO_Params
-    bool  SSAO          = true;
+    bool  SSAO          = false;
     int   sKernelSize   = 32;
     float sRadius       = 0.5f;    
     float sBias         = 0.025;
@@ -65,7 +65,7 @@ struct RenderDebugSettings {
 
     //HDR
     HDRMode hdrMode = HDRMode::ACESFilm;
-    bool GammaHDR_correct = true;
+    bool GammaHDR_correct = false;
     float Exposure = 1.0f;
     float Saturation = 1.0f;
     float Contrast = 1.1f;

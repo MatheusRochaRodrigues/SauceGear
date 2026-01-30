@@ -15,7 +15,14 @@ enum class FramebufferTextureType {
     Position, Normal, Albedo,    
     //PBR
     MetallicRoughnessAO,
-    HDR
+    HDR,
+
+     
+    ColorRGBA8,
+    RGBA16F,
+    RGB16F,
+    R16F,
+    R32I 
 };
 
 struct FramebufferAttachment {
@@ -45,6 +52,8 @@ public:
 
     int GetWidth()  { return width;  }
     int GetHeight() { return height; }
+
+    void Clear() const;
 
     GLuint GetTextureByType(FramebufferTextureType type) const {
         int i = 0;

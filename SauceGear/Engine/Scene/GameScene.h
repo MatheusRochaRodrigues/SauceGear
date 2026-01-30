@@ -114,7 +114,7 @@ public:
         
 
         //const int octreeSize = 64; // 64    //128    //256
-        const int octreeSize = 256;  //pow(2, 8)  
+        const int octreeSize = 32;  //pow(2, 8)  
         VertexBuffer vertexBuffer;      IndexBuffer indexBuffer;
 
         auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize);  //, 1

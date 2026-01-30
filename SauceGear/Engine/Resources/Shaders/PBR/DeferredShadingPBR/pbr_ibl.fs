@@ -31,7 +31,9 @@ void main(){
     vec3  N   = texture(gNormal,   uv).rgb;
     if(all(lessThan(abs(N), vec3(1e-6)))) discard; // pixel vazio do GBuffer
     N = normalize(N);
-    vec3  albedo = pow(texture(gAlbedo, uv).rgb, vec3(2.2)); // linear
+
+    vec3 albedo = texture(gAlbedo, uv).rgb;       //vec3  albedo = pow(texture(gAlbedo, uv).rgb, vec3(2.2)); // linear
+
     vec3  mra = texture(gMRA, uv).rgb;
 
     float metallic  = mra.r;

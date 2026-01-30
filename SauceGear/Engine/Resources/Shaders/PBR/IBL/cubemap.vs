@@ -8,6 +8,7 @@ uniform mat4 view;
 
 void main()
 {
+    //WorldPos = normalize(aPos); // FIX: evita distorção e buracos
     WorldPos = aPos;  
     gl_Position =  projection * view * vec4(WorldPos, 1.0);
 }

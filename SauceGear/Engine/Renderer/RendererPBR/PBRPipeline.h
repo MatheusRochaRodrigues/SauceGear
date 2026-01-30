@@ -31,6 +31,7 @@ public:
 
     // util
     std::string currentHDR = "Engine/Resources/Textures/hdr/spruit_sunrise_4k.hdr";
+    //std::string currentHDR = "Assets/HDR/sky_47_2k (1)/sky_47_2k.png";
     std::string cacheDir = "Engine/Resources/Cache/IBL";
 
 private:

@@ -77,37 +77,41 @@ void PBRPipeline::Render(Scene& scene) {
     HandleFBOs();                       //ibl = DayNightSystem::GetSkyboxFront();
 
     // Render Light and Shadows
-    lightPass->Update(debug.Shadow);
+    //lightPass->Update(debug.Shadow);
     // GBUFFER + STENCIL
     geometryPass->Execute(scene, *gBuffer);
 
-    if (debug.SSAO) ssaoPass->Execute(*gBuffer, *ssaoBuffer, *ssaoBlurBuffer);
+    //if (debug.SSAO) ssaoPass->Execute(*gBuffer, *ssaoBuffer, *ssaoBlurBuffer);
 
     // Deferred Lighting                    (usa ssao)
     lightingPass->Execute(scene, *lightingBuffer, *gBuffer, ibl,   
         debug.SSAO, ssaoBlurBuffer->GetTexture(0));
     // outline usa depth + stencil do geometry
-    if (GetEngineSettings().renderDebug.outlineSys) outlinePass->Execute(scene, *lightingBuffer);
+    //if (GetEngineSettings().renderDebug.outlineSys) outlinePass->Execute(scene, *lightingBuffer);
 
 
     // === FOG PASS (AQUI) ===
-    if (engineSettings.renderDebug.FogEnabled) {
+    /*if (engineSettings.renderDebug.FogEnabled) {
         fogPass->Execute(
             lightingBuffer,
             gBuffer,
             GEngine->mainCamera->Position
         );
-    }
+    }*/
 
     // Forward  
-    forwardPass->Execute(scene, *gBuffer, *lightingBuffer);
+    //forwardPass->Execute(scene, *gBuffer, *lightingBuffer);
+    
     // Skybox 
+    /*postBufferA->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
     if (GetEngineSettings().renderDebug.Skybox) 
         skyboxPass->Execute(*GEngine->mainCamera, 
-            (debug.skyMode == SkyboxMode::Skybox ? 0 : ibl.envCubemap),
-            *lightingBuffer);  //shaders.skybox 
+            (debug.skyMode == SkyboxMode::Skybox ? ibl.prefilter : ibl.irradiance),
+            *lightingBuffer);
+
     // SUN
-    skyboxPass->RenderDebugSun();
+    //skyboxPass->RenderDebugSun();
      
 
 
@@ -152,14 +156,15 @@ void PBRPipeline::Render(Scene& scene) {
     //GEngine->renderer->GetTextureRendered = lightingBuffer->GetTexture(0);  
     //GEngine->renderer->GetTextureRendered = gBuffer->GetTexture(1);
 
-    // POST PROCESSING   
+    // POST PROCESSING    
     auto fboFinale = postBufferA;
     if (engineSettings.renderDebug.postProcess)  
         fboFinale = postProcess->Execute(scene, *postBufferA, *postBufferB);  
     //Finish, to next fase
     if(engineSettings.renderDebug.GammaHDR_correct) postProcess->CorrectSpaceColor(*fboFinale); 
+     
 
-
+    //GEngine->renderer->GetTextureRendered = postBufferA->GetTexture(0);
     postProcess->Finish();  
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -1,4 +1,4 @@
-#pragma once 
+﻿#pragma once 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -62,6 +62,10 @@ public:
             std::cout << "OpenGL loader failed\n";
             return false;
         }
+        //-----------------------------------------------------------
+            EnableGLDebug();    // Ative apenas para Debug, pois é pesado
+        //-----------------------------------------------------------
+
         SG::Welcome::Load("OpenGL");
 
         // GPU INFO
@@ -106,4 +110,39 @@ public:
 private:
     const char* m_title;
     GLFWwindow* m_window;
+
+
+
+    static void APIENTRY GLDebugCallback(
+        GLenum source, GLenum type, GLuint id,
+        GLenum severity, GLsizei length,
+        const GLchar* message, const void* userParam)
+    {
+        if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+            return;
+
+        std::cerr << "🔥 GL DEBUG\n";
+        std::cerr << "Message: " << message << "\n";
+        std::cerr << "Type: " << type << "  Severity: " << severity << "\n\n";
+    }
+
+
+    void EnableGLDebug()
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(GLDebugCallback, nullptr);
+
+
+        /*Se quiser pegar só erros graves, filtre:
+        glDebugMessageControl(
+            GL_DONT_CARE,
+            GL_DONT_CARE,
+            GL_DEBUG_SEVERITY_NOTIFICATION,
+            0, nullptr,
+            GL_FALSE
+        ); 
+        */
+    }
+
 };

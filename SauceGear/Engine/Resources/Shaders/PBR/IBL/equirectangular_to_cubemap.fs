@@ -17,6 +17,13 @@ void main()
 {		
     vec2 uv = SampleSphericalMap(normalize(WorldPos));
     vec3 color = texture(equirectangularMap, uv).rgb;
+
+    //Sanitize
+    color = max(color, vec3(0.0));
+    color = min(color, vec3(65504.0)); 
+    if (any(isnan(color)) || any(isinf(color))) color = vec3(0.0);
+       
+
     
     FragColor = vec4(color, 1.0);
 }

@@ -26,26 +26,23 @@ public:
         if (cubemap == 0) cubemap = skybox;
 
         target.Bind();
+
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
         DrawSkybox(cam, cubemap);
         //RenderDebugSun();
     }
 
     void DrawSkybox(Camera& cam, GLuint cubemap) {
-        glDepthFunc(GL_LEQUAL);
+        glDepthFunc(GL_LEQUAL);     // change depth function so depth test passes when values are equal to depth buffer's content
         shader->use();
         shader->setMat4("view", cam.GetViewMatrix());
-        shader->setMat4("projection", cam.GetProjectionMatrix());
-
-        glActiveTexture(GL_TEXTURE0);
-
-        // Nunca chame StartCubemapJob() dentro do draw. Faça no Update 
-        // Bind seguro
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, DayNightSystem::GetSkyboxFront().envCubemap);  //glBindTexture(GL_TEXTURE_CUBE_MAP, ibl.prefilter);
-
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
-
+        shader->setMat4("projection", cam.GetProjectionMatrix()); 
+        glActiveTexture(GL_TEXTURE0); 
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap); 
         RenderCube();
-        glDepthFunc(GL_LESS);  
+        glDepthFunc(GL_LESS);        // set depth function back to default
     }
 
     void RenderDebugSun() {

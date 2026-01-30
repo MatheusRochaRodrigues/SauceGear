@@ -86,6 +86,13 @@ public:
         }
         
 
+        //Finish  
+        glDisable(GL_BLEND);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);        glDepthMask(GL_TRUE);         // não escreve no depth  
+        return;
+
+
         // ADDITIVE LIGHTS     -> to SunLight and PointLights
         glEnable(GL_BLEND); glBlendEquation(GL_FUNC_ADD); glBlendFunc(GL_ONE, GL_ONE);
         glEnable(GL_CULL_FACE); glCullFace(GL_BACK);

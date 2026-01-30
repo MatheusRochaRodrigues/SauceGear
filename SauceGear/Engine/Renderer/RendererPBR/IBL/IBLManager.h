@@ -23,6 +23,10 @@ public:
     // === Pipeline de geração ===
     static GLuint LoadHDRTexture(const std::string& hdrPath);
 private:
+    static IBLSet resolveHDRtoCube(
+        const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap, Shader& hdrToCube,
+        const glm::mat4& proj, const std::vector<glm::mat4>& views,
+        GLuint captureFBO, GLuint captureRBO);
 
     static GLuint CreateCubemap_Tex(int size);
     static void   RenderHDRToCubemap(GLuint hdrTexture, GLuint envCubemap,
