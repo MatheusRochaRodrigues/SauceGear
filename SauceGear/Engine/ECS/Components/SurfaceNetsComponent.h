@@ -15,12 +15,10 @@ struct SurfaceNetsComponent {
     glm::vec3 colorBox = glm::vec3(1.0f, 0, 1.0f); 
      
     SurfaceNetsComponent(Chunk* chunk) : chunk(chunk) {}
-    SurfaceNetsComponent(Chunk* chunk, OctreeNode* node) : chunk(chunk), node(node) {}
-    SurfaceNetsComponent(Chunk* chunk, OctreeNode* node, glm::vec3 center) : chunk(chunk), node(node), center(center) {}
+    SurfaceNetsComponent(Chunk* chunk, OctreeNode* node) : chunk(chunk), node(node) {} 
     SurfaceNetsComponent() {}
 
-    //Debug
-    glm::vec3 center;  
+    //Debug 
     std::vector<glm::vec3> points;
     std::vector<glm::vec3> pointsDeep;
     int lod; 
@@ -29,8 +27,7 @@ struct SurfaceNetsComponent {
         REFLECT_HEADER("SurfaceNetsComponent");
         REFLECT_FIELD(showBoxOctree);
         REFLECT_FIELD(colorBox);
-        REFLECT_HEADER("CenterNode");
-        REFLECT_FIELD(center);
+        REFLECT_HEADER("points"); 
         REFLECT_VECTOR(points, glm::vec3);
         REFLECT_VECTOR(pointsDeep, glm::vec3);
 

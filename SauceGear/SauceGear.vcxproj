@@ -146,6 +146,7 @@
     <ClCompile Include="Editor\FileDialog\FileDialog.cpp" />
     <ClCompile Include="Editor\Panels\DrawMeshRendererInspector.h" />
     <ClCompile Include="Editor\Panels\HierarchyPanel.cpp" />
+    <ClCompile Include="Editor\Utils\ImGuiMouseLock.cpp" />
     <ClCompile Include="Engine\Assets\AssetLoader.cpp" />
     <ClCompile Include="Engine\Assets\ModelAsset.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\Chunk\Chunk.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="Editor\FileDialog\FileDialog.h" />
     <ClInclude Include="Editor\Panels\SettingsPanel.h" />
     <ClInclude Include="Editor\Themes\Theme4.h" />
+    <ClInclude Include="Editor\Utils\ImGuiMouseLock.h" />
     <ClInclude Include="Engine\Assets\AssetDatabase.h" />
     <ClInclude Include="Engine\Assets\AssetLoader.h" />
     <ClInclude Include="Engine\Assets\IAsset.h" />
@@ -344,6 +346,7 @@
     <ClInclude Include="Editor\Utils\InspectorDrawer.h" />
     <ClInclude Include="Editor\Utils\ImGuiUtils.h" />
     <ClInclude Include="Engine\Data\Color.h" />
+    <ClInclude Include="Engine\Utils\EventBus.h" />
     <ClInclude Include="Game\exec.h" />
     <ClInclude Include="Engine\ECS\Reflection\Macros.h" />
     <ClInclude Include="Engine\Utils\Octree\OctreeNode.h" />

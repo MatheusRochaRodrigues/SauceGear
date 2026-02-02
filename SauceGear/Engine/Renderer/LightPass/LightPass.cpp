@@ -115,55 +115,46 @@ void LightPass::Update(bool updtSun) {
 
 
 void LightPass::SetLightsToSSBO() { 
-    std::vector<GPULight> gpuLights;
-
+    std::vector<GPULight> gpuLights; 
     for(auto& e : lightInActive.point) {
+        if (!GEngine->scene->EntityExists(e)) continue;
+        if (!GEngine->scene->HasComponent<LightComponent>(e) ||
+            !GEngine->scene->HasComponent<TransformComponent>(e)) continue;
+
         auto& l = GEngine->scene->GetComponent<LightComponent>(e);
         auto& t = GEngine->scene->GetComponent<TransformComponent>(e);
 
         GPULight g{};
         g.pos_radius = { t.position, l.range };
         g.color_intensity = { l.color, l.intensity };
+
+        float shadowIndex = -1.0f; // valor seguro padrão
+        auto it = ShadowPool::ShadowMaps.find(e);
+        if (it != ShadowPool::ShadowMaps.end()) shadowIndex = float(it->second.second); 
+
         g.params = {
             float(l.type),
             float(l.castShadow),
             l.angle,
-            float(ShadowPool::ShadowMaps[e].second)
+            shadowIndex
         };
         g.lightMatrix = l.lightSpaceMatrix;
 
         gpuLights.push_back(g);
-    }
-
-    /*ForEachLight(lightInActive, [&](Entity e) {
-        auto& l = GEngine->scene->GetComponent<LightComponent>(e);
-        auto& t = GEngine->scene->GetComponent<TransformComponent>(e);
-
-        GPULight g{};
-        g.pos_radius = { t.position, l.range };
-        g.color_intensity = { l.color, l.intensity };
-        g.params = {
-            float(l.type),
-            float(l.castShadow),
-            l.angle,
-            float(ShadowPool::ShadowMaps[e].second)
-        };
-        g.lightMatrix = l.lightSpaceMatrix;
-
-        gpuLights.push_back(g);
-    });*/
-
+    }  
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightSSBO);
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER,
-        0,
-        gpuLights.size() * sizeof(GPULight),
-        gpuLights.data()
-    );
-    
 
-    //default
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-}
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, gpuLights.size() * sizeof(GPULight), gpuLights.data() ); 
+     
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); //default
+} 
+/*
+DICA FINAL (engine-level) 
+No shader:
+
+if (light.params.w < 0.0)  // luz sem shadow 
+else   // usa shadow map 
+*/
 
 
 void LightPass::HandleShadowMapReturn(const glm::vec3& playerPosition) {
@@ -209,6 +200,37 @@ void LightPass::HandleShadowMapReturn(const glm::vec3& playerPosition) {
     for (auto& e : toErase) ShadowPool::ShadowMaps.erase(e);
 }
 
+template<typename T>
+void EraseFromVector(std::vector<T>& v, T value) {
+    v.erase(std::remove(v.begin(), v.end(), value), v.end());
+} 
+
+
+
+void LightPass::OnEntityDestroyed(Entity e) {
+
+    // Remove de listas ativas
+    EraseFromVector(lightInActive.point, e);
+    EraseFromVector(lightInActive.directional, e);
+    EraseFromVector(lightInActive.spot, e);
+
+    // Remove shadow map
+    auto it = ShadowPool::ShadowMaps.find(e);
+    if (it != ShadowPool::ShadowMaps.end()) {
+
+        auto& [lod, _] = it->second;
+
+        if (GEngine->scene->HasComponent<LightComponent>(e)) {
+            auto& light = GEngine->scene->GetComponent<LightComponent>(e);
+            if (light.depthMap != 0) {
+                ShadowPool::ReturnShadowMapToPool(lod, light.depthMap, light.type);
+                light.depthMap = 0;
+            }
+        }
+
+        ShadowPool::ShadowMaps.erase(it);
+    }
+}
 
 
 

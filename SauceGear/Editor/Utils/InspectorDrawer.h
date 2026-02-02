@@ -8,7 +8,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <typeindex>
 #include <cstring>
-#include <functional>
+#include <functional> 
 
 // --- Nota: extensão mínima em TypeInfo para suportar callback ---
 // Adicione esse member em sua definição TypeInfo (no arquivo onde TypeInfo está definido):
@@ -254,8 +254,7 @@ namespace InspectorDrawer {
                     changed = true;
                 }
             }
-            */
-
+            */  
             if (changed && ownerType && ownerType->onEdited) ownerType->onEdited(instance);     // instance == componentPtr
 
             break;
@@ -303,7 +302,6 @@ namespace InspectorDrawer {
         }
 
         }
-
 
     }
 

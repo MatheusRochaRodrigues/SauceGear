@@ -34,7 +34,8 @@ public:
     //FrameScreenResult
     GLuint GetTextureRendered;             //GLuint* GetTextureRendered;
     Framebuffer* frameScreen;
-     
+
+    unsigned int width, height;
 };
 
 

@@ -1,12 +1,29 @@
 #include "InputSystem.h"
 #include "../Platform/Window.h"
+ 
+static double rawDeltaX = 0.0;
+static double rawDeltaY = 0.0;
 
+static void MouseCallback(GLFWwindow*, double xpos, double ypos) {
+    static double lastX = xpos;
+    static double lastY = ypos;
+
+    rawDeltaX += xpos - lastX;
+    rawDeltaY += ypos - lastY;
+
+    lastX = xpos;
+    lastY = ypos;
+}
+ 
 void InputSystem::Initialize(Window* _window) {
-    window = _window->GetNativeWindow();
+    window = _window->GetNativeWindow();   
 
     /*glfwSetCursorPosCallback(m_Window->GetNativeWindow(), MouseCallback);
     glfwSetScrollCallback(m_Window->GetNativeWindow(), ScrollCallback);
     glfwSetInputMode(m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED); */
+
+    glfwSetCursorPosCallback(window, MouseCallback);
+
 };
 
 void InputSystem::Update() {
@@ -32,6 +49,7 @@ void InputSystem::Update() {
     lastMouseX = mouseX;
     lastMouseY = mouseY;
 
+
     glfwGetCursorPos(window, &mouseX, &mouseY);
 
 
@@ -51,25 +69,41 @@ bool InputSystem::IsMouseReleased(int btn) { return mouseReleased[btn]; }
 
 glm::vec2 InputSystem::GetMousePosition() const {
     return glm::vec2(mouseX, mouseY);
-}
-
+} 
 
 glm::vec2 InputSystem::GetMouseDelta() {
     return glm::vec2(mouseX - lastMouseX, mouseY - lastMouseY);
+} 
+
+
+void InputSystem::ClearMouseDelta() {
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
 }
 
 
 
 
 
-
-
-
-
-
-
-
-
+//void InputSystem::ClearMouseDelta() {
+//    lastMouseX = mouseX;
+//    lastMouseY = mouseY;
+//}
+//
+//
+//
+//void InputSystem::ResetMouseDelta() {
+//    lastMouseX = mouseX;
+//    lastMouseY = mouseY;
+//}
+//
+//void InputSystem::ResetMouseDeltaTo(double x, double y) {
+//    mouseX = x;
+//    mouseY = y;
+//    lastMouseX = x;
+//    lastMouseY = y;
+//}
+ 
 
 
 

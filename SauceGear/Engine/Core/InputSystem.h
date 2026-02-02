@@ -25,6 +25,10 @@ public:
     glm::vec2 GetMousePosition() const;
     glm::vec2 GetMouseDelta();
 
+   /* void ResetMouseDelta();
+    void ResetMouseDeltaTo(double x, double y);*/
+
+    void ClearMouseDelta();
 private:
     GLFWwindow* window;
 
@@ -35,10 +39,9 @@ private:
     std::unordered_map<int, bool> mouseDown;
     std::unordered_map<int, bool> mousePressed;
     std::unordered_map<int, bool> mouseReleased;
-
-    //glm::vec2 mousePosition = { 0, 0 };
+     
+    double mouseX = 0, mouseY = 0; 
     double lastMouseX = 0, lastMouseY = 0;
-    double mouseX = 0, mouseY = 0;
 
     //friend class EngineContext;
 };

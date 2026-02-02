@@ -65,6 +65,8 @@ void PBRPipeline::Init() {
 
     // *FBO_Biceps*
     GEngine->renderer->frameScreen = lightingBuffer;
+    GEngine->renderer->width = width;
+    GEngine->renderer->height = height;
 }
 
 
@@ -98,7 +100,7 @@ void PBRPipeline::Render(Scene& scene) {
 
     // Skybox 
     /*postBufferA->Bind();   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-    lightingBuffer->Bind();
+    //lightingBuffer->Bind();
     if (GetEngineSettings().renderDebug.Skybox) 
         skyboxPass->Execute(
             *GEngine->mainCamera, 
@@ -107,8 +109,8 @@ void PBRPipeline::Render(Scene& scene) {
 
 
     // === FOG PASS (AQUI) ===
-    postBufferA->Bind();
     if (engineSettings.renderDebug.FogEnabled) {
+        postBufferA->Bind();
         fogPass->Execute(
             lightingBuffer,
             gBuffer,
@@ -124,7 +126,10 @@ void PBRPipeline::Render(Scene& scene) {
     //----------------------------- New Debug Edit ------------------------------------------------------------
     switch (debug.viewMode) {
     case RenderViewMode::FinalLighting:
-        GEngine->renderer->GetTextureRendered = postBufferA->GetTexture(0);    //lightingBuffer->GetTexture(0);
+        if(engineSettings.renderDebug.FogEnabled)
+            GEngine->renderer->GetTextureRendered = postBufferA->GetTexture(0);
+        else
+            GEngine->renderer->GetTextureRendered = lightingBuffer->GetTexture(0);
         break;
 
     case RenderViewMode::Position:
@@ -157,7 +162,7 @@ void PBRPipeline::Render(Scene& scene) {
     // POST PROCESSING -------------------------------------------------------------------------------------- 
     auto fboFinale = postBufferB;
     if (engineSettings.renderDebug.postProcess)  
-        fboFinale = postProcess->Execute(scene, *postBufferA, *postBufferB);  
+        fboFinale = postProcess->Execute(scene, *postBufferB, *postBufferA);  
 
     //Finish, to next fase
     if (engineSettings.renderDebug.GammaHDR_correct) {
@@ -189,6 +194,11 @@ void PBRPipeline::HandleFBOs() {
          
         ssaoBuffer->Resize(w/2, h/2);
         ssaoBlurBuffer->Resize(w/2, h/2); 
+
+
+
+        GEngine->renderer->width = w;
+        GEngine->renderer->height = h;
     }
 } 
   

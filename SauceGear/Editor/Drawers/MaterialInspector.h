@@ -6,6 +6,8 @@
 #include "../../Engine/Assets/MaterialAsset.h"
 #include "../FileDialog/FileDialog.h"
 
+#include "../Utils/ImGuiMouseLock.h" 
+
 struct MaterialInspector {
     // ===============================
     // INSPECTOR TABLE HELPERS
@@ -142,6 +144,7 @@ struct MaterialInspector {
 
                     v.data = TextureCache::Get().GetSolidColor(color);
                     inst.dirty = true;
+                    ImGuiLockMouseWhileActive();
                 }
 
                 /*if (!std::holds_alternative<Color>(v.data))
@@ -161,7 +164,7 @@ struct MaterialInspector {
                 //DrawLabeledFloat(name.c_str(), v, def.min, def.max);     // ImGui::SliderFloat(name.c_str(), &v, def.min, def.max); 
                 if (ImGui::SliderFloat( (std::string("##scalar_") + label).c_str(),  &scalar, 0.0f, 1.0f )) {
                     v.data = MakeScalarTexture(scalar);
-                    inst.dirty = true;
+                    inst.dirty = true; 
                 }
                 tex->dataColor.x = scalar;
             break; 
@@ -171,11 +174,12 @@ struct MaterialInspector {
                 ImGui::DragFloat(name.c_str(), &scalar, 0.01f);
                 inst.dirty = true;  
                 tex->dataColor.x = scalar;
+                ImGuiLockMouseWhileActive();
 
                 break;
 
             }
-        }
+        } 
 
         ImGui::EndGroup();
         ImGui::EndGroup();
@@ -247,13 +251,14 @@ private:
             if (def.specification == MaterialBase::ParamDef::UIType::Slider) {
                 if (ImGui::SliderFloat("##v", &v, def.min, def.max)) {
                     value->data = v;
-                    inst.dirty = true;
+                    inst.dirty = true; 
                 }
             }
             else {
                 if (ImGui::DragFloat("##v", &v, 0.01f)) {
                     value->data = v;
                     inst.dirty = true;
+                    ImGuiLockMouseWhileActive();
                 }
             }
             break;
@@ -264,6 +269,7 @@ private:
             if (ImGui::ColorEdit3("##v", &v.x)) {
                 value->data = v;
                 inst.dirty = true;
+                ImGuiLockMouseWhileActive();
             }
             break;
         }
@@ -279,6 +285,7 @@ private:
             )) {
                 value->data = v;
                 inst.dirty = true;
+                ImGuiLockMouseWhileActive();
             }
             break;
         }

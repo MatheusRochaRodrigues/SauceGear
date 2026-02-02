@@ -33,9 +33,11 @@ struct HierarchyPanel : IPanel {
     //}
 
     void Draw(SceneECS& scene) override {
-        ImGui::Begin("Hierarchy");
+        ImGui::Begin("Hierarchy"); 
 
         HandleShortcuts(scene);
+
+        DrawAddObjectPopup();
 
         for (Entity entity : scene.GetAllEntities()) {
             if (IsRoot(scene, entity)) {
@@ -69,12 +71,10 @@ private:
                 return;
             }
 
-            ImGui::Separator();
-
-            DrawAddObjectPopup(); //  RENOMEADO
+            ImGui::Separator(); 
 
             ImGui::EndPopup();
-        }
+        } 
 
         ImGui::PopID();
     }
@@ -116,8 +116,7 @@ private:
 
         // contexto
         DrawContextMenu(scene, entity);
-
-        // 👇 REGRA CORRETA
+         
         if (open) {
             if (hasChildren) {
                 Entity child = scene.GetComponent<HierarchyComponent>(entity).firstChild;
@@ -250,8 +249,105 @@ private:
 };
 
   
+/*
+
+if (ImGui::BeginPopupContextItem()) {
+
+    if (ImGui::BeginMenu("Add Object")) {
+
+        if (ImGui::MenuItem("Cube")) {
+            SceneBuilder::CreateModel(PrimitiveMesh::Cube());
+        }
+
+        if (ImGui::MenuItem("Sphere")) {
+            showConfigWindow = true;
+        }
+
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::MenuItem("Delete")) {
+        scene.DestroyEntity(entity);
+    }
+
+    ImGui::EndPopup();
+}
 
 
+
+*/
+
+
+
+/*
+
+CONTEXT MENU + SUBMENUS (seu caso)
+
+Exemplo igual Unity / Unreal:
+
+if (ImGui::BeginPopupContextWindow()) {
+
+    if (ImGui::BeginMenu("Add")) {
+
+        if (ImGui::BeginMenu("Mesh")) {
+            ImGui::MenuItem("Cube");
+            ImGui::MenuItem("Sphere");
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Light")) {
+            ImGui::MenuItem("Directional");
+            ImGui::MenuItem("Point");
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenu();
+    }
+
+    ImGui::EndPopup();
+}
+
+
+
+
+if (ImGui::BeginMenu("Add Object")) {
+
+    if (ImGui::BeginMenu("Mesh")) {
+
+        if (ImGui::MenuItem("Cube")) {
+            // ação
+        }
+
+        if (ImGui::BeginMenu("Sphere")) {
+
+            if (ImGui::MenuItem("Low Poly")) {
+                // cria esfera low
+            }
+
+            if (ImGui::MenuItem("High Poly")) {
+                // cria esfera high
+            }
+
+            ImGui::EndMenu(); // Sphere
+        }
+
+        ImGui::EndMenu(); // Mesh
+    }
+
+    if (ImGui::BeginMenu("Light")) {
+
+        if (ImGui::MenuItem("Directional")) {}
+        if (ImGui::MenuItem("Point")) {}
+        if (ImGui::MenuItem("Spot")) {}
+
+        ImGui::EndMenu(); // Light
+    }
+
+    ImGui::EndMenu(); // Add Object
+}
+
+
+*/
 
 
 

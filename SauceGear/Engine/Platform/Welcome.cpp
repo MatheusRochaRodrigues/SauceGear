@@ -105,40 +105,64 @@ namespace SG::Welcome {
         }
     }
 
+    constexpr const wchar_t* INDENT = L"      "; // 4 espaços
+
     void PrintSauceGear()
     {
         InitConsoleUTF8();
         SetupConsole();
 
+        std::wcout << "\n";
 
-        SetColor(12, "\033[38;5;196m");
+        //SetColor(10, 32);     //SetColor(12, "\033[38;5;196m");
+        SetColor(2, 32); // verde escuro, elegante
+        SetColor(4, 32); // vermelho escuro
+        SetColor(10, 32);     //SetColor(12, "\033[38;5;196m");
         std::wcout <<
-            L" ██████╗ ███████╗ █████╗ ██████╗\n"
-            L"██╔════╝ ██╔════╝██╔══██╗██╔══██╗\n"
-            L"██║  ███╗█████╗  ███████║██████╔╝\n"
-            L"██║   ██║██╔══╝  ██╔══██║██╔══██╗\n"
-            L"╚██████╔╝███████╗██║  ██║██║  ██║\n"
-            L" ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝\n";
+            INDENT << L" ██████╗ ███████╗ █████╗ ██████╗\n"  << 
+            INDENT << L"██╔════╝ ██╔════╝██╔══██╗██╔══██╗\n" << 
+            INDENT << L"██║  ███╗█████╗  ███████║██████╔╝\n" << 
+            INDENT << L"██║   ██║██╔══╝  ██╔══██║██╔══██╗\n" << 
+            INDENT << L"╚██████╔╝███████╗██║  ██║██║  ██║\n" << 
+            INDENT << L" ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝\n";
 
         ResetColor();
 
         std::wcout << "\n";
 
-        SetColor(12, "\033[38;5;196m");
+        //SetColor(12, "\033[38;5;196m");
+        SetColor(2, 32); // verde escuro, elegante
+        SetColor(4, 32); // vermelho escuro
+        //SetColor(12, "\033[38;5;196m");
+        SetColor(1, 32); // azul médio para highlight
+        SetColor(4, 32); // vermelho escuro
         std::wcout <<
-            L"███████╗ █████╗ ██╗   ██╗ ██████╗███████╗\n"
-            L"██╔════╝██╔══██╗██║   ██║██╔════╝██╔════╝\n"
-            L"███████╗███████║██║   ██║██║     █████╗\n"
-            L"╚════██║██╔══██║██║   ██║██║     ██╔══╝\n"
-            L"███████║██║  ██║╚██████╔╝╚██████╗███████╗\n";
+            INDENT << L"███████╗ █████╗ ██╗   ██╗ ██████╗███████╗\n" << 
+            INDENT << L"██╔════╝██╔══██╗██║   ██║██╔════╝██╔════╝\n" << 
+            INDENT << L"███████╗███████║██║   ██║██║     █████╗\n" << 
+            INDENT << L"╚════██║██╔══██║██║   ██║██║     ██╔══╝\n" << 
+            INDENT << L"███████║██║  ██║╚██████╔╝╚██████╗███████╗\n" << 
+            INDENT << L"╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚══════╝\n";
 
         ResetColor();
          
         std::wcout << "\n\n";
 
+        // ================= SEPARADOR =================
+        SetColor(8, 32); // cinza
+        std::wcout << L"────────────────────────────────────────────────────────────\n";
+        ResetColor(); 
+
+        // ================= SUBTÍTULO =================
+        SetColor(7, 32); // cinza claro
+        std::wcout << L"        SauceGear Engine • Build 0.1 • Debug\n";
+
+        std::wcout << "\n";
+
+        ResetColor();
 
 #ifdef _WIN32
-        RestoreConsole(); // 🔥 VOLTA AO NORMAL
+        RestoreConsole(); // VOLTA AO NORMAL
 #endif
 
 
@@ -160,3 +184,97 @@ namespace SG::Welcome {
     }
 
 }
+
+
+
+/*
+
+
+        std::wcout <<
+            L"███████╗ █████╗ ██╗   ██╗ ██████╗███████╗\n"
+            L"██╔════╝██╔══██╗██║   ██║██╔════╝██╔════╝\n"
+            L"███████╗███████║██║   ██║██║     █████╗\n"
+            L"╚════██║██╔══██║██║   ██║██║     ██╔══╝\n"
+            L"███████║██║  ██║╚██████╔╝╚██████╗███████╗\n";
+
+
+
+
+
+
+
+
+
+
+            
+    void PrintSauceGear()
+    {
+        InitConsoleUTF8();
+        SetupConsole();
+
+        std::wcout << "\n";
+
+        //SetColor(10, 32);     //SetColor(12, "\033[38;5;196m");
+        SetColor(2, 32); // verde escuro, elegante
+        SetColor(4, 32); // vermelho escuro
+        SetColor(10, 32);     //SetColor(12, "\033[38;5;196m");
+        std::wcout <<
+            L" ██████╗ ███████╗ █████╗ ██████╗\n"
+            L"██╔════╝ ██╔════╝██╔══██╗██╔══██╗\n"
+            L"██║  ███╗█████╗  ███████║██████╔╝\n"
+            L"██║   ██║██╔══╝  ██╔══██║██╔══██╗\n"
+            L"╚██████╔╝███████╗██║  ██║██║  ██║\n"
+            L" ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝\n";
+
+        ResetColor();
+
+        std::wcout << "\n";
+
+        //SetColor(12, "\033[38;5;196m");
+        SetColor(2, 32); // verde escuro, elegante
+        SetColor(4, 32); // vermelho escuro
+        //SetColor(12, "\033[38;5;196m");
+        SetColor(1, 32); // azul médio para highlight
+        SetColor(4, 32); // vermelho escuro
+        std::wcout <<
+            L"███████╗ █████╗ ██╗   ██╗ ██████╗███████╗\n"
+            L"██╔════╝██╔══██╗██║   ██║██╔════╝██╔════╝\n"
+            L"███████╗███████║██║   ██║██║     █████╗\n"
+            L"╚════██║██╔══██║██║   ██║██║     ██╔══╝\n"
+            L"███████║██║  ██║╚██████╔╝╚██████╗███████╗\n"
+            L"╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝╚══════╝\n";
+
+        ResetColor();
+         
+        std::wcout << "\n\n";
+
+        // ================= SEPARADOR =================
+        SetColor(8, 32); // cinza
+        std::wcout << L"────────────────────────────────────────────\n";
+        ResetColor(); 
+
+        // ================= SUBTÍTULO =================
+        SetColor(7, 32); // cinza claro
+        std::wcout << L"        SauceGear Engine • Build 0.1 • Debug\n";
+
+        std::wcout << "\n";
+
+        ResetColor();
+
+#ifdef _WIN32
+        RestoreConsole(); // VOLTA AO NORMAL
+#endif
+
+
+        std::cout << "Log normal ASCII\n\n";
+
+    }
+
+
+
+*/
+
+
+
+
+

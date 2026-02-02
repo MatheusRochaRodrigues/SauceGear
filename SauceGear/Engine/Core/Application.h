@@ -5,8 +5,7 @@ class GameScene;
 class Renderer;
 class Time;
 class InputSystem;
-
-//#include "../Editor/EditorApp.h" 
+ 
 //#define GAME_RUNTIME
 
 class Application {
@@ -16,11 +15,11 @@ public:
     void Update();
     void Shutdown();
 
-    Window* window;
-    GameScene* scene;            //SceneECS scene;
-    Renderer* renderer;
-    Time* time;
-    InputSystem* input;
+    Window*         window;
+    GameScene*      scene;            //SceneECS scene;
+    Renderer*       renderer;
+    Time*           time;
+    InputSystem*    input;
 };
 
  

@@ -29,6 +29,8 @@ public:
 
     // light-in-active (lista de luzes que renderizamos no frame)
     static inline LightGroups lightInActive;  
+
+    static void OnEntityDestroyed(Entity e);
 private:
     GLuint depthMapFBO = 0; // framebuffer usado para renderizar sombras 2D / cube (delegado para pool)
     GLuint lightSSBO = 0; 
@@ -39,3 +41,17 @@ private:
     friend class LightPoint;
     friend class CascadeSun;
 };
+
+
+
+/*
+caso singleton se eu preferir
+
+LightPass& LightPass::Get()
+{
+    static LightPass instance;
+    return instance;
+}
+
+
+*/

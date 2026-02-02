@@ -78,7 +78,12 @@ struct SceneViewPanel : IPanel {
             viewportSize.y
         };
 
-        state.sceneViewportHovered = ImGui::IsWindowHovered();
+        state.sceneViewportHovered =
+            ImGui::IsWindowHovered(
+                ImGuiHoveredFlags_RootWindow |
+                ImGuiHoveredFlags_NoPopupHierarchy                      //ImGuiHoveredFlags_ChildWindows
+            );
+         
         state.sceneViewportFocused = ImGui::IsWindowFocused();
 
         glm::vec2 mouse = input->GetMousePosition();

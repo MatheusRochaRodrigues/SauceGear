@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <functional>
+#include "../Utils/ImGuiMouseLock.h" 
 
 inline ImVec4 operator*(const ImVec4& a, const ImVec4& b) {
     return ImVec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
@@ -13,22 +14,28 @@ inline ImVec4 operator*(const ImVec4& a, float s) {
 }
 
 namespace ImGuiUtils {
-      
-    inline bool DragFloat(const char* label, float& value) { 
-        return ImGui::DragFloat(label, &value, 0.1f);
-    }
-
-    inline bool DragInt(const char* label, int& value) {
-        return ImGui::DragInt(label, &value);
-    }
 
     inline bool Checkbox(const char* label, bool& value) {
         return ImGui::Checkbox(label, &value);
     }
 
-    inline bool DragVec2(const char* label, glm::vec2& value) {
-        return ImGui::DragFloat2(label, &value.x, 0.1f);
+    inline bool DragFloat(const char* label, float& value) {
+        bool b = ImGui::DragFloat(label, &value, 0.1f);
+        ImGuiLockMouseWhileActive();
+        return b;
     }
+
+    inline bool DragInt(const char* label, int& value) {
+        bool b = ImGui::DragInt(label, &value);
+        ImGuiLockMouseWhileActive();
+        return b;
+    }
+
+    inline bool DragVec2(const char* label, glm::vec2& value) {
+        bool b = ImGui::DragFloat2(label, &value.x, 0.1f);
+        ImGuiLockMouseWhileActive();
+        return b;
+    }  
 
     // Função auxiliar para desenhar glm::vec2 com cores 
     inline bool DragVec2Colored(const char* label, glm::vec2& value, float speed = 0.1f, float min = 0.0f, float max = 0.0f) {
@@ -49,6 +56,7 @@ namespace ImGuiUtils {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 100, 100, 255));
         ImGui::SetNextItemWidth(itemWidth);
         changed |= ImGui::DragFloat("##X", &value.x, speed, min, max, "%.3f");
+        if (changed) ImGuiLockMouseWhileActive();
         ImGui::PopStyleColor();
 
         ImGui::SameLine();
@@ -57,18 +65,21 @@ namespace ImGuiUtils {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 255, 100, 255));
         ImGui::SetNextItemWidth(itemWidth);
         changed |= ImGui::DragFloat("##Y", &value.y, speed, min, max, "%.3f");
+        if (changed) ImGuiLockMouseWhileActive();
         ImGui::PopStyleColor();
 
         ImGui::EndGroup();
 
         ImGui::PopID();
-
+         
         return changed;
     }
 
 
     inline bool DragVec3(const char* label, glm::vec3& value) {
-        return ImGui::DragFloat3(label, &value.x, 0.1f);
+        bool b = ImGui::DragFloat3(label, &value.x, 0.1f);
+        ImGuiLockMouseWhileActive();
+        return b;
     }
 
     inline bool DrawVec3(
@@ -86,16 +97,19 @@ namespace ImGuiUtils {
 
         ImGui::SetNextItemWidth(itemWidth);
         auto a = ImGui::DragFloat("##X", &v.x, speed);
+        if (a) ImGuiLockMouseWhileActive();
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(itemWidth);
         auto b = ImGui::DragFloat("##Y", &v.y, speed);
+        if (b) ImGuiLockMouseWhileActive();
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(itemWidth);
         auto c = ImGui::DragFloat("##Z", &v.z, speed);
+        if (c) ImGuiLockMouseWhileActive();
 
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(); 
 
         return a || b || c;
     }
@@ -137,18 +151,24 @@ namespace ImGuiUtils {
             ImGui::SetNextItemWidth(70.0f); // largura fixa de cada campo numérico
             changed |= ImGui::DragFloat(("##" + std::string(axisLabels[i])).c_str(), &value[i], speed);
 
+
+            if (changed) ImGuiLockMouseWhileActive();
+
+
             if (i < 2) ImGui::SameLine();
         }
 
         ImGui::Columns(1);
-        ImGui::PopID();
+        ImGui::PopID(); 
 
         return changed;
     }
 
 
-    inline bool DragVec4(const char* label, glm::vec4& value) {
-        return ImGui::DragFloat4(label, &value.x, 0.1f);
+    inline bool DragVec4(const char* label, glm::vec4& value) { 
+        bool b = ImGui::DragFloat4(label, &value.x, 0.1f);
+        ImGuiLockMouseWhileActive();
+        return b;
     }
 
     /*inline void InputString(const char* label, std::string& str) {

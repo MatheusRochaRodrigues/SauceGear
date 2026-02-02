@@ -53,4 +53,7 @@ public:
         return GEngine && GEngine->input ? GEngine->input->GetMouseDelta() : glm::vec2(0);
     }
 
+    static void ClearMouseDelta() {
+        GEngine->input->ClearMouseDelta();
+    }
 };

@@ -37,8 +37,7 @@ void SceneECS::initECS() {
     componentManager->Register<MeshRenderer>();
     componentManager->Register<LightComponent>();
     componentManager->Register<HierarchyComponent>();
-    componentManager->Register<NameComponent>();
-    //componentManager->Register<PostProcessComponent>(); 
+    componentManager->Register<NameComponent>(); 
     componentManager->Register<AABBComponent>(); 
     componentManager->Register<SurfaceNetsComponent>();
     componentManager->Register<DebugMeshComponent>();
@@ -71,8 +70,10 @@ Entity SceneECS::CreateEntity() {
 
 
 void SceneECS::DestroyEntity(Entity entity) {
-    if (!entityManager.Exists(entity))
-        return;
+    if (!entityManager.Exists(entity)) return;
+
+    LightPass::OnEntityDestroyed(entity);  //Destroy Light
+
 
     // 1️ Remove da hierarquia (pai / filhos)
     if (HasComponent<HierarchyComponent>(entity)) {
