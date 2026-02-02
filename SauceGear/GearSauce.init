@@ -1,6 +1,6 @@
 [Window][DockSpace]
 Pos=0,48
-Size=1600,852
+Size=1920,1032
 Collapsed=0
 
 [Window][Debug##Default]
@@ -10,7 +10,7 @@ Collapsed=0
 
 [Window][Scene]
 Pos=4,56
-Size=1016,699
+Size=1336,879
 Collapsed=0
 DockId=0x00000001,0
 
@@ -20,31 +20,31 @@ Size=265,48
 Collapsed=0
 
 [Window][Painel Customizável]
-Pos=1022,527
-Size=574,365
+Pos=1342,628
+Size=574,444
 Collapsed=0
 DockId=0x00000006,2
 
 [Window][Hierarchy]
-Pos=1022,56
-Size=574,469
+Pos=1342,56
+Size=574,570
 Collapsed=0
 DockId=0x00000005,0
 
 [Window][TopBar]
 Pos=0,0
-Size=1600,48
+Size=1920,48
 Collapsed=0
 
 [Window][File Explorer]
-Pos=4,757
-Size=1016,135
+Pos=4,937
+Size=1336,135
 Collapsed=0
 DockId=0x00000002,0
 
 [Window][Inspector]
-Pos=1022,527
-Size=574,365
+Pos=1342,628
+Size=574,444
 Collapsed=0
 DockId=0x00000006,0
 
@@ -69,8 +69,8 @@ Size=228,62
 Collapsed=0
 
 [Window][Settings]
-Pos=1022,527
-Size=574,365
+Pos=1342,628
+Size=574,444
 Collapsed=0
 DockId=0x00000006,1
 
@@ -554,12 +554,28 @@ Column 1  Weight=1.5015
 Column 0  Weight=0.4985
 Column 1  Weight=1.5015
 
+[Table][0xCF599AE0,2]
+Column 0  Weight=0.4985
+Column 1  Weight=1.5015
+
+[Table][0x194533E9,2]
+Column 0  Weight=0.4985
+Column 1  Weight=1.5015
+
+[Table][0x66B39528,2]
+Column 0  Weight=0.4985
+Column 1  Weight=1.5015
+
+[Table][0x7B930D42,2]
+Column 0  Weight=0.4985
+Column 1  Weight=1.5015
+
 [Docking][Data]
-DockSpace     ID=0x0FCAA000 Window=0x3DA2F1DE Pos=4,56 Size=1592,836 Split=X Selected=0xE601B12F
+DockSpace     ID=0x0FCAA000 Window=0x3DA2F1DE Pos=4,56 Size=1912,1016 Split=X Selected=0xE601B12F
   DockNode    ID=0x00000003 Parent=0x0FCAA000 SizeRef=1336,1016 Split=Y Selected=0xE601B12F
     DockNode  ID=0x00000001 Parent=0x00000003 SizeRef=1075,879 CentralNode=1 Selected=0xE601B12F
     DockNode  ID=0x00000002 Parent=0x00000003 SizeRef=1075,135 Selected=0x9C2B5678
   DockNode    ID=0x00000004 Parent=0x0FCAA000 SizeRef=574,1016 Split=Y Selected=0xBABDAE5E
     DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=332,469 Selected=0xBABDAE5E
-    DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=332,365 Selected=0x4746B4B8
+    DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=332,365 Selected=0x36DC96AB
 

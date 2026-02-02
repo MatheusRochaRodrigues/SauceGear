@@ -124,7 +124,7 @@ public:
 
         auto asset = std::make_shared<MaterialAsset>();
         asset->base = MaterialLibrary::Get("PBR_Default");
-        asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(0.551, 0.436, 0.044, 1));
+        asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(0.835f, 0.353f, 0.149f, 1.000f));
         asset->defaults["Metallic"].data = TextureCache::Get().GetSolidColor(glm::vec4(0, 0, 0, 1));
         asset->defaults["Roughness"].data = TextureCache::Get().GetSolidColor(glm::vec4(1, 1, 1, 1));
 
