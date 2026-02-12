@@ -67,7 +67,7 @@ public:
                 EditorState& state = *GEngine->editorState; 
                 if (mouseLocked /*&& state.sceneViewportHovered*/ && !state.gizmoUsing) {     // mouseLocked == Input::GetMouseButton(MOUSE_BUTTON_RIGHT)          !ImGui::GetIO().WantCaptureMouse
                     glm::vec2 delta = Input::GetMouseDelta();   
-                    cam->ProcessMouseMovement(delta.x, -delta.y); // inverte y
+                    cam->ProcessMouseMovement(delta.x, -delta.y); // inverte y, reversed since y-coordinates go from bottom to top
                 }
                  
 

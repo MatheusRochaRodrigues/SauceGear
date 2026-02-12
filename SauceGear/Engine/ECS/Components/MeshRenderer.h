@@ -6,6 +6,8 @@
 #include "../../Materials/MaterialBinder.h"
 #include "../Reflection/Macros.h"
 
+#include "../../Core/Profiler/FrameMetrics.h"
+
 enum class RenderPassType {
     Geometry,
     DeferredLight,
@@ -57,7 +59,8 @@ struct MeshRenderer {
     }
 
     void Draw() {
-        if (!mesh) return;
+        if (!mesh) return;  
+        auto& stats = g_FrameMetrics.Write();
 
         for (auto& batch : batches) {
             auto* base = batch.material->asset->base.get();
@@ -69,13 +72,20 @@ struct MeshRenderer {
                 *base
             );
 
-            for (uint32_t sm : batch.submeshes)
+            for (uint32_t sm : batch.submeshes) {
+                const auto& sub = mesh->mesh->submeshes[sm]; 
                 mesh->DrawSubmesh(sm);
+
+                stats.drawCalls++;
+                stats.triangles += sub.indexCount / 3;
+            }
         }
     }
 
+
     void Draw(Shader* shader) {
         if (!mesh) return;
+        auto& stats = g_FrameMetrics.Write();
 
         for (auto& batch : batches) {
             auto* base = batch.material->asset->base.get();
@@ -86,8 +96,13 @@ struct MeshRenderer {
                 *base
             );
 
-            for (uint32_t sm : batch.submeshes)
+            for (uint32_t sm : batch.submeshes) {
                 mesh->DrawSubmesh(sm);
+
+
+                stats.drawCalls++;
+                stats.triangles += mesh->mesh->submeshes[sm].indexCount / 3;
+            }
         }
     }
 

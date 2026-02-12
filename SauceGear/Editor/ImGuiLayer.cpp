@@ -8,6 +8,8 @@
 #include "Panels/FileExplorer/FileExplorerPanel.h"
 #include "Panels/HierarchyPanel.h"
 #include "Panels/InspectorPanel.h" 
+#include "Panels/ProfilerPanel.h" 
+#include "Panels/MetricsPanel.h"  
  
 void ImGuiLayer::Init(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
@@ -77,7 +79,9 @@ void ImGuiLayer::RegisterPanels() {
     RegisteredPanels.push_back(std::make_shared<HierarchyPanel>());
     RegisteredPanels.push_back(std::make_shared<InspectorPanel>());
     RegisteredPanels.push_back(std::make_shared<FileExplorerPanel>());
-    RegisteredPanels.push_back(std::make_shared<SettingsPanel>()); 
+    RegisteredPanels.push_back(std::make_shared<SettingsPanel>());
+    RegisteredPanels.push_back(std::make_shared<ProfilerPanel>());
+    RegisteredPanels.push_back(std::make_shared<MetricsPanel>()); 
 }
 
 void ImGuiLayer::RenderIPanels(Scene& scene) {

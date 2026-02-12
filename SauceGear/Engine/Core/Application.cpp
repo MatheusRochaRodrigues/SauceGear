@@ -12,6 +12,8 @@
 #include "EditorState.h"
 #include "../Assets/AssetDatabase.h"
 #include "../Materials/MaterialLibrary.h"
+
+#include "Profiler/Profiler.h" 
  
 int Application::Init() {
     // cria janela GLFW
@@ -42,13 +44,13 @@ int Application::Init() {
 int Application::Run() {  
     Init();     // Inicialização básica  
       
-    while (!glfwWindowShouldClose(window->GetNativeWindow())) {
+    while (!glfwWindowShouldClose(window->GetNativeWindow())) { 
         renderer->BeginFrame();  // Limpa buffers, etc. 
          
         Update(); 
           
         window->SwapBuffers();
-        window->PollEvents();
+        window->PollEvents(); 
     } 
 
     Shutdown();
@@ -57,6 +59,8 @@ int Application::Run() {
 }
 
 void Application::Update() {
+    Profiler::Get().BeginFrame();
+
     //DeltaTime
     time->Update();
     float dt = time->GetDeltaTime();
@@ -66,6 +70,8 @@ void Application::Update() {
     scene->Update(dt);    // Atualiza todos os sistemas (inclui physics)     // Atualiza ECS
 
     AssetDatabase::Update();
+
+    Profiler::Get().EndFrame(); // coleta GPU atrasada
 }
 
 void Application::Shutdown() {

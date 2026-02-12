@@ -4,6 +4,8 @@
 #include "../../Renderer/RendererPBR/PBRPipeline.h"
 #include "../../Renderer/RendererBlinnPhong/BlinnPhongRenderer.h"
 
+#include "../../Core/Profiler/ProfilerMacros.h"
+
 class RenderSystem : public System {
 public:   
     RenderSystem() { 

@@ -112,6 +112,7 @@ public:
         AddComponent<PostProcessComponent>( blurX, new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)) );*/
 
         
+        /*      DUAL CONTOURING
 
         //const int octreeSize = 64; // 64    //128    //256
         const int octreeSize = 256;  //pow(2, 8)  
@@ -134,7 +135,7 @@ public:
         auto* t = GEngine->scene->TryGetComponent<TransformComponent>(e);
         t->SetLocalPosition(glm::vec3(0, -16, 0));
          
-
+         */
 
         int nrRows = 7;
         int nrColumns = 7;

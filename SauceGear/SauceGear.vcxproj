@@ -149,6 +149,9 @@
     <ClCompile Include="Editor\Utils\ImGuiMouseLock.cpp" />
     <ClCompile Include="Engine\Assets\AssetLoader.cpp" />
     <ClCompile Include="Engine\Assets\ModelAsset.cpp" />
+    <ClCompile Include="Engine\Core\Profiler\FrameMetrics.cpp" />
+    <ClCompile Include="Engine\Core\Profiler\Profiler.cpp" />
+    <ClCompile Include="Engine\Core\Profiler\RenderStats.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\Chunk\Chunk.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\DC\DCMeshBuilder.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\Density\density.cpp" />
@@ -233,6 +236,10 @@
     <ClInclude Include="Editor\Drawers\DrawFieldTexture.h" />
     <ClInclude Include="Editor\Drawers\MaterialInspector.h" />
     <ClInclude Include="Editor\FileDialog\FileDialog.h" />
+    <ClInclude Include="Editor\Panels\FlameGraphPanel.h" />
+    <ClInclude Include="Editor\Panels\MetricsPanel.h" />
+    <ClInclude Include="Editor\Panels\ProfilerGraphWindow.h" />
+    <ClInclude Include="Editor\Panels\ProfilerPanel.h" />
     <ClInclude Include="Editor\Panels\SettingsPanel.h" />
     <ClInclude Include="Editor\Themes\Theme4.h" />
     <ClInclude Include="Editor\Utils\ImGuiMouseLock.h" />
@@ -243,6 +250,13 @@
     <ClInclude Include="Engine\Assets\MeshAsset.h" />
     <ClInclude Include="Engine\Assets\ModelAsset.h" />
     <ClInclude Include="Engine\Assets\ShaderAsset.h" />
+    <ClInclude Include="Engine\Core\Profiler\FrameMetrics.h" />
+    <ClInclude Include="Engine\Core\Profiler\Profiler.h" />
+    <ClInclude Include="Engine\Core\Profiler\ProfilerConfig.h" />
+    <ClInclude Include="Engine\Core\Profiler\ProfilerMacros.h" />
+    <ClInclude Include="Engine\Core\Profiler\RenderStats.h" />
+    <ClInclude Include="Engine\Core\Profiler\ScopedCPUProfiler.h" />
+    <ClInclude Include="Engine\Core\Profiler\ScopedGPUProfiler.h" />
     <ClInclude Include="Engine\Platform\Welcome.h" />
     <ClInclude Include="Engine\DebugRender\DebugDraw.h" />
     <ClInclude Include="Engine\ECS\Components\DebugMeshComponent.h" />

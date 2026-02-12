@@ -16,6 +16,7 @@
 #include "../PostProcessPass/PostProcess.h"
 #include "../Outline/OutlinePass.h"
 
+#include "../../Core/Profiler/ProfilerMacros.h"
   
 void PBRPipeline::Init() {
     std::cout << "initPipeline" << std::endl; 
@@ -70,63 +71,83 @@ void PBRPipeline::Init() {
 }
 
 
-void PBRPipeline::Render(Scene& scene) {
-    auto& engineSettings = GetEngineSettings();
-    auto& debug = engineSettings.renderDebug;
-    
+void PBRPipeline::Render(Scene& scene) {  
     //=============================================TimeLine============================================================
     HandleFBOs();                       //ibl = DayNightSystem::GetSkyboxFront();
+     
+    {   // Render Light and Shadows
+        PROFILE_CPU("LightPass");   
+        PROFILE_GPU("LightPass");
 
-    // Render Light and Shadows
-    lightPass->Update(debug.Shadow);
+        lightPass->Update(GetEngineSettings().renderDebug.Shadow);
+    } 
     
-    // GBUFFER + STENCIL
-    gBuffer->Bind();
-    geometryPass->Execute(scene);
-    gBuffer->Unbind();
+    {   // GBUFFER + STENCIL 
+        PROFILE_CPU("GeometryPass");
+        PROFILE_GPU("GeometryPass");
+
+        gBuffer->Bind();
+        geometryPass->Execute(scene);
+        gBuffer->Unbind();
+    }
 
     // SSAO - proprio gerenciamento de FBO Interno
-    if (debug.SSAO) ssaoPass->Execute(*gBuffer, *ssaoBuffer, *ssaoBlurBuffer);
+    if (GetEngineSettings().renderDebug.SSAO) {
+        PROFILE_CPU("SSAOPass");
+        PROFILE_GPU("SSAOPass");
+        ssaoPass->Execute(*gBuffer, *ssaoBuffer, *ssaoBlurBuffer);
+    }
 
-    // Deferred Lighting                    (usa ssao)
-    lightingBuffer->Bind();
-    lightingPass->Execute(scene, *gBuffer, ibl, debug.SSAO, ssaoBlurBuffer->GetTexture(0));
+    {   // Deferred Lighting  (usa ssao)
+        PROFILE_CPU("DeferredLightingPass");
+        PROFILE_GPU("DeferredLightingPass");
+        lightingBuffer->Bind();
+        lightingPass->Execute(
+            scene, *gBuffer, ibl,
+            GetEngineSettings().renderDebug.SSAO,
+            ssaoBlurBuffer->GetTexture(0)
+        );
+    } 
 
     // outline usa depth + stencil do geometry 
-    if (GetEngineSettings().renderDebug.outlineSys) outlinePass->Execute(scene);
+    if (GetEngineSettings().renderDebug.outlineSys) {
+        PROFILE_CPU("OutlinePass");
+        PROFILE_GPU("OutlinePass");
+        outlinePass->Execute(scene); 
+    }
      
     // Forward  
     //forwardPass->Execute(scene, *gBuffer, *lightingBuffer); 
 
-    // Skybox 
-    /*postBufferA->Bind();   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-    //lightingBuffer->Bind();
-    if (GetEngineSettings().renderDebug.Skybox) 
+    // Skybox  
+    if (GetEngineSettings().renderDebug.Skybox) {
+        PROFILE_CPU("SkyboxPass");
+        PROFILE_GPU("SkyboxPass");
         skyboxPass->Execute(
-            *GEngine->mainCamera, 
-            (debug.skyMode == SkyboxMode::Skybox ? 0 : ibl.envCubemap) 
-        );
-
-
-    // === FOG PASS (AQUI) ===
-    if (engineSettings.renderDebug.FogEnabled) {
-        postBufferA->Bind();
-        fogPass->Execute(
-            lightingBuffer,
-            gBuffer,
-            GEngine->mainCamera->Position
+            *GEngine->mainCamera,
+            (GetEngineSettings().renderDebug.skyMode == SkyboxMode::Skybox ? 0 : ibl.envCubemap)
         );
     }
+
+    // === FOG PASS (AQUI) ===
+    if (GetEngineSettings().renderDebug.FogEnabled) {
+        PROFILE_CPU("FogPass");
+        PROFILE_GPU("FogPass");
+        postBufferA->Bind();
+        fogPass->Execute(lightingBuffer, gBuffer, GEngine->mainCamera->Position);
+    } 
 
     // SUN
     skyboxPass->RenderDebugSun();
       
 
     //========================================BUFFER RENDER============================================================ 
+    
     //----------------------------- New Debug Edit ------------------------------------------------------------
-    switch (debug.viewMode) {
+    switch (GetEngineSettings().renderDebug.viewMode) {
+
     case RenderViewMode::FinalLighting:
-        if(engineSettings.renderDebug.FogEnabled)
+        if(GetEngineSettings().renderDebug.FogEnabled)
             GEngine->renderer->GetTextureRendered = postBufferA->GetTexture(0);
         else
             GEngine->renderer->GetTextureRendered = lightingBuffer->GetTexture(0);
@@ -161,11 +182,11 @@ void PBRPipeline::Render(Scene& scene) {
 
     // POST PROCESSING -------------------------------------------------------------------------------------- 
     auto fboFinale = postBufferB;
-    if (engineSettings.renderDebug.postProcess)  
+    if (GetEngineSettings().renderDebug.postProcess)
         fboFinale = postProcess->Execute(scene, *postBufferB, *postBufferA);  
 
     //Finish, to next fase
-    if (engineSettings.renderDebug.GammaHDR_correct) {
+    if (GetEngineSettings().renderDebug.GammaHDR_correct) {
         fboFinale->Bind();
         postProcess->CorrectSpaceColor();
         GEngine->renderer->GetTextureRendered = fboFinale->GetTexture(0);
