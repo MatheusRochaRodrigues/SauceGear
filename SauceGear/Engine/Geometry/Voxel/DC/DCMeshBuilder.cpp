@@ -99,7 +99,7 @@ void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 			DCNode* edgeNodes[4];
 
 			// Para essa sub-aresta i:
-			// quais filhos de cada célula participam?
+			// quais filhos de cada célula participam? 
 			const int c[4] =
 			{
 				edgeProcEdgeMask[dir][i][0],
