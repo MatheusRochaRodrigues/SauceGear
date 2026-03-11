@@ -140,5 +140,5 @@ Planned improvements include:
 
 Matheus Rocha  
 
-GitHub: https://github.com/MatheusRochaRodrigues
+GitHub: https://github.com/MatheusRochaRodrigues  
 LinkedIn: www.linkedin.com/in/mathewrocha
