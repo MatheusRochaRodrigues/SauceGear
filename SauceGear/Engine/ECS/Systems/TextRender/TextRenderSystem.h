@@ -15,10 +15,10 @@
 #include "../../../GUI/FontManager.h"
 
 #include "../../../GUI/ToLetter3D.h" 
-#include "../../../Geometry/World/SurfaceNet/WorldOctree/SurfaceNets/SysVoxel.h" 
-#include "../../../Geometry/World/SurfaceNet/WorldOctree/SurfaceNets/OctreeNode.h" 
+#include "../../../Geometry/SurfOption/SurfaceNet/WorldOctree/SurfaceNets/SysVoxel.h" 
+#include "../../../Geometry/SurfOption/SurfaceNet/WorldOctree/SurfaceNets/OctreeNode.h" 
 #include "../DebugRenderer.h"
-#include "../../../Geometry/World/SurfaceNet/World/SurfaceNets/SurfaceNets.h" 
+#include "../../../Geometry/SurfOption/SurfaceNet/World/SurfaceNets/SurfaceNets.h" 
  
 
 

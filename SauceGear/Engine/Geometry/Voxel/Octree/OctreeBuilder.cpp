@@ -2,55 +2,73 @@
 #include "../Density/Density.h"
 #include "ConstructLeaf.h"
 
-DCNode* BuildOctree(const ivec3& min, const int size)
+DCNode* BuildOctree(const ivec3 min, const int size)
 {
 	DCNode* root = new DCNode;
 	root->min = min;
 	root->size = size;
 	root->type = Node_Internal;
 
-	ConstructOctreeNodes(root); 
+	if (ConstructOctreeNodes(root) == nullptr)  
+		return nullptr; 
 
 	return root;
 }
 
 DCNode* ConstructOctreeNodes(DCNode* node)
-{
+{ 
 	if (!node)
 	{
 		return nullptr;
 	}
 
 	if (node->size == 1)
-	{
-		return ConstructLeaf(node);
+	{ 
+		return ConstructLeaf(node); 
 	}
 
 	const int childSize = node->size / 2;
 	bool hasChildren = false;
 
 	for (int i = 0; i < 8; i++)
-	{
+	{ 
 		ivec3 min = node->min + (CHILD_MIN_OFFSETS[i] * childSize);  
 		if (!NodeHasSurface(min, childSize)) continue;
 
 		DCNode* child = new DCNode;
 		child->size = childSize;
 		child->min = min;
-		child->type = Node_Internal;
+		child->type = Node_Internal; 
 		 
 		node->children[i] = ConstructOctreeNodes(child);
-		hasChildren |= (node->children[i] != nullptr);
+		hasChildren |= (node->children[i] != nullptr); 
 	}
-
+	 
 	if (!hasChildren)
 	{
 		delete node;
 		return nullptr;
-	}
+	} 
 
 	return node;
 }
+
+
+void DestroyOctree(DCNode* node)
+{
+	if (!node) return;
+	for (int i = 0; i < 8; i++)
+		DestroyOctree(node->children[i]);
+	delete node;
+}
+
+
+
+
+
+
+
+/*
 
 
 DCNode* BuildOctree2(const glm::ivec3& min, int size)
@@ -89,10 +107,4 @@ DCNode* BuildOctree2(const glm::ivec3& min, int size)
 	return node;
 }
 
-void DestroyOctree(DCNode* node)
-{
-	if (!node) return;
-	for (int i = 0; i < 8; i++)
-		DestroyOctree(node->children[i]);
-	delete node;
-}
+*/

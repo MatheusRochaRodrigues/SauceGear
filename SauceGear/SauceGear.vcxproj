@@ -159,6 +159,8 @@
     <ClCompile Include="Engine\Geometry\Voxel\DC\QEF\svd.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\Octree\ConstructLeaf.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\Octree\OctreeBuilder.cpp" />
+    <ClCompile Include="Engine\Geometry\World\clipmap_system.cpp" />
+    <ClCompile Include="Engine\Geometry\World\ThreadWorker.cpp" />
     <ClCompile Include="Engine\Instancing\MaterialInstance.cpp" />
     <ClCompile Include="Engine\DebugRender\DebugLinesRenderer.cpp" />
     <ClCompile Include="Engine\Platform\Welcome.cpp" />
@@ -257,6 +259,7 @@
     <ClInclude Include="Engine\Core\Profiler\RenderStats.h" />
     <ClInclude Include="Engine\Core\Profiler\ScopedCPUProfiler.h" />
     <ClInclude Include="Engine\Core\Profiler\ScopedGPUProfiler.h" />
+    <ClInclude Include="Engine\Geometry\World\ThreadWorker.h" />
     <ClInclude Include="Engine\Platform\Welcome.h" />
     <ClInclude Include="Engine\DebugRender\DebugDraw.h" />
     <ClInclude Include="Engine\ECS\Components\DebugMeshComponent.h" />
@@ -308,30 +311,30 @@
     <ClInclude Include="Engine\Renderer\RendererPBR\RenderPass.h" />
     <ClInclude Include="Engine\Renderer\Shaders\ShaderLibrary.h" />
     <ClInclude Include="Engine\GUI\ToLetter3D.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\BasicTerrainSDF.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\CavesSDF.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\OperationsSDF.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\Planet.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\SignedDistanceField.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\Terrain.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\TerrainSDF.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.cpp" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\MakeMap.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeDebug.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeNode.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\SysVoxel.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\SDF_Map.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeLOD.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\WorldSys.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\Structs\ObjectPool.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\DebugVoxels.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\GPUJobQueue.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\MapGenerator.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNetsBufferPool.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNetsGPU.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNetsGPUBuffer.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\GSurfPool.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\BasicTerrainSDF.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\CavesSDF.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\OperationsSDF.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\Planet.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\SignedDistanceField.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\Terrain.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\TerrainSDF.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.cpp" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\MakeMap.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeDebug.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeNode.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\SysVoxel.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\SDF_Map.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeLOD.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\WorldSys.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\Structs\ObjectPool.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\DebugVoxels.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\GPUJobQueue.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\MapGenerator.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNetsBufferPool.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNetsGPU.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNetsGPUBuffer.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\GSurfPool.h" />
     <ClInclude Include="Engine\Graphics\Vertex.h" />
     <ClInclude Include="Engine\GUI\Font.h" />
     <ClInclude Include="Engine\GUI\FontAtlasBuilder.h" />
@@ -364,8 +367,8 @@
     <ClInclude Include="Game\exec.h" />
     <ClInclude Include="Engine\ECS\Reflection\Macros.h" />
     <ClInclude Include="Engine\Utils\Octree\OctreeNode.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\NoiseGenerator\SphereSDF.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNets.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\NoiseGenerator\SphereSDF.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNets.h" />
     <ClInclude Include="Engine\Graphics\ComputeShader.h" />
     <ClInclude Include="Engine\Graphics\ShaderBase.h" />
     <ClInclude Include="Engine\ImGui\Fonts\IconsFontAwesome5.h" />
@@ -466,8 +469,8 @@
     <ClInclude Include="Engine\ECS\Systems\ScriptSystem .h" />
     <ClInclude Include="Engine\ECS\Components\ScriptComponent.h" />
     <ClInclude Include="Engine\ECS\Components\Tags\TransparentTag.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\Voxel.h" />
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\WorldComputeThread.hpp" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\Voxel.h" />
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\WorldComputeThread.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc143-mtd.dll" />
@@ -489,7 +492,7 @@
     <None Include="Engine\Resources\Shaders\DebugP\dbgIntancing_line.vs" />
     <None Include="Engine\Resources\Shaders\debugQuad.vs" />
     <None Include="Engine\Resources\Shaders\debugQuadDepth.fs" />
-    <None Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAO.fs" />
     <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\dfrdSSAO.fs" />
     <None Include="Engine\Resources\Shaders\DeferredShading\SSAO\SSAO.vs" />
@@ -665,8 +668,8 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
-    <Text Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeLod.txt" />
-    <Text Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\Texto.txt" />
+    <Text Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeLod.txt" />
+    <Text Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\Texto.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />

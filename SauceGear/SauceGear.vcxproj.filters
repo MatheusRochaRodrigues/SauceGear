@@ -285,6 +285,12 @@
     <ClCompile Include="Engine\Core\Profiler\FrameMetrics.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Geometry\World\clipmap_system.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\World\ThreadWorker.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Camera.h">
@@ -809,88 +815,88 @@
     <ClInclude Include="Engine\Geometry\Voxel\DC\QEF\svd.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\BasicTerrainSDF.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\BasicTerrainSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\CavesSDF.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\CavesSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\OperationsSDF.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\OperationsSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\Planet.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\Planet.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\SignedDistanceField.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\SignedDistanceField.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\Terrain.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\Terrain.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SDF\TerrainSDF.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SDF\TerrainSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.cpp">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\ConstructMap.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\MakeMap.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\MakeMap.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeDebug.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeDebug.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeNode.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeNode.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\SysVoxel.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\SysVoxel.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\SDF_Map.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\SDF_Map.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeLOD.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeLOD.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\WorldSys.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\WorldSys.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\Structs\ObjectPool.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\Structs\ObjectPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\DebugVoxels.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\DebugVoxels.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\GPUJobQueue.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\GPUJobQueue.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\MapGenerator.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\MapGenerator.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNetsBufferPool.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNetsBufferPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNetsGPU.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNetsGPU.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNetsGPUBuffer.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNetsGPUBuffer.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\GSurfPool.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\GSurfPool.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\NoiseGenerator\SphereSDF.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\NoiseGenerator\SphereSDF.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\SurfaceNets.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\SurfaceNets.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\Voxel.h">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\Voxel.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\World\SurfaceNet\World\WorldComputeThread.hpp">
+    <ClInclude Include="Engine\Geometry\SurfOption\SurfaceNet\World\WorldComputeThread.hpp">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Renderer\RenderDebugSettings.h">
@@ -990,6 +996,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Panels\ProfilerGraphWindow.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\World\ThreadWorker.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1176,7 +1185,7 @@
     <None Include="Engine\Resources\Shaders\Utils\LightType.glsl" />
     <None Include="Engine\Resources\Shaders\Utils\PBR\Classic\EquanceReflectancePBR_LrngOPGL.glsl" />
     <None Include="Engine\Resources\Shaders\Utils\PBR\Classic\EquanceReflectanceIBL_LrngOPGL.glsl" />
-    <None Include="Engine\Geometry\World\SurfaceNet\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
+    <None Include="Engine\Geometry\SurfOption\SurfaceNet\World\SurfaceNets\Backups\Old\SurfaceNetsGPU.comp" />
     <None Include="Engine\Resources\Shaders\PBR\DeferredShadingPBR\extras\pbr_deferred_point.fs" />
     <None Include="Engine\Resources\Shaders\Utils\ShadowsPoint.glsl" />
     <None Include="Engine\Resources\Shaders\PostProcess\Correct_HDR_GAMA.fs" />
@@ -1207,8 +1216,8 @@
     <Text Include="Editor\Styles\styles5.txt" />
     <Text Include="Editor\Styles\styles6.txt" />
     <Text Include="Editor\Styles\styles7.txt" />
-    <Text Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\OctreeLod.txt" />
-    <Text Include="Engine\Geometry\World\SurfaceNet\WorldOctree\SurfaceNets\Texto.txt" />
+    <Text Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\OctreeLod.txt" />
+    <Text Include="Engine\Geometry\SurfOption\SurfaceNet\WorldOctree\SurfaceNets\Texto.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\MaterialIcons-Regular.ttf" />

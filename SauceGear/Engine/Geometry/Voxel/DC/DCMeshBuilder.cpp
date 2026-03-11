@@ -300,14 +300,13 @@ void ContourCellProc(DCNode* node, IndexBuffer& indexBuffer)
 
 void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
 {
-	if (!node) return;
-
-	if (node->type != Node_Leaf) {
-		for (int i = 0; i < 8; i++)
-		{
-			GenerateVertexIndices(node->children[i], vertexBuffer);
+	if (!node) return; 
+	 
+	if (node->type != Node_Leaf) {								//(node->type == Node_Internal) 
+		for (int i = 0; i < 8; i++) {   
+			GenerateVertexIndices(node->children[i], vertexBuffer); 
 		}
-	}
+	} 
 
 	if (node->type != Node_Internal)
 	{
@@ -320,7 +319,7 @@ void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
 
 		d->index = vertexBuffer.size();
 		vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });		//vertexBuffer.push_back(Vertex(d->position, d->averageNormal));
-	}
+	} 
 }
 
 void GenerateMeshFromOctree(DCNode* node, VertexBuffer& vertexBuffer, IndexBuffer& indexBuffer)
@@ -329,7 +328,28 @@ void GenerateMeshFromOctree(DCNode* node, VertexBuffer& vertexBuffer, IndexBuffe
 
 	vertexBuffer.clear();
 	indexBuffer.clear();		//onde os triângulos finais serão escritos
-
-	GenerateVertexIndices(node, vertexBuffer);
+	 
+	GenerateVertexIndices(node, vertexBuffer); 
 	ContourCellProc(node, indexBuffer);
 }
+
+
+/*
+void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
+{
+	if (!node) return;
+
+	if (node->type != Node_Leaf) {
+		for (int i = 0; i < 8; i++)
+			if (node->children[i])
+				GenerateVertexIndices(node->children[i], vertexBuffer);
+	}
+
+	if (node->type != Node_Internal && node->drawInfo)
+	{
+		OctreeDrawInfo* d = node->drawInfo;
+		d->index = vertexBuffer.size();
+		vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });
+	}
+}
+*/

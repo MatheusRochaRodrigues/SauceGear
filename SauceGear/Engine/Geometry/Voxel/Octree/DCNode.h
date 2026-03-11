@@ -90,7 +90,8 @@ public:
 		, size(0)
 		, drawInfo(nullptr)
 	{
-		for (int i = 0; i < 8; i++) children[i] = nullptr;
+		for (int i = 0; i < 8; i++) 
+			children[i] = nullptr;
 	}
 
 	DCNode(const DCNodeType _type)
@@ -99,16 +100,14 @@ public:
 		, size(0)
 		, drawInfo(nullptr)
 	{
-		for (int i = 0; i < 8; i++)
-		{
-			children[i] = nullptr;
-		}
+		for (int i = 0; i < 8; i++) 
+			children[i] = nullptr; 
 	}
 
-	DCNodeType	type;
+	DCNodeType		type;
 	ivec3			min;
 	int				size;
-	DCNode* children[8];
+	DCNode*			children[8];
 	OctreeDrawInfo* drawInfo;
 	 
 };

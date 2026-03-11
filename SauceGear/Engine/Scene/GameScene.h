@@ -21,6 +21,10 @@
 #include "../Geometry/Voxel/DC/DCMeshBuilder.h"
 #include "../Geometry/Voxel/Octree/OctreeBuilder.h"
 
+#include "../Geometry/World/clipmap_system.cpp"
+#include "../Geometry/World/ThreadWorker.h"
+
+
 class GameScene : public SceneECS {
 public: 
     void Load() override {
@@ -112,14 +116,40 @@ public:
         AddComponent<PostProcessComponent>( blurX, new BlurEffectComponent(new Shader("post.vert", "blur.frag"), glm::vec2(1, 0)) );*/
 
         
-        /*      DUAL CONTOURING
+        /*
+        //      DUAL CONTOURING
 
         //const int octreeSize = 64; // 64    //128    //256
         const int octreeSize = 256;  //pow(2, 8)  
         VertexBuffer vertexBuffer;      IndexBuffer indexBuffer;
 
+        auto start = std::chrono::high_resolution_clock::now();
+
         auto* root = BuildOctree(glm::ivec3(-octreeSize / 2), octreeSize);  //, 1
         GenerateMeshFromOctree(root, vertexBuffer, indexBuffer);
+
+
+        auto end = std::chrono::high_resolution_clock::now();
+
+        double ms = std::chrono::duration<double, std::milli>(end - start).count();
+        //double minutes = ms / 60000.0;
+
+        printf("\n\n - __WORLD_DEBUGS__ \n");
+        printf("World generation took %.2f ms\n", ms);
+
+        double totalSeconds = ms / 1000.0;
+        int minutesPart = (int)(totalSeconds / 60);
+        double secondsPart = fmod(totalSeconds, 60.0);
+
+        //printf("World generation took %d minutes and %.2f seconds\n", minutesPart, secondsPart);
+
+        printf("World generation took %d min %d s %d ms\n",
+            minutesPart,
+            (int)secondsPart,
+            (int)((secondsPart - (int)secondsPart) * 1000));
+
+        printf("\n\n\n");
+
         std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(vertexBuffer, indexBuffer);
         mesh->name = "DC";
 
@@ -134,8 +164,44 @@ public:
 
         auto* t = GEngine->scene->TryGetComponent<TransformComponent>(e);
         t->SetLocalPosition(glm::vec3(0, -16, 0));
+        */
          
-         */
+        ClipmapSystem* system = new ClipmapSystem();
+        std::cout << "\n\nlp1\n\n";
+        system->Initialize();
+        std::cout << "\n\nlp2\n\n";
+
+        system->Update(glm::vec3(0));
+        std::cout << "\n\nlp3\n\n";
+
+
+        std::cout << "bb1" << std::endl;
+        // esperar todas as tarefas do pool terminarem
+        gThreadPool.WaitAll(); // você precisa implementar essa função no ThreadPool
+
+
+        auto asset = std::make_shared<MaterialAsset>();
+        asset->base = MaterialLibrary::Get("PBR_Default");
+        asset->defaults["Albedo"].data = TextureCache::Get().GetSolidColor(glm::vec4(0.835f, 0.353f, 0.149f, 1.000f));
+        asset->defaults["Metallic"].data = TextureCache::Get().GetSolidColor(glm::vec4(0, 0, 0, 1));
+        asset->defaults["Roughness"].data = TextureCache::Get().GetSolidColor(glm::vec4(1, 1, 1, 1));
+
+        asset->name = "DC Mat";  // name 
+        for (auto s : system->world.chunks)
+        {
+            std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(s.second->vertexBuffer, s.second->indexBuffer);
+            mesh->name = "DC";
+             
+            auto e = SceneBuilder::CreateModel(mesh, MaterialAsset::Instantiate(asset));
+
+            auto* t = GEngine->scene->TryGetComponent<TransformComponent>(e);
+            t->SetLocalPosition(glm::vec3(0, -16, 0));
+        }
+
+        std::cout << "bb2" << std::endl;
+        //-------------------------------------------------------------------------------------------------------------------------
+
+
 
         int nrRows = 7;
         int nrColumns = 7;

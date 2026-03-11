@@ -1,12 +1,120 @@
-#include "ConstructLeaf.h"
+ï»¿#include "ConstructLeaf.h"
 #include "DCNode.h"
 #include "../Density/Density.h" 
 using namespace glm; 
 
 bool NodeHasSurface(ivec3 min, int size)
+{ 
+	const float d = Density_Func( min + (size/2) );
+	const float surfaceNetThreshold = size * 2 * 2.25f;
+	return std::abs(d) < surfaceNetThreshold;  
+}  
+ 
+vec3 CalculateSurfaceNormal(const vec3& p)
+{
+	const float H = 0.001f;
+	const float dx = Density_Func(p + vec3(H, 0.f, 0.f)) - Density_Func(p - vec3(H, 0.f, 0.f));
+	const float dy = Density_Func(p + vec3(0.f, H, 0.f)) - Density_Func(p - vec3(0.f, H, 0.f));
+	const float dz = Density_Func(p + vec3(0.f, 0.f, H)) - Density_Func(p - vec3(0.f, 0.f, H));
+
+	return glm::normalize(vec3(dx, dy, dz));
+}  
+
+// y = y0â€‹ * (1âˆ’t) + y1 â€‹* t =>         Interpolation basic        being T that interpolates where it will be on the edge
+static vec3 FindSurfaceEdgeIntersection_ZeroCrossing(uint32_t c1, uint32_t c2, float v1, float v2) {
+	float interp1 = v1 / (v1 - v2);         // t            ==   Acha onde cruza a superfÃ­cie em 0
+	float interp2 = 1.0f - interp1;         // 1- t
+	return interp2 * glm::vec3(CHILD_MIN_OFFSETS[c1]) + interp1 * glm::vec3(CHILD_MIN_OFFSETS[c2]);
+} 
+
+DCNode* ConstructLeaf(DCNode* leaf) {
+	if (!leaf || leaf->size != 1)  return nullptr; 
+
+	float	cornerDensity[8];		
+	int		corners = 0;        // sinais dos 8 cantos
+	int		cornersNegative = 0;
+
+	for (int i = 0; i < 8; i++)
+	{
+		const ivec3 cornerPos = leaf->min + CHILD_MIN_OFFSETS[i];
+		cornerDensity[i] = Density_Func(vec3(cornerPos));
+		if (cornerDensity[i] < 0.0f) ++cornersNegative;
+
+
+		const int material = cornerDensity[i] < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
+		corners |= (material << i);
+	}
+
+	// voxel is full inside or outside the volume -> //void block 
+	if (cornersNegative == 0 || cornersNegative == 8) {
+		delete leaf;
+		return nullptr;
+	}
+
+	// otherwise the voxel contains the surface, so find the edge intersections
+	const int MAX_CROSSINGS = 6;
+	int edgeCount = 0;
+	vec3 averageNormal(0.0f);
+	svd::QefSolver qef;
+
+	for (auto& edge : edgevmap) {
+		if (edgeCount >= MAX_CROSSINGS) break;
+
+		const int c1 = edge[0];	  
+		const int c2 = edge[1];
+		float d1 = cornerDensity[c1];
+		float d2 = cornerDensity[c2];	
+
+		// zero crossing on this edge
+		if ((d1 < 0.0f) != (d2 < 0.0f)) {
+
+			vec3 p = FindSurfaceEdgeIntersection_ZeroCrossing(c1, c2, d1, d2);
+			p = glm::vec3(leaf->min) + p;
+			const vec3 n = CalculateSurfaceNormal(p);
+			qef.add(p.x, p.y, p.z, n.x, n.y, n.z);
+
+			averageNormal += n;		edgeCount++;
+		}
+	}
+
+	svd::Vec3 qefPosition;
+	qef.solve(qefPosition, QEF_ERROR, QEF_SWEEPS, QEF_ERROR);
+
+	OctreeDrawInfo* drawInfo = new OctreeDrawInfo;
+	drawInfo->position = vec3(qefPosition.x, qefPosition.y, qefPosition.z);
+	drawInfo->qef = qef.getData();
+	drawInfo->corners = corners;
+
+	const vec3 min = vec3(leaf->min);
+	const vec3 max = vec3(leaf->min + ivec3(leaf->size));
+	if (drawInfo->position.x < min.x || drawInfo->position.x > max.x ||
+		drawInfo->position.y < min.y || drawInfo->position.y > max.y ||
+		drawInfo->position.z < min.z || drawInfo->position.z > max.z)
+	{
+		const auto& mp = qef.getMassPoint();
+		drawInfo->position = vec3(mp.x, mp.y, mp.z);
+	}
+
+	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
+	for (int i = 0; i < 8; i++) drawInfo->cornersDens[i] = cornerDensity[i];
+
+	leaf->type = Node_Leaf;
+	leaf->drawInfo = drawInfo;
+
+	return leaf;
+}
+
+
+
+
+
+//to analize surface
+
+/*
+bool NodeHasSurface(ivec3 min, int size)
 {
 	//First Way
-	const float d = Density_Func(min + (size/2));
+	const float d = Density_Func(min + (size / 2));
 	const float surfaceNetThreshold = size * 2 * 2.25f;
 	return std::abs(d) < surfaceNetThreshold;
 
@@ -28,7 +136,7 @@ bool NodeHasSurface(ivec3 min, int size)
 	sdfMin = glm::min(sdfMin, dcenter);
 	sdfMax = glm::max(sdfMax, dcenter);
 
-	// Se o zero NÃO está no intervalo, não existe superfície
+	// Se o zero NÃƒO estÃ¡ no intervalo, nÃ£o existe superfÃ­cie
 	return !(sdfMin > 0.f || sdfMax < 0.f); */
 
 	//Tercery Way
@@ -58,7 +166,7 @@ bool NodeHasSurface(ivec3 min, int size)
 	sdfMin = glm::min(sdfMin, dcenter);
 	sdfMax = glm::max(sdfMax, dcenter);
 
-	// Se o zero NÃO está no intervalo, não existe superfície
+	// Se o zero NÃƒO estÃ¡ no intervalo, nÃ£o existe superfÃ­cie
 	return !(sdfMin > 0.f || sdfMax < 0.f);  */
 
 	// 4 Way
@@ -77,18 +185,19 @@ bool NodeHasSurface(ivec3 min, int size)
 			hasEdgeCrossing = true;
 			break;
 		}
-	} */
+	}  
 
-} 
- 
+}
+*/
+
 
 /*
 int GetMinVoxelSizeForLOD(const ivec3& min, int size)
 {
-	// Centro do nó
+	// Centro do nÃ³
 	const vec3 center = vec3(min) + vec3(size * 0.5f);
 
-	// Distância da câmera (substitua pela sua)
+	// DistÃ¢ncia da cÃ¢mera (substitua pela sua)
 	extern vec3 gCameraPosition;
 	const float dist = glm::length(center - gCameraPosition);
 
@@ -103,122 +212,3 @@ int GetMinVoxelSizeForLOD(const ivec3& min, int size)
 
 */
 
-
-// ---------------------------------------------------------------------------- 
-vec3 ApproximateZeroCrossingPosition(const vec3& p0, const vec3& p1)
-{
-	// approximate the zero crossing by finding the min value along the edge
-	float minValue = 100000.f;
-	float t = 0.f;
-	float currentT = 0.f;
-	const int steps = 8;
-	const float increment = 1.f / (float)steps;
-	while (currentT <= 1.f)
-	{
-		const vec3 p = p0 + ((p1 - p0) * currentT);
-		const float density = glm::abs(Density_Func(p));
-		if (density < minValue)
-		{
-			minValue = density;
-			t = currentT;
-		}
-
-		currentT += increment;
-	}
-
-	return p0 + ((p1 - p0) * t);
-}
-
-// ----------------------------------------------------------------------------
-
-vec3 CalculateSurfaceNormal(const vec3& p)
-{
-	const float H = 0.001f;
-	const float dx = Density_Func(p + vec3(H, 0.f, 0.f)) - Density_Func(p - vec3(H, 0.f, 0.f));
-	const float dy = Density_Func(p + vec3(0.f, H, 0.f)) - Density_Func(p - vec3(0.f, H, 0.f));
-	const float dz = Density_Func(p + vec3(0.f, 0.f, H)) - Density_Func(p - vec3(0.f, 0.f, H));
-
-	return glm::normalize(vec3(dx, dy, dz));
-}
-
-
-DCNode* ConstructLeaf(DCNode* leaf)
-{
-	if (!leaf || leaf->size != 1)
-	{
-		return nullptr;
-	}
-
-	int corners = 0;
-	for (int i = 0; i < 8; i++)
-	{
-		const ivec3 cornerPos = leaf->min + CHILD_MIN_OFFSETS[i];
-		const float density = Density_Func(vec3(cornerPos));
-		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
-		corners |= (material << i);
-	}
-
-	if (corners == 0 || corners == 255)
-	{
-		// voxel is full inside or outside the volume
-		delete leaf;
-		return nullptr;
-	}
-
-	// otherwise the voxel contains the surface, so find the edge intersections
-	const int MAX_CROSSINGS = 6;
-	int edgeCount = 0;
-	vec3 averageNormal(0.f);
-	svd::QefSolver qef;
-
-	for (int i = 0; i < 12 && edgeCount < MAX_CROSSINGS; i++)
-	{
-		const int c1 = edgevmap[i][0];
-		const int c2 = edgevmap[i][1];
-
-		const int m1 = (corners >> c1) & 1;
-		const int m2 = (corners >> c2) & 1;
-
-		if ((m1 == MATERIAL_AIR && m2 == MATERIAL_AIR) ||
-			(m1 == MATERIAL_SOLID && m2 == MATERIAL_SOLID))
-		{
-			// no zero crossing on this edge
-			continue;
-		}
-
-		const vec3 p1 = vec3(leaf->min + CHILD_MIN_OFFSETS[c1]);
-		const vec3 p2 = vec3(leaf->min + CHILD_MIN_OFFSETS[c2]);
-		const vec3 p = ApproximateZeroCrossingPosition(p1, p2);
-		const vec3 n = CalculateSurfaceNormal(p);
-		qef.add(p.x, p.y, p.z, n.x, n.y, n.z);
-
-		averageNormal += n;
-
-		edgeCount++;
-	}
-
-	svd::Vec3 qefPosition;
-	qef.solve(qefPosition, QEF_ERROR, QEF_SWEEPS, QEF_ERROR);
-
-	OctreeDrawInfo* drawInfo = new OctreeDrawInfo;
-	drawInfo->position = vec3(qefPosition.x, qefPosition.y, qefPosition.z);
-	drawInfo->qef = qef.getData();
-
-	const vec3 min = vec3(leaf->min);
-	const vec3 max = vec3(leaf->min + ivec3(leaf->size));
-	if (drawInfo->position.x < min.x || drawInfo->position.x > max.x ||
-		drawInfo->position.y < min.y || drawInfo->position.y > max.y ||
-		drawInfo->position.z < min.z || drawInfo->position.z > max.z)
-	{
-		const auto& mp = qef.getMassPoint();
-		drawInfo->position = vec3(mp.x, mp.y, mp.z);
-	}
-
-	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
-	drawInfo->corners = corners;
-
-	leaf->type = Node_Leaf;
-	leaf->drawInfo = drawInfo;
-
-	return leaf;
-}
