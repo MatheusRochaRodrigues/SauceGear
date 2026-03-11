@@ -10,7 +10,7 @@ This project explores low-level graphics programming concepts such as **voxel te
 
 Click the image below to watch a demonstration of the engine:
 
-[![Engine Demo](https://github.com/user-attachments/assets/3406f1bd-4253-445b-b672-e876879eb282)](https://www.linkedin.com/posts/mathewrocha_here-are-some-of-the-features-ive-been-implementing-activity-7423646120695951360-YUm9)
+[![Engine Demo]](https://www.linkedin.com/posts/mathewrocha_here-are-some-of-the-features-ive-been-implementing-activity-7423646120695951360-YUm9)
 
 ---
 
