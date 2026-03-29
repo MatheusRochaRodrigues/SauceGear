@@ -5,9 +5,9 @@
 #include <cmath> 
 #include <vector>  
 #include <glad/glad.h> 
-
-/*
-class { 
+ 
+class IBLPersistence {
+public:
     // === Cache binário simples ===
     // cada .bin tem um header leve e, para cubemap, grava todas faces/mips em sequência. 
     bool TryLoadFromCache(const std::string& base, IBLSet& out) {
@@ -161,5 +161,4 @@ class {
 
 
 };
-
-*/
+ 

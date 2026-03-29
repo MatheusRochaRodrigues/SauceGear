@@ -2,6 +2,6 @@
 #include <glm/glm.hpp>
 
 class DCNode;
+class BuildContext_CK;
 
-bool NodeHasSurface(glm::ivec3 min, int size);
-DCNode* ConstructLeaf(DCNode* leaf);
+DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK&);

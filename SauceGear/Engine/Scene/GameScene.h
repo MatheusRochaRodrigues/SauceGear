@@ -1,29 +1,16 @@
 ﻿#pragma once
+#include <stdexcept> 
+#include "SceneBuilder.h"
+#include <memory> 
 #include "SceneECS.h" 
-#include "../Graphics/Framebuffer.h" 
-
+#include "../Graphics/Framebuffer.h"  
 #include "../ECS/Components/CameraComponent.h"
 #include "../ECS/Components/TransformComponent.h"
 #include "../ECS/Components/ComputeSyncComponent.h"
-#include "../ECS/Components/LightComponent.h"
-
-#include <stdexcept> 
-#include "SceneBuilder.h"
-#include <memory>
-
+#include "../ECS/Components/LightComponent.h" 
 #include"../ECS/Systems/DebugRenderer.h"
-#include "../GUI/FontManager.h" 
-
-//#include "../Geometry/World/SurfaceNet/World/SurfaceNets/Voxel.h"
-#include "../Resources/Primitives/Primitive.h"
-  
-//#include "../Geometry/World/DC/DCTree.h"
-#include "../Geometry/Voxel/DC/DCMeshBuilder.h"
-#include "../Geometry/Voxel/Octree/OctreeBuilder.h"
-
-#include "../Geometry/World/clipmap_system.cpp"
-#include "../Geometry/World/ThreadWorker.h"
-
+#include "../GUI/FontManager.h"  
+#include "../Resources/Primitives/Primitive.h"  
 
 class GameScene : public SceneECS {
 public: 
@@ -166,7 +153,17 @@ public:
         t->SetLocalPosition(glm::vec3(0, -16, 0));
         */
          
+
+
+
+
+
+        /*
         ClipmapSystem* system = new ClipmapSystem();
+
+        auto start = std::chrono::high_resolution_clock::now();
+
+
         std::cout << "\n\nlp1\n\n";
         system->Initialize();
         std::cout << "\n\nlp2\n\n";
@@ -178,7 +175,11 @@ public:
         std::cout << "bb1" << std::endl;
         // esperar todas as tarefas do pool terminarem
         gThreadPool.WaitAll(); // você precisa implementar essa função no ThreadPool
+        */
 
+
+        /*
+        auto end = std::chrono::high_resolution_clock::now();
 
         auto asset = std::make_shared<MaterialAsset>();
         asset->base = MaterialLibrary::Get("PBR_Default");
@@ -198,7 +199,26 @@ public:
             t->SetLocalPosition(glm::vec3(0, -16, 0));
         }
 
+        double ms = std::chrono::duration<double, std::milli>(end - start).count();
+        printf("\n\n - __WORLD_DEBUGS__ \n");
+        printf("World generation took %.2f ms\n", ms);
+
+        double totalSeconds = ms / 1000.0;
+        int minutesPart = (int)(totalSeconds / 60);
+        double secondsPart = fmod(totalSeconds, 60.0);
+
+        printf("World generation took %d min %d s %d ms\n",
+            minutesPart,
+            (int)secondsPart,
+            (int)((secondsPart - (int)secondsPart) * 1000));
+
+        printf("\n\n\n");
+
         std::cout << "bb2" << std::endl;
+        */
+
+        //-------------------------------------------------------------------------------------------------------------------------
+        //  Sphere Lights
         //-------------------------------------------------------------------------------------------------------------------------
 
 
@@ -280,7 +300,7 @@ public:
             txt.units = TextComponent::Units::Relative;
             //txt.align = TextComponent::Align::Left;
             txt.anchor = TextComponent::Anchor::TopLeft;
-            txt.color = vec4(2.5f, 0.0f, 0.0f, 1);
+            txt.color = glm::vec4(2.5f, 0.0f, 0.0f, 1);
 
             txt.style.shadowOffset = { 2, -2 };
             txt.style.shadowColor = { 0,0,0,0.6f }; 
@@ -303,7 +323,7 @@ public:
             txt.units = TextComponent::Units::Pixels;
             txt.align = TextComponent::Align::Center;
             txt.anchor = TextComponent::Anchor::Center;
-            txt.color = vec4(0.75f, 0.75f, 0, 1);
+            txt.color = glm::vec4(0.75f, 0.75f, 0, 1);
             txt.style.shadowOffset = { 1.5, -1.5 };
             txt.style.shadowColor = { 0,0,0,0.6f }; 
         } 

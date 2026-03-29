@@ -1,6 +1,6 @@
 ﻿#include"DCMeshBuilder.h" 
 
-// ---------------------------------------------------------------------------- 
+// The vertex is created here
 void ContourProcessEdge(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 {
 	int minSize = 1000000;		// arbitrary big number
@@ -55,51 +55,35 @@ void ContourProcessEdge(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 			indexBuffer.push_back(indices[3]);
 		}
 	}
-}
+} 
 
-// ----------------------------------------------------------------------------
-
-// ContourEdgeProc resolve UMA ARESTA compartilhada por 4 células
-// Ele garante que todas estejam no MESMO nível de detalhe
+// ContourEdgeProc resolve UMA ARESTA compartilhada por 4 células, ele garante que todas estejam no MESMO nível de detalhe 
 // Se não estiverem, ele subdivide a aresta recursivamente
 void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
-{
-	// Se qualquer uma das 4 células não existe,
-	// essa aresta não é válida
-	if (!node[0] || !node[1] || !node[2] || !node[3])
+{ 
+	if (!node[0] || !node[1] || !node[2] || !node[3])	// Se qualquer uma das 4 células não existe, essa aresta não é válida
 	{
 		return;
 	}
-
-	// ------------------------------------------------------------------
-	// CASO BASE:
-	// Se NENHUMA das 4 células é interna,
-	// então todas estão no nível mais fino relevante
-	// → podemos gerar triângulos com segurança
+	 
+	// CASO BASE: Se NENHUMA das 4 células é interna, então todas estão no nível mais fino relevante -> podemos gerar triângulos com segurança
 	if (node[0]->type != Node_Internal &&
 		node[1]->type != Node_Internal &&
 		node[2]->type != Node_Internal &&
 		node[3]->type != Node_Internal)
-	{
-		// Aqui acontece a geração real de triângulos
-		ContourProcessEdge(node, dir, indexBuffer);
+	{ 
+		ContourProcessEdge(node, dir, indexBuffer);	// Aqui acontece a geração real de triângulos
 	}
 	else
-	{
-		// ------------------------------------------------------------------
-		// CASO RECURSIVO:
-		// Pelo menos uma das células é interna
-		// Isso significa que a aresta real está "escondida"
-		// dentro de subdivisões menores
-		//
-		// Uma aresta 3D, ao descer um nível da octree,
-		// se divide em DUAS sub-arestas
+	{ 
+		// CASO RECURSIVO: Pelo menos uma das células é interna
+		// Isso significa que a aresta real está "escondida" dentro de subdivisões menores 
+		// Uma aresta 3D, ao descer um nível da octree, se divide em DUAS sub-arestas
 		for (int i = 0; i < 2; i++)
 		{
 			DCNode* edgeNodes[4];
 
-			// Para essa sub-aresta i:
-			// quais filhos de cada célula participam? 
+			// Para essa sub-aresta i: quais filhos de cada célula participam? 
 			const int c[4] =
 			{
 				edgeProcEdgeMask[dir][i][0],
@@ -111,8 +95,7 @@ void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 			// Para cada uma das 4 células ao redor da aresta:
 			for (int j = 0; j < 4; j++)
 			{
-				// Se a célula já é folha (ou pseudo-leaf),
-				// ela já está no nível mais fino possível
+				// Se a célula já é folha (ou pseudo-leaf), ela já está no nível mais fino possível
 				if (node[j]->type == Node_Leaf ||
 					node[j]->type == Node_Psuedo)
 				{
@@ -120,15 +103,12 @@ void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 				}
 				else
 				{
-					// Caso contrário, descemos para o filho
-					// que toca essa sub-aresta específica
+					// Caso contrário, descemos para o filho que toca essa sub-aresta específica
 					edgeNodes[j] = node[j]->children[c[j]];
 				}
 			}
 
-			// Recursão:
-			// Continua descendo até que TODAS as 4 células
-			// estejam no mesmo nível local
+			// Recursão: Continua descendo até que TODAS as 4 células, estejam no mesmo nível local
 			ContourEdgeProc(edgeNodes, edgeProcEdgeMask[dir][i][4], indexBuffer);
 		}
 	}
@@ -139,35 +119,26 @@ void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
 // Ela NÃO gera triângulos diretamente (exceto via EdgeProc)
 // Ela garante que TODAS as arestas internas dessa face sejam processadas no nível correto
 void ContourFaceProc(DCNode* node[2], int dir, IndexBuffer& indexBuffer)
-{
-	// Se uma das células não existe, não há face válida
-	if (!node[0] || !node[1])
+{ 
+	if (!node[0] || !node[1])	// Se uma das células não existe, não há face válida
 		return;
 
-	// Se ambas são folhas, essa face NÃO precisa ser subdividida
-	// As arestas dela serão resolvidas diretamente no EdgeProc
+	// Se ambas são folhas, essa face NÃO precisa ser subdividida. As arestas dela serão resolvidas diretamente no EdgeProc
 	if (node[0]->type == Node_Internal || node[1]->type == Node_Internal)
-	{
-		// ------------------------------------------------------------------
-		// ETAPA 1: SUBDIVIDIR A FACE EM 4 SUBFACES (caso exista LOD diferente)
-		//
-		// Uma face 3D, ao descer um nível na octree, vira 4 subfaces 2D
+	{ 
+		// ETAPA 1: SUBDIVIDIR A FACE EM 4 SUBFACES (caso exista LOD diferente), uma face 3D, ao descer um nível na octree, vira 4 subfaces 2D
 		// Precisamos tratar cada uma separadamente
 		for (int i = 0; i < 4; i++)
 		{
 			DCNode* faceNodes[2];
-
-			// Para a subface i e direção dir:
-			// quais filhos do node[0] e node[1] realmente se tocam nessa subface?
-			const int c[2] = {
-				//Para essa subface i e direção dir, quais filhos do node[0] e node[1] se tocam?
+			 
+			const int c[2] = { 
 				faceProcFaceMask[dir][i][0], // filho do node[0]
 				faceProcFaceMask[dir][i][1]  // filho do node[1]
 			};
 
 			// Para cada lado da face:
-			// - Se o nó já é folha -> ele é o mais fino possível
-			// - Se é interno → descemos para o filho correto que toca essa subface
+			// - Se o nó já é folha -> ele é o mais fino possível. - Se é interno -> descemos para o filho correto que toca essa subface
 			for (int j = 0; j < 2; j++)
 			{
 				if (node[j]->type != Node_Internal)
@@ -176,58 +147,45 @@ void ContourFaceProc(DCNode* node[2], int dir, IndexBuffer& indexBuffer)
 					faceNodes[j] = node[j]->children[c[j]];
 			}
 
-			// Recursão:
-			// Continua descendo até que AMBOS os lados estejam no mesmo nível local
+			// Recursão: Continua descendo até que AMBOS os lados estejam no mesmo nível local
 			ContourFaceProc(faceNodes, faceProcFaceMask[dir][i][2], indexBuffer);
 		}
-
-		// ------------------------------------------------------------------
-		// ETAPA 2: PROCESSAR AS 4 ARESTAS INTERNAS DESSA FACE
-		//
-		// Após dividir a face em subfaces, surgem 4 arestas internas
-		// Essas arestas são onde os cracks realmente aparecem
+		 
+		// ETAPA 2: PROCESSAR AS 4 ARESTAS INTERNAS DESSA FACE 
+		// Após dividir a face em subfaces, surgem 4 arestas internas, Essas arestas são onde os cracks realmente aparecem
 		const int orders[2][4] =
 		{
-			{ 0, 0, 1, 1 }, // padrão 0 → dois nós do lado 0, dois do lado 1
-			{ 0, 1, 0, 1 }  // padrão 1 → intercalado
+			{ 0, 0, 1, 1 }, // padrão 0 -> dois nós do lado 0, dois do lado 1
+			{ 0, 1, 0, 1 }  // padrão 1 -> intercalado
 		};
 
 		for (int i = 0; i < 4; i++)
 		{
 			DCNode* edgeNodes[4];
 
-			// Para essa aresta interna:
-			// quais filhos participam dela?
-			const int c[4] =	//obs : só será necessario essa informação quando a aresta nao esta no no mais fino pois é necessario saber quais nós tocaram essa edge
+			// Para essa aresta interna: quais filhos participam dela?
+			const int c[4] =	 
 			{
 				faceProcEdgeMask[dir][i][1],
 				faceProcEdgeMask[dir][i][2],
 				faceProcEdgeMask[dir][i][3],
 				faceProcEdgeMask[dir][i][4],
 			};
-
-			// Escolhe qual padrão de lados usar (node[0] ou node[1])
+			 
 			const int* order = orders[faceProcEdgeMask[dir][i][0]];
 
 			// Para cada um dos 4 nós que cercam a aresta:
 			for (int j = 0; j < 4; j++)
 			{
-				// Se o nó já é folha (ou pseudo-leaf),
-				// usamos ele diretamente
-				if (node[order[j]]->type == Node_Leaf ||
-					node[order[j]]->type == Node_Psuedo)
-				{
-					edgeNodes[j] = node[order[j]];
-				}
-				else
-				{
+				// Se o nó já é folha (ou pseudo-leaf), usamos ele diretamente
+				if (node[order[j]]->type == Node_Leaf || node[order[j]]->type == Node_Psuedo) 
+					edgeNodes[j] = node[order[j]]; 
+				else 
 					// Caso contrário, descemos para o filho correto
-					edgeNodes[j] = node[order[j]]->children[c[j]];
-				}
+					edgeNodes[j] = node[order[j]]->children[c[j]]; 
 			}
 
-			// Agora temos exatamente 4 células corretas ao redor da aresta
-			// EdgeProc irá gerar os triângulos sem cracks
+			// Agora temos exatamente 4 células corretas ao redor da aresta, EdgeProc irá gerar os triângulos sem cracks
 			ContourEdgeProc(edgeNodes, faceProcEdgeMask[dir][i][5], indexBuffer);
 		}
 	}
@@ -238,29 +196,20 @@ void ContourFaceProc(DCNode* node[2], int dir, IndexBuffer& indexBuffer)
 void ContourCellProc(DCNode* node, IndexBuffer& indexBuffer)
 {
 	if (!node) return;
-
-	// Apenas nós internos participam:
-	// folhas só armazenam vértices
+	 
 	if (node->type != Node_Internal)
 		return;
-
-	// ------------------------------------------------------------------
-	// ETAPA 1: RECURSÃO
-	// Garante que os níveis mais finos sejam processados primeiro
+	 
+	// ETAPA 1: RECURSÃO, Garante que os níveis mais finos sejam processados primeiro
 	for (int i = 0; i < 8; i++)
 		ContourCellProc(node->children[i], indexBuffer);
-
-	// ------------------------------------------------------------------
-	// ETAPA 2: PROCESSAR AS FACES INTERNAS ENTRE OS FILHOS
-	//
-	// Um cubo tem 12 pares de filhos que compartilham UMA FACE interna
+	 
+	// ETAPA 2: PROCESSAR AS FACES INTERNAS ENTRE OS FILHOS, Um cubo tem 12 pares de filhos que compartilham UMA FACE interna
 	for (int i = 0; i < 12; i++)
 	{
 		DCNode* faceNodes[2];
 
-		// Cada entrada da máscara indica:
-		// - dois filhos que se tocam por uma face
-		// - a direção dessa face (X, Y ou Z)
+		// Cada entrada da máscara indica: - dois filhos que se tocam por uma face. - a direção dessa face (X, Y ou Z)
 		const int c[2] = {
 			cellProcFaceMask[i][0],
 			cellProcFaceMask[i][1]
@@ -272,11 +221,8 @@ void ContourCellProc(DCNode* node, IndexBuffer& indexBuffer)
 		// Resolve LOD e subdivisões nessa face interna
 		ContourFaceProc(faceNodes, cellProcFaceMask[i][2], indexBuffer);
 	}
-
-	// ------------------------------------------------------------------
-	// ETAPA 3: PROCESSAR AS 6 ARESTAS INTERNAS DO CUBO
-	//
-	// Essas são arestas onde todos os 4 nós estão no mesmo nível
+	 
+	// ETAPA 3: PROCESSAR AS 6 ARESTAS INTERNAS DO CUBO, Essas são arestas onde todos os 4 nós estão no mesmo nível
 	for (int i = 0; i < 6; i++)
 	{
 		DCNode* edgeNodes[4];
@@ -318,7 +264,7 @@ void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
 		}
 
 		d->index = vertexBuffer.size();
-		vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });		//vertexBuffer.push_back(Vertex(d->position, d->averageNormal));
+		vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });	 
 	} 
 }
 
@@ -327,29 +273,10 @@ void GenerateMeshFromOctree(DCNode* node, VertexBuffer& vertexBuffer, IndexBuffe
 	if (!node) return;
 
 	vertexBuffer.clear();
-	indexBuffer.clear();		//onde os triângulos finais serão escritos
+	indexBuffer.clear();		 
 	 
 	GenerateVertexIndices(node, vertexBuffer); 
 	ContourCellProc(node, indexBuffer);
 }
 
-
-/*
-void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
-{
-	if (!node) return;
-
-	if (node->type != Node_Leaf) {
-		for (int i = 0; i < 8; i++)
-			if (node->children[i])
-				GenerateVertexIndices(node->children[i], vertexBuffer);
-	}
-
-	if (node->type != Node_Internal && node->drawInfo)
-	{
-		OctreeDrawInfo* d = node->drawInfo;
-		d->index = vertexBuffer.size();
-		vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });
-	}
-}
-*/
+ 

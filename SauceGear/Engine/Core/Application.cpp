@@ -1,13 +1,17 @@
 #include "Application.h"  
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"            // for glfwTerminate, glfwWindowShouldClose
+
+#include "stb/stb_image.h"         // for stbi_set_flip_vertically_on_load
+#include "../Platform/Window.h"    // for Window
+#include "../Graphics/Shader.h"    // for Shader
 #include "../Core/InputSystem.h"   // for InputSystem
 #include "../Core/Time.h"          // for Time
 #include "../Graphics/Renderer.h"  // for Renderer
-#include "../Platform/Window.h"    // for Window
 #include "../Scene/GameScene.h"    // for GameScene
 #include "EngineContext.h"         // for EngineContext, GEngine
-#include "GLFW/glfw3.h"            // for glfwTerminate, glfwWindowShouldClose
-#include "../Graphics/Shader.h"                // for Shader
-#include "stb/stb_image.h"         // for stbi_set_flip_vertically_on_load
+#include "../World/World.h"        // for World System
 
 #include "EditorState.h"
 #include "../Assets/AssetDatabase.h"
@@ -36,9 +40,11 @@ int Application::Init() {
     GEngine = new EngineContext{ scene, renderer, window, time, input, new EditorState};
     GEngine->input->Initialize(GEngine->window);                 // conecta input ao contexto da janela 
     renderer->Initialize();                              // inicializa entidades/sistemas da cena                scene.Init();    
-        
-       
+         
     stbi_set_flip_vertically_on_load(true);
+
+    world = new World();
+    world->Initialize(*scene);
 }
 
 int Application::Run() {  
@@ -64,8 +70,13 @@ void Application::Update() {
     //DeltaTime
     time->Update();
     float dt = time->GetDeltaTime();
+
     //controll update
     input->Update();                     //GEngine->input->Update(); 
+
+    //World 
+    world->Update(GEngine->GetMainCamera());
+
     //Scene Update
     scene->Update(dt);    // Atualiza todos os sistemas (inclui physics)     // Atualiza ECS
 

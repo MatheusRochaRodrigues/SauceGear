@@ -1,31 +1,50 @@
 #include "OctreeBuilder.h"
 #include "../Density/Density.h"
 #include "ConstructLeaf.h"
+#include "../../../World/WorldController.h"
+#include "../../Voxel/Density/DensityBrickCache.h"
 
-DCNode* BuildOctree(const ivec3 min, const int size)
-{
+DCNode* BuildOctree (
+	/*Parameters World*/
+	const ivec3 min, const int size, 
+	/*Data Chunk*/
+	BuildContext_CK& ctx
+) {
 	DCNode* root = new DCNode;
 	root->min = min;
 	root->size = size;
 	root->type = Node_Internal;
 
-	if (ConstructOctreeNodes(root) == nullptr)  
+	ctx.minOctree = min;
+
+	if (ConstructOctreeNodes(root, ctx) == nullptr)
 		return nullptr; 
 
 	return root;
 }
-
-DCNode* ConstructOctreeNodes(DCNode* node)
+ 
+bool NodeHasSurface(ivec3 min, int size, BuildContext_CK& ctx)
 { 
+	const float d = Density_Func(min + (size / 2));
+	const float surfaceNetThreshold = size * 2 * 2.25f;
+	return std::abs(d) < surfaceNetThreshold;
+}
+
+DCNode* ConstructOctreeNodes(
+	DCNode* node,	//unique Data that is truly recursive
+	BuildContext_CK& ctx
+) { 
 	if (!node)
 	{
 		return nullptr;
 	}
 
-	if (node->size == 1)
+	if (node->size == (BASE_CELL_SIZE << ctx.chunkLOD))	// == 1 min size node accept		//	<=
 	{ 
-		return ConstructLeaf(node); 
+		return ConstructLeaf(node, ctx);
 	}
+
+	if (node->size < 1) assert("NodeSize is smaller than 1");
 
 	const int childSize = node->size / 2;
 	bool hasChildren = false;
@@ -33,14 +52,14 @@ DCNode* ConstructOctreeNodes(DCNode* node)
 	for (int i = 0; i < 8; i++)
 	{ 
 		ivec3 min = node->min + (CHILD_MIN_OFFSETS[i] * childSize);  
-		if (!NodeHasSurface(min, childSize)) continue;
+		if (!NodeHasSurface(min, childSize, ctx)) continue;
 
 		DCNode* child = new DCNode;
 		child->size = childSize;
 		child->min = min;
 		child->type = Node_Internal; 
 		 
-		node->children[i] = ConstructOctreeNodes(child);
+		node->children[i] = ConstructOctreeNodes(child, ctx);
 		hasChildren |= (node->children[i] != nullptr); 
 	}
 	 
@@ -61,6 +80,19 @@ void DestroyOctree(DCNode* node)
 		DestroyOctree(node->children[i]);
 	delete node;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

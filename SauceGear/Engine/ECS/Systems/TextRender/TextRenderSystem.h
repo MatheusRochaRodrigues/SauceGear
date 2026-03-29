@@ -12,16 +12,10 @@
 #include "../../Components/TextComponent.h" 
 #include "../../Components/TransformComponent.h" 
 #include "../../../GUI/FontRenderer.h" 
-#include "../../../GUI/FontManager.h"
-
-#include "../../../GUI/ToLetter3D.h" 
-#include "../../../Geometry/SurfOption/SurfaceNet/WorldOctree/SurfaceNets/SysVoxel.h" 
-#include "../../../Geometry/SurfOption/SurfaceNet/WorldOctree/SurfaceNets/OctreeNode.h" 
-#include "../DebugRenderer.h"
-#include "../../../Geometry/SurfOption/SurfaceNet/World/SurfaceNets/SurfaceNets.h" 
- 
-
-
+#include "../../../GUI/FontManager.h" 
+#include "../../../GUI/ToLetter3D.h"  
+#include "../DebugRenderer.h" 
+  
 class TextRenderSystem : public System{
 public:
     static void Init();         static void Shutdown();
@@ -59,13 +53,14 @@ public:
             //3D
             FLUSH3D(worldTexts);
               
+            /*
             auto entities = GEngine->scene->GetEntitiesWith<SurfaceNetsComponent>();
             for (auto e : entities) {
                 auto& sf = GEngine->scene->GetComponent<SurfaceNetsComponent>(e);
                 if (sf.showBoxOctree)
                     DebugDrawChunkSDFGrid(sf.node, sf.chunk->buff->densityMap, GEngine->mainCamera, 0.004f);
             }
-
+            */
 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);  
         } catch (const std::exception& e) {

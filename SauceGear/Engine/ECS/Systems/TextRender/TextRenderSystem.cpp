@@ -221,7 +221,7 @@ void FlushDebug3D(std::string text, glm::vec3 position, float scale, glm::vec3 c
 }
 
  
-
+/*
 void TextRenderSystem::DebugDrawChunkSDFGrid(
     OctreeNode* node,
     const std::vector<float>& sdf,
@@ -279,7 +279,6 @@ void TextRenderSystem::DebugDrawChunkSDFGrid(
 
 
 
-
 void DebugDrawChunkGrid(OctreeNode* node) {
     int N = sysv.get_voxelGrid();
     glm::vec3 min = node->getBounds().min;
@@ -319,6 +318,7 @@ void DebugDrawChunkGrid(OctreeNode* node) {
 }
 
 
+*/
 
 
 

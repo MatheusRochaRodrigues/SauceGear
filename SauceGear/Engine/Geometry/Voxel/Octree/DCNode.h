@@ -1,6 +1,7 @@
 #pragma once 
 #include <glm/glm.hpp> 
 #include "../DC/OctreeDrawInfo.h"
+#include "EdgeCache.h"
 
 using namespace glm;
 
@@ -58,14 +59,14 @@ const int faceProcEdgeMask[3][4][6] = {
 const ivec3 CHILD_MIN_OFFSETS[] =
 {
 	// needs to match the vertMap from Dual Contouring impl
-	ivec3(0, 0, 0),
-	ivec3(0, 0, 1),
-	ivec3(0, 1, 0),
-	ivec3(0, 1, 1),
-	ivec3(1, 0, 0),
-	ivec3(1, 0, 1),
-	ivec3(1, 1, 0),
-	ivec3(1, 1, 1),
+	ivec3(0, 0, 0),		//0
+	ivec3(0, 0, 1),		//1
+	ivec3(0, 1, 0),		//2
+	ivec3(0, 1, 1),		//3
+	ivec3(1, 0, 0),		//4
+	ivec3(1, 0, 1),		//5
+	ivec3(1, 1, 0),		//6
+	ivec3(1, 1, 1),		//7
 };
  
 
@@ -110,4 +111,17 @@ public:
 	DCNode*			children[8];
 	OctreeDrawInfo* drawInfo;
 	 
+};
+
+class DensityCache;
+
+struct BuildContext_CK
+{
+	int chunkLOD;
+	DensityCache* densityCache;
+	EdgeCache edgeCache;
+
+	ivec3 minOctree;
+
+	BuildContext_CK(int chunkLOD, DensityCache* densityCache) : densityCache(densityCache), chunkLOD(chunkLOD) {};
 };

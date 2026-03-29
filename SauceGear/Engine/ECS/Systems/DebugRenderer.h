@@ -12,9 +12,7 @@
 
 #include "../../DebugRender/DebugLinesRenderer.h"
 #include "../../DebugRender/DebugWireframeRenderer.h"
-#include "../../DebugRender/DebugPointRenderer.h"
-
-#include "../../Geometry/SurfOption/SurfaceNet/WorldOctree/SurfaceNets/OctreeNode.h"
+#include "../../DebugRender/DebugPointRenderer.h" 
 
 class DebugRenderer : public System {
 public:
@@ -106,6 +104,7 @@ public:
                     }
                 }
 
+                /*
                 if (!GEngine->scene->HasComponent<SurfaceNetsComponent>(e)) continue;
                 auto& sf = GEngine->scene->GetComponent<SurfaceNetsComponent>(e);
                 if(sf.showBoxOctree) {
@@ -113,6 +112,7 @@ public:
                     DebugRenderer::Cube(aabb.min, aabb.max, dbg.colorBox, false);
                     DebugDrawChunkGrid(sf.node);
                 }
+                */
                 
             }
 
@@ -125,7 +125,7 @@ public:
     }
 
 
-
+    /*
     void DebugDrawChunkGrid(OctreeNode* node) {
         int N = sysv.get_voxelGrid(); // ex: 17
         glm::vec3 min = node->getBounds().min;
@@ -149,7 +149,7 @@ public:
                     );
                 }
     }
-
+    */
 
 
 

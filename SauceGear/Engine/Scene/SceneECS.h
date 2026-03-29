@@ -182,12 +182,97 @@ public:
 
     void AddComponentByType_Internal(Entity e, std::type_index type);
 
+    //----------------------------------------------------------------------------
+    //  RESOURCES
+    //----------------------------------------------------------------------------
+
+    /*template<typename T>
+    void SetResource(std::shared_ptr<T> resource)
+    {
+        resources[typeid(T)] = resource;
+    }*/
+
+    /*
+    template<typename T>
+    void SetResource(T* resource)
+    {
+        resources[typeid(T)] = std::shared_ptr<T>(resource);
+    }
+    */
+
+    /*
+    template<typename T>
+    void SetResource(T resource)
+    {
+        resources[typeid(T)] = std::make_shared<T>(std::move(resource));
+    }
+    */
+
+    template<typename T, typename... Args>
+    std::shared_ptr<T> EmplaceResource(Args&&... args)
+    {
+        auto resource = std::make_shared<T>(std::forward<Args>(args)...);
+        resources[typeid(T)] = resource;
+        return resource;
+
+        //auto bridge = scene.EmplaceResource<ChunkStreamingBridge>();   way use example
+    }
+
+    /*template<typename T>
+    T& GetResource()
+    {
+        auto it = resources.find(typeid(T));
+        if (it == resources.end())
+            throw std::runtime_error("Resource not found");
+
+        return *std::static_pointer_cast<T>(it->second);
+    }*/
+
+    template<typename T>
+    std::shared_ptr<T> GetResource()
+    {
+        auto it = resources.find(typeid(T));
+        if (it == resources.end())
+            throw std::runtime_error("Resource not found");
+
+        return std::static_pointer_cast<T>(it->second);
+    }
+
+    template<typename T>
+    std::shared_ptr<T> TryGetResource()
+    {
+        auto it = resources.find(typeid(T));
+        if (it == resources.end())
+            return nullptr;
+
+        return std::static_pointer_cast<T>(it->second);
+    }
+
+    template<typename T>
+    T* TryGetResourceRaw()      //if you want to avoid the cost of the shared_ptr, Pointer Raw is lighter.
+    {
+        auto it = resources.find(typeid(T));
+        if (it == resources.end())
+            return nullptr;
+
+        return static_cast<T*>(it->second.get());
+    }
+
+    void DestroyGameObject(Entity e) {
+        toDestroy.push_back(e);
+    }
+
 private:
     std::unique_ptr<ComponentManager> componentManager = std::make_unique<ComponentManager>(); 
     std::vector<std::unique_ptr<System>> systems;
     EntityManager entityManager;
 
+    std::unordered_map<std::type_index, std::shared_ptr<void>> resources;
+
     Entity selectedEntity = INVALID_ENTITY;
+
+
+    std::vector<Entity> toDestroy;
 };
 
  

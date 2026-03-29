@@ -7,6 +7,9 @@
 #include <array>
 #include <string>
 
+// The IBL Image resolutions are all Hardcoded, so therefore  ->  512, 32, 128, 5  -> 
+//      it's necessary for all of them to match, otherwise, the IBL cache will exhibit a bug.
+
 static GLuint LoadCubemapPNG(const std::array<std::string, 6>& faces)
 {
     stbi_set_flip_vertically_on_load(false); // cubemap NÃO flipa
@@ -129,6 +132,21 @@ GLuint IBLManager::LoadHDRTexture(const std::string& path) {
 // === Interface principal ===
 //create ambient IBL                    LoadOrBuild
 IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cacheDir, bool isAlreadyCubeMap) {
+    IBLSet set{};
+     
+    //--------------------------------------------------------------------------------------
+    //  IBL Persistence 
+    //--------------------------------------------------------------------------------------
+    IBLPersistence persistence;
+    std::string base = persistence.MakeBaseName(cacheDir, hdrPath);
+
+    // tenta carregar cache             TRY CACHE
+    if (persistence.TryLoadFromCache(base, set)) {
+        std::cout << "[IBL] Loaded from cache\n";
+        return set;
+    }
+    
+    
     //----------------------------SETUP-----------------------------------------
     // Lazy init do FBO/RBO default se não tiver sido passado
     //problema com destrutor 
@@ -138,22 +156,20 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cach
         glGenRenderbuffers(1, &captureRBO);
     }
 
-    Shader& hdrToCube = ShaderLibrary::Get("HDR_ToCubemap");
-    Shader& Irradiance = ShaderLibrary::Get("IBL_Irradiance");
-    Shader& Prefilter = ShaderLibrary::Get("IBL_Prefilter");
-    Shader& BRDF = ShaderLibrary::Get("IBL_BRDF");
+    Shader& hdrToCube   = ShaderLibrary::Get("HDR_ToCubemap");
+    Shader& Irradiance  = ShaderLibrary::Get("IBL_Irradiance");
+    Shader& Prefilter   = ShaderLibrary::Get("IBL_Prefilter");
+    Shader& BRDF        = ShaderLibrary::Get("IBL_BRDF");
     //--------------------------------------------------------------------------
 
 
-    //start
+    //---------------------------- BUILD ----------------------------------------- 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST); // às vezes depth atrapalha
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     const auto proj = CaptureProjection();
-    const auto views = CaptureViews();
-
-    IBLSet set{};
+    const auto views = CaptureViews(); 
 
     // === FONTE DO ENVIRONMENT MAP ===  
     if (!isAlreadyCubeMap) {
@@ -199,6 +215,10 @@ IBLSet IBLManager::EnsureIBL(const std::string& hdrPath, const std::string& cach
     IntegrateBRDF(set.brdfLUT, BRDF, captureFBO, captureRBO, 512);
 
 
+    //---------------------------- SAVE CACHE ----------------------------------------- 
+    //  IBL Persistence  
+    persistence.SaveToCache(base, set);
+    std::cout << "[IBL] Saved to cache\n";
 
 
 

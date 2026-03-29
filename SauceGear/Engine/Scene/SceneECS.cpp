@@ -13,6 +13,7 @@
 #include "../ECS/Systems/AABBSystem.h"   
 #include "../ECS/Systems/DebugRenderer.h"   
 #include "../ECS/Systems/TextRender/TextRenderSystem.h"  
+#include "../ECS/Systems/ChunkSpawnSystem.h"  
 // Components
 #include "../ECS/Components/TransformComponent.h"
 #include "../ECS/Components/MeshRenderer.h"  
@@ -30,7 +31,10 @@
 
 
 void SceneECS::initECS() {
-    ///----------Components
+    ///-----------------------------------------------------------------------------------------
+    /// Components  
+    ///-----------------------------------------------------------------------------------------
+    
     //auto* physics = scene.RegisterSystem<PhysicsSystem>();
     componentManager->Register<CameraComponent>();
     componentManager->Register<TransformComponent>(); 
@@ -44,7 +48,11 @@ void SceneECS::initECS() {
     componentManager->Register<TextComponent>();
 
 
-    ///----------Systems
+    ///-----------------------------------------------------------------------------------------
+    /// Systems 
+    ///-----------------------------------------------------------------------------------------
+    
+    RegisterSystem <ChunkSpawnSystem>();
     RegisterSystem <TransformSystem>();
     RegisterSystem <AABBSystem>();
     RegisterSystem <CameraSystem>();
@@ -54,14 +62,13 @@ void SceneECS::initECS() {
     RegisterSystem <GlobalUniformSystem>(); 
     RegisterSystem <RenderSystem>(); 
     RegisterSystem <DebugRenderer>();
-    RegisterSystem <TextRenderSystem>();
-
-    //RegisterSystem <OctreeWorldSystem>();  
+    RegisterSystem <TextRenderSystem>(); 
 
     //auto* moveSystem = scene.RegisterSystem<MoveSystem>();
     //auto* inputSystem = RegisterSystem <InputSystem>(); 
 
-    RegisterSystem <EndLoopSystem>();
+    auto* endLoopSystem = RegisterSystem <EndLoopSystem>();
+    endLoopSystem->toDestroy = &toDestroy;
 }
 
 Entity SceneECS::CreateEntity() {

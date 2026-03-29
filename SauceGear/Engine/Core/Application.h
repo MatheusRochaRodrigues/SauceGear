@@ -4,8 +4,9 @@ class Window;
 class GameScene;
 class Renderer;
 class Time;
-class InputSystem;
- 
+class InputSystem; 
+class World;
+
 //#define GAME_RUNTIME
 
 class Application {
@@ -20,6 +21,8 @@ public:
     Renderer*       renderer;
     Time*           time;
     InputSystem*    input;
+    World*          world;
+
 };
 
  

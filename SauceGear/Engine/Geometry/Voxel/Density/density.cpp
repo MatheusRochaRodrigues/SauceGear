@@ -1,6 +1,6 @@
 #include "density.h" 
 #include <glm/ext.hpp>
-#include "../../SurfOption/SurfaceNet/WorldOctree/SDF/Terrain.h"
+#include "SDF/Terrain.h"
 using namespace glm;
 
 // ----------------------------------------------------------------------------

@@ -1,0 +1,389 @@
+﻿#pragma once 
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <memory>
+#include <shared_mutex>
+#include <atomic>
+#include <glm/glm.hpp> 
+
+#include "ThreadWorker.h"  
+#include "ChunkStreamingBridge.h" 
+#include "WorldController.h"
+#include "../Geometry/Voxel/Density/DensityBrickCache.h"
+#include "Chunk/Chunk.h" 
+
+using namespace glm;  
+
+// CHUNK KEY  
+struct ChunkKey
+{
+    ivec3 coord;
+    int lod;
+
+    bool operator==(const ChunkKey& o) const
+    {
+        return coord == o.coord && lod == o.lod;
+    }
+};
+
+struct ChunkKeyHasher
+{
+    size_t operator()(const ChunkKey& k) const
+    {
+        size_t h = std::hash<int>()(k.coord.x);
+        h ^= std::hash<int>()(k.coord.y) << 1;
+        h ^= std::hash<int>()(k.coord.z) << 2;
+        h ^= std::hash<int>()(k.lod) << 3;
+        return h;
+    }
+}; 
+
+// CHUNK REQUEST (priority queue)  
+struct ChunkRequest
+{
+    ChunkKey key;
+    float priority;
+
+    bool operator<(const ChunkRequest& other) const
+    {
+        return priority > other.priority; // menor = mais importante
+    }
+}; 
+
+// ============================================================
+// WORLD STORAGE (GLOBAL)
+// ============================================================
+
+class WorldChunkStorage {
+public:
+    std::unordered_map< ChunkKey, std::shared_ptr<Chunk>, ChunkKeyHasher > chunks;
+    //  std::vector<ChunkKey> required; required.reserve(512);
+
+    mutable std::shared_mutex mutex;
+
+    std::shared_ptr<Chunk> GetChunk(const ivec3& coord, int lod) const {
+        std::shared_lock lock(mutex);
+
+        auto it = chunks.find({ coord, lod });
+        if (it != chunks.end()) return it->second;
+
+        return nullptr;
+    }
+
+    void Insert(const ChunkKey& key, std::shared_ptr<Chunk> chunk) {
+        std::unique_lock lock(mutex);
+        chunks[key] = chunk;
+    }
+
+    void Remove(const ChunkKey& key, ChunkStreamingBridge* bridge) {
+        std::unique_lock lock(mutex); 
+
+        //ECS  
+        auto it = chunks.find(key);
+        if (it != chunks.end()) {
+            auto chunk = it->second;
+
+            if (!chunk->pendingRemoval.exchange(true))
+                bridge->removeChunks.push(chunk);
+        }
+
+        //System World
+        chunks.erase(key);
+    }
+}; 
+
+
+// ============================================================
+// CLIPMAP SYSTEM
+// ============================================================
+
+// CLIP LEVEL  
+struct ClipLevel
+{
+    int lod;
+    int ringRadius; 
+    ivec3 lastCenter;
+};
+
+class ClipmapSystem
+{
+public:
+    // STRUCTS
+    WorldChunkStorage world;
+
+    DensityCache densityCache;
+
+    ClipLevel levels[CLIP_LEVELS];
+
+    //uint32_t lastVisitedFrame[CLIP_LEVELS];
+
+    // CONFIG  
+    float directionBias = 2.0f;  
+
+    // CHUNK ECS 
+    ChunkStreamingBridge* bridge;       //ThreadSafeQueue<std::shared_ptr<Chunk>>* readyChunks;   
+
+    // STREAMING            
+    std::priority_queue<ChunkRequest> requestQueue; 
+
+    // CONFIG  
+    int chunksPerFrame = THREAD_COUNT;   // budget      4
+     
+    void Initialize()
+    {
+        for (int i = 0; i < CLIP_LEVELS; i++)
+        {
+            levels[i].lod = i; 
+            levels[i].ringRadius = BASE_RING_RADIUS;        //levels[i].ringRadius = BASE_RING_RADIUS << i;
+            levels[i].lastCenter = ivec3(FLT_MAX);
+        }
+    }
+
+    float ChunkWorldSize(int lod) const {
+        return CHUNK_SIZE * BASE_CELL_SIZE * float(1 << lod);
+    }
+
+    void Update(const vec3& cameraPos, const vec3& cameraForward)
+    {
+        frameID++;
+
+        for (int i = 0; i < CLIP_LEVELS; i++)
+            UpdateLevel(levels[i], cameraPos, cameraForward);
+    }
+
+private:
+
+    void UpdateLevel(ClipLevel& level, const vec3& cameraPos, const vec3& cameraForward)  {
+        if (bridge == nullptr) std::cout << "Ready Chunks NULL" << std::endl;
+
+        float worldSize = ChunkWorldSize(level.lod);
+
+        // Convert world-space camera position into clip-level grid coordinates. (We divide by the current LOD's world size (chunk_size * 2^lod)), to find which chunk cell the camera is inside at this clip level.
+        ivec3 center = ivec3(floor(cameraPos / worldSize));
+         
+        bool moved = (center != level.lastCenter);
+        level.lastCenter = center;
+
+        ProcessChunkRequests();
+
+        // avoid recalculating if nothing change
+        if (!moved) return; 
+
+        int r = level.ringRadius; 
+
+        //std::unordered_set<ChunkKey, ChunkKeyHasher> required;
+
+        for (int z = -r; z <= r; z++)
+            for (int y = -r; y <= r; y++)
+                for (int x = -r; x <= r; x++)
+                {
+                    // remove inner ring
+                    if (level.lod > 0)
+                    {
+                        int inner = BASE_RING_RADIUS / 2;
+
+                        if (abs(x) <= inner &&
+                            abs(y) <= inner &&
+                            abs(z) <= inner)
+                            continue;
+                    }
+
+                    ivec3 coord = center + ivec3(x, y, z);
+
+                    ChunkKey key{ coord, level.lod };
+                    //required.insert(key);
+
+                    // is already exists?
+                    if (world.GetChunk(coord, level.lod)) {     //if (chunk->state != ChunkState::Empty) continue;
+                        auto chunk = world.GetChunk(coord, level.lod); 
+                        if (chunk) {
+                            if (!chunk->pendingRemoval) chunk->pendingRemoval.exchange(false);
+                            chunk->lastVisitedFrame = frameID;
+                            continue;
+                        } 
+                    }   
+
+                    // PRIORITY 
+                    vec3 delta = vec3(coord - center);
+                    float dist = length(delta);
+
+                    vec3 dir = normalize(delta);        //normalize(delta + vec3(0.0001f));
+                    float alignment = dot(dir, cameraForward);
+
+                    float priority = dist - alignment * directionBias;
+
+                    requestQueue.push({ key, priority });
+
+                    //std::cout << "Chunk built: " << coord.x << "," << coord.y << "," << coord.z << "\n";
+
+                    //Você pode expandir o grid na direção da câmera:   Você pode expandir o grid na direção da câmera:
+                    //ivec3 bias = ivec3(round(cameraForward * 2.0f));  //coord = center + ivec3(x, y, z) + bias;
+                }
+
+        RemoveUnused(level.lod);
+        //RemoveUnused(required, level.lod);
+
+    }
+
+    // PROCESS REQUESTS (BUDGET CONTROL)  
+    void ProcessChunkRequests()
+    {
+        int budget = chunksPerFrame;
+
+        while (budget-- > 0 && !requestQueue.empty())
+        {
+            ChunkRequest req = requestQueue.top();
+            requestQueue.pop();
+
+            CreateChunk(req.key);
+        }
+    }
+
+    //Without Required
+    void RemoveUnused(int lod)
+    {
+        std::vector<ChunkKey> toRemove;
+
+        {
+            std::shared_lock lock(world.mutex);
+
+            for (auto& [key, chunk] : world.chunks)
+            {
+                if (key.lod != lod)
+                    continue;
+
+                if (chunk->lastVisitedFrame != frameID)
+                    toRemove.push_back(key);
+            }
+        }
+
+        for (auto& k : toRemove)
+        {
+            auto chunk = world.GetChunk(k.coord, k.lod);
+
+            if (chunk)
+                bridge->removeChunks.push(chunk);
+
+            world.Remove(k, bridge);    //world.Remove(k);
+        }
+    }
+
+    //With Required
+    void RemoveUnused(const std::unordered_set<ChunkKey, ChunkKeyHasher>& required, int lod)
+    {
+        std::vector<ChunkKey> toRemove;
+
+        {
+            std::shared_lock lock(world.mutex);
+
+            for (auto& [key, chunk] : world.chunks)
+            {
+                if (key.lod != lod)
+                    continue;
+
+                /*if (chunk->state == ChunkState::Building) continue;*/     //RESOLVER AQ
+
+                if (required.find(key) == required.end())
+                    toRemove.push_back(key);
+            }
+        }
+
+        for (auto& k : toRemove) {
+            /*
+            std::shared_ptr<Chunk> chunk;
+
+            {
+                std::shared_lock lock(world.mutex);
+                auto it = world.chunks.find(k);
+                if (it != world.chunks.end())
+                    chunk = it->second;
+            }
+
+            if (chunk) bridge->removeChunks.push(chunk);
+            */
+
+            //Remove from World
+            world.Remove(k, bridge);        // world.Remove(k);
+        }
+    } 
+
+    // CREATE CHUNK (ASYNC)  
+    void CreateChunk(const ChunkKey& key)
+    {
+        auto chunk = std::make_shared<Chunk>();
+
+        chunk->coord = key.coord;
+        chunk->lod = key.lod;
+        chunk->state = ChunkState::NeedsBuild;
+
+        world.Insert(key, chunk);
+
+        // MULTITHREAD
+        gThreadPool.Enqueue([chunk, this]()
+        {
+            chunk->BuildChunk(densityCache);     //(world, densityCache)
+
+            // após mesh pronta
+            //chunk->state = ChunkState::MeshReady;
+
+            if (chunk->state == ChunkState::Ready) 
+                bridge->readyChunks.push(chunk); // envia para ECS 
+        });
+
+        //SEQUENTIAL
+        /*
+        chunk->BuildChunk(densityCache);
+        if (chunk->state == ChunkState::Ready)
+            readyChunks->push(chunk); // envia para ECS 
+        */
+    } 
+
+
+//========================================================
+//  STREAMING LOGIC  
+//========================================================
+private:
+
+    // STREAMING LOGIC  
+    void UpdateStreaming(const vec3& cameraPos, const vec3& cameraForward)
+    {
+        for (int i = 0; i < CLIP_LEVELS; i++)
+        {
+            UpdateLevel(levels[i], cameraPos, cameraForward);
+        }
+    } 
+
+    // STITCHING (HOOK) 
+
+    //void ProcessStitching()
+    //{
+    //    for (auto& [key, chunk] : clipmap.world.chunks)
+    //    {
+    //        if (chunk->state == ChunkState::MeshReady)
+    //        {
+    //            TryStitchChunk(chunk);
+    //        }
+    //    }
+    //}
+
+    //void TryStitchChunk(std::shared_ptr<Chunk> chunk)
+    //{
+    //    auto neighbors = chunk->GetSpatialNeighbors(clipmap.world);
+
+    //    for (auto& n : neighbors)
+    //    {
+    //        if (!n || n->state < ChunkState::MeshReady)
+    //            return;
+    //    }
+
+    //    // aqui você pluga sua costura adaptativa
+    //    // Stitch(chunk, neighbors);
+
+    //    chunk->state = ChunkState::Ready;
+    //}
+
+private:
+    uint32_t frameID = 1;
+};
+
