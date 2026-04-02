@@ -88,12 +88,19 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 
 	float	cornerDensity[8];		
 	int		corners = 0;				// sinais dos 8 cantos
-	int		cornersNegative = 0;
+	int		cornersNegative = 0; 
+
+	float voxelSize = VOXEL_SCALE;	//DataWorld::getVoxelSize(ctx.chunkLOD)
 
 	for (int i = 0; i < 8; i++)
 	{
-		const ivec3 cornerPos = leaf->min + CHILD_MIN_OFFSETS[i] * leaf->size;
-		cornerDensity[i] = ctx.densityCache->Sample(cornerPos, leaf->size);			// Density_Func(vec3(cornerPos));
+		//const ivec3 cornerPos = leaf->min + CHILD_MIN_OFFSETS[i] * leaf->size;
+		//cornerDensity[i] = ctx.densityCache->Sample(cornerPos, leaf->size);			// Density_Func(vec3(cornerPos));
+
+		ivec3 corner2Grid = leaf->min + CHILD_MIN_OFFSETS[i] * leaf->size; // grid 
+		vec3 corner2World = vec3(corner2Grid) * voxelSize;			/// implement voxelSize			
+		cornerDensity[i] = Density_Func(corner2World);			//cornerDensity[i] = ctx.densityCache->Sample(worldPos);  
+
 		if (cornerDensity[i] < 0.0f) ++cornersNegative; 
 
 		const int material = cornerDensity[i] < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
@@ -110,7 +117,7 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 	const int MAX_CROSSINGS = 6;
 	int edgeCount = 0;
 	vec3 averageNormal(0.0f);
-	svd::QefSolver qef;
+	svd::QefSolver qef; 
 
 	for (auto& edge : edgevmap) {
 		if (edgeCount >= MAX_CROSSINGS) break;
@@ -120,15 +127,15 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 		float d1 = cornerDensity[c1];
 		float d2 = cornerDensity[c2];	
 
+
 		// zero crossing on this edge
 		if ((d1 < 0.0f) != (d2 < 0.0f)) {
-			/*
-			vec3 p = FindSurfaceEdgeIntersection_ZeroCrossing(c1, c2, d1, d2, leaf->size);
-			p = glm::vec3(leaf->min) + p;
+			vec3 local = FindSurfaceEdgeIntersection_ZeroCrossing(c1, c2, d1, d2, leaf->size);	// local
+			vec3 p = (glm::vec3(leaf->min) + local) * voxelSize;				/// implement voxelSize
 			const vec3 n = CalculateSurfaceNormal(p); 
-			*/
 
 			//------------------- 2 option ----------------------------
+			/*
 			vec3 p, n;  
 			ivec3 localVoxelMin = (leaf->min - ctx.minOctree) / leaf->size;	// voxelSize == leaf->size	//divisão por voxelSize normaliza o LOD
 
@@ -147,6 +154,7 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 				edgeData.normal   = n;
 				edgeData.valid    = 1;
 			}
+			*/
 			//---------------------------------------------------------
 
 			qef.add(p.x, p.y, p.z, n.x, n.y, n.z);
@@ -162,8 +170,8 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 	drawInfo->qef = qef.getData();
 	drawInfo->corners = corners;
 
-	const vec3 min = vec3(leaf->min);
-	const vec3 max = vec3(leaf->min + ivec3(leaf->size));
+	const vec3 min = vec3(leaf->min) * voxelSize;								/// implement voxelSize
+	const vec3 max = vec3(leaf->min + ivec3(leaf->size)) * voxelSize;			/// implement voxelSize
 	if (drawInfo->position.x < min.x || drawInfo->position.x > max.x ||
 		drawInfo->position.y < min.y || drawInfo->position.y > max.y ||
 		drawInfo->position.z < min.z || drawInfo->position.z > max.z)

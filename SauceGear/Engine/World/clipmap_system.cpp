@@ -127,6 +127,8 @@ public:
     // STREAMING            
     std::priority_queue<ChunkRequest> requestQueue; 
 
+    std::unordered_set<ChunkKey, ChunkKeyHasher> pending;
+
     // CONFIG  
     int chunksPerFrame = THREAD_COUNT;   // budget      4
      
@@ -138,11 +140,7 @@ public:
             levels[i].ringRadius = BASE_RING_RADIUS;        //levels[i].ringRadius = BASE_RING_RADIUS << i;
             levels[i].lastCenter = ivec3(FLT_MAX);
         }
-    }
-
-    float ChunkWorldSize(int lod) const {
-        return CHUNK_SIZE * BASE_CELL_SIZE * float(1 << lod);
-    }
+    } 
 
     void Update(const vec3& cameraPos, const vec3& cameraForward)
     {
@@ -157,11 +155,11 @@ private:
     void UpdateLevel(ClipLevel& level, const vec3& cameraPos, const vec3& cameraForward)  {
         if (bridge == nullptr) std::cout << "Ready Chunks NULL" << std::endl;
 
-        float worldSize = ChunkWorldSize(level.lod);
+        float worldSize = DataWorld::ChunkWorldSize(level.lod);
 
         // Convert world-space camera position into clip-level grid coordinates. (We divide by the current LOD's world size (chunk_size * 2^lod)), to find which chunk cell the camera is inside at this clip level.
-        ivec3 center = ivec3(floor(cameraPos / worldSize));
-         
+        ivec3 center = ivec3(floor(cameraPos / worldSize)); 
+
         bool moved = (center != level.lastCenter);
         level.lastCenter = center;
 
@@ -172,7 +170,7 @@ private:
 
         int r = level.ringRadius; 
 
-        //std::unordered_set<ChunkKey, ChunkKeyHasher> required;
+        std::unordered_set<ChunkKey, ChunkKeyHasher> required;
 
         for (int z = -r; z <= r; z++)
             for (int y = -r; y <= r; y++)
@@ -183,6 +181,9 @@ private:
                     {
                         int inner = BASE_RING_RADIUS / 2;
 
+                        /*int outer = level.ringRadius;
+                        int inner = (level.lod == 0) ? 0 : levels[level.lod - 1].ringRadius;*/
+
                         if (abs(x) <= inner &&
                             abs(y) <= inner &&
                             abs(z) <= inner)
@@ -192,28 +193,31 @@ private:
                     ivec3 coord = center + ivec3(x, y, z);
 
                     ChunkKey key{ coord, level.lod };
-                    //required.insert(key);
+                    required.insert(key);
 
                     // is already exists?
-                    if (world.GetChunk(coord, level.lod)) {     //if (chunk->state != ChunkState::Empty) continue;
-                        auto chunk = world.GetChunk(coord, level.lod); 
-                        if (chunk) {
-                            if (!chunk->pendingRemoval) chunk->pendingRemoval.exchange(false);
-                            chunk->lastVisitedFrame = frameID;
-                            continue;
-                        } 
+                    auto chunk = world.GetChunk(coord, level.lod);
+                    if (chunk) {     //if (chunk->state != ChunkState::Empty) continue;
+                        if (!chunk->pendingRemoval) chunk->pendingRemoval.exchange(false);
+                        continue;
+                        //chunk->lastVisitedFrame = frameID;
                     }   
+                    
 
-                    // PRIORITY 
-                    vec3 delta = vec3(coord - center);
-                    float dist = length(delta);
+                    if (pending.insert(key).second)
+                    { 
+                        // PRIORITY 
+                        vec3 delta = vec3(coord - center);
+                        float dist = length(delta);
 
-                    vec3 dir = normalize(delta);        //normalize(delta + vec3(0.0001f));
-                    float alignment = dot(dir, cameraForward);
+                        vec3 dir = normalize(delta + vec3(0.0001f));
+                        float alignment = dot(dir, cameraForward);
 
-                    float priority = dist - alignment * directionBias;
+                        float priority = dist - alignment * directionBias;
 
-                    requestQueue.push({ key, priority });
+                        // REQUEST
+                        requestQueue.push({ key, priority });
+                    }
 
                     //std::cout << "Chunk built: " << coord.x << "," << coord.y << "," << coord.z << "\n";
 
@@ -221,8 +225,8 @@ private:
                     //ivec3 bias = ivec3(round(cameraForward * 2.0f));  //coord = center + ivec3(x, y, z) + bias;
                 }
 
-        RemoveUnused(level.lod);
-        //RemoveUnused(required, level.lod);
+        //RemoveUnused(level.lod);
+        RemoveUnused(required, level.lod);
 
     }
 
@@ -237,35 +241,6 @@ private:
             requestQueue.pop();
 
             CreateChunk(req.key);
-        }
-    }
-
-    //Without Required
-    void RemoveUnused(int lod)
-    {
-        std::vector<ChunkKey> toRemove;
-
-        {
-            std::shared_lock lock(world.mutex);
-
-            for (auto& [key, chunk] : world.chunks)
-            {
-                if (key.lod != lod)
-                    continue;
-
-                if (chunk->lastVisitedFrame != frameID)
-                    toRemove.push_back(key);
-            }
-        }
-
-        for (auto& k : toRemove)
-        {
-            auto chunk = world.GetChunk(k.coord, k.lod);
-
-            if (chunk)
-                bridge->removeChunks.push(chunk);
-
-            world.Remove(k, bridge);    //world.Remove(k);
         }
     }
 
@@ -320,7 +295,7 @@ private:
         world.Insert(key, chunk);
 
         // MULTITHREAD
-        gThreadPool.Enqueue([chunk, this]()
+        gThreadPool.Enqueue([chunk, this, key]()
         {
             chunk->BuildChunk(densityCache);     //(world, densityCache)
 
@@ -329,6 +304,8 @@ private:
 
             if (chunk->state == ChunkState::Ready) 
                 bridge->readyChunks.push(chunk); // envia para ECS 
+
+            pending.erase(key);
         });
 
         //SEQUENTIAL
@@ -387,3 +364,47 @@ private:
     uint32_t frameID = 1;
 };
 
+
+
+
+
+
+
+
+
+/*
+//Without Required
+void RemoveUnused(int lod)
+{
+    std::vector<ChunkKey> toRemove;
+
+    {
+        std::shared_lock lock(world.mutex);
+
+        for (auto& [key, chunk] : world.chunks)
+        {
+            if (key.lod != lod)
+                continue;
+
+            if (chunk->lastVisitedFrame != frameID)
+                toRemove.push_back(key);
+        }
+    }
+
+    for (auto& k : toRemove)
+    {
+        auto chunk = world.GetChunk(k.coord, k.lod);
+
+        if (chunk)
+            bridge->removeChunks.push(chunk);
+
+        world.Remove(k, bridge);    //world.Remove(k);
+    }
+}
+*/
+
+
+
+
+// ALINHAMENTO ENTRE LODS
+//int align = 1 << level.lod; center = (center / align) * align;

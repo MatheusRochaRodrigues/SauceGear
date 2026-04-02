@@ -117,11 +117,10 @@ class DensityCache;
 
 struct BuildContext_CK
 {
+	ivec3 minOctree;
 	int chunkLOD;
 	DensityCache* densityCache;
-	EdgeCache edgeCache;
+	EdgeCache edgeCache; 
 
-	ivec3 minOctree;
-
-	BuildContext_CK(int chunkLOD, DensityCache* densityCache) : densityCache(densityCache), chunkLOD(chunkLOD) {};
+	BuildContext_CK(ivec3 minOctree, int chunkLOD, DensityCache* densityCache) : minOctree(minOctree), chunkLOD(chunkLOD), densityCache(densityCache) {};
 };

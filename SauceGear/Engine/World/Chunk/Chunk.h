@@ -32,12 +32,7 @@ struct alignas(64) Chunk
     IndexBuffer             indexBuffer;
      
     std::atomic<bool>       pendingRemoval = false;
-    uint32_t                lastVisitedFrame = 0;
-
-    // Calcula posição em mundo 
-    int ChunkWorldSize() const {
-        return CHUNK_SIZE * BASE_CELL_SIZE * (1 << lod);
-    }
+    //uint32_t                lastVisitedFrame = 0; 
 
     // BUILD FUNCTION      
     void BuildChunk(DensityCache& densityCache) {       //WorldChunkStorage& world
@@ -45,15 +40,17 @@ struct alignas(64) Chunk
             std::cout << "makeChunk start for chunk " << coord.x << "," << coord.y << "," << coord.z << "\n";
             state = ChunkState::Building;
 
-            //BuildSDF();  //BuildEdgeCache();
+            //BuildSDF();  //BuildEdgeCache(); 
 
-            BuildContext_CK ctx(lod, &densityCache);
+            int chunkWorldSize = DataWorld::ChunkWorldSize(lod);
 
             //float voxelSize = worldSize / resolution;
-            ivec3 worldMin = ivec3(coord * ChunkWorldSize());
+            ivec3 worldMin = coord * chunkWorldSize;
+
+            BuildContext_CK ctx(worldMin, lod, &densityCache);
 
             root = std::unique_ptr<DCNode>(
-                BuildOctree(worldMin, ChunkWorldSize(), ctx)
+                BuildOctree(worldMin, chunkWorldSize, ctx)
             );
 
             // Checagem de segurança

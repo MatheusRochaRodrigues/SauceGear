@@ -1,4 +1,5 @@
 #pragma once  
+#include <format>
 #include "../System.h" 
 #include "../../Scene/SceneECS.h" 
 #include "../../Scene/SceneBuilder.h"  
@@ -44,11 +45,16 @@ public:
                 scene->AddComponent<TransformComponent>(e, worldPos); */
 
                 /// 2
-                std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(chunk->vertexBuffer, chunk->indexBuffer);
+                std::shared_ptr<MeshAsset> mesh = make_shared<MeshAsset>(chunk->vertexBuffer, chunk->indexBuffer); 
+                mesh->name = std::string("[Chunk] ")
+                    + std::to_string(chunk->coord.x) + ", "
+                    + std::to_string(chunk->coord.y) + ", "
+                    + std::to_string(chunk->coord.z) + " LOD "
+                    + std::to_string(chunk->lod);
+                
                 auto e = SceneBuilder::CreateModel(mesh, MaterialAsset::Instantiate(material));
                 auto* t = GEngine->scene->TryGetComponent<TransformComponent>(e);
                 t->SetLocalPosition(glm::vec3(0, -16, 0));
-                mesh->name = "Chunk";
  
                 //chunk->entity = e;
                 chunk->state = ChunkState::Ready;

@@ -1,6 +1,6 @@
 [Window][DockSpace]
 Pos=0,48
-Size=1600,852
+Size=1920,1032
 Collapsed=0
 
 [Window][Debug##Default]
@@ -10,7 +10,7 @@ Collapsed=0
 
 [Window][Scene]
 Pos=4,56
-Size=1169,699
+Size=1489,879
 Collapsed=0
 DockId=0x00000001,0
 
@@ -20,31 +20,31 @@ Size=265,48
 Collapsed=0
 
 [Window][Painel Customizável]
-Pos=1175,459
-Size=421,433
+Pos=1495,545
+Size=421,527
 Collapsed=0
 DockId=0x00000007,1
 
 [Window][Hierarchy]
-Pos=1175,56
-Size=421,401
+Pos=1495,56
+Size=421,487
 Collapsed=0
 DockId=0x00000005,0
 
 [Window][TopBar]
 Pos=0,0
-Size=1600,48
+Size=1920,48
 Collapsed=0
 
 [Window][File Explorer]
-Pos=4,757
-Size=1169,135
+Pos=4,937
+Size=1489,135
 Collapsed=0
 DockId=0x00000002,0
 
 [Window][Inspector]
-Pos=1175,459
-Size=421,433
+Pos=1495,545
+Size=421,527
 Collapsed=0
 DockId=0x00000007,0
 
@@ -69,20 +69,20 @@ Size=228,62
 Collapsed=0
 
 [Window][Settings]
-Pos=1175,56
-Size=421,401
+Pos=1495,56
+Size=421,487
 Collapsed=0
 DockId=0x00000005,1
 
 [Window][Profiler]
-Pos=1175,56
-Size=421,401
+Pos=1495,56
+Size=421,487
 Collapsed=0
 DockId=0x00000005,2
 
 [Window][Metrics]
-Pos=1175,56
-Size=421,401
+Pos=1495,56
+Size=421,487
 Collapsed=0
 DockId=0x00000005,3
 
@@ -1119,14 +1119,102 @@ Column 1  Weight=1.3978
 Column 0  Weight=0.6022
 Column 1  Weight=1.3978
 
+[Table][0x2BCB7D66,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x3E5AFED1,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xADBCA783,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x06E2990A,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x193DDA63,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xFEAFE67A,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x73A73F04,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xD0F355B6,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x98B59527,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x261C9673,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xA76D7164,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x8B0E673D,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xB75CD1CF,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xF5C0E784,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x647FE98D,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x9C1670FE,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xAAAAE1D0,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x4FB0CFC7,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x4BCDEE8A,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x25BD61A9,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0x8CF42E5C,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
+[Table][0xBC476624,2]
+Column 0  Weight=0.6022
+Column 1  Weight=1.3978
+
 [Docking][Data]
-DockSpace       ID=0x0FCAA000 Window=0x3DA2F1DE Pos=4,56 Size=1592,836 Split=X Selected=0xE601B12F
+DockSpace       ID=0x0FCAA000 Window=0x3DA2F1DE Pos=4,56 Size=1912,1016 Split=X Selected=0xE601B12F
   DockNode      ID=0x00000003 Parent=0x0FCAA000 SizeRef=1489,1016 Split=Y Selected=0xE601B12F
     DockNode    ID=0x00000001 Parent=0x00000003 SizeRef=1075,879 CentralNode=1 Selected=0xE601B12F
     DockNode    ID=0x00000002 Parent=0x00000003 SizeRef=1075,135 Selected=0x9C2B5678
   DockNode      ID=0x00000004 Parent=0x0FCAA000 SizeRef=421,1016 Split=Y Selected=0xBABDAE5E
     DockNode    ID=0x00000005 Parent=0x00000004 SizeRef=332,487 Selected=0x0B0ECC4C
     DockNode    ID=0x00000006 Parent=0x00000004 SizeRef=332,527 Split=Y Selected=0x9B5D3198
-      DockNode  ID=0x00000007 Parent=0x00000006 SizeRef=644,430 Selected=0xF57415B2
+      DockNode  ID=0x00000007 Parent=0x00000006 SizeRef=644,430 Selected=0x36DC96AB
       DockNode  ID=0x00000008 Parent=0x00000006 SizeRef=644,180 Selected=0xB32960CB
 

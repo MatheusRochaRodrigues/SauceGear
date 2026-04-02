@@ -13,9 +13,7 @@ DCNode* BuildOctree (
 	DCNode* root = new DCNode;
 	root->min = min;
 	root->size = size;
-	root->type = Node_Internal;
-
-	ctx.minOctree = min;
+	root->type = Node_Internal; 
 
 	if (ConstructOctreeNodes(root, ctx) == nullptr)
 		return nullptr; 
@@ -23,9 +21,9 @@ DCNode* BuildOctree (
 	return root;
 }
  
-bool NodeHasSurface(ivec3 min, int size, BuildContext_CK& ctx)
+bool NodeHasSurface(vec3 min, int size, BuildContext_CK& ctx)
 { 
-	const float d = Density_Func(min + (size / 2));
+	const float d = Density_Func(min + (size / 2.0f)		*  VOXEL_SCALE); 	/// implement voxelSize
 	const float surfaceNetThreshold = size * 2 * 2.25f;
 	return std::abs(d) < surfaceNetThreshold;
 }
@@ -39,7 +37,7 @@ DCNode* ConstructOctreeNodes(
 		return nullptr;
 	}
 
-	if (node->size == (BASE_CELL_SIZE << ctx.chunkLOD))	// == 1 min size node accept		//	<=
+	if (node->size == (BASE_CELL_SIZE << ctx.chunkLOD))		// node->size == (1 << ctx.chunkLOD)   	// == 1 min size node accept		//	==
 	{ 
 		return ConstructLeaf(node, ctx);
 	}

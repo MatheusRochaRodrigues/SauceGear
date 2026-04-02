@@ -21,7 +21,7 @@ struct EdgeCache
     std::vector<EdgeIntersection> edgesY;
     std::vector<EdgeIntersection> edgesZ;
 
-    EdgeCache() { Init(CHUNK_SIZE); }
+    EdgeCache() { Init(GRID_RESOLUTION /*CHUNK_SIZE*/); }
 
     void Init(int res)
     {
