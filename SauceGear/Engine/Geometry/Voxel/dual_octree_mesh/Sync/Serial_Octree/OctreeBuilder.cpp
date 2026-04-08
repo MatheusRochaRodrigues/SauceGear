@@ -1,14 +1,22 @@
 #include "OctreeBuilder.h"
-#include "../Density/Density.h"
+#include "../../Data/DCNode.h" 
 #include "ConstructLeaf.h"
-#include "../../../World/WorldController.h"
-#include "../../Voxel/Density/DensityBrickCache.h"
+#include "../../../Density/Density.h"
+#include "../../../Density/DensityBrickCache.h"
+#include "../../../../../World/WorldController.h"
+ 
+bool NodeHasSurface(vec3 min, float size, BuildCxt& ctx)
+{
+	const float d = Density_Func(min + (size / 2.0f));
+	const float surfaceNetThreshold = size * 2 * 2.25f;
+	return std::abs(d) < surfaceNetThreshold;
+}
 
 DCNode* BuildOctree (
 	/*Parameters World*/
 	const ivec3 min, const int size, 
 	/*Data Chunk*/
-	BuildContext_CK& ctx
+	BuildCxt& ctx
 ) {
 	DCNode* root = new DCNode;
 	root->min = min;
@@ -20,36 +28,30 @@ DCNode* BuildOctree (
 
 	return root;
 }
- 
-bool NodeHasSurface(vec3 min, int size, BuildContext_CK& ctx)
-{ 
-	const float d = Density_Func(min + (size / 2.0f)		*  VOXEL_SCALE); 	/// implement voxelSize
-	const float surfaceNetThreshold = size * 2 * 2.25f;
-	return std::abs(d) < surfaceNetThreshold;
-}
 
 DCNode* ConstructOctreeNodes(
 	DCNode* node,	//unique Data that is truly recursive
-	BuildContext_CK& ctx
+	BuildCxt& ctx
 ) { 
 	if (!node)
 	{
 		return nullptr;
 	}
 
-	if (node->size == (BASE_CELL_SIZE << ctx.chunkLOD))		// node->size == (1 << ctx.chunkLOD)   	// == 1 min size node accept		//	==
+	float minimunNode = BASE_CELL_SIZE * (1 << ctx.chunkLOD);
+	if (node->size == minimunNode)		// node->size == (1 << ctx.chunkLOD)   	// == 1 min size node accept		//	==
 	{ 
 		return ConstructLeaf(node, ctx);
 	}
 
-	if (node->size < 1) assert("NodeSize is smaller than 1");
+	if (node->size < minimunNode) assert("NodeSize is smaller than 1");		//node->size < 1
 
-	const int childSize = node->size / 2;
+	const float childSize = node->size / 2;
 	bool hasChildren = false;
 
 	for (int i = 0; i < 8; i++)
 	{ 
-		ivec3 min = node->min + (CHILD_MIN_OFFSETS[i] * childSize);  
+		vec3 min = node->min + (CHILD_MIN_OFFSETS_FLOAT[i] * childSize);
 		if (!NodeHasSurface(min, childSize, ctx)) continue;
 
 		DCNode* child = new DCNode;

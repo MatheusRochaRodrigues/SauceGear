@@ -23,7 +23,7 @@ public:
         clipmap.Initialize(); 
 
         auto bridge = scene.EmplaceResource<ChunkStreamingBridge>(); 
-        clipmap.bridge = bridge.get();         //clipmap.readyChunks = &bridge->readyChunks;
+        clipmap.bridge.ECSBridge = bridge.get();         //clipmap.readyChunks = &bridge->readyChunks;
     }
      
 

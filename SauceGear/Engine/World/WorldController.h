@@ -6,8 +6,7 @@
 // ============================================================
  
 constexpr int   GRID_RESOLUTION  = 32 / 4;            // CHUNK_SIZE == RESOLUTION == Grid
-constexpr int   BASE_CELL_SIZE   = 1;				     // float BASE_CELL_SIZE = 1.0f;
-constexpr float VOXEL_SCALE      = 1.0f/4;
+constexpr float BASE_CELL_SIZE   = 1 / 1.0f;				     // float BASE_CELL_SIZE = 1.0f; 
 constexpr int   CLIP_LEVELS      = 5;				     
 constexpr int   BASE_RING_RADIUS = 2;
 

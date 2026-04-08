@@ -1,6 +1,6 @@
 #pragma once  
 #include <glm/glm.hpp>
-#include "QEF/qef.h"
+#include "../Math/QEF/qef.h"
 
 using namespace glm;
 

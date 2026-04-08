@@ -222,10 +222,10 @@
     <ClCompile Include="Engine\Geometry\Voxel\Density\density.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\Voxel\DC\QEF\qef.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Math\QEF\qef.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\Voxel\DC\QEF\svd.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Math\QEF\svd.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="stb.cpp">
@@ -249,13 +249,13 @@
     <ClCompile Include="Engine\Scene\ECSBridge.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\Voxel\DC\DCMeshBuilder.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Sync\Serial_DC\DCMeshBuilder.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\Voxel\Octree\OctreeBuilder.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Sync\Serial_Octree\OctreeBuilder.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\Voxel\Octree\ConstructLeaf.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Sync\Serial_Octree\ConstructLeaf.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Platform\Welcome.cpp">
@@ -282,7 +282,7 @@
     <ClCompile Include="Engine\Core\Profiler\FrameMetrics.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Geometry\Voxel\Octree\EdgeCache.cpp">
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Data\EdgeCache.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Geometry\Voxel\Density\DensityBrickCache.cpp">
@@ -304,6 +304,24 @@
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
     <ClCompile Include="Engine\World\WorldController.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_OctreeBuilder.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Utils\Threads\JobSystem.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\World\Chunk\TreeStructureUtils.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\World\C_Thread.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_ConstructLeaf.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\Multi_DCMeshBuilder.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -821,10 +839,10 @@
     <ClInclude Include="Engine\Geometry\Voxel\Density\density.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\DC\QEF\qef.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Math\QEF\qef.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\DC\QEF\svd.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Math\QEF\svd.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Renderer\RenderDebugSettings.h">
@@ -857,19 +875,19 @@
     <ClInclude Include="Engine\Scene\ECSBridge.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\Octree\DCNode.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Data\DCNode.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\DC\DCMeshBuilder.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Sync\Serial_DC\DCMeshBuilder.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\Octree\OctreeBuilder.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Sync\Serial_Octree\OctreeBuilder.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\DC\OctreeDrawInfo.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Data\OctreeDrawInfo.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\Octree\ConstructLeaf.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Sync\Serial_Octree\ConstructLeaf.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Data\Color.h">
@@ -923,7 +941,7 @@
     <ClInclude Include="Editor\Panels\ProfilerGraphWindow.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Geometry\Voxel\Octree\EdgeCache.h">
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Data\EdgeCache.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Geometry\Voxel\Density\DensityBrickCache.h">
@@ -987,6 +1005,45 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Geometry\Voxel\Density\SDF\Terrain.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\Density\SDFJob.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_OctreeBuilder.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utils\Threads\ThreadArena.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utils\Threads\JLOG.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utils\Threads\BlockPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\World\Chunk\ChunkTypes.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\World\ThreadDef.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utils\Threads\JobSystem.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\World\C_Thread.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utils\Threads\ObjectPool.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Utils\Threads\ObjPoolTaste.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_ConstructLeaf.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\Multi_DCMeshBuilder.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>

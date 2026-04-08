@@ -1,7 +1,7 @@
 ﻿#include "ConstructLeaf.h"
-#include "DCNode.h" 
-#include "../Density/DensityBrickCache.h"
-#include "EdgeCache.h"
+#include "../../Data/DCNode.h" 
+#include "../../../Density/DensityBrickCache.h"
+#include "../../Data/EdgeCache.h"
 
 using namespace glm;  
  
@@ -16,14 +16,15 @@ vec3 CalculateSurfaceNormal(const vec3& p)
 }  
 
 // y = y0​ * (1−t) + y1 ​* t =>         Interpolation basic        being T that interpolates where it will be on the edge
-static vec3 FindSurfaceEdgeIntersection_ZeroCrossing(uint32_t c1, uint32_t c2, float v1, float v2, const int size) {
+static vec3 FindSurfaceEdgeIntersection_ZeroCrossing(uint32_t c1, uint32_t c2, float v1, float v2, const float size) {
 	float interp1 = v1 / (v1 - v2);         // t            ==   Acha onde cruza a superfície em 0
 	float interp2 = 1.0f - interp1;         // 1- t
-	return interp2 * glm::vec3(CHILD_MIN_OFFSETS[c1] * size) + interp1 * glm::vec3(CHILD_MIN_OFFSETS[c2] * size);
+	return interp2 * (CHILD_MIN_OFFSETS_FLOAT[c1] * size) + interp1 * (CHILD_MIN_OFFSETS_FLOAT[c2] * size);
+	//return interp2 * glm::vec3(CHILD_MIN_OFFSETS[c1] * size) + interp1 * glm::vec3(CHILD_MIN_OFFSETS[c2] * size);
 } 
 
 
-EdgeIntersection& SampleEdge(const ivec3& p, int axis, BuildContext_CK& ctx )
+EdgeIntersection& SampleEdge(const ivec3& p, int axis, BuildCxt& ctx )
 {
 	//ivec3 localVoxelMin = p;
 	/*if (localVoxelMin.x < 0 || localVoxelMin.x >= ctx.edgeCache.resolution ||
@@ -83,23 +84,20 @@ int GetEdgeAxis(int c1, int c2)
 	return 2;				  	//axis Z
 }
 
-DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
+DCNode* ConstructLeaf(DCNode* leaf, BuildCxt& ctx) {
 	if (!leaf)  return nullptr;			// || leaf->size != 1
 
 	float	cornerDensity[8];		
 	int		corners = 0;				// sinais dos 8 cantos
 	int		cornersNegative = 0; 
 
-	float voxelSize = VOXEL_SCALE;	//DataWorld::getVoxelSize(ctx.chunkLOD)
-
 	for (int i = 0; i < 8; i++)
 	{
 		//const ivec3 cornerPos = leaf->min + CHILD_MIN_OFFSETS[i] * leaf->size;
 		//cornerDensity[i] = ctx.densityCache->Sample(cornerPos, leaf->size);			// Density_Func(vec3(cornerPos));
 
-		ivec3 corner2Grid = leaf->min + CHILD_MIN_OFFSETS[i] * leaf->size; // grid 
-		vec3 corner2World = vec3(corner2Grid) * voxelSize;			/// implement voxelSize			
-		cornerDensity[i] = Density_Func(corner2World);			//cornerDensity[i] = ctx.densityCache->Sample(worldPos);  
+		vec3 cornerPos = leaf->min + CHILD_MIN_OFFSETS_FLOAT[i] * leaf->size; // grid  		
+		cornerDensity[i] = Density_Func(cornerPos);			//cornerDensity[i] = ctx.densityCache->Sample(worldPos);  
 
 		if (cornerDensity[i] < 0.0f) ++cornersNegative; 
 
@@ -131,7 +129,7 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 		// zero crossing on this edge
 		if ((d1 < 0.0f) != (d2 < 0.0f)) {
 			vec3 local = FindSurfaceEdgeIntersection_ZeroCrossing(c1, c2, d1, d2, leaf->size);	// local
-			vec3 p = (glm::vec3(leaf->min) + local) * voxelSize;				/// implement voxelSize
+			vec3 p = leaf->min + local;				/// implement voxelSize				(glm::vec3(leaf->min) + local)
 			const vec3 n = CalculateSurfaceNormal(p); 
 
 			//------------------- 2 option ----------------------------
@@ -170,8 +168,8 @@ DCNode* ConstructLeaf(DCNode* leaf, BuildContext_CK& ctx) {
 	drawInfo->qef = qef.getData();
 	drawInfo->corners = corners;
 
-	const vec3 min = vec3(leaf->min) * voxelSize;								/// implement voxelSize
-	const vec3 max = vec3(leaf->min + ivec3(leaf->size)) * voxelSize;			/// implement voxelSize
+	const vec3 min = leaf->min;								
+	const vec3 max = leaf->min + vec3(leaf->size);			
 	if (drawInfo->position.x < min.x || drawInfo->position.x > max.x ||
 		drawInfo->position.y < min.y || drawInfo->position.y > max.y ||
 		drawInfo->position.z < min.z || drawInfo->position.z > max.z)

@@ -13,8 +13,8 @@ namespace DataWorld {
      
 
     inline float getVoxelSize(int lod) {
-        //return BASE_CELL_SIZE * (1 << lod);        //BASE_VOXEL_SIZE
-        return BASE_CELL_SIZE << lod;       
+        return BASE_CELL_SIZE * (1 << lod);        //BASE_VOXEL_SIZE
+        //return BASE_CELL_SIZE << lod;       
     }
 
     float ChunkWorldSize(int lod) {

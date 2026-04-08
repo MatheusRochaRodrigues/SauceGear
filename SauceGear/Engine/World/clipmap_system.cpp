@@ -8,48 +8,13 @@
 #include <glm/glm.hpp> 
 
 #include "ThreadWorker.h"  
+#include "../Utils/Threads/JobSystem.h"  
 #include "ChunkStreamingBridge.h" 
 #include "WorldController.h"
 #include "../Geometry/Voxel/Density/DensityBrickCache.h"
 #include "Chunk/Chunk.h" 
 
-using namespace glm;  
-
-// CHUNK KEY  
-struct ChunkKey
-{
-    ivec3 coord;
-    int lod;
-
-    bool operator==(const ChunkKey& o) const
-    {
-        return coord == o.coord && lod == o.lod;
-    }
-};
-
-struct ChunkKeyHasher
-{
-    size_t operator()(const ChunkKey& k) const
-    {
-        size_t h = std::hash<int>()(k.coord.x);
-        h ^= std::hash<int>()(k.coord.y) << 1;
-        h ^= std::hash<int>()(k.coord.z) << 2;
-        h ^= std::hash<int>()(k.lod) << 3;
-        return h;
-    }
-}; 
-
-// CHUNK REQUEST (priority queue)  
-struct ChunkRequest
-{
-    ChunkKey key;
-    float priority;
-
-    bool operator<(const ChunkRequest& other) const
-    {
-        return priority > other.priority; // menor = mais importante
-    }
-}; 
+using namespace glm;   
 
 // ============================================================
 // WORLD STORAGE (GLOBAL)
@@ -96,7 +61,7 @@ public:
 
 // ============================================================
 // CLIPMAP SYSTEM
-// ============================================================
+// ============================================================ 
 
 // CLIP LEVEL  
 struct ClipLevel
@@ -114,23 +79,17 @@ public:
 
     DensityCache densityCache;
 
-    ClipLevel levels[CLIP_LEVELS];
-
-    //uint32_t lastVisitedFrame[CLIP_LEVELS];
+    ClipLevel levels[CLIP_LEVELS]; 
 
     // CONFIG  
-    float directionBias = 2.0f;  
+    float directionBias = 2.0f;
 
-    // CHUNK ECS 
-    ChunkStreamingBridge* bridge;       //ThreadSafeQueue<std::shared_ptr<Chunk>>* readyChunks;   
+    int chunksPerFrame = THREAD_COUNT;   // budget      4
 
     // STREAMING            
-    std::priority_queue<ChunkRequest> requestQueue; 
+    Bridge bridge;
 
-    std::unordered_set<ChunkKey, ChunkKeyHasher> pending;
-
-    // CONFIG  
-    int chunksPerFrame = THREAD_COUNT;   // budget      4
+    //JobSystem jobSystem;
      
     void Initialize()
     {
@@ -140,6 +99,8 @@ public:
             levels[i].ringRadius = BASE_RING_RADIUS;        //levels[i].ringRadius = BASE_RING_RADIUS << i;
             levels[i].lastCenter = ivec3(FLT_MAX);
         }
+
+        //jobSystem.Init();
     } 
 
     void Update(const vec3& cameraPos, const vec3& cameraForward)
@@ -153,80 +114,80 @@ public:
 private:
 
     void UpdateLevel(ClipLevel& level, const vec3& cameraPos, const vec3& cameraForward)  {
-        if (bridge == nullptr) std::cout << "Ready Chunks NULL" << std::endl;
+        if (bridge.ECSBridge == nullptr) std::cout << "ECS Bridge is NULL" << std::endl;
 
         float worldSize = DataWorld::ChunkWorldSize(level.lod);
 
         // Convert world-space camera position into clip-level grid coordinates. (We divide by the current LOD's world size (chunk_size * 2^lod)), to find which chunk cell the camera is inside at this clip level.
         ivec3 center = ivec3(floor(cameraPos / worldSize)); 
 
-        bool moved = (center != level.lastCenter);
-        level.lastCenter = center;
+        bool moved = (center != level.lastCenter); 
+        // avoid recalculating if nothing change
+        if (moved) {
+            level.lastCenter = center;
+
+            int r = level.ringRadius;
+
+            std::unordered_set<ChunkKey, ChunkKeyHasher> required;
+
+            for (int z = -r; z <= r; z++)
+                for (int y = -r; y <= r; y++)
+                    for (int x = -r; x <= r; x++)
+                    {
+                        // remove inner ring
+                        if (level.lod > 0)
+                        {
+                            int inner = BASE_RING_RADIUS / 2;
+
+                            /*int outer = level.ringRadius;
+                            int inner = (level.lod == 0) ? 0 : levels[level.lod - 1].ringRadius;*/
+
+                            if (abs(x) <= inner &&
+                                abs(y) <= inner &&
+                                abs(z) <= inner)
+                                continue;
+                        }
+
+                        ivec3 coord = center + ivec3(x, y, z);
+
+                        ChunkKey key{ coord, level.lod };
+                        required.insert(key);
+
+                        // is already exists?
+                        auto chunk = world.GetChunk(coord, level.lod);
+                        if (chunk) {     //if (chunk->state != ChunkState::Empty) continue;
+                            if (!chunk->pendingRemoval) chunk->pendingRemoval.exchange(false);
+                            continue;                   //chunk->lastVisitedFrame = frameID;
+                        }
+
+
+                        if (bridge.pending.insert(key).second)
+                        {
+                            // PRIORITY 
+                            vec3 delta = vec3(coord - center);
+                            float dist = length(delta);
+
+                            vec3 dir = normalize(delta + vec3(0.0001f));
+                            float alignment = dot(dir, cameraForward);
+
+                            //float priority = dist - alignment * directionBias;
+                            float priority = dist * (1.0f - std::max(0.0f, alignment) * 0.5f);
+
+                            // REQUEST
+                            bridge.requestQueue.push({ key, priority });
+                        }
+
+                        //std::cout << "Chunk built: " << coord.x << "," << coord.y << "," << coord.z << "\n";
+
+                        //Você pode expandir o grid na direção da câmera:   Você pode expandir o grid na direção da câmera:
+                        //ivec3 bias = ivec3(round(cameraForward * 2.0f));  //coord = center + ivec3(x, y, z) + bias;
+                    } 
+            
+            RemoveUnused(required, level.lod);
+
+        }
 
         ProcessChunkRequests();
-
-        // avoid recalculating if nothing change
-        if (!moved) return; 
-
-        int r = level.ringRadius; 
-
-        std::unordered_set<ChunkKey, ChunkKeyHasher> required;
-
-        for (int z = -r; z <= r; z++)
-            for (int y = -r; y <= r; y++)
-                for (int x = -r; x <= r; x++)
-                {
-                    // remove inner ring
-                    if (level.lod > 0)
-                    {
-                        int inner = BASE_RING_RADIUS / 2;
-
-                        /*int outer = level.ringRadius;
-                        int inner = (level.lod == 0) ? 0 : levels[level.lod - 1].ringRadius;*/
-
-                        if (abs(x) <= inner &&
-                            abs(y) <= inner &&
-                            abs(z) <= inner)
-                            continue;
-                    }
-
-                    ivec3 coord = center + ivec3(x, y, z);
-
-                    ChunkKey key{ coord, level.lod };
-                    required.insert(key);
-
-                    // is already exists?
-                    auto chunk = world.GetChunk(coord, level.lod);
-                    if (chunk) {     //if (chunk->state != ChunkState::Empty) continue;
-                        if (!chunk->pendingRemoval) chunk->pendingRemoval.exchange(false);
-                        continue;
-                        //chunk->lastVisitedFrame = frameID;
-                    }   
-                    
-
-                    if (pending.insert(key).second)
-                    { 
-                        // PRIORITY 
-                        vec3 delta = vec3(coord - center);
-                        float dist = length(delta);
-
-                        vec3 dir = normalize(delta + vec3(0.0001f));
-                        float alignment = dot(dir, cameraForward);
-
-                        float priority = dist - alignment * directionBias;
-
-                        // REQUEST
-                        requestQueue.push({ key, priority });
-                    }
-
-                    //std::cout << "Chunk built: " << coord.x << "," << coord.y << "," << coord.z << "\n";
-
-                    //Você pode expandir o grid na direção da câmera:   Você pode expandir o grid na direção da câmera:
-                    //ivec3 bias = ivec3(round(cameraForward * 2.0f));  //coord = center + ivec3(x, y, z) + bias;
-                }
-
-        //RemoveUnused(level.lod);
-        RemoveUnused(required, level.lod);
 
     }
 
@@ -235,10 +196,10 @@ private:
     {
         int budget = chunksPerFrame;
 
-        while (budget-- > 0 && !requestQueue.empty())
+        while (budget-- > 0 && !bridge.requestQueue.empty())
         {
-            ChunkRequest req = requestQueue.top();
-            requestQueue.pop();
+            ChunkRequest req = bridge.requestQueue.top();
+            bridge.requestQueue.pop();
 
             CreateChunk(req.key);
         }
@@ -279,9 +240,9 @@ private:
             */
 
             //Remove from World
-            world.Remove(k, bridge);        // world.Remove(k);
+            world.Remove(k, bridge.ECSBridge);        // world.Remove(k);
         }
-    } 
+    }  
 
     // CREATE CHUNK (ASYNC)  
     void CreateChunk(const ChunkKey& key)
@@ -294,7 +255,11 @@ private:
 
         world.Insert(key, chunk);
 
+        // JOB SYSTEM
+        BuildChunk(chunk, densityCache, &bridge); 
+
         // MULTITHREAD
+        /*
         gThreadPool.Enqueue([chunk, this, key]()
         {
             chunk->BuildChunk(densityCache);     //(world, densityCache)
@@ -307,6 +272,7 @@ private:
 
             pending.erase(key);
         });
+        */
 
         //SEQUENTIAL
         /*

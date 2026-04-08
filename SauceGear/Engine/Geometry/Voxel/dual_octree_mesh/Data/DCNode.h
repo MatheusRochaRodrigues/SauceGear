@@ -1,6 +1,6 @@
 #pragma once 
 #include <glm/glm.hpp> 
-#include "../DC/OctreeDrawInfo.h"
+#include "OctreeDrawInfo.h"
 #include "EdgeCache.h"
 
 using namespace glm;
@@ -69,6 +69,18 @@ const ivec3 CHILD_MIN_OFFSETS[] =
 	ivec3(1, 1, 1),		//7
 };
  
+const vec3 CHILD_MIN_OFFSETS_FLOAT[] =
+{
+	// needs to match the vertMap from Dual Contouring impl
+	vec3(0, 0, 0),		//0
+	vec3(0, 0, 1),		//1
+	vec3(0, 1, 0),		//2
+	vec3(0, 1, 1),		//3
+	vec3(1, 0, 0),		//4
+	vec3(1, 0, 1),		//5
+	vec3(1, 1, 0),		//6
+	vec3(1, 1, 1),		//7
+};
 
 // -------------------------------Structs--------------------------------------
 enum DCNodeType
@@ -106,21 +118,33 @@ public:
 	}
 
 	DCNodeType		type;
-	ivec3			min;
-	int				size;
+	vec3			min;
+	float			size;
 	DCNode*			children[8];
 	OctreeDrawInfo* drawInfo;
 	 
 };
 
-class DensityCache;
 
-struct BuildContext_CK
+
+
+// ============================================================================
+// CHUNK CONTEXT
+// ============================================================================
+
+class DensityCache; 
+//struct ChunkMemory;
+
+struct BuildCxt
 {
-	ivec3 minOctree;
-	int chunkLOD;
-	DensityCache* densityCache;
-	EdgeCache edgeCache; 
+	const ivec3		minOctree;
+	const int		chunkLOD;
+	DensityCache*	densityCache;
+	EdgeCache		edgeCache;
+	// Thread
+	//ChunkMemory*	memory;  
 
-	BuildContext_CK(ivec3 minOctree, int chunkLOD, DensityCache* densityCache) : minOctree(minOctree), chunkLOD(chunkLOD), densityCache(densityCache) {};
+	//NO THREAD VERSION
+	BuildCxt(const ivec3 minOctree, const int chunkLOD, DensityCache* densityCache) :
+		minOctree(minOctree), chunkLOD(chunkLOD), densityCache(densityCache) {};
 };
