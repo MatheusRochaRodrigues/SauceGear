@@ -105,6 +105,8 @@ public:
 	{
 		for (int i = 0; i < 8; i++) 
 			children[i] = nullptr;
+
+		childMask = 0;
 	}
 
 	DCNode(const DCNodeType _type)
@@ -115,17 +117,40 @@ public:
 	{
 		for (int i = 0; i < 8; i++) 
 			children[i] = nullptr; 
+
+		childMask = 0;
 	}
 
-	DCNodeType		type;
-	vec3			min;
-	float			size;
-	DCNode*			children[8];
-	OctreeDrawInfo* drawInfo;
-	 
+	DCNodeType				type;
+	vec3					min;
+	float					size;
+	DCNode*					children[8];
+	OctreeDrawInfo*			drawInfo;
+
+	std::atomic<uint8_t>	childMask{ 0 };		// 8 bits -> 1 bit for each child 
 };
 
+inline bool IsValidNode(DCNode* n) {
+	return 
+		n && 
+		!(n->childMask == 0 && n->type != DCNodeType::Node_Leaf) && 
+		n->type != DCNodeType::Node_None;										 
+}   
 
+inline bool hasChildNodes(DCNode* n) {
+	return n->childMask != 0;
+}
+
+inline void MarkChildLife(DCNode* node, int i) {
+	node->childMask.fetch_or(1 << i, std::memory_order_relaxed);
+}
+
+
+/*
+inline bool IsValidNode(DCNode* n) {
+	return n && n->type != DCNodeType::Node_None;	//Node_Empty
+}
+*/
 
 
 // ============================================================================

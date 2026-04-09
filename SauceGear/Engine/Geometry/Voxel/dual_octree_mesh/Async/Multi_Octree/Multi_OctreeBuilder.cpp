@@ -110,13 +110,16 @@ namespace MultiBuilder {
     }
 
     void BuildNodeSerial(DCNode* node, BuildCxt& ctx, int depth) {
-        if (node == nullptr) return;
         //JOB_LOG("[BUILD NODE] NODE " << node);
+        if (node == nullptr) return;
 
         float minimumNode = BASE_CELL_SIZE * (1 << ctx.chunkLOD);
         if (node->size == minimumNode)
         {
             ConstructLeaf(node, ctx);
+
+            //if (ConstructLeaf(node, ctx)) node->childMask.fetch_and(1 << i, std::memory_order_relaxed);
+            
             return;
         }
 
@@ -130,6 +133,7 @@ namespace MultiBuilder {
                 continue;
 
             DCNode* child = GetNodeArena().Allocate();;       //new (child) DCNode();
+            MarkChildLife(node, i);         // node->childMask.fetch_or(1 << i, std::memory_order_relaxed);
 
             child->size = childSize;
             child->min = min;

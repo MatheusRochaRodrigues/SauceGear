@@ -1,14 +1,13 @@
-#pragma once 
-#include "../../Data/DCNode.h"
+#pragma once  
 #include "../../../../../Graphics/Vertex.h"
+
+class DCNode;
 
 namespace MultiBuilder {
 
-	void GenerateMeshFromOctree_MultiThread(
-		DCNode* root,
-		VertexBuffer& vertices,
-		IndexBuffer& indices
-	);
+	constexpr int MESH_TASK_SIZE_THRESHOLD = 16;
 
-	// without any logic for creating octree.
+	void GenerateVertexIndices(DCNode* node, VertexBuffer& localVertexBuffer);
+	void ContourCellProc(DCNode* node, IndexBuffer& indexBuffer);
+	 
 }

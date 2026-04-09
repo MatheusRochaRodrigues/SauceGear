@@ -1,6 +1,7 @@
 ﻿#include"Multi_DCMeshBuilder.h" 
+#include"../../Data/DCNode.h"   
 
-namespace MultiBuilder {
+namespace MultiBuilder {  
 
 	// The vertex is created here
 	void ContourProcessEdge(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
@@ -61,12 +62,11 @@ namespace MultiBuilder {
 
 	// ContourEdgeProc resolve UMA ARESTA compartilhada por 4 células, ele garante que todas estejam no MESMO nível de detalhe 
 	// Se não estiverem, ele subdivide a aresta recursivamente
-	void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& indexBuffer)
-	{
-		if (!node[0] || !node[1] || !node[2] || !node[3])	// Se qualquer uma das 4 células não existe, essa aresta não é válida
-		{
+	void ContourEdgeProc(DCNode* node[4], int dir, IndexBuffer& localIndexBuffer)
+	{ 
+		// Se qualquer uma das 4 células não existe, essa aresta não é válida
+		if (!IsValidNode(node[0]) || !IsValidNode(node[1]) || !IsValidNode(node[2]) || !IsValidNode(node[3]))
 			return;
-		}
 
 		// CASO BASE: Se NENHUMA das 4 células é interna, então todas estão no nível mais fino relevante -> podemos gerar triângulos com segurança
 		if (node[0]->type != Node_Internal &&
@@ -74,7 +74,7 @@ namespace MultiBuilder {
 			node[2]->type != Node_Internal &&
 			node[3]->type != Node_Internal)
 		{
-			ContourProcessEdge(node, dir, indexBuffer);	// Aqui acontece a geração real de triângulos
+			ContourProcessEdge(node, dir, localIndexBuffer);	// Aqui acontece a geração real de triângulos
 		}
 		else
 		{
@@ -111,7 +111,7 @@ namespace MultiBuilder {
 				}
 
 				// Recursão: Continua descendo até que TODAS as 4 células, estejam no mesmo nível local
-				ContourEdgeProc(edgeNodes, edgeProcEdgeMask[dir][i][4], indexBuffer);
+				ContourEdgeProc(edgeNodes, edgeProcEdgeMask[dir][i][4], localIndexBuffer);
 			}
 		}
 	}
@@ -122,7 +122,7 @@ namespace MultiBuilder {
 	// Ela garante que TODAS as arestas internas dessa face sejam processadas no nível correto
 	void ContourFaceProc(DCNode* node[2], int dir, IndexBuffer& indexBuffer)
 	{
-		if (!node[0] || !node[1])	// Se uma das células não existe, não há face válida
+		if (!IsValidNode(node[0]) || !IsValidNode(node[1]))	// Se uma das células não existe, não há face válida
 			return;
 
 		// Se ambas são folhas, essa face NÃO precisa ser subdividida. As arestas dela serão resolvidas diretamente no EdgeProc
@@ -197,7 +197,7 @@ namespace MultiBuilder {
 	// ContourCellProc percorre a octree e inicia todo o processo de geração de malha
 	void ContourCellProc(DCNode* node, IndexBuffer& indexBuffer)
 	{
-		if (!node) return;
+		if (!IsValidNode(node)) return;
 
 		if (node->type != Node_Internal)
 			return;
@@ -244,32 +244,52 @@ namespace MultiBuilder {
 			ContourEdgeProc(edgeNodes, cellProcEdgeMask[i][4], indexBuffer);
 		}
 	}
-
-
-	void GenerateVertexIndices(DCNode* node, VertexBuffer& vertexBuffer)
+	 
+	void GenerateVertexIndices(DCNode* node, VertexBuffer& localVertexBuffer)
 	{
-		if (!node) return;
+		if (!IsValidNode(node)) return;
 
-		if (node->type != Node_Leaf) {								//(node->type == Node_Internal) 
+		if (node->type != Node_Leaf) 		// (node->type == Node_Internal) 
+		{							
 			for (int i = 0; i < 8; i++) {
-				GenerateVertexIndices(node->children[i], vertexBuffer);
+				GenerateVertexIndices(node->children[i], localVertexBuffer);
 			}
 		}
 
 		if (node->type != Node_Internal)
 		{
 			OctreeDrawInfo* d = node->drawInfo;
-			if (!d)
+			if (!d)	//if (!d) return;
 			{
 				printf("Error! Could not add vertex!\n");
 				exit(EXIT_FAILURE);
-			}
+			} 
 
-			d->index = vertexBuffer.size();
-			vertexBuffer.push_back(Vertex{ d->position, d->averageNormal });
+			d->index = (int)localVertexBuffer.size();   //  índice LOCAL
+			localVertexBuffer.push_back(Vertex{ d->position, d->averageNormal }); 
 		}
-	}
+	}   
+	 
+}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
 	void GenerateMeshFromOctree_MultiThread(DCNode* node, VertexBuffer& vertexBuffer, IndexBuffer& indexBuffer)
 	{
 		if (!node) return;
@@ -280,5 +300,4 @@ namespace MultiBuilder {
 		GenerateVertexIndices(node, vertexBuffer);
 		ContourCellProc(node, indexBuffer);
 	}
-
-}
+*/

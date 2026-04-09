@@ -153,6 +153,7 @@
     <ClCompile Include="Engine\Core\Profiler\Profiler.cpp" />
     <ClCompile Include="Engine\Core\Profiler\RenderStats.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\Multi_DCMeshBuilder.cpp" />
+    <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\Kernel_DC.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_ConstructLeaf.cpp" />
     <ClCompile Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_OctreeBuilder.cpp" />
     <ClCompile Include="Engine\Utils\Threads\JobSystem.cpp" />
@@ -278,12 +279,14 @@
     <ClInclude Include="Engine\Core\Profiler\ScopedCPUProfiler.h" />
     <ClInclude Include="Engine\Core\Profiler\ScopedGPUProfiler.h" />
     <ClInclude Include="Engine\ECS\Systems\ChunkSpawnSystem.h" />
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\Kernel_DC.h" />
     <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\Multi_DCMeshBuilder.h" />
     <ClInclude Include="Engine\Geometry\Voxel\Density\SDFJob.h" />
     <ClInclude Include="Engine\Geometry\Voxel\Density\SDF\OperationsSDF.h" />
     <ClInclude Include="Engine\Geometry\Voxel\Density\SDF\SignedDistanceField.h" />
     <ClInclude Include="Engine\Geometry\Voxel\Density\SDF\Terrain.h" />
     <ClInclude Include="Engine\Geometry\Voxel\Density\SDF\TerrainSDF.h" />
+    <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_DC\TypesMB.h" />
     <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_ConstructLeaf.h" />
     <ClInclude Include="Engine\Geometry\Voxel\dual_octree_mesh\Async\Multi_Octree\Multi_OctreeBuilder.h" />
     <ClInclude Include="Engine\Utils\Threads\BlockPool.h" />

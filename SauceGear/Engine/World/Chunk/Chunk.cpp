@@ -2,7 +2,8 @@
 #include "../WorldController.h" 
 #include "../../Geometry/Voxel/dual_octree_mesh/Data/DCNode.h"   
 #include "../../Geometry/Voxel/dual_octree_mesh/Async/Multi_Octree/Multi_OctreeBuilder.h"
-#include "../../Geometry/Voxel/dual_octree_mesh/Async/Multi_DC/Multi_DCMeshBuilder.h" 
+#include "../../Geometry/Voxel/dual_octree_mesh/Async/Multi_DC/Kernel_DC.h" 
+//#include "../../Geometry/Voxel/dual_octree_mesh/Async/Multi_DC/Multi_DCMeshBuilder.h" 
 #include "../ChunkStreamingBridge.h"     
 
 //-------------------------------------------------------------------
@@ -10,7 +11,21 @@
 //-------------------------------------------------------------------
 
 void submitJobChunk(std::shared_ptr<Chunk> c, DCNode* rootOctree, Bridge* bridge) {
-    return; 
+    if (!c) {
+        std::cout << "-------------------- CHUNK VAZADO ------------------ \n";
+        return;
+    }
+
+    if (!rootOctree) {
+        std::cout << "Chunk at " << c->coord.x << "," << c->coord.y << "," << c->coord.z << " has no surface! Skipping mesh generation.\n";
+        c->state = ChunkState::Empty;
+        return;
+    }
+
+    std::cout << "Mesh generated for chunk " << c->coord.x << "," << c->coord.y << "," << c->coord.z << "\n";
+    MultiBuilder::GenerateMeshFromOctree_MultiThread(rootOctree, c->vertexBuffer, c->indexBuffer);
+    std::cout << "Mesh generated for chunk " << c->coord.x << "," << c->coord.y << "," << c->coord.z << "\n";
+    //return; 
     /*
     if (!c) {
         std::cout << "-------------------- CHUNK VAZADO ------------------ \n";
@@ -70,7 +85,7 @@ void BuildChunk(std::shared_ptr<Chunk> c, DensityCache& densityCache, Bridge* br
             // ~Lambda
             [c, bridge](DCNode* node)
             {
-                //submitJobChunk(c, node, bridge);
+                submitJobChunk(c, node, bridge);
             }
         );
 
